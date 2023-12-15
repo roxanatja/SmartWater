@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400;500;600;700;800&family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300;1,400;1,500&display=swap');
+
+.RealizarPedidoCuadro {
+    width: 450px;
+    height: 274px;
+    border-radius: 20px;
+    padding-left: 17px;
+    padding-right: 15px;
+    padding-top: 12px;
+    padding-bottom: 20px;
+    border: 1px solid #D6D5D5;
+    background: #FFF;
+    font-family: 'Poppins', sans-serif;
+}
+
+.titulo-RealizarPedido {
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-bottom: 16PX;
+}
+
+.selec-pedido {
+    width: 399px;
+    height: 38px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    padding-left: 15px;
+    padding-right: 6px;
+    border-radius: 5px;
+    border: 1px solid #626262;
+    background: #FFF;
+    margin-top: 8px;
+}
+
+.cantidad-pedido {
+    width: 256px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 1px solid #626262;
+    background: #FFF;
+    color: #626262;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+}
+
+.numero-pedido {
+    width: 110px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    margin-left: 61px;
+}
+
+.boton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.numero-solicitado {
+    width: 40px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+    border: 1px solid #626262;
+    background: #FFF;
+    text-align: center;
+    color: #626262;
+    font-family: Poppins;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.numero-input{
+    width: 85px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 1px solid #626262;
+    border-end-end-radius: 0px;
+    border-top-right-radius: 0px ;
+    background: #FFF;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #626262;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.letras-Bs{
+    width: 43px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 1px solid #626262;
+    border-end-start-radius: 0px;
+    border-top-left-radius: 0px ;
+    border-left: none;
+    background: #FFF;
+    color: #626262;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.boton-realizar-pedido{
+    width: 166px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 30px;
+    border: 1px solid #367DFD;
+    background: #367DFD;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #FFF;
+    font-family: Poppins;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+.boton-realizar-pedido:hover{
+    background: #2150a7;
+}

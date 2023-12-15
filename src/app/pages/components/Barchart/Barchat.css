@@ -1,0 +1,11 @@
+.BarContainer{
+    width: 78vw;
+    height: 307px;
+    border-radius: 20px;
+    border: 1px solid #D6D5D5;
+    background: #FFF;
+    margin-top: 34px;
+    padding-top: 30px;
+    padding-bottom: 21px;
+    padding-right: 27px;
+}

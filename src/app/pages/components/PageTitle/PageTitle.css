@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,900;1,9..40,300;1,9..40,400;1,9..40,500;1,9..40,600&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200&display=swap');
+
+.Pages {
+    display: flex;
+    justify-content: space-between;
+    height: 50px;
+}
+
+.Title-Pages {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    color: #1B1B1B;
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 100%;
+}
+
+.Title-Pages img {
+    filter: invert(1) !important;
+}
