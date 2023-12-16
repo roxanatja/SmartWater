@@ -1,4 +1,5 @@
 import { SmartwaterContext } from "../../../SmartwaterContext";
+import { PedidosAtendidos } from "../../components/CuadroPedidos/PedidosAtendidos";
 import { PedidosCurso } from "../../components/CuadroPedidos/PedidosCurso";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
@@ -23,7 +24,7 @@ const Pedidos: FC = () => {
                         </div>
                         :
                         <div style={{display:"flex", flexWrap: "wrap"}}>
-
+                            <PedidosAtendidos/>
                         </div>
                     }
                 </FiltroPaginado>
