@@ -1,9 +1,12 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import "./PedidosCurso.css";
 import { Option } from "../Option/Option"
+import { SmartwaterContext } from "../../../SmartwaterContext";
+import { OpcionesPedidos } from "./OpcionesPedidos/OpcionesPedidos";
 
 const PedidosCurso: FC = () => {
 
+    const { showMiniModal, setShowMiniModal } = useContext(SmartwaterContext);
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
     const Opciones = () => {
@@ -39,7 +42,7 @@ const PedidosCurso: FC = () => {
                     <span>N° 125451215</span>
                 </div>
                 <div className="PedidosCurso-datos">
-                    <button type="button" className="btn" >
+                    <button type="button" className="btn" onClick={()=> setShowMiniModal(true)}>
                         <img src="./Opciones-icon.svg" />
                     </button>
                 </div>
@@ -96,6 +99,7 @@ const PedidosCurso: FC = () => {
                 <span>Entrega hoy entre las 12: 00 a 13:00</span>
             </div>
         </div>
+        {showMiniModal && <OpcionesPedidos/>}
         </>
     )
 }

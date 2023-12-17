@@ -1,0 +1,23 @@
+.OpcionesPedidos-modalContent{
+    width: 299px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    padding: 44px 25px;
+}
+
+.OpcionesPedidos-Item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.OpcionesPedidos-text{
+    color: #1A3D7D;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}

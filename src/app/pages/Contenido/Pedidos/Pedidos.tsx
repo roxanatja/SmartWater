@@ -3,9 +3,8 @@ import { PedidosAtendidos } from "../../components/CuadroPedidos/PedidosAtendido
 import { PedidosCurso } from "../../components/CuadroPedidos/PedidosCurso";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
-import { Switch } from "../../components/Switch/Switch";
 import "./Pedidos.css";
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext } from "react";
 
 const Pedidos: FC = () => {
 
