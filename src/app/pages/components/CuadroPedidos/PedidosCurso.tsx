@@ -1,7 +1,26 @@
-import { FC } from "react";
+import { FC, useContext, useState } from "react";
 import "./PedidosCurso.css";
+import { Option } from "../Option/Option"
+import { SmartwaterContext } from "../../../SmartwaterContext";
+import { OpcionesPedidos } from "./OpcionesPedidos/OpcionesPedidos";
 
 const PedidosCurso: FC = () => {
+
+    const { showMiniModal, setShowMiniModal } = useContext(SmartwaterContext);
+    const [showOptions, setShowOptions] = useState<boolean>(false);
+
+    const Opciones = () => {
+        setShowOptions(!showOptions);
+    }
+    
+    const Edit = () => {
+        setShowOptions(false);
+    }
+
+    const Delete = () => {
+        setShowOptions(false);
+    }
+
     return(
         <>
         <div className="PedidosCurso-container" style={{gap: "14px"}}>
@@ -23,7 +42,7 @@ const PedidosCurso: FC = () => {
                     <span>N° 125451215</span>
                 </div>
                 <div className="PedidosCurso-datos">
-                    <button type="button" className="btn" >
+                    <button type="button" className="btn" onClick={()=> setShowMiniModal(true)}>
                         <img src="./Opciones-icon.svg" />
                     </button>
                 </div>
@@ -55,11 +74,32 @@ const PedidosCurso: FC = () => {
                         <a href="#" className="PedidosCurso-infoUbicacion">Ver ubicación en el mapa</a>
                     </div>
                 </div>
+                <div className="PedidosCurso-datos">
+                    <img src="./whap-icon.svg" alt="" />
+                    <span>78 25 48 96 87</span>
+                </div>
+                <div>
+                    <button type="button" className="btn" onClick={() => Opciones()}>
+                        <img src="./opcion-icon.svg" alt="" />
+                    </button>
+                    <Option editAction={Edit} visible={showOptions} editar={true} eliminar={true} deleteAction={Delete}/>
+                </div>
             </div>
-            <div>
-
+            <div className="PedidosCurso-Nota">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <g clip-path="url(#clip0_14_2925)">
+                        <path d="M2.5 0C1.12109 0 0 1.12109 0 2.5V13.75C0 15.1289 1.12109 16.25 2.5 16.25H6.25V19.375C6.25 19.6133 6.38281 19.8281 6.59375 19.9336C6.80469 20.0391 7.05859 20.0156 7.25 19.875L12.082 16.25H17.5C18.8789 16.25 20 15.1289 20 13.75V2.5C20 1.12109 18.8789 0 17.5 0H2.5Z" fill="#1A3D7D"/>
+                    </g>
+                    <defs>
+                        <clipPath id="clip0_14_2925">
+                        <rect width="20" height="20" fill="white"/>
+                        </clipPath>
+                    </defs>
+                </svg>
+                <span>Entrega hoy entre las 12: 00 a 13:00</span>
             </div>
         </div>
+        {showMiniModal && <OpcionesPedidos/>}
         </>
     )
 }

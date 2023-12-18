@@ -1,10 +1,10 @@
 import { SmartwaterContext } from "../../../SmartwaterContext";
+import { PedidosAtendidos } from "../../components/CuadroPedidos/PedidosAtendidos";
 import { PedidosCurso } from "../../components/CuadroPedidos/PedidosCurso";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
-import { Switch } from "../../components/Switch/Switch";
 import "./Pedidos.css";
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext } from "react";
 
 const Pedidos: FC = () => {
 
@@ -23,7 +23,7 @@ const Pedidos: FC = () => {
                         </div>
                         :
                         <div style={{display:"flex", flexWrap: "wrap"}}>
-
+                            <PedidosAtendidos/>
                         </div>
                     }
                 </FiltroPaginado>

@@ -8,6 +8,7 @@ type Componentes = {
     paginacion?: boolean;
     infoPedidos?: boolean;
     resultados?: boolean;
+    resultadosPrestamo?: boolean;
     children?: ReactNode;
     swith?: boolean;
     opcionesSwitch1?: string;
@@ -15,7 +16,8 @@ type Componentes = {
     onAdd?: () => void;
 };
 
-const FiltroPaginado: FC<Componentes> = ({ exportar, add, paginacion, children, onAdd, infoPedidos, resultados, swith, opcionesSwitch1, opcionesSwitch2 }) => {
+const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children, onAdd, infoPedidos, 
+                                            resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo }) => {
 
     return(
         <>
@@ -41,6 +43,23 @@ const FiltroPaginado: FC<Componentes> = ({ exportar, add, paginacion, children, 
                                     <option value="">Más reciente</option>
                                     <option value="">Más antiguos</option>
                                 </select>
+                            </div>
+                        </div>
+                    }
+                    {
+                        resultadosPrestamo &&
+                        <div style={{ width:"100%", display: "flex", justifyContent: "end", gap: "50px"}}>
+                            <div className="resultado-busqueda">
+                                <span>Resultados:</span>
+                                <span style={{color: "#1A3D7D"}}> 42</span>
+                            </div>
+                            <div className="resultado-busqueda">
+                                <span>Dispensadores:</span>
+                                <span style={{color: "#1A3D7D"}}> 52</span>
+                            </div>
+                            <div className="resultado-busqueda">
+                                <span>Botellones:</span>
+                                <span style={{color: "#1A3D7D"}}> 20</span>
                             </div>
                         </div>
                     }
