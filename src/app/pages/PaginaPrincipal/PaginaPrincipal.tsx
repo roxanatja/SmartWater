@@ -9,6 +9,7 @@ import { MonitoreoDistribuidores } from "../Contenido/MonitoreoDistribuidores/Mo
 import { Ventas } from "../Contenido/Ventas/Ventas";
 import { Pedidos } from "../Contenido/Pedidos/Pedidos";
 import { Prestamos } from "../Contenido/Préstamos/Prestamos";
+import { ArqueoDeCaja } from "../Contenido/Finanzas/ArqueoDeCaja/ArqueoDeCaja";
 
 const PaginaPrincipal: FC = () => {
 
@@ -34,6 +35,8 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Pedidos' element={<Pedidos />} />
 
                             <Route path='/Prestamos' element={<Prestamos />} />
+
+                            <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCaja/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
