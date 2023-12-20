@@ -2,7 +2,6 @@ import { FC, useContext, useState } from "react";
 import "./CuadroPrestamo.css";
 import { SmartwaterContext } from "../../../SmartwaterContext";
 import { Option } from "../Option/Option";
-import { OpcionesPrestamo } from "./OpcionesPrestamo";
 
 type Prestamo = {
     estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null
@@ -10,7 +9,7 @@ type Prestamo = {
 
 const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
 
-    const { setShowMiniModal, showMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(SmartwaterContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -37,7 +36,7 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                     </div>
                     <div style={{display: "flex", alignItems: "center"}}>
                         <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
-                            <img src="./Opciones-icon.svg" />
+                            <img src="./Opciones-icon.svg" alt="" />
                         </button>
                     </div>
                     <div className="infoClientes-ultimaventa">
@@ -100,8 +99,8 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                     <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
                             <image xlinkHref="./ConContrato.svg" x="4" y="5" width="21" height="21" />
-                            <circle cx="14.5" cy="14.5" r="13" stroke="#FF0000" stroke-width="3"/>
-                            <path d="M7.0 22.9L23.1 6" stroke="#FF0000" stroke-width="3"/>
+                            <circle cx="14.5" cy="14.5" r="13" stroke="#FF0000" strokeWidth="3"/>
+                            <path d="M7.0 22.9L23.1 6" stroke="#FF0000" strokeWidth="3"/>
                         </svg>
                         <span className="CuadroPrestamo-texto" style={{fontSize: "9px", fontWeight: "500", fontFamily: "'Poppins', sans-serif"}}>Sin Contrato</span>
                     </div>
@@ -116,7 +115,6 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                 }
             </div>
         </div>
-        {showMiniModal && <OpcionesPrestamo/>}
         </>
     )
 }

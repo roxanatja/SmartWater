@@ -8,7 +8,7 @@ const OpcionesClientes: FC = () => {
     
     return(
         <>
-        <div className="modal-overlay">
+        <div className="modal-overlay-opcionesClientes">
             <div className="opcionesClientes-modalContent">
                 <div className="opcionesClientes-Item">
                     <div style={{display: "flex", alignItems: "center"}}>

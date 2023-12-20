@@ -1,4 +1,5 @@
 import { SmartwaterContext } from "../../../SmartwaterContext";
+import { OpcionesPedidos } from "../../components/CuadroPedidos/OpcionesPedidos/OpcionesPedidos";
 import { PedidosAtendidos } from "../../components/CuadroPedidos/PedidosAtendidos";
 import { PedidosCurso } from "../../components/CuadroPedidos/PedidosCurso";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
@@ -8,7 +9,7 @@ import { FC, useContext } from "react";
 
 const Pedidos: FC = () => {
 
-    const {selectedOption} = useContext(SmartwaterContext);
+    const {selectedOption, showMiniModal} = useContext(SmartwaterContext);
 
 
     return (
@@ -28,6 +29,7 @@ const Pedidos: FC = () => {
                     }
                 </FiltroPaginado>
             </div>
+            {showMiniModal && <OpcionesPedidos/>}
         </>
     )
 }

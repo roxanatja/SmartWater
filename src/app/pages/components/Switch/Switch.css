@@ -1,6 +1,7 @@
 .switch-contenido {
     display: flex;
-    width: 321px;
+    min-width: 321px;
+    max-width: 413px;
     height: 40px;
     border-radius: 30px;
     border: 1px solid #F2F2F2;
@@ -23,7 +24,6 @@
 }
 
 .switch-option.selected {
-    width: 166.728px;
     border-radius: 30px;
     background: #367dfd;
     box-shadow: 1px 0px 4px 0px rgba(0, 0, 0, 0.25);

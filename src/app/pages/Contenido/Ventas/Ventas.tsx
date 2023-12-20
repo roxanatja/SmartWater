@@ -1,10 +1,14 @@
+import { SmartwaterContext } from "../../../SmartwaterContext";
 import { CuadroVentaCliente } from "../../components/CuadroVentaCliente/CuadroVentaCliente";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
+import { OpcionesClientes } from "../Clientes/OpcionesClientes/OpcionesClientes";
 import "./Ventas.css";
-import { FC } from "react";
+import { FC, useContext } from "react";
 
 const Ventas: FC = () => {
+
+    const { showMiniModal } = useContext(SmartwaterContext)
 
     return (
         <>
@@ -14,6 +18,7 @@ const Ventas: FC = () => {
                     <CuadroVentaCliente/>
                 </FiltroPaginado>
             </div>
+            {showMiniModal && <OpcionesClientes/>}
         </>
     )
 }

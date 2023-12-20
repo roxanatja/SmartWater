@@ -70,6 +70,10 @@
     text-decoration: none;
 }
 
+.PedidosCurso-infoUbicacion:hover{
+    color: #2a5fc2;
+}
+
 .PedidosCurso-Nota{
     display: flex;
     align-items: center;

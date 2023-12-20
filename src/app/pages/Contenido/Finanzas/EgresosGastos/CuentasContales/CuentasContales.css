@@ -1,0 +1,71 @@
+.CuentasContales-container{
+    display: flex;
+    flex-direction: column;
+    min-width: 707px;
+    max-width: 707px;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.CuentasContables-titulo{
+    color: var(--Azul-oscuro, #1A3D7D);
+    font-family: 'Baloo Bhai 2', sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.CuentasContales-input{
+    width: 665px;
+    height: 31px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 1px solid #000;
+    background: #FFF;
+    padding-left: 30px;
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+}
+
+.CuentasContables-btn{
+    color: var(--Azul-oscuro, #1A3D7D);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 28px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 30px;
+    border: 1px solid var(--Azul, #367DFD);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    width: 150.105px;
+}
+
+.CuentasContables-btn:hover{
+    background: #ececec;
+}
+
+.CuentasContables-btn-crear{
+    color:#FFF;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 28px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 30px;
+    border: 1px solid #367DFD;
+    background: #367DFD;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    width: 150.105px;
+}
+
+.CuentasContables-btn-crear:hover{
+    background: #234fa0;
+    border: 1px solid #234fa0;
+}

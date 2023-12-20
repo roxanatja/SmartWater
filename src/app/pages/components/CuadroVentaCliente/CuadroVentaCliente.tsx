@@ -1,12 +1,11 @@
 import { FC, useContext, useState } from "react"
 import "./CuadroVentaCliente.css"
 import { SmartwaterContext } from "../../../SmartwaterContext"
-import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes"
 import { Option } from "../Option/Option"
 
 const CuadroVentaCliente: FC = () => {
 
-    const { setShowMiniModal, showMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(SmartwaterContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -34,7 +33,7 @@ const CuadroVentaCliente: FC = () => {
                         </div>
                         <div style={{display: "flex", alignItems: "center"}}>
                             <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
-                                <img src="./Opciones-icon.svg" />
+                                <img src="./Opciones-icon.svg" alt=""/>
                             </button>
                         </div>
                         <div className="infoClientes-ultimaventa">
@@ -116,7 +115,6 @@ const CuadroVentaCliente: FC = () => {
                 <span className="CuadroVentaCliente-text" style={{fontWeight: "600", fontSize: "18px", color: "#1A3D7D"}}>60Bs</span>
             </div>
         </div>
-        {showMiniModal && <OpcionesClientes/>}
         </>
     )
 }
