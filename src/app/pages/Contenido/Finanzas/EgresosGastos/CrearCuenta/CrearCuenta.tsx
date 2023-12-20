@@ -119,7 +119,7 @@ return (
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                        <button type="button" className="btn-registrar">Registrar cliente</button>
+                        <button type="button" className="btn-registrar">Registrar</button>
                     </div>
                 </div>
             </div>
