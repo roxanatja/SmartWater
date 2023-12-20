@@ -14,20 +14,22 @@ type Componentes = {
     opcionesSwitch1?: string;
     opcionesSwitch2?: string;
     onAdd?: () => void;
+    finanzas?: boolean;
 };
 
 const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children, onAdd, infoPedidos, 
-                                            resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo }) => {
+                                            resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
+                                            finanzas}) => {
 
     return(
         <>
         <div className="filtro-contenido" style={{marginTop: "2em", maxHeight: "100vh"}}>
             <div style={{ width:"100%", display: "flex"}}>
                 <div style={{ width:"70%", minWidth: "70%", marginRight: "2em", display: "flex", flexDirection: "column"}}>
-                    <form className="search__container" onSubmit={(e) => e.preventDefault()} role="Buscar">
+                    <form className="search__container" onSubmit={(e) => e.preventDefault()}>
                         <input className="search__input" type="text" placeholder="Buscar" required />
                         <button type="submit" className="boton-buscar">
-                            <img style={{width: "24px", height: "24.5px"}} src="./Buscar.svg" alt="" />
+                            <img style={{width: "24px", height: "24.5px"}} src="../Buscar.svg" alt="" />
                         </button>
                     </form>
                     {
@@ -68,7 +70,7 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                     <div>
                         <button type="button" className="boton-filtro">
                             <span style={{marginRight: "5px"}}>Filtrar</span>
-                            <img src="./Filtro.svg" alt="Filtro" />
+                            <img src="../Filtro.svg" alt="" />
                         </button>
                     </div>
                     {paginacion && 
@@ -131,11 +133,21 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                             <span style={{color: "#1A3D7D"}}> 42</span>
                         </div>
                         <div className="resultado-busqueda">
-                            <span>Ordenar por: </span>
-                            <select className="select-filtro" name="filter">
-                                <option value="">Más reciente</option>
-                                <option value="">Más antiguos</option>
-                            </select>
+                            {
+                                finanzas ? 
+                                <>
+                                <span>Total: </span>
+                                <span style={{color: "#1A3D7D", fontWeight: "600"}}>500 Bs </span>
+                                </>
+                                :
+                                <>
+                                <span>Ordenar por: </span>
+                                <select className="select-filtro" name="filter">
+                                    <option value="">Más reciente</option>
+                                    <option value="">Más antiguos</option>
+                                </select>
+                                </>
+                            }
                         </div>
                     </div>
                 </div>

@@ -10,10 +10,11 @@ type ItemSub = {
 type Item = {
     tituloItem: string,
     icon?: string,
+    to: string,
     opciones?: Array<ItemSub>
 }
 
-const AsideSubMenu = ({ tituloItem, icon, opciones }: Item) => {
+const AsideSubMenu = ({ tituloItem, icon, opciones, to }: Item) => {
 
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(false);
     const [indiceActivo, setIndiceActivo] = useState<number | null>(null);
@@ -29,13 +30,13 @@ const AsideSubMenu = ({ tituloItem, icon, opciones }: Item) => {
         <>
             <div className={opcionesVisibles ? "backgroundSub-item active-link" : "backgroundSub-item"}>
                 <span className="biñetaSub-item"></span>
-                <div className="infoSub-item">
+                <div className="infoSub-item" onClick={handleOpcionesClick}>
                     <div className="infoTitle-item">
                         <img src={icon} alt="" />
                         <span className="tituloSub-item">{tituloItem}</span>
                     </div>
                     <div className="infoTitle-item">
-                        <button type="button" onClick={handleOpcionesClick} className={opcionesVisibles ? "btn-option active-btn" : "btn-option"}><img src="../Desplegable-icon.svg" alt="" /></button>
+                        <button type="button" className={opcionesVisibles ? "btn-option active-btn" : "btn-option"}><img src="../Desplegable-icon.svg" alt="" /></button>
                     </div>
                 </div>
             </div>

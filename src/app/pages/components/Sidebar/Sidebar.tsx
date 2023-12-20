@@ -52,6 +52,7 @@ const Sidebar: FC = () => {
                         <AsideSubMenu
                             tituloItem="Finanzas"
                             icon="../Finanzas-icon.svg"
+                            to="/Finanzas/ArqueoDeCajas"
                             opciones={[
                                 { titulo: "Arqueo de cajas", to: "/Finanzas/ArqueoDeCajas", id: 0 },
                                 { titulo: "Cuentas por cobrar - cobros", to: "/Finanzas/CuentasPorCobrarCobros", id: 1 },
@@ -63,6 +64,7 @@ const Sidebar: FC = () => {
                         <AsideSubMenu
                             tituloItem="Reportes"
                             icon="../Reportes-icon.svg"
+                            to="/Reportes/Ingresos(CuentasPorCobrar)"
                             opciones={[
                                 { titulo: "Ingresos (cuentas por cobrar)", to: "/Reportes/Ingresos(CuentasPorCobrar)", id: 0 },
                                 { titulo: "Egresos (cuentas por pagar)", to: "/Reportes/Egresos(CuentasPorPagar)", id: 1 },
@@ -72,6 +74,7 @@ const Sidebar: FC = () => {
                         <AsideSubMenu
                             tituloItem="Configuración"
                             icon="../Configuracion-icon.svg"
+                            to="/Configuración/ConfiguraciónGeneral"
                             opciones={[
                                 { titulo: "Configuración general", to: "/Configuración/ConfiguraciónGeneral", id: 0 },
                                 { titulo: "Usuario", to: "/Configuración/Usuario", id: 1 },

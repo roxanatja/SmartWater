@@ -2,7 +2,6 @@ import { FC, useContext, useState } from "react";
 import "./CuadroPrestamo.css";
 import { SmartwaterContext } from "../../../SmartwaterContext";
 import { Option } from "../Option/Option";
-import { OpcionesPrestamo } from "./OpcionesPrestamo";
 
 type Prestamo = {
     estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null
@@ -10,7 +9,7 @@ type Prestamo = {
 
 const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
 
-    const { setShowMiniModal, showMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(SmartwaterContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -37,7 +36,7 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                     </div>
                     <div style={{display: "flex", alignItems: "center"}}>
                         <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
-                            <img src="./Opciones-icon.svg" />
+                            <img src="./Opciones-icon.svg" alt="" />
                         </button>
                     </div>
                     <div className="infoClientes-ultimaventa">
@@ -116,7 +115,6 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                 }
             </div>
         </div>
-        {showMiniModal && <OpcionesPrestamo/>}
         </>
     )
 }
