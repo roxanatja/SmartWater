@@ -7,7 +7,7 @@ const CobrosClientes: FC = () => {
         <div className="CuadroCuentasPorCobrar-container">
             <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
                 <div className="CuadroVentaCliente-header">
-                    <img src="../Cliente2.svg" alt="" />
+                    <img src="../../Cliente2.svg" alt="" />
                     <span>Rubén González</span>
                 </div>
             </div>

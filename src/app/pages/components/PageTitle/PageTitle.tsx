@@ -18,7 +18,7 @@ const PageTitle: FC<TituloPages> = ({ titulo, icon }) => {
                     </div>
                 </div>
                 <div>
-                    <img src="../Notificacion-icon.svg" alt="" />
+                    <img src="../../Notificacion-icon.svg" alt="" />
                 </div>
             </div>
         </>

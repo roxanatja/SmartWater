@@ -11,6 +11,8 @@ import { Pedidos } from "../Contenido/Pedidos/Pedidos";
 import { Prestamos } from "../Contenido/Préstamos/Prestamos";
 import { ArqueoDeCaja } from "../Contenido/Finanzas/ArqueoDeCaja/ArqueoDeCaja";
 import { CuentasPorCobrar } from "../Contenido/Finanzas/CuentasPorCobrar/CuentasPorCobrar";
+import { Historial } from "../Contenido/Finanzas/Historial/Historial";
+import { EgresosGastos } from "../Contenido/Finanzas/EgresosGastos/EgresosGastos";
 
 const PaginaPrincipal: FC = () => {
 
@@ -40,6 +42,10 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCaja/>} />
 
                             <Route path='/Finanzas/CuentasPorCobrarCobros' element={<CuentasPorCobrar/>} />
+
+                            <Route path='/Finanzas/CuentasPorCobrarCobros/Historial' element={<Historial/>} />
+
+                            <Route path='/Finanzas/EgresosGastos' element={<EgresosGastos/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
