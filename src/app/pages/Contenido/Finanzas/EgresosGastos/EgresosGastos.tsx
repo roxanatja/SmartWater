@@ -5,30 +5,41 @@ import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginad
 import { SmartwaterContext } from "../../../../SmartwaterContext";
 import { CuentasContales } from "./CuentasContales/CuentasContales";
 import { RegistrosEyG } from "./RegistrosEyG/RegistrosEyG";
-import { CrearCuenta } from "./CrearCuenta/CrearCuenta";
+import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
 
 const EgresosGastos: FC = () => {
 
-    const {selectedOption, showModal} = useContext(SmartwaterContext);
+    const {selectedOption, showModal, setShowModal} = useContext(SmartwaterContext);
+
+    const handleModal = () => {
+        setShowModal(true)
+    }
 
     return(
         <>
         <div>
             <PageTitle titulo="Cuentas Egresos y gastos" icon="../../Finanzas-icon.svg"/>
-            <FiltroPaginado swith finanzas opcionesSwitch1="Cuentas contables" opcionesSwitch2="Registros Egresos y Gastos">
                 {
                     selectedOption === false ?
+                    <FiltroPaginado swith finanzas 
+                            opcionesSwitch1="Cuentas contables" 
+                            opcionesSwitch2="Registros Egresos y Gastos">
                     <div style={{display:"flex", flexWrap: "wrap", gap: "36px", paddingLeft: "5px"}}>
                         <CuentasContales/>
                     </div>
+                    </FiltroPaginado>
                     :
-                    <div style={{display:"flex", flexWrap: "wrap", gap: "23px", paddingLeft: "5px"}}>
-                        <RegistrosEyG/>
-                    </div>
+                    <FiltroPaginado swith finanzas add onAdd={handleModal}
+                            opcionesSwitch1="Cuentas contables" 
+                            opcionesSwitch2="Registros Egresos y Gastos">
+                        <div style={{display:"flex", flexWrap: "wrap", gap: "23px", paddingLeft: "5px"}}>
+                            <RegistrosEyG/>
+                        </div>
+                    </FiltroPaginado>
                 }
-            </FiltroPaginado>
+            
         </div>
-        {showModal && <CrearCuenta/>}
+        {showModal && <AddEgresosGastos/>}
         </>
     )
 }

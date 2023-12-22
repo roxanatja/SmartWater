@@ -1,8 +1,8 @@
 import { FC, useContext, useState } from "react";
-import "./CrearCuenta.css";
+import "./AddEgresosGastos.css";
 import { SmartwaterContext } from "../../../../../SmartwaterContext";
 
-const CrearCuenta: FC = () => {
+const AddEgresosGastos: FC = () => {
     const { setShowModal } = useContext(SmartwaterContext);
 
     const handleCloseModal = () => {
@@ -128,4 +128,4 @@ return (
 );
 }
 
-export{CrearCuenta}
+export{AddEgresosGastos}

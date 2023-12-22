@@ -1,16 +1,13 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import "./CuentasContales.css";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
-import { CrearCuenta } from "../CrearCuenta/CrearCuenta";
 
 const CuentasContales: FC = () => {
 
-    const { setShowModal, showModal } = useContext(SmartwaterContext);
+    //const { setShowModal, showModal } = useContext(SmartwaterContext);
 
-    const handleModal = () => {
-        setShowModal(true)
-        console.log(showModal)
-    }
+    // const handleModal = () => {
+    //     setShowModal(true)
+    // }
     
     return(
         <>
@@ -94,7 +91,7 @@ const CuentasContales: FC = () => {
                 <button className="btn CuentasContables-btn">
                     <span>Cancelar</span>
                 </button>
-                <button className="btn CuentasContables-btn-crear" onClick={handleModal}>
+                <button className="btn CuentasContables-btn-crear">
                     <span>Crear cuenta</span>
                 </button>
             </div>
