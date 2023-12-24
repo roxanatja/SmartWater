@@ -15,6 +15,7 @@ import { Historial } from "../Contenido/Finanzas/Historial/Historial";
 import { EgresosGastos } from "../Contenido/Finanzas/EgresosGastos/EgresosGastos";
 import { Proveedores } from "../Contenido/Finanzas/Proveedores/Proveedores";
 import { CuentasPorPagar } from "../Contenido/Finanzas/CuentasPorPagar/CuentasPorPagar";
+import { HistorialCuentas } from "../Contenido/Finanzas/CuentasPorPagar/HistorialCuentasPorPagar/HistorialCuentas";
 
 const PaginaPrincipal: FC = () => {
 
@@ -52,6 +53,8 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Finanzas/Proveedores' element={<Proveedores/>} />
 
                             <Route path='/Finanzas/CuentasPorPagar' element={<CuentasPorPagar/>} />
+
+                            <Route path='/Finanzas/CuentasPorPagar/Historial' element={<HistorialCuentas/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
