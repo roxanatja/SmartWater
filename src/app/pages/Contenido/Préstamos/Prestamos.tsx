@@ -1,14 +1,14 @@
-import { SmartwaterContext } from "../../../SmartwaterContext";
-import { CuadroPrestamo } from "../../components/CuadroPrestamo/CuadroPrestamo";
-import { OpcionesPrestamo } from "../../components/CuadroPrestamo/OpcionesPrestamo";
+import { CuadroPrestamo } from "./CuadroPrestamo/CuadroPrestamo";
+import { OpcionesPrestamo } from "./CuadroPrestamo/OpcionesPrestamo";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
 import { FC, useContext } from "react";
+import { PrestamosContext } from "./PrestamosContext";
 
 const Prestamos: FC = () => {
 
-    const { showMiniModal } = useContext(SmartwaterContext)
+    const { showMiniModal } = useContext(PrestamosContext)
 
     return (
         <>

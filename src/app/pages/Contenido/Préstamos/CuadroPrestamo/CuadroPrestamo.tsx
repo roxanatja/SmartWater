@@ -1,7 +1,7 @@
 import { FC, useContext, useState } from "react";
 import "./CuadroPrestamo.css";
-import { SmartwaterContext } from "../../../SmartwaterContext";
-import { Option } from "../Option/Option";
+import { Option } from "../../../components/Option/Option";
+import { PrestamosContext } from "../PrestamosContext";
 
 type Prestamo = {
     estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null
@@ -9,7 +9,7 @@ type Prestamo = {
 
 const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
 
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(PrestamosContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 

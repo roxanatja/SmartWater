@@ -1,11 +1,11 @@
 import { FC, useContext, useState } from "react"
 import "./InfoCliente.css"
-import { Option } from "../Option/Option"
-import { SmartwaterContext } from "../../../SmartwaterContext"
+import { Option } from "../../../components/Option/Option"
+import { ClientesContext } from "../ClientesContext"
 
 const InfoCliente: FC = () => {
 
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(ClientesContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 

@@ -1,11 +1,15 @@
 import { FC, useContext } from "react"
-import "./OpcionesClientes.css"
+import "./OpcionesVentas.css"
 import { Link } from "react-router-dom"
-import { ClientesContext } from "../ClientesContext";
+import { VentasContext } from "../VentasContext";
 
-const OpcionesClientes: FC = () => {
+const OpcionesVentas: FC = () => {
     
-    const { setShowMiniModal } = useContext(ClientesContext);
+    const { setShowModal } = useContext(VentasContext);
+
+    const handleClose = () => {
+        setShowModal(false);
+    }
     
     return(
         <>
@@ -77,7 +81,7 @@ const OpcionesClientes: FC = () => {
                     </Link>
                 </div>
                 <div style={{width: "100%", marginTop: "15px", display: "flex", justifyContent: "center"}}>
-                    <button type="button" className="opcionesClientes-Btn" onClick={() => setShowMiniModal(false)}>
+                    <button type="button" className="opcionesClientes-Btn" onClick={handleClose}>
                         Cerrar
                     </button>
                 </div>
@@ -87,4 +91,4 @@ const OpcionesClientes: FC = () => {
     )
 }
 
-export { OpcionesClientes }
+export { OpcionesVentas }

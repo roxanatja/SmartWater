@@ -1,11 +1,11 @@
 import { ChangeEvent, useContext, useState } from "react";
-import "./AgregarCliente.css";
+import "./AgregarClienteMapa.css";
 //import { GoogleMapComponent } from "../../../components/GoogleMaps/GoogleMapComponent";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
-import { ClientesContext } from "../ClientesContext";
+import { MapaClientesContext } from "../MapaClientesContext";
 
-const AgregarCliente = () => {
-    const { setShowModal } = useContext(ClientesContext);
+const AgregarClienteMapa = () => {
+    const { setShowModal } = useContext(MapaClientesContext);
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -257,4 +257,4 @@ return (
 );
 };
 
-export { AgregarCliente };
+export { AgregarClienteMapa };

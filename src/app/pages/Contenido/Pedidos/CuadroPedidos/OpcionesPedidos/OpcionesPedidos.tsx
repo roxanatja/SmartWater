@@ -1,16 +1,17 @@
 import { FC, useContext } from "react";
 import { Link } from "react-router-dom";
 import "./OpcionesPedidos.css";
-import { SmartwaterContext } from "../../../../SmartwaterContext";
+import { PedidosContext } from "../../PedidosContext";
 
 
 const OpcionesPedidos: FC = () => {
 
-    const { showMiniModal, setShowMiniModal } = useContext(SmartwaterContext);
+    const { setShowMiniModal } = useContext(PedidosContext);
 
     const handleCloseModal = () => {
         setShowMiniModal(false);
     };
+
     return(
         <>
         <div className="modal-overlay" onClick={handleCloseModal}>

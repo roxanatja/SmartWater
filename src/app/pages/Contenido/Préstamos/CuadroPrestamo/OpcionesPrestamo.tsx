@@ -1,11 +1,11 @@
 import { FC, useContext } from "react";
 import { Link } from "react-router-dom";
-import { SmartwaterContext } from "../../../SmartwaterContext";
+import { PrestamosContext } from "../PrestamosContext";
 
 
 const OpcionesPrestamo: FC = () => {
 
-    const { showMiniModal, setShowMiniModal } = useContext(SmartwaterContext);
+    const { setShowMiniModal } = useContext(PrestamosContext);
 
     const handleCloseModal = () => {
         setShowMiniModal(false);

@@ -1,13 +1,13 @@
-import { SmartwaterContext } from "../../../SmartwaterContext";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./MapaClientes.css";
 import { FC, useContext } from "react";
 import { RegistrarNuevo } from "./RegistrarNuevo/RegistrarNuevo";
+import { MapaClientesContext } from "./MapaClientesContext";
 
 const MapaClientes: FC = () => {
 
-    const { showMiniModal ,setShowMiniModal } = useContext(SmartwaterContext);
+    const { showMiniModal ,setShowMiniModal } = useContext(MapaClientesContext);
 
     const AddUbicacion = () => {
         setShowMiniModal(true)

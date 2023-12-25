@@ -1,11 +1,11 @@
 import { FC, useContext, useState } from "react";
 import "./PedidosCurso.css";
-import { Option } from "../Option/Option"
-import { SmartwaterContext } from "../../../SmartwaterContext";
+import { PedidosContext } from "../PedidosContext";
+import { Option } from "../../../components/Option/Option";
 
 const PedidosCurso: FC = () => {
 
-    const { setShowMiniModal } = useContext(SmartwaterContext);
+    const { setShowMiniModal } = useContext(PedidosContext);
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
     const Opciones = () => {

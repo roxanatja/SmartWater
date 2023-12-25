@@ -1,13 +1,17 @@
-import { FC, useContext, useState } from "react"
-import "./CuadroVentaCliente.css"
-import { SmartwaterContext } from "../../../SmartwaterContext"
-import { Option } from "../Option/Option"
+import { FC, useContext, useState } from "react";
+import "./CuadroVentaCliente.css";
+import { Option } from "../../../components/Option/Option";
+import { VentasContext } from "../VentasContext";
 
 const CuadroVentaCliente: FC = () => {
 
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowModal } = useContext(VentasContext);
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
+
+    const handleOpen = () => {
+        setShowModal(true);
+    }
 
     const Opciones = () => {
         setShowOptions(!showOptions);
@@ -32,7 +36,7 @@ const CuadroVentaCliente: FC = () => {
                             <span>Rubén González</span>
                         </div>
                         <div style={{display: "flex", alignItems: "center"}}>
-                            <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
+                            <button type="button" className="btn" onClick={handleOpen}>
                                 <img src="./Opciones-icon.svg" alt=""/>
                             </button>
                         </div>

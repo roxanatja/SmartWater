@@ -1,21 +1,7 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import "./PedidosAtendidos.css";
-import { Option } from "../Option/Option"
 
 const PedidosAtendidos: FC = () => {
-    const [showOptions, setShowOptions] = useState<boolean>(false);
-
-    const Opciones = () => {
-        setShowOptions(!showOptions);
-    }
-    
-    const Edit = () => {
-        setShowOptions(false);
-    }
-
-    const Delete = () => {
-        setShowOptions(false);
-    }
 
     return(
         <>
