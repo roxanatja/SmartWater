@@ -2,7 +2,6 @@ import "./PaginaPrincipal.css";
 import { FC } from "react";
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { HistorialCuentas } from "../Contenido/Finanzas/CuentasPorPagar/HistorialCuentasPorPagar/HistorialCuentas";
 import { InicioWrapper } from "../Contenido/Inicio/InicioWrapper";
 import { ClientesWrapper } from "../Contenido/Clientes/ClientesWrapper";
 import { MapaClientesWrapper } from "../Contenido/MapaClientes/MapaClientesWrapper";
@@ -15,6 +14,8 @@ import { CuentasPorCobrarWrapper } from "../Contenido/Finanzas/CuentasPorCobrar/
 import { EgresosGastosWrapper } from "../Contenido/Finanzas/EgresosGastos/EgresosGastosWrapper";
 import { ProveedoresWrapper } from "../Contenido/Finanzas/Proveedores/ProveedoresWrapper";
 import { CuentasPorPagarWrapper } from "../Contenido/Finanzas/CuentasPorPagar/CuentasPorPagarWrapper";
+import { ReportesIngresosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesIngresosWrapper";
+import { ReportesGraficosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesGraficos/ReportesIngresosWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -50,6 +51,10 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Finanzas/Proveedores' element={<ProveedoresWrapper/>} />
 
                             <Route path='/Finanzas/CuentasPorPagar/*' element={<CuentasPorPagarWrapper/>} />
+
+                            <Route path='/Reportes/Ingresos/*' element={<ReportesIngresosWrapper/>} />
+
+                            <Route path='/Reportes/Ingresos/Graficos/*' element={<ReportesGraficosWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
