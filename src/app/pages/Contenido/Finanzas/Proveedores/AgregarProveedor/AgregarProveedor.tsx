@@ -1,10 +1,10 @@
 import { FC, useContext } from "react";
 import "./AgregarProveedor.css";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
+import { ProveedoresContext } from "../ProveedoresContext";
 
 const AgregarProveedor: FC = () => {
 
-    const { setShowModal } = useContext(SmartwaterContext);
+    const { setShowModal } = useContext(ProveedoresContext);
 
     const handleCloseModal = () => {
         setShowModal(false);

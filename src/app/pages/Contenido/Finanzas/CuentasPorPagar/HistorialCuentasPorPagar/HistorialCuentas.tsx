@@ -6,10 +6,12 @@ import { PageTitle } from "../../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
 import { CuadroPagosProveedor } from "../CuadroPagosProveedor/CuadroPagosProveedor";
 import { CuadroHistorialCredito } from "./CuadroHistorialCredito/CuadroHistorialCredito";
+import { CuentasPorPagarContext } from "../CuentasPorPagarContext";
 
 const HistorialCuentas: FC = () => {
 
-    const {selectedOption, setShowMiniModal} = useContext(SmartwaterContext);
+    const {selectedOption} = useContext(SmartwaterContext);
+    const {setShowMiniModal} = useContext(CuentasPorPagarContext);
     const navigate = useNavigate();
 
     const handleClick = () => {

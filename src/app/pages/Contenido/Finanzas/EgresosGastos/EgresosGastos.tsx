@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 import "./EgresosGastos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
@@ -6,14 +6,21 @@ import { SmartwaterContext } from "../../../../SmartwaterContext";
 import { CuentasContales } from "./CuentasContales/CuentasContales";
 import { RegistrosEyG } from "./RegistrosEyG/RegistrosEyG";
 import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
+import { EgresosGastosContext } from "./EgresosGastosContext";
 
 const EgresosGastos: FC = () => {
 
-    const {selectedOption, showModal, setShowModal} = useContext(SmartwaterContext);
+    const {selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+
+    const {showModal, setShowModal} = useContext(EgresosGastosContext);
 
     const handleModal = () => {
         setShowModal(true)
     }
+
+    useEffect(() => {
+        setSelectedOption(false)
+    }, [setSelectedOption])
 
     return(
         <>

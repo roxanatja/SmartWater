@@ -1,9 +1,9 @@
 import { FC, useContext, useState } from "react";
 import "./AddEgresosGastos.css";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
+import { EgresosGastosContext } from "../EgresosGastosContext";
 
 const AddEgresosGastos: FC = () => {
-    const { setShowModal } = useContext(SmartwaterContext);
+    const { setShowModal } = useContext(EgresosGastosContext);
 
     const handleCloseModal = () => {
         setShowModal(false);

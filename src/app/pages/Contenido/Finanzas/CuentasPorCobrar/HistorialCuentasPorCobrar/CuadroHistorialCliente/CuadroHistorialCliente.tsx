@@ -1,17 +1,16 @@
 import { FC, useContext, useState } from "react";
 import "./CuadroHistorialCliente.css";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
-import { Option } from "../../../../components/Option/Option"
+import { Option } from "../../../../../components/Option/Option"
+import { CuentasPorCobrarContext } from "../../CuentasPorCobrarContext";
 
 const CuadroHistorialCliente: FC = () => {
     
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(CuentasPorCobrarContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
     const Opciones = () => {
         setShowOptions(!showOptions);
-        console.log(showOptions)
     }
 
     const Delete = () => {

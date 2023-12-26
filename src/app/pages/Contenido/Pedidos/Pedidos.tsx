@@ -1,7 +1,7 @@
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Pedidos.css";
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 import { PedidosContext } from "./PedidosContext";
 import { PedidosCurso } from "./CuadroPedidos/PedidosCurso";
 import { PedidosAtendidos } from "./CuadroPedidos/PedidosAtendidos";
@@ -11,7 +11,11 @@ import { SmartwaterContext } from "../../../SmartwaterContext";
 const Pedidos: FC = () => {
 
     const { showMiniModal} = useContext(PedidosContext);
-    const { selectedOption } = useContext(SmartwaterContext);
+    const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+
+    useEffect(() => {
+        setSelectedOption(false);
+    }, [setSelectedOption])
 
     return (
         <>

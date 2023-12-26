@@ -1,10 +1,10 @@
 import { FC, useContext } from "react"
-import { SmartwaterContext } from "../../../../SmartwaterContext"
 import { Link } from "react-router-dom"
+import { CuentasPorPagarContext } from "./CuentasPorPagarContext"
 
 const ModalCuentasPorPagar: FC = () =>{
 
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(CuentasPorPagarContext)
 
     return(
         <>

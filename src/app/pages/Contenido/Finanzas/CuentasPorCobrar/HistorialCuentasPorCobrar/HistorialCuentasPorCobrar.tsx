@@ -1,15 +1,17 @@
 import { FC, useContext } from "react";
-import "./Historial.css";
-import { PageTitle } from "../../../components/PageTitle/PageTitle";
-import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
-import { SmartwaterContext } from "../../../../SmartwaterContext";
+import "./HistorialCuentasPorCobrar.css";
+import { PageTitle } from "../../../../components/PageTitle/PageTitle";
+import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
+import { SmartwaterContext } from "../../../../../SmartwaterContext";
 import { CuadroHistorialCliente } from "./CuadroHistorialCliente/CuadroHistorialCliente";
-import { CobrosClientes } from "../../../components/CuadroCuentasPorCobrar/CobrosClientes";
+import { CobrosClientes } from "../CuadroCuentasPorCobrar/CobrosClientes";
 import { useNavigate } from "react-router-dom";
+import { CuentasPorCobrarContext } from "../CuentasPorCobrarContext";
 
-const Historial: FC = () => {
+const HistorialCuentasPorCobrar: FC = () => {
 
-    const {selectedOption, setShowMiniModal} = useContext(SmartwaterContext);
+    const {selectedOption} = useContext(SmartwaterContext);
+    const {setShowMiniModal} = useContext(CuentasPorCobrarContext);
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -47,4 +49,4 @@ const Historial: FC = () => {
     )
 }
 
-export{ Historial }
+export{ HistorialCuentasPorCobrar }

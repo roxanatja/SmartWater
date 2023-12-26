@@ -1,10 +1,10 @@
 import { FC, useContext } from "react";
 import "./CuadroCuentasPorPagar.css";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
+import { CuentasPorPagarContext } from "../CuentasPorPagarContext";
 
 const CuadroCuentasPorPagar: FC = () => {
 
-    const { setShowMiniModal } = useContext(SmartwaterContext)
+    const { setShowMiniModal } = useContext(CuentasPorPagarContext)
 
     return(
         <>

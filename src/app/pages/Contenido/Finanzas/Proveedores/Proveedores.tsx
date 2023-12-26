@@ -2,13 +2,13 @@ import { FC, useContext } from "react";
 import "./Proveedores.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
-import { SmartwaterContext } from "../../../../SmartwaterContext";
 import { AgregarProveedor } from "./AgregarProveedor/AgregarProveedor";
 import { CuadroProveedor } from "./CuadroProveedor/CuadroProveedor";
+import { ProveedoresContext } from "./ProveedoresContext";
 
 const Proveedores: FC = () => {
     
-    const { showModal, setShowModal } = useContext(SmartwaterContext);
+    const { showModal, setShowModal } = useContext(ProveedoresContext);
 
     const handleModal = () => {
         setShowModal(true)
