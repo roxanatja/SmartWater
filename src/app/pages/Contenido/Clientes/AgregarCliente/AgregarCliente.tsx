@@ -1,11 +1,11 @@
 import { ChangeEvent, useContext, useState } from "react";
 import "./AgregarCliente.css";
-import { SmartwaterContext } from "../../../../SmartwaterContext";
 //import { GoogleMapComponent } from "../../../components/GoogleMaps/GoogleMapComponent";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
+import { ClientesContext } from "../ClientesContext";
 
 const AgregarCliente = () => {
-    const { setShowModal } = useContext(SmartwaterContext);
+    const { setShowModal } = useContext(ClientesContext);
 
     const handleCloseModal = () => {
         setShowModal(false);

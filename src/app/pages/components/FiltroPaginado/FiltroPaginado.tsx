@@ -15,11 +15,12 @@ type Componentes = {
     opcionesSwitch2?: string;
     onAdd?: () => void;
     finanzas?: boolean;
+    iconUbicacion?: boolean;
 };
 
 const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children, onAdd, infoPedidos, 
                                             resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
-                                            finanzas}) => {
+                                            finanzas, iconUbicacion}) => {
 
     return(
         <>
@@ -133,6 +134,43 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                 }
             </div>
             {
+                iconUbicacion &&
+                <div style={{display: "flex", gap: "35px", marginBottom: "25px", marginTop: "10px"}}>
+                    <div className="Mapaclientes-ubicacion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="31" height="47" viewBox="0 0 31 47" fill="#DD0000">
+                            <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z"/>
+                        </svg>
+                        <span>
+                            Clientes registrados
+                        </span>
+                    </div>
+                    <div className="Mapaclientes-ubicacion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="31" height="47" viewBox="0 0 31 47" fill="#FF5C00">
+                            <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z"/>
+                        </svg>
+                        <span>
+                            Clientes registrados
+                        </span>
+                    </div>
+                    <div className="Mapaclientes-ubicacion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="31" height="47" viewBox="0 0 31 47" fill="#960090">
+                            <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z"/>
+                        </svg>
+                        <span>
+                            Clientes registrados
+                        </span>
+                    </div>
+                    <div className="Mapaclientes-ubicacion">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="31" height="47" viewBox="0 0 31 47" fill="#1FAF38">
+                            <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z"/>
+                        </svg>
+                        <span>
+                            Clientes registrados
+                        </span>
+                    </div>
+                </div>
+            }
+            {
                 swith &&
                 <div style={{display: "flex", justifyContent: "space-between", flexWrap: "wrap", width: "100%", alignItems: "center", marginBottom: "32px", marginTop: "20px"}}>
                     <div style={{width: "50%"}}>
@@ -163,7 +201,7 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                     </div>
                 </div>
             }
-            <div className="filtroScroll" style={{height: exportar && add ? "62vh" : "70vh", maxHeight: exportar && add ? "62vh" : "75vh", marginTop: "1em", marginBottom: "1em"}}>
+            <div className="filtroScroll" style={{height: exportar && add ? "62vh" : "65vh", maxHeight: exportar && add ? "62vh" : "75vh", marginTop: swith ? "auto" : "1em" }}>
                 {children}
             </div>
             {paginacion &&
@@ -197,7 +235,9 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                 {add && onAdd &&
                     <div style={{marginBottom: "1em"}}>
                         <button type="button" className="btn-agregar" onClick={onAdd}>
-                            <img src="./IconMas.svg" alt="" />
+                            <span className="material-symbols-outlined">
+                                add
+                            </span>
                         </button>
                     </div>
                 }

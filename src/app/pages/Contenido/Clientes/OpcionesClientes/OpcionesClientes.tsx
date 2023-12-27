@@ -1,10 +1,11 @@
 import { FC, useContext } from "react"
 import "./OpcionesClientes.css"
 import { Link } from "react-router-dom"
-import { SmartwaterContext } from "../../../../SmartwaterContext";
+import { ClientesContext } from "../ClientesContext";
 
 const OpcionesClientes: FC = () => {
-    const { setShowMiniModal } = useContext(SmartwaterContext);
+    
+    const { setShowMiniModal } = useContext(ClientesContext);
     
     return(
         <>

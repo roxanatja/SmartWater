@@ -1,15 +1,15 @@
-import { SmartwaterContext } from "../../../SmartwaterContext";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
-import { InfoCliente } from "../../components/InfoCliente/InfoCliente";
+import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { AgregarCliente } from "./AgregarCliente/AgregarCliente";
 import "./Clientes.css";
 import { FC, useContext } from "react";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
+import { ClientesContext } from "./ClientesContext";
 
 const Clientes: FC = () => {
 
-    const { showModal, setShowModal, showMiniModal } = useContext(SmartwaterContext);
+    const { showModal, setShowModal, showMiniModal } = useContext(ClientesContext);
 
     const AddCliente = () => {
         setShowModal(true)

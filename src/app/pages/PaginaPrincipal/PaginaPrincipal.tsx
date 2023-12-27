@@ -2,17 +2,23 @@ import "./PaginaPrincipal.css";
 import { FC } from "react";
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { Clientes } from "../Contenido/Clientes/Clientes";
-import { Inicio } from "../Contenido/Inicio/Inicio";
-import { MapaClientes } from "../Contenido/MapaClientes/MapaClientes";
-import { MonitoreoDistribuidores } from "../Contenido/MonitoreoDistribuidores/MonitoreoDistribuidores";
-import { Ventas } from "../Contenido/Ventas/Ventas";
-import { Pedidos } from "../Contenido/Pedidos/Pedidos";
-import { Prestamos } from "../Contenido/Préstamos/Prestamos";
-import { ArqueoDeCaja } from "../Contenido/Finanzas/ArqueoDeCaja/ArqueoDeCaja";
-import { CuentasPorCobrar } from "../Contenido/Finanzas/CuentasPorCobrar/CuentasPorCobrar";
-import { Historial } from "../Contenido/Finanzas/Historial/Historial";
-import { EgresosGastos } from "../Contenido/Finanzas/EgresosGastos/EgresosGastos";
+import { InicioWrapper } from "../Contenido/Inicio/InicioWrapper";
+import { ClientesWrapper } from "../Contenido/Clientes/ClientesWrapper";
+import { MapaClientesWrapper } from "../Contenido/MapaClientes/MapaClientesWrapper";
+import { MonitoreoDistribuidoresWrapper } from "../Contenido/MonitoreoDistribuidores/MonitoreoDistribuidoresWrapper";
+import { VentasWrapper } from "../Contenido/Ventas/VentasWrapper";
+import { PedidosWrapper } from "../Contenido/Pedidos/PedidosWrapper";
+import { PrestamosWrapper } from "../Contenido/Préstamos/PrestamosWrapper";
+import { ArqueoDeCajaWrapper } from "../Contenido/Finanzas/ArqueoDeCaja/ArqueoDeCajaWrapper";
+import { CuentasPorCobrarWrapper } from "../Contenido/Finanzas/CuentasPorCobrar/CuentasPorCobrarWrapper";
+import { EgresosGastosWrapper } from "../Contenido/Finanzas/EgresosGastos/EgresosGastosWrapper";
+import { ProveedoresWrapper } from "../Contenido/Finanzas/Proveedores/ProveedoresWrapper";
+import { CuentasPorPagarWrapper } from "../Contenido/Finanzas/CuentasPorPagar/CuentasPorPagarWrapper";
+import { ReportesIngresosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesIngresosWrapper";
+import { ReportesGraficosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesGraficos/ReportesGraficosWrapper";
+import { ReportesEgresosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesEgresosWrapper";
+import { ReportesEgresosGraficosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesGraficos/ReportesEgresosGraficosWrapper";
+import { ReportesResultadosWrapper } from "../Contenido/Reportes/ReportesResultados/ReportesResultadosWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -25,27 +31,39 @@ const PaginaPrincipal: FC = () => {
                         <Routes>
                             <Route path="" element={<Navigate to='/Inicio' />} />
 
-                            <Route path='/Inicio' element={<Inicio />} />
+                            <Route path='/Inicio' element={<InicioWrapper />} />
 
-                            <Route path='/Clientes' element={<Clientes />} />
+                            <Route path='/Clientes' element={<ClientesWrapper />} />
 
-                            <Route path='/MapaClientes' element={<MapaClientes />} />
+                            <Route path='/MapaClientes' element={<MapaClientesWrapper />} />
 
-                            <Route path='/MonitoreoDistribuidores' element={<MonitoreoDistribuidores />} />
+                            <Route path='/MonitoreoDistribuidores' element={<MonitoreoDistribuidoresWrapper />} />
 
-                            <Route path='/Ventas' element={<Ventas />} />
+                            <Route path='/Ventas' element={<VentasWrapper />} />
 
-                            <Route path='/Pedidos' element={<Pedidos />} />
+                            <Route path='/Pedidos' element={<PedidosWrapper />} />
 
-                            <Route path='/Prestamos' element={<Prestamos />} />
+                            <Route path='/Prestamos' element={<PrestamosWrapper />} />
 
-                            <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCaja/>} />
+                            <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCajaWrapper/>} />
 
-                            <Route path='/Finanzas/CuentasPorCobrarCobros' element={<CuentasPorCobrar/>} />
+                            <Route path='/Finanzas/CuentasPorCobrarCobros/*' element={<CuentasPorCobrarWrapper/>} />
 
-                            <Route path='/Finanzas/CuentasPorCobrarCobros/Historial' element={<Historial/>} />
+                            <Route path='/Finanzas/EgresosGastos' element={<EgresosGastosWrapper/>} />
 
-                            <Route path='/Finanzas/EgresosGastos' element={<EgresosGastos/>} />
+                            <Route path='/Finanzas/Proveedores' element={<ProveedoresWrapper/>} />
+
+                            <Route path='/Finanzas/CuentasPorPagar/*' element={<CuentasPorPagarWrapper/>} />
+
+                            <Route path='/Reportes/Ingresos/*' element={<ReportesIngresosWrapper/>} />
+
+                            <Route path='/Reportes/Ingresos/Graficos/*' element={<ReportesGraficosWrapper/>} />
+
+                            <Route path='/Reportes/Egresos/*' element={<ReportesEgresosWrapper/>} />
+
+                            <Route path='/Reportes/Egresos/Graficos/*' element={<ReportesEgresosGraficosWrapper/>} />
+
+                            <Route path='/Reportes/Resultados/*' element={<ReportesResultadosWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>

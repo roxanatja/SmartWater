@@ -1,0 +1,33 @@
+.CuadroProveedor-container {
+    width: 510px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    border: 1px solid #F0F4FD;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.CuadroProveedor-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.CuadroVentaCliente-header2{
+    display: flex;
+    align-items: center;
+    gap: 21px;
+}
+
+.CuadroVentaCliente-body {
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}

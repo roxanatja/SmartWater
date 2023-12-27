@@ -1,16 +1,21 @@
-import { SmartwaterContext } from "../../../SmartwaterContext";
-import { OpcionesPedidos } from "../../components/CuadroPedidos/OpcionesPedidos/OpcionesPedidos";
-import { PedidosAtendidos } from "../../components/CuadroPedidos/PedidosAtendidos";
-import { PedidosCurso } from "../../components/CuadroPedidos/PedidosCurso";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Pedidos.css";
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
+import { PedidosContext } from "./PedidosContext";
+import { PedidosCurso } from "./CuadroPedidos/PedidosCurso";
+import { PedidosAtendidos } from "./CuadroPedidos/PedidosAtendidos";
+import { OpcionesPedidos } from "./CuadroPedidos/OpcionesPedidos/OpcionesPedidos";
+import { SmartwaterContext } from "../../../SmartwaterContext";
 
 const Pedidos: FC = () => {
 
-    const {selectedOption, showMiniModal} = useContext(SmartwaterContext);
+    const { showMiniModal} = useContext(PedidosContext);
+    const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
 
+    useEffect(() => {
+        setSelectedOption(false);
+    }, [setSelectedOption])
 
     return (
         <>

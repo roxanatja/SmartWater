@@ -37,7 +37,7 @@ const AsideSubMenu = ({ tituloItem, icon, opciones, to }: Item) => {
                     </div>
                     <div className="infoTitle-item">
                         <button type="button" className={opcionesVisibles ? "btn-option active-btn" : "btn-option"}>
-                            <img src="../../Desplegable-icon.svg" alt="" />
+                            <img src="../../../Desplegable-icon.svg" alt="" />
                         </button>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import "./RegistrosEyG.css";
 import { CuadroRegistrarEyG } from "./CuadroRegistrarEyG";
 
 const RegistrosEyG: FC = () => {
+
     return(
         <>
         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "45px"}}>

@@ -1,15 +1,21 @@
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 import "./CuentasPorCobrar.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
 import { SmartwaterContext } from "../../../../SmartwaterContext";
-import { CuadroCuentasPorCobrar } from "../../../components/CuadroCuentasPorCobrar/CuadroCuentasPorCobrar";
-import { CobrosClientes } from "../../../components/CuadroCuentasPorCobrar/CobrosClientes";
-import { OpcionesCuentasCobrar } from "./OpcionesCuentasCobrar";
+import { CuadroCuentasPorCobrar } from "./CuadroCuentasPorCobrar/CuadroCuentasPorCobrar";
+import { CobrosClientes } from "./CuadroCuentasPorCobrar/CobrosClientes";
+import { OpcionesCuentasCobrar } from "./OpcionesCuentasCobrar/OpcionesCuentasCobrar";
+import { CuentasPorCobrarContext } from "./CuentasPorCobrarContext";
 
 const CuentasPorCobrar: FC = () => {
 
-    const {selectedOption, showMiniModal} = useContext(SmartwaterContext);
+    const {selectedOption, setSelectedOption} = useContext(SmartwaterContext);
+    const {showMiniModal} = useContext(CuentasPorCobrarContext);
+
+    useEffect(() => {
+        setSelectedOption(false)
+    }, [setSelectedOption])
 
     return(
         <>
