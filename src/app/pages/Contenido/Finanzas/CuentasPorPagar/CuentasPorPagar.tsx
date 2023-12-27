@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext } from "react";
 import "./CuentasPorPagar.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
@@ -10,12 +10,12 @@ import { CuentasPorPagarContext } from "./CuentasPorPagarContext";
 
 const CuentasPorPagar: FC = () => {
 
-    const {selectedOption, setSelectedOption, } = useContext(SmartwaterContext);
-    const {showMiniModal} = useContext(CuentasPorPagarContext);
+    const { selectedOption } = useContext(SmartwaterContext);
+    const { showMiniModal } = useContext(CuentasPorPagarContext);
 
-    useEffect(() => {
-        setSelectedOption(false)
-    }, [setSelectedOption])
+    // useEffect(() => {
+    //     setSelectedOption(false)
+    // }, [setSelectedOption])
 
     return(
         <>

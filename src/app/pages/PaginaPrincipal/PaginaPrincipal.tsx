@@ -15,7 +15,10 @@ import { EgresosGastosWrapper } from "../Contenido/Finanzas/EgresosGastos/Egreso
 import { ProveedoresWrapper } from "../Contenido/Finanzas/Proveedores/ProveedoresWrapper";
 import { CuentasPorPagarWrapper } from "../Contenido/Finanzas/CuentasPorPagar/CuentasPorPagarWrapper";
 import { ReportesIngresosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesIngresosWrapper";
-import { ReportesGraficosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesGraficos/ReportesIngresosWrapper";
+import { ReportesGraficosWrapper } from "../Contenido/Reportes/ReportesIngresos/ReportesGraficos/ReportesGraficosWrapper";
+import { ReportesEgresosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesEgresosWrapper";
+import { ReportesEgresosGraficosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesGraficos/ReportesEgresosGraficosWrapper";
+import { ReportesResultadosWrapper } from "../Contenido/Reportes/ReportesResultados/ReportesResultadosWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -55,6 +58,12 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Reportes/Ingresos/*' element={<ReportesIngresosWrapper/>} />
 
                             <Route path='/Reportes/Ingresos/Graficos/*' element={<ReportesGraficosWrapper/>} />
+
+                            <Route path='/Reportes/Egresos/*' element={<ReportesEgresosWrapper/>} />
+
+                            <Route path='/Reportes/Egresos/Graficos/*' element={<ReportesEgresosGraficosWrapper/>} />
+
+                            <Route path='/Reportes/Resultados/*' element={<ReportesResultadosWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
