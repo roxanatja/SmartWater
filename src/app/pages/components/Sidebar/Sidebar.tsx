@@ -76,7 +76,7 @@ const Sidebar: FC = () => {
                             icon="../../../Configuracion-icon.svg"
                             to="/Configuración/ConfiguraciónGeneral"
                             opciones={[
-                                { titulo: "Configuración general", to: "/Configuración/ConfiguraciónGeneral", id: 0 },
+                                { titulo: "Configuración general", to: "/Configuracion/General", id: 0 },
                                 { titulo: "Usuario", to: "/Configuración/Usuario", id: 1 },
                                 { titulo: "Barrios", to: "/Configuración/Barrios", id: 2 },
                                 { titulo: "Zonas", to: "/Configuración/Zonas", id: 3 },
