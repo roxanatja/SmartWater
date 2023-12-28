@@ -39,7 +39,7 @@ const PagoProveedores: FC = () => {
                 </button>
             </div>
             <div style={{marginTop: "32px"}}>
-                <form>
+                <form onSubmit={(e) => e.preventDefault()}>
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
                         <div style={{display: "flex", alignItems: "flex-start", gap: "48px"}}>
                             <div style={{display: "flex", alignItems: "center", gap: "15px"}}>

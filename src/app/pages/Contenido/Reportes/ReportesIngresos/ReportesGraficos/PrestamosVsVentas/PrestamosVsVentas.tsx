@@ -39,7 +39,7 @@ const PrestamosVsVentas:FC = () => {
                 </button>
             </div>
             <div style={{marginTop: "32px"}}>
-                <form>
+                <form onSubmit={(e) => e.preventDefault()}>
                     <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                         <div style={{display: "flex", alignItems: "center", gap: "15px"}}>
                             <div className="PrestamosVsVentas-Fecha">

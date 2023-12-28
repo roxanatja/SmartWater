@@ -28,7 +28,7 @@ const AddEgresosGastos: FC = () => {
 
 return (
     <>
-        <form>
+        <form onSubmit={(e) => e.preventDefault()}>
             <div className="modal-overlay">
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                     <div className="modal-header" style={{height: "auto"}}>
