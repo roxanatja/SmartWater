@@ -21,7 +21,7 @@ const CuentasPorCobrar: FC = () => {
         <>
         <div>
             <PageTitle titulo="Cuentas por cobrar / cobros" icon="../Finanzas-icon.svg"/>
-            <FiltroPaginado swith opcionesSwitch1="Cuentas por cobrar" opcionesSwitch2="Cobros a clientes" finanzas>
+            <FiltroPaginado filtro swith opcionesSwitch1="Cuentas por cobrar" opcionesSwitch2="Cobros a clientes" finanzas>
                 {
                     selectedOption === false ?
                     <div style={{display:"flex", flexWrap: "wrap", gap: "36px"}}>

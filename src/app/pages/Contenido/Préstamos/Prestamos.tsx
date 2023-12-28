@@ -14,7 +14,7 @@ const Prestamos: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Préstamos" icon="./Prestamos-icon.svg"/>
-                <FiltroPaginado resultadosPrestamo>
+                <FiltroPaginado filtro resultadosPrestamo>
                     <div style={{display: "flex", flexWrap: "wrap", gap: "30px"}}>
                         <CuadroPrestamo estadoContrato="Sin Contrato"/>
                         <CuadroPrestamo estadoContrato="Con Contrato"/>

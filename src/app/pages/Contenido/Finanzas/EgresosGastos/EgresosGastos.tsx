@@ -28,7 +28,7 @@ const EgresosGastos: FC = () => {
             <PageTitle titulo="Cuentas Egresos y gastos" icon="../../Finanzas-icon.svg"/>
                 {
                     selectedOption === false ?
-                    <FiltroPaginado swith finanzas 
+                    <FiltroPaginado filtro swith finanzas 
                             opcionesSwitch1="Cuentas contables" 
                             opcionesSwitch2="Registros Egresos y Gastos">
                     <div style={{display:"flex", flexWrap: "wrap", gap: "36px", paddingLeft: "5px"}}>
@@ -36,7 +36,7 @@ const EgresosGastos: FC = () => {
                     </div>
                     </FiltroPaginado>
                     :
-                    <FiltroPaginado swith finanzas add onAdd={handleModal}
+                    <FiltroPaginado filtro swith finanzas add onAdd={handleModal}
                             opcionesSwitch1="Cuentas contables" 
                             opcionesSwitch2="Registros Egresos y Gastos">
                         <div style={{display:"flex", flexWrap: "wrap", gap: "23px", paddingLeft: "5px"}}>

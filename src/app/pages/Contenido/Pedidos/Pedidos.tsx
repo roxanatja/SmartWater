@@ -21,7 +21,7 @@ const Pedidos: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Pedidos" icon="./Pedidos-icon.svg"/>
-                <FiltroPaginado swith={true} opcionesSwitch1="En curso" opcionesSwitch2="Atendidos">
+                <FiltroPaginado filtro swith={true} opcionesSwitch1="En curso" opcionesSwitch2="Atendidos">
                     {
                         selectedOption === false ?
                         <div style={{display:"flex", flexWrap: "wrap"}}>
