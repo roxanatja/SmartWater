@@ -21,6 +21,7 @@ import { ReportesEgresosGraficosWrapper } from "../Contenido/Reportes/ReportesEg
 import { ReportesResultadosWrapper } from "../Contenido/Reportes/ReportesResultados/ReportesResultadosWrapper";
 import { ConfiguracionGeneralWrapper } from "../Contenido/Configuracion/ConfiguracionGeneral/ConfiguracionGeneralWrapper";
 import { UsuariosWrapper } from "../Contenido/Configuracion/Usuarios/UsuariosWrapper";
+import { BarriosWrapper } from "../Contenido/Configuracion/Barrios/BarriosWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -70,6 +71,8 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Configuracion/General' element={<ConfiguracionGeneralWrapper/>} />
 
                             <Route path='/Configuracion/Usuarios' element={<UsuariosWrapper/>} />
+
+                            <Route path='/Configuracion/Barrios' element={<BarriosWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
