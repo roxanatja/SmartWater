@@ -1,12 +1,10 @@
 import { FC, useState } from "react";
 import "./Barrios.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
-import { Option } from "../../../components/Option/Option";
 import { BarriosItem } from "./BarriosItem/BarriosItem";
 
 const Barrios: FC = () => {
 
-    const [option, setOption] = useState<boolean>(false)
     const [filtro, setFiltro] = useState<boolean>(false)
 
     const [checkbox1, setCheckbox1] = useState<boolean>(false);

@@ -22,6 +22,9 @@ import { ReportesResultadosWrapper } from "../Contenido/Reportes/ReportesResulta
 import { ConfiguracionGeneralWrapper } from "../Contenido/Configuracion/ConfiguracionGeneral/ConfiguracionGeneralWrapper";
 import { UsuariosWrapper } from "../Contenido/Configuracion/Usuarios/UsuariosWrapper";
 import { BarriosWrapper } from "../Contenido/Configuracion/Barrios/BarriosWrapper";
+import { ZonasWrapper } from "../Contenido/Configuracion/Zonas/ZonasWrapper";
+import { ProductosWrapper } from "../Contenido/Configuracion/Productos/ProductosWrapper";
+import { ItemsWrapper } from "../Contenido/Configuracion/Items/ItemsWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -73,6 +76,12 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Configuracion/Usuarios' element={<UsuariosWrapper/>} />
 
                             <Route path='/Configuracion/Barrios' element={<BarriosWrapper/>} />
+
+                            <Route path='/Configuracion/Zonas' element={<ZonasWrapper/>} />
+
+                            <Route path='/Configuracion/Productos' element={<ProductosWrapper/>} />
+
+                            <Route path='/Configuracion/Items' element={<ItemsWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>
