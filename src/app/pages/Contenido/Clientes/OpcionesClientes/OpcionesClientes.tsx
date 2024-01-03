@@ -16,7 +16,7 @@ const OpcionesClientes: FC = () => {
                         <img src="./ventas-optionIcon.svg" alt="" style={{ marginRight: "15px"}}/>
                         <span>Registrar Ventas</span>
                     </div>
-                    <Link to={"#"}>
+                    <Link to={"/Clientes/RegistrarVenta"}>
                         <button type="button" className="btn" style={{marginTop: "5px"}}>
                         <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                             chevron_right

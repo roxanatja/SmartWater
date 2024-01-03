@@ -39,7 +39,7 @@ const PaginaPrincipal: FC = () => {
 
                             <Route path='/Inicio' element={<InicioWrapper />} />
 
-                            <Route path='/Clientes' element={<ClientesWrapper />} />
+                            <Route path='/Clientes/*' element={<ClientesWrapper />} />
 
                             <Route path='/MapaClientes' element={<MapaClientesWrapper />} />
 
