@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './OptionScrooll.css';
 
 interface CustomSelectProps {
     options: string[];
+    onOptionChange: (selectedOption: string) => void;
 }
 
-const OptionScrooll: React.FC<CustomSelectProps> = ({ options }) => {
+const OptionScrooll: React.FC<CustomSelectProps> = ({ options, onOptionChange }) => {
     const [selectedOption, setSelectedOption] = useState(0);
 
     const handleUpClick = () => {
@@ -15,6 +16,10 @@ const OptionScrooll: React.FC<CustomSelectProps> = ({ options }) => {
     const handleDownClick = () => {
         setSelectedOption((prev) => (prev < options.length - 1 ? prev + 1 : prev));
     };
+
+    useEffect(() => {
+        onOptionChange(options[selectedOption]);
+    }, [selectedOption, options, onOptionChange]);
 
     const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
         if (e.deltaY < 0) {

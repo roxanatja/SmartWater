@@ -111,13 +111,13 @@
     border-width: 10px;
 }
 
-.RegistrarVenta-TablaTitulo{
-    width: 100%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, rgba(255, 255, 255, 0.85) 19.27%, #FFF 61.18%, #FFF 100%, #FFF 100%);   
+.RegistrarVenta-TablaTitulo2{
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 56vh;
+    height: 32px;
+    padding: 4px;
     color: #000;
     text-align: center;
     font-family: 'Poppins', sans-serif;
@@ -127,28 +127,12 @@
     line-height: normal;
 }
 
-.RegistrarVenta-TablaTitulo2{
-    display: flex;
-    width: 40vh;
-    height: 32px;
-    padding: 4px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
 .RegistrarVenta-TablaBody{
-    width: 100%;
+    width: 56vh;
     height: 200px;
-    flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    flex-direction: row;
     background: linear-gradient(180deg, rgba(26, 175, 190, 0.00) 0%, rgba(28, 178, 194, 0.75) 12.4%, #1DB4C5 100%);
-    border-radius: 0px 0px 20px 20px;
     padding-bottom: 20px;
 }
 
@@ -203,4 +187,10 @@
     font-style: normal;
     font-weight: 600;
     line-height: normal;
+    cursor: pointer;
+}
+
+.RegistrarVenta-btnVender:hover{
+    border: #2a66d4;
+    background: #2a66d4;
 }

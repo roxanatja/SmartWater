@@ -1,19 +1,30 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import "./RegistrarVenta.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
+
+type ProductosAdd = {
+    id: number,
+    cantidadSeleccionada: string,
+    productoSeleccionado: string,
+    precioSeleccionado: string
+}
 
 const RegistrarVenta: FC = () => {
 
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
     const [checkbox2, setCheckbox2] = useState<boolean>(false);
+    const [productosAgregados, setProductosAgregados] = useState<Array<ProductosAdd>>([]);
+    const [selectedCantidad, setSelectedCantidad] = useState<string>('');
+    const [selectedProducto, setSelectedProducto] = useState<string>('');
+    const [selectedPrecio, setSelectedPrecio] = useState<string>('');
     const navigate = useNavigate();
 
-    const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-    const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"]
-    const Precio = ["5000", "10000", "300", "4000", "20000"]
+    const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"];
+    const Precio = ["5000", "10000", "300", "4000", "20000"];
 
     const handleOpcionesClick = () => {
         setOpcionesVisibles(!opcionesVisibles);
@@ -37,9 +48,25 @@ const RegistrarVenta: FC = () => {
         }
     };
 
+    const AgregarProducto = () => {
+        var TodosProductos = [...productosAgregados]
+        var ProductoNew: ProductosAdd = {
+            id: productosAgregados.length + 1,
+            cantidadSeleccionada: selectedCantidad,
+            productoSeleccionado:  selectedProducto,
+            precioSeleccionado: selectedPrecio
+        }
+        TodosProductos.push(ProductoNew);
+        setProductosAgregados(TodosProductos);
+    }
+
+    useEffect(() => {
+        console.log(productosAgregados);
+    }, [productosAgregados]);
+
     return(
         <>
-        <form>
+        <form onSubmit={(e) => e.preventDefault()}>
             <div>
                 <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
                 <div className="RegistrarVenta-titulo">
@@ -93,44 +120,52 @@ const RegistrarVenta: FC = () => {
                             <div style={{ width: "100%", marginTop: "25px" }}>
                                 <table style={{ width: "100%", borderSpacing: "0px" }}>
                                     <thead>
-                                        <tr>
-                                            <div className="RegistrarVenta-TablaTitulo">
-                                                <th>
-                                                    <div className="RegistrarVenta-TablaTitulo2">
-                                                        <span>Cantidad</span>
-                                                    </div>
-                                                </th>
-                                                <th>
-                                                    <div className="RegistrarVenta-TablaTitulo2">
-                                                        <span>Producto</span>
-                                                    </div>
-                                                </th>
-                                                <th>
-                                                    <div className="RegistrarVenta-TablaTitulo2">
-                                                        <span>Precio</span>
-                                                    </div>
-                                                </th>
-                                            </div>
+                                        <tr style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                                            <th>
+                                                <div className="RegistrarVenta-TablaTitulo2">
+                                                    <span>Cantidad</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div className="RegistrarVenta-TablaTitulo2">
+                                                    <span>Producto</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div className="RegistrarVenta-TablaTitulo2">
+                                                    <span>Precio</span>
+                                                </div>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <div className="RegistrarVenta-TablaBody">
-                                                <td>
-                                                    <OptionScrooll options={Cantidad}/>
-                                                </td>
-                                                <td>
-                                                    <OptionScrooll options={Producto}/>
-                                                </td>
-                                                <td>
-                                                    <OptionScrooll options={Precio}/>
-                                                </td>
-                                            </div>
+                                        <tr style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                                            <td>
+                                                <div className="RegistrarVenta-TablaBody" style={{borderRadius: "0px 0px 0px 20px"}}>
+                                                    <OptionScrooll 
+                                                        options={Cantidad}
+                                                        onOptionChange={(selectedOption) => setSelectedCantidad(selectedOption)}/>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="RegistrarVenta-TablaBody" style={{borderRadius: "0px 0px 0px 0px"}}>
+                                                    <OptionScrooll 
+                                                        options={Producto}
+                                                        onOptionChange={(selectedOption) => setSelectedProducto(selectedOption)}/>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="RegistrarVenta-TablaBody" style={{borderRadius: "0px 0px 20px 0px"}}>
+                                                    <OptionScrooll 
+                                                        options={Precio}
+                                                        onOptionChange={(selectedOption) => setSelectedPrecio(selectedOption)}/>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <button className="RegistrarVenta-agregarproducto">
+                            <button className="RegistrarVenta-agregarproducto" onClick={AgregarProducto}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="49" height="48" viewBox="0 0 49 48" fill="none">
                                     <g filter="url(#filter0_d_9_26327)">
                                         <circle cx="24.5" cy="20" r="20" fill="#1A3D7D"/>
@@ -138,8 +173,8 @@ const RegistrarVenta: FC = () => {
                                     </g>
                                     <path d="M23.3182 28.2758V21.1822H16.2246V18.8177H23.3182V11.7241H25.6827V18.8177H32.7763V21.1822H25.6827V28.2758H23.3182Z" fill="white"/>
                                     <defs>
-                                        <filter id="filter0_d_9_26327" x="0.5" y="0" width="48" height="48" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                        <filter id="filter0_d_9_26327" x="0.5" y="0" width="48" height="48" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                                        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
                                         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
                                         <feOffset dy="4"/>
                                         <feGaussianBlur stdDeviation="2"/>
