@@ -29,7 +29,7 @@ const OpcionesClientes: FC = () => {
                         <img src="./Carrito-icon.svg" alt="" style={{ marginRight: "14px"}}/>
                         <span>Registrar pedido</span>
                     </div>
-                    <Link to={"#"}>
+                    <Link to={"/Clientes/RegistrarPedido"}>
                         <button type="button" className="btn" style={{marginTop: "5px"}}>
                         <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                             chevron_right
@@ -42,7 +42,7 @@ const OpcionesClientes: FC = () => {
                         <img src="./HojaMas-icon.svg" alt="" style={{ marginRight: "15px"}}/>
                         <span>Registrar préstamo</span>
                     </div>
-                    <Link to={"#"}>
+                    <Link to={"/Clientes/RegistrarPrestamo"}>
                         <button type="button" className="btn" style={{marginTop: "5px"}}>
                         <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                             chevron_right

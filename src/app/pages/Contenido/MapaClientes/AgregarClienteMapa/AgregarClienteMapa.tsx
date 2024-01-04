@@ -48,18 +48,6 @@ const AgregarClienteMapa = () => {
         }
     };
 
-    const ImagenSeleccionadaDelantera = (imagen: string | null) => {
-        setImageCarnetTrasero(imagen);
-    };
-
-    const ImagenSeleccionadaTrasera = (imagen: string | null) => {
-        setImageCarnetDelantero(imagen);
-    };
-
-    const ImagenCasaSeleccionada = (imagen: string | null) => {
-        setImageCasa(imagen);
-    };
-
     /*const handleLocationSelect = (location: google.maps.LatLng) => {
         setSelectedLocation(location);
     };*/
@@ -185,18 +173,18 @@ return (
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (trasero)" onImagenSeleccionada={ImagenSeleccionadaTrasera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (trasero)" imagenSelect={imageCarnetTrasero} onImagenSeleccionada={setImageCarnetTrasero} id="trasero" />
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (Delantero)" onImagenSeleccionada={ImagenSeleccionadaDelantera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (Delantero)" imagenSelect={imageCarnetDelantero} onImagenSeleccionada={setImageCarnetDelantero} id="delantero" />
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Foto de la fachada del domicilio" onImagenSeleccionada={ImagenCasaSeleccionada}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Foto de la fachada del domicilio" imagenSelect={imageCasa} onImagenSeleccionada={setImageCasa} id="casa" />
                             </div>
                         </div>
                         <div className="grupo-input">

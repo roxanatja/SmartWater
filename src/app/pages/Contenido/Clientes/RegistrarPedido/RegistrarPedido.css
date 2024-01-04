@@ -1,4 +1,4 @@
-.RegistrarVenta-titulo{
+.RegistrarPedido-titulo{
     display: flex;
     width: 100%;
     align-items: center;
@@ -13,14 +13,14 @@
     margin-top: 41px;
 }
 
-.RegistrarVenta-btn{
+.RegistrarPedido-btn{
     cursor: pointer;
     background: none;
     border: none;
     color: #1A3D7D;
 }
 
-.RegistrarVenta-scrooll{
+.RegistrarPedido-scrooll{
     height: 73vh;
     overflow-y: scroll;
     background: #FFF;
@@ -29,26 +29,32 @@
 }
 
 /* Estilos específicos de las barras de desplazamiento en Chrome y Safari*/
-.RegistrarVenta-scrooll::-webkit-scrollbar {
+.RegistrarPedido-scrooll::-webkit-scrollbar {
     width: 6px;
 }
 
-.RegistrarVenta-scrooll::-webkit-scrollbar-thumb {
+.RegistrarPedido-scrooll::-webkit-scrollbar-thumb {
     background-color: #000;
     border-radius: 100px;
 }
 
-.RegistrarVenta-scrooll::-webkit-scrollbar-track {
+.RegistrarPedido-scrooll::-webkit-scrollbar-track {
     background-color: #F5F5F5;
 }
 
-.RegistrarVenta-NombreCliente{
+.RegistrarPedido-NombreCliente{
+    display: flex;
+    align-items: center;
+    gap: 83px;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.RegistrarPedido-Nombre{
     display: flex;
     align-items: center;
     gap: 5px;
-    flex-wrap: wrap;
-    width: 100%;
-    justify-content: flex-start;
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -57,7 +63,7 @@
     line-height: normal;
 }
 
-.RegistrarVenta-AgregarProducto{
+.RegistrarPedido-AgregarProducto{
     display: flex;
     width: 100%;
     padding: 16px 8px;
@@ -66,7 +72,7 @@
     gap: 16px;
 }
 
-.RegistrarVenta-AgregarProductoTitulo{
+.RegistrarPedido-AgregarProductoTitulo{
     display: flex;
     align-items: flex-start;
     gap: 16px;
@@ -81,7 +87,7 @@
     line-height: 20px;
 }
 
-.RegistrarVenta-btnAgregarProducto{
+.RegistrarPedido-btnAgregarProducto{
     background: none;
     border: none;
     cursor: pointer;
@@ -97,7 +103,7 @@
     background: rgba(0, 0, 0, 0.15);
 }
 
-.RegistrarVenta-opciones{
+.RegistrarPedido-opciones{
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -106,7 +112,7 @@
     line-height: 20px; /* 166.667% */
 }
 
-.RegistrarVenta-grupo-checbox{
+.RegistrarPedido-grupo-checbox{
     display: flex;
     align-items: flex-start;
     gap: 16px;
@@ -114,7 +120,7 @@
     padding: 16px 0px;
 }
 
-.RegistrarVenta-grupo-check{
+.RegistrarPedido-grupo-check{
     display: flex;
     align-items: center;
     gap: 10px;
@@ -126,18 +132,18 @@
     line-height: normal;
 }
 
-.RegistrarVenta-input-check{
+.RegistrarPedido-input-check{
     width: 18px;
     height: 18px;
     border-color: #808080;
     border-width: 10px;
 }
 
-.RegistrarVenta-TablaTitulo2{
+.RegistrarPedido-TablaTitulo2{
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56vh;
+    width: 84vh;
     height: 32px;
     padding: 4px;
     color: #000;
@@ -149,8 +155,8 @@
     line-height: normal;
 }
 
-.RegistrarVenta-TablaBody{
-    width: 56vh;
+.RegistrarPedido-TablaBody{
+    width: 84vh;
     height: 200px;
     display: flex;
     align-items: center;
@@ -158,7 +164,7 @@
     padding-bottom: 20px;
 }
 
-.RegistrarVenta-agregarproducto{
+.RegistrarPedido-agregarproducto{
     display: flex;
     width: 100%;
     padding: 15px;
@@ -178,7 +184,7 @@
     cursor: pointer;
 }
 
-.RegistrarVenta-productoAgregado{
+.RegistrarPedido-productoAgregado{
     width: 100%;
     display: flex;
     padding: 15px;
@@ -192,7 +198,7 @@
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
-.RegistrarVenta-productoAgregado1{
+.RegistrarPedido-productoAgregado1{
     display: flex;
     justify-content: space-between;
     gap: 10px;
@@ -206,19 +212,19 @@
     line-height: normal;
 }
 
-.RegistrarVenta-productoAgregadobtncontainer{
+.RegistrarPedido-productoAgregadobtncontainer{
     display: flex;
     align-items: flex-start;
     gap: 12px;
 }
 
-.RegistrarVenta-productoAgregadoBTN{
+.RegistrarPedido-productoAgregadoBTN{
     background: none;
     border: none;
     cursor: pointer;
 }
 
-.RegistrarVenta-productoAgregadoCantidad{
+.RegistrarPedido-productoAgregadoCantidad{
     width: 100%;
     color: #000;
     font-family: 'Poppins', sans-serif;
@@ -228,7 +234,17 @@
     line-height: normal;
 }
 
-.RegistrarVenta-AgregarComentario{
+.RegistrarPedido-FechaComentario{
+    display: flex;
+    padding: 24px 0px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    align-self: stretch;
+    margin-bottom: 45px;
+}
+
+.RegistrarPedido-AgregarComentario{
     display: flex;
     width: 100%;
     padding: 16px 0px;
@@ -242,10 +258,9 @@
     font-weight: 600;
     line-height: normal;
     border-bottom: #1A3D7D 1px solid;
-    margin-bottom: 45px;
 }
 
-.RegistrarVenta-btnVender{
+.RegistrarPedido-btnVender{
     width: 320px;
     height: 50px;
     flex-shrink: 0;
@@ -262,7 +277,7 @@
     cursor: pointer;
 }
 
-.RegistrarVenta-btnVender:hover{
+.RegistrarPedido-btnVender:hover{
     border: #2a66d4;
     background: #2a66d4;
 }

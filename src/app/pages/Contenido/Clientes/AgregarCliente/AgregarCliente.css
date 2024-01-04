@@ -204,41 +204,6 @@
     height: 20px;
 }
 
-.img-carnet{
-    width: 100%;
-    height: 250px;
-    align-self: stretch;
-    border-radius: 30px;
-    background: #D9D9D9;
-}
-
-.boton-img{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 13px;
-}
-
-.text-img{
-    color: #606060;
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-}
-
-.carnet{
-    width: 70%;
-    height: 85%;
-    overflow: hidden;
-    border-radius: 30px;
-    background: #D9D9D9;
-}
-
 .Ubi-Google{
     width: 100%;
     height: 339px;

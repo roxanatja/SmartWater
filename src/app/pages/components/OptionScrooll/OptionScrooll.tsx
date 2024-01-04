@@ -21,18 +21,27 @@ const OptionScrooll: React.FC<CustomSelectProps> = ({ options, onOptionChange })
         onOptionChange(options[selectedOption]);
     }, [selectedOption, options, onOptionChange]);
 
-    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-        if (e.deltaY < 0) {
-        handleUpClick();
-        } else if (e.deltaY > 0) {
-        handleDownClick();
-        }
-    };
+    // const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+    //     if (optionScroollRef.current?.contains(e.target as Node)) {
+    //         e.preventDefault();
+    //         if (e.deltaY < 0) {
+    //             handleUpClick();
+    //         } else if (e.deltaY > 0) {
+    //             handleDownClick();
+    //         }
+    //     }
+    // };
 
     return (
-        <div className="OptionScrooll-select" onWheel={handleWheel}>
+        <div className="OptionScrooll-select">
+            <button className='OptionScrooll-btn' onClick={handleUpClick} style={{opacity: selectedOption === 0 ? "0.2" : ""}}>
+                <span className="material-symbols-outlined">
+                    expand_less
+                </span>
+            </button>
             <span>{options[selectedOption]}</span>
-            <button className='OptionScrooll-btn' onClick={handleDownClick}>
+            <button className='OptionScrooll-btn' onClick={handleDownClick} style={{opacity: selectedOption === options.length - 1 ? "0.2" : ""}}>
                 <span className="material-symbols-outlined">
                     expand_more
                 </span>

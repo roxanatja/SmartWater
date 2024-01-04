@@ -48,18 +48,6 @@ const AgregarCliente = () => {
         }
     };
 
-    const ImagenSeleccionadaDelantera = (imagen: string | null) => {
-        setImageCarnetTrasero(imagen);
-    };
-
-    const ImagenSeleccionadaTrasera = (imagen: string | null) => {
-        setImageCarnetDelantero(imagen);
-    };
-
-    const ImagenCasaSeleccionada = (imagen: string | null) => {
-        setImageCasa(imagen);
-    };
-
     /*const handleLocationSelect = (location: google.maps.LatLng) => {
         setSelectedLocation(location);
     };*/
@@ -164,42 +152,36 @@ return (
                                 </select>
                             </div>
                         </div>
-                        <div className="grupo-checbox">
-                            <div className="grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="text-check">Cliente habitual</label>
+                            <div className="grupo-checbox">
+                                <div className="grupo-check">
+                                    <input
+                                    className="input-check"
+                                    type="checkbox"
+                                    checked={checkbox1}
+                                    onChange={handleCheckbox1Change}
+                                    />
+                                    <label className="text-check">Cliente habitual</label>
+                                </div>
+                                <div className="grupo-check">
+                                    <input
+                                    className="input-check"
+                                    type="checkbox"
+                                    checked={checkbox2}
+                                    onChange={handleCheckbox2Change}
+                                    />
+                                    <label className="text-check">Agencia</label>
+                                </div>
                             </div>
-                            <div className="grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox2}
-                                onChange={handleCheckbox2Change}
-                                />
-                                <label className="text-check">Agencia</label>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (trasero)" imagenSelect={imageCarnetTrasero} onImagenSeleccionada={setImageCarnetTrasero} id="trasero" />
                             </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (trasero)" onImagenSeleccionada={ImagenSeleccionadaTrasera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (Delantero)" imagenSelect={imageCarnetDelantero} onImagenSeleccionada={setImageCarnetDelantero} id="delantero" />
                             </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (Delantero)" onImagenSeleccionada={ImagenSeleccionadaDelantera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Foto de la fachada del domicilio" imagenSelect={imageCasa} onImagenSeleccionada={setImageCasa} id="casa" />
                             </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Foto de la fachada del domicilio" onImagenSeleccionada={ImagenCasaSeleccionada}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
+                            <div className="grupo-input">
                             <div className="Ubi-Google">
                                 {/* <GoogleMapComponent apiKey={apiKey} onLocationSelect={handleLocationSelect} /> */}
                             </div>
