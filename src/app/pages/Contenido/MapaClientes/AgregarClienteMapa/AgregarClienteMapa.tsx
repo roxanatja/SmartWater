@@ -20,7 +20,7 @@ const AgregarClienteMapa = () => {
     //const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLng | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
-    const apiKey = 'TU_API_KEY';
+    //const apiKey = 'TU_API_KEY';
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];

@@ -5,7 +5,7 @@ import { ClientesContext } from "../ClientesContext";
 
 const OpcionesClientes: FC = () => {
     
-    const { setShowMiniModal } = useContext(ClientesContext);
+    const { setShowMiniModal, setSelectedOption } = useContext(ClientesContext);
     
     return(
         <>
@@ -55,8 +55,8 @@ const OpcionesClientes: FC = () => {
                         <img src="./Devolucion-icon.svg" alt="" style={{ marginRight: "11px"}}/>
                         <span>Registrar devolución paracial</span>
                     </div>
-                    <Link to={"#"}>
-                        <button type="button" className="btn" style={{marginTop: "5px"}}>
+                    <Link to={"/Clientes/RegistrarDevolucion"}>
+                        <button type="button" className="btn" style={{marginTop: "5px"}} onClick={() => setSelectedOption(false)}>
                         <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                             chevron_right
                         </span>
@@ -68,8 +68,8 @@ const OpcionesClientes: FC = () => {
                         <img src="./Retorno-icon.svg" alt="" style={{ marginRight: "16px"}}/>
                         <span>Registrar devolución total</span>
                     </div>
-                    <Link to={"#"}>
-                        <button type="button" className="btn" style={{marginTop: "5px"}}>
+                    <Link to={"/Clientes/RegistrarDevolucion"}>
+                        <button type="button" className="btn" style={{marginTop: "5px"}} onClick={() => setSelectedOption(true)}>
                         <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                             chevron_right
                         </span>
