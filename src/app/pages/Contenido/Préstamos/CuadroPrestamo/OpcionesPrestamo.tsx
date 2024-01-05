@@ -32,7 +32,7 @@ const OpcionesPrestamo: FC = () => {
                         </svg>
                         <span className="OpcionesPedidos-text">Registrar Ventas</span>
                     </div>
-                    <Link to={"#"}>
+                    <Link to={"/Prestamos/RegistrarVenta"}>
                         <button type="button" className="btn" style={{marginTop: "5px"}}>
                             <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                                 chevron_right
@@ -47,7 +47,7 @@ const OpcionesPrestamo: FC = () => {
                         </svg>
                         <span className="OpcionesPedidos-text">Registrar devolución</span>
                     </div>
-                    <Link to={"#"}>
+                    <Link to={"/Prestamos/RegistrarDevolucion"}>
                         <button type="button" className="btn" style={{marginTop: "5px"}}>
                             <span className="material-symbols-outlined" style={{color: "#1A3D7D"}}>
                                 chevron_right

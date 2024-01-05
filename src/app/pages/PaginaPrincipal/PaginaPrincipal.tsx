@@ -41,15 +41,15 @@ const PaginaPrincipal: FC = () => {
 
                             <Route path='/Clientes/*' element={<ClientesWrapper />} />
 
-                            <Route path='/MapaClientes' element={<MapaClientesWrapper />} />
+                            <Route path='/MapaClientes/*' element={<MapaClientesWrapper />} />
 
                             <Route path='/MonitoreoDistribuidores' element={<MonitoreoDistribuidoresWrapper />} />
 
-                            <Route path='/Ventas' element={<VentasWrapper />} />
+                            <Route path='/Ventas/*' element={<VentasWrapper />} />
 
-                            <Route path='/Pedidos' element={<PedidosWrapper />} />
+                            <Route path='/Pedidos/*' element={<PedidosWrapper />} />
 
-                            <Route path='/Prestamos' element={<PrestamosWrapper />} />
+                            <Route path='/Prestamos/*' element={<PrestamosWrapper />} />
 
                             <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCajaWrapper/>} />
 
