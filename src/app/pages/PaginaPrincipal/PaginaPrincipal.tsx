@@ -19,6 +19,12 @@ import { ReportesGraficosWrapper } from "../Contenido/Reportes/ReportesIngresos/
 import { ReportesEgresosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesEgresosWrapper";
 import { ReportesEgresosGraficosWrapper } from "../Contenido/Reportes/ReportesEgresos/ReportesGraficos/ReportesEgresosGraficosWrapper";
 import { ReportesResultadosWrapper } from "../Contenido/Reportes/ReportesResultados/ReportesResultadosWrapper";
+import { ConfiguracionGeneralWrapper } from "../Contenido/Configuracion/ConfiguracionGeneral/ConfiguracionGeneralWrapper";
+import { UsuariosWrapper } from "../Contenido/Configuracion/Usuarios/UsuariosWrapper";
+import { BarriosWrapper } from "../Contenido/Configuracion/Barrios/BarriosWrapper";
+import { ZonasWrapper } from "../Contenido/Configuracion/Zonas/ZonasWrapper";
+import { ProductosWrapper } from "../Contenido/Configuracion/Productos/ProductosWrapper";
+import { ItemsWrapper } from "../Contenido/Configuracion/Items/ItemsWrapper";
 
 const PaginaPrincipal: FC = () => {
 
@@ -33,17 +39,17 @@ const PaginaPrincipal: FC = () => {
 
                             <Route path='/Inicio' element={<InicioWrapper />} />
 
-                            <Route path='/Clientes' element={<ClientesWrapper />} />
+                            <Route path='/Clientes/*' element={<ClientesWrapper />} />
 
-                            <Route path='/MapaClientes' element={<MapaClientesWrapper />} />
+                            <Route path='/MapaClientes/*' element={<MapaClientesWrapper />} />
 
                             <Route path='/MonitoreoDistribuidores' element={<MonitoreoDistribuidoresWrapper />} />
 
-                            <Route path='/Ventas' element={<VentasWrapper />} />
+                            <Route path='/Ventas/*' element={<VentasWrapper />} />
 
-                            <Route path='/Pedidos' element={<PedidosWrapper />} />
+                            <Route path='/Pedidos/*' element={<PedidosWrapper />} />
 
-                            <Route path='/Prestamos' element={<PrestamosWrapper />} />
+                            <Route path='/Prestamos/*' element={<PrestamosWrapper />} />
 
                             <Route path='/Finanzas/ArqueoDeCajas' element={<ArqueoDeCajaWrapper/>} />
 
@@ -64,6 +70,18 @@ const PaginaPrincipal: FC = () => {
                             <Route path='/Reportes/Egresos/Graficos/*' element={<ReportesEgresosGraficosWrapper/>} />
 
                             <Route path='/Reportes/Resultados/*' element={<ReportesResultadosWrapper/>} />
+
+                            <Route path='/Configuracion/General' element={<ConfiguracionGeneralWrapper/>} />
+
+                            <Route path='/Configuracion/Usuarios' element={<UsuariosWrapper/>} />
+
+                            <Route path='/Configuracion/Barrios' element={<BarriosWrapper/>} />
+
+                            <Route path='/Configuracion/Zonas' element={<ZonasWrapper/>} />
+
+                            <Route path='/Configuracion/Productos' element={<ProductosWrapper/>} />
+
+                            <Route path='/Configuracion/Items' element={<ItemsWrapper/>} />
 
                             <Route path="*" element={<Navigate to='/Inicio' />} />
                         </Routes>

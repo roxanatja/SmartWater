@@ -20,7 +20,7 @@ const AgregarClienteMapa = () => {
     //const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLng | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
-    const apiKey = 'TU_API_KEY';
+    //const apiKey = 'TU_API_KEY';
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -48,18 +48,6 @@ const AgregarClienteMapa = () => {
         }
     };
 
-    const ImagenSeleccionadaDelantera = (imagen: string | null) => {
-        setImageCarnetTrasero(imagen);
-    };
-
-    const ImagenSeleccionadaTrasera = (imagen: string | null) => {
-        setImageCarnetDelantero(imagen);
-    };
-
-    const ImagenCasaSeleccionada = (imagen: string | null) => {
-        setImageCasa(imagen);
-    };
-
     /*const handleLocationSelect = (location: google.maps.LatLng) => {
         setSelectedLocation(location);
     };*/
@@ -73,7 +61,7 @@ const AgregarClienteMapa = () => {
 
 return (
     <>
-        <form>
+        <form onSubmit={(e) => e.preventDefault()}>
             <div className="modal-overlay">
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                     <div className="modal-header">
@@ -185,18 +173,18 @@ return (
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (trasero)" onImagenSeleccionada={ImagenSeleccionadaTrasera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (trasero)" imagenSelect={imageCarnetTrasero} onImagenSeleccionada={setImageCarnetTrasero} id="trasero" />
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Porfavor, adjunta foto del carnet (Delantero)" onImagenSeleccionada={ImagenSeleccionadaDelantera}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Porfavor, adjunta foto del carnet (Delantero)" imagenSelect={imageCarnetDelantero} onImagenSeleccionada={setImageCarnetDelantero} id="delantero" />
                             </div>
                         </div>
                         <div className="grupo-input">
-                            <div className="img-carnet">
-                                <ImagenInsertar imagenSelect="Foto de la fachada del domicilio" onImagenSeleccionada={ImagenCasaSeleccionada}/>
+                            <div className="grupo-input">
+                                <ImagenInsertar texto="Foto de la fachada del domicilio" imagenSelect={imageCasa} onImagenSeleccionada={setImageCasa} id="casa" />
                             </div>
                         </div>
                         <div className="grupo-input">

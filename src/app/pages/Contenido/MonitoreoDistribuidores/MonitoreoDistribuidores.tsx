@@ -9,7 +9,7 @@ const MonitoreoDistribuidores: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Monitoreo de Distribuidores" icon="./envio-cronometrado 1.png"/>
-                <FiltroPaginado add={false} exportar={false} paginacion={false}>
+                <FiltroPaginado filtro add={false} exportar={false} paginacion={false}>
                     <div style={{display: "flex", flexDirection: "column"}}>
                         <div style={{display: "flex", gap: "35px", marginBottom: "37px"}}>
                             <div className="Mapaclientes-ubicacion">

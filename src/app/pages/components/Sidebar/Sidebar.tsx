@@ -76,12 +76,12 @@ const Sidebar: FC = () => {
                             icon="../../../Configuracion-icon.svg"
                             to="/Configuración/ConfiguraciónGeneral"
                             opciones={[
-                                { titulo: "Configuración general", to: "/Configuración/ConfiguraciónGeneral", id: 0 },
-                                { titulo: "Usuario", to: "/Configuración/Usuario", id: 1 },
-                                { titulo: "Barrios", to: "/Configuración/Barrios", id: 2 },
-                                { titulo: "Zonas", to: "/Configuración/Zonas", id: 3 },
-                                { titulo: "Productos", to: "/Configuración/Productos", id: 4 },
-                                { titulo: "Items", to: "/Configuración/Items", id: 5 },
+                                { titulo: "Configuración general", to: "/Configuracion/General", id: 0 },
+                                { titulo: "Usuarios", to: "/Configuracion/Usuarios", id: 1 },
+                                { titulo: "Barrios", to: "/Configuracion/Barrios", id: 2 },
+                                { titulo: "Zonas", to: "/Configuracion/Zonas", id: 3 },
+                                { titulo: "Productos", to: "/Configuracion/Productos", id: 4 },
+                                { titulo: "Items", to: "/Configuracion/Items", id: 5 },
                             ]}
                         />
                     </ul>

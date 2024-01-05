@@ -18,7 +18,7 @@ const Proveedores: FC = () => {
         <>
         <div>
             <PageTitle titulo="Proveedores" icon="../../Finanzas-icon.svg"/>
-            <FiltroPaginado resultados add onAdd={handleModal}>
+            <FiltroPaginado filtro resultados add onAdd={handleModal}>
                 <div style={{display:"flex", flexWrap: "wrap", gap: "16px"}}>
                     <CuadroProveedor/>
                     <CuadroProveedor/>

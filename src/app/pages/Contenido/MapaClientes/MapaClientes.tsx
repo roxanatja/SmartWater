@@ -17,7 +17,7 @@ const MapaClientes: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
-                <FiltroPaginado paginacion={false} add={true} exportar={false} onAdd={AddUbicacion} iconUbicacion>
+                <FiltroPaginado filtro paginacion={false} add={true} exportar={false} onAdd={AddUbicacion} iconUbicacion>
                     <div>
 
                     </div>

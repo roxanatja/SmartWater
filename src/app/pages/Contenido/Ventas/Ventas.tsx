@@ -14,7 +14,7 @@ const Ventas: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Ventas" icon="./Ventas-icon.svg" />
-                <FiltroPaginado exportar={true} add={false} paginacion={false} infoPedidos={true} resultados={true}>
+                <FiltroPaginado filtro exportar={true} add={false} paginacion={false} infoPedidos={true} resultados={true}>
                     <CuadroVentaCliente/>
                 </FiltroPaginado>
             </div>

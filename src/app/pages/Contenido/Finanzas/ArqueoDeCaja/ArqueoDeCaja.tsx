@@ -16,7 +16,7 @@ const ArqueoDeCaja: FC = () => {
                 finalizarArqueo === false ?
                 <div style={{width: "100%", padding: "70px 20px 0px 40px"}}>
                     <TableArqueoCaja/>
-                    <form>
+                    <form onSubmit={(e) => e.preventDefault()}>
                         <div className="ArqueoCaja-containerform">
                             <div className="ArqueoCaja-tituloform">
                                 <span>Nuevo arqueo de caja</span>
