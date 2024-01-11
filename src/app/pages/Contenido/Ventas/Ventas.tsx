@@ -5,7 +5,7 @@ import { OpcionesVentas } from "./OpcionesVentas/OpcionesVentas";
 import "./Ventas.css";
 import { FC, useContext } from "react";
 import { VentasContext } from "./VentasContext";
-import { FiltroVenta } from "./FiltroVenta/FiltroClientes";
+import { FiltroVenta } from "./FiltroVenta/FiltroVenta";
 
 const Ventas: FC = () => {
 
