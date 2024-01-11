@@ -5,20 +5,26 @@ import { OpcionesVentas } from "./OpcionesVentas/OpcionesVentas";
 import "./Ventas.css";
 import { FC, useContext } from "react";
 import { VentasContext } from "./VentasContext";
+import { FiltroVenta } from "./FiltroVenta/FiltroClientes";
 
 const Ventas: FC = () => {
 
-    const { showModal } = useContext(VentasContext)
+    const { showModal, setShowFiltro, showFiltro } = useContext(VentasContext)
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     return (
         <>
             <div>
                 <PageTitle titulo="Ventas" icon="./Ventas-icon.svg" />
-                <FiltroPaginado filtro exportar={true} add={false} paginacion={false} infoPedidos={true} resultados={true}>
+                <FiltroPaginado filtro exportar={true} add={false} paginacion={false} infoPedidos={true} resultados={true} onFilter={Onfilter}>
                     <CuadroVentaCliente/>
                 </FiltroPaginado>
             </div>
             {showModal && <OpcionesVentas/>}
+            {showFiltro && <FiltroVenta/>}
         </>
     )
 }
