@@ -1,29 +1,13 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext } from "react";
 import "./FiltroCuentasPorCobrar.css";
-import { Contador } from "../../../../components/Contador/Contador";
-import { SmartwaterContext } from "../../../../../SmartwaterContext";
 import { ReportesIngresosContext } from "../ReportesIngresosContext";
 
 const FiltroCuentasPorCobrar: FC = () => {
 
     const { setCuentasPorCobrarCobros } = useContext(ReportesIngresosContext);
-    const { selectedOption } = useContext(SmartwaterContext);
-    const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(false);
 
     const handleCloseModal = () => {
         setCuentasPorCobrarCobros(false);
-    };
-
-    const handleOpcionesClick = () => {
-        setOpcionesVisibles(!opcionesVisibles);
-    };
-
-    const handleDecrementar = (cantidad: number) => {
-        console.log(`Decrementar: ${cantidad}`);
-    };
-
-    const handleIncrementar = (cantidad: number) => {
-        console.log(`Incrementar: ${cantidad}`);
     };
 
     return (

@@ -1,4 +1,4 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext } from "react";
 import "./ReportesIngresos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { Link } from "react-router-dom";
