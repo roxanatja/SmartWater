@@ -7,11 +7,16 @@ import { CuadroCuentasPorCobrar } from "./CuadroCuentasPorCobrar/CuadroCuentasPo
 import { CobrosClientes } from "./CuadroCuentasPorCobrar/CobrosClientes";
 import { OpcionesCuentasCobrar } from "./OpcionesCuentasCobrar/OpcionesCuentasCobrar";
 import { CuentasPorCobrarContext } from "./CuentasPorCobrarContext";
+import { FiltroCuentasPorCobrar } from "./FiltroCuentasPorCobrar/FiltroCuentasPorCobrar";
 
 const CuentasPorCobrar: FC = () => {
 
     const {selectedOption, setSelectedOption} = useContext(SmartwaterContext);
-    const {showMiniModal} = useContext(CuentasPorCobrarContext);
+    const {showMiniModal, showFiltro, setShowFiltro} = useContext(CuentasPorCobrarContext);
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     useEffect(() => {
         setSelectedOption(false)
@@ -21,7 +26,7 @@ const CuentasPorCobrar: FC = () => {
         <>
         <div>
             <PageTitle titulo="Cuentas por cobrar / cobros" icon="../Finanzas-icon.svg"/>
-            <FiltroPaginado filtro swith opcionesSwitch1="Cuentas por cobrar" opcionesSwitch2="Cobros a clientes" finanzas>
+            <FiltroPaginado filtro onFilter={Onfilter} swith opcionesSwitch1="Cuentas por cobrar" opcionesSwitch2="Cobros a clientes" finanzas>
                 {
                     selectedOption === false ?
                     <div style={{display:"flex", flexWrap: "wrap", gap: "36px"}}>
@@ -37,6 +42,7 @@ const CuentasPorCobrar: FC = () => {
                 }
             </FiltroPaginado>
         </div>
+        {showFiltro && <FiltroCuentasPorCobrar/>}
         {showMiniModal && <OpcionesCuentasCobrar/>}
         </>
     )

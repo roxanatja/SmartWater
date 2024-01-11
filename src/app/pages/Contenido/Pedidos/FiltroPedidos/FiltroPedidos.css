@@ -90,7 +90,7 @@
     line-height: normal;
 }
 
-.search__container {
+.FiltroPedidossearch__container {
     width: 100%;
     margin: auto;
     display: flex;
@@ -98,11 +98,12 @@
     justify-content: flex-start;
     border: none;
     border-radius: 0px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #D6D5D5;
     transition: all 250ms ease-in-out;
 }
 
-.search__input {
+.FiltroPedidossearch__input {
     width: 100%;
     margin-left: 10px;
     color: #D6D5D5;
@@ -128,9 +129,9 @@
 
 }
 
-.searchButton {
+.FiltroPedidossearchButton {
     color: #D6D5D5;
-    width: 10px;
+    width: 20px;
     height: 10px;
     margin-right: 5px;
     border: none;

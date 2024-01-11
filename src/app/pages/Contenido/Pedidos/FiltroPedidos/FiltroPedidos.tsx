@@ -126,11 +126,11 @@ const FiltroPedidos: FC = () => {
                                     <span>Clientes</span>
                                 </div>
                                 <div className="FiltroPedidos-itemCheckContainer">
-                                    <form className="search__container" onSubmit={(e) => e.preventDefault()}>
-                                        <button type="submit" className="searchButton">
+                                    <form className="FiltroPedidossearch__container" onSubmit={(e) => e.preventDefault()}>
+                                        <button type="submit" className="FiltroPedidossearchButton">
                                             <i className="material-icons">search</i>
                                         </button>
-                                        <input className="search__input" type="text" placeholder="Buscar Clientes" required />
+                                        <input className="FiltroPedidossearch__input" type="text" placeholder="Buscar Clientes" required />
                                     </form>
                                     <div className="FiltroPedidos-itemCheck">
                                         <div className="FiltroPedidos-item">

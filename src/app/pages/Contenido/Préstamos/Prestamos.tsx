@@ -5,16 +5,21 @@ import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
 import { FC, useContext } from "react";
 import { PrestamosContext } from "./PrestamosContext";
+import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
 
 const Prestamos: FC = () => {
 
-    const { showMiniModal } = useContext(PrestamosContext)
+    const { showMiniModal, showFiltro, setShowFiltro } = useContext(PrestamosContext)
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     return (
         <>
             <div>
                 <PageTitle titulo="Préstamos" icon="./Prestamos-icon.svg"/>
-                <FiltroPaginado filtro resultadosPrestamo>
+                <FiltroPaginado filtro resultadosPrestamo onFilter={Onfilter}>
                     <div style={{display: "flex", flexWrap: "wrap", gap: "30px"}}>
                         <CuadroPrestamo estadoContrato="Sin Contrato"/>
                         <CuadroPrestamo estadoContrato="Con Contrato"/>
@@ -22,6 +27,7 @@ const Prestamos: FC = () => {
                     </div>
                 </FiltroPaginado>
             </div>
+            {showFiltro && <FiltroPrestamos/>}
             {showMiniModal && <OpcionesPrestamo/>}
         </>
     )
