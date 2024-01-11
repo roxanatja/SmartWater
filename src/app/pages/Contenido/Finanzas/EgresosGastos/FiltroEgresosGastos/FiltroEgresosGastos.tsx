@@ -1,27 +1,13 @@
-import { FC, useContext, useState } from "react";
-import "./FiltroPrestamos.css";
-import { PrestamosContext } from "../PrestamosContext";
-import { Contador } from "../../../components/Contador/Contador";
+import { FC, useContext } from "react";
+import "./FiltroEgresosGastos.css";
+import { EgresosGastosContext } from "../EgresosGastosContext";
 
-const FiltroPrestamos: FC = () => {
+const FiltroEgresosGastos: FC = () => {
 
-    const { setShowFiltro } = useContext(PrestamosContext);
-    const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
+    const { setShowFiltro } = useContext(EgresosGastosContext);
 
     const handleCloseModal = () => {
         setShowFiltro(false);
-    };
-
-    const handleOpcionesClick = () => {
-        setOpcionesVisibles(!opcionesVisibles);
-    };
-
-    const handleDecrementar = (cantidad: number) => {
-        console.log(`Decrementar: ${cantidad}`);
-    };
-
-    const handleIncrementar = (cantidad: number) => {
-        console.log(`Incrementar: ${cantidad}`);
     };
 
     return (
@@ -44,33 +30,7 @@ const FiltroPrestamos: FC = () => {
                             </div>
                         </div>
                         <div className="modal-body">
-                            <div className="FiltroClientes-Renovación">
-                                <div className="FiltroClientes-RenovaciónTitulo">
-                                    <span>Renovación</span>
-                                    <button onClick={handleOpcionesClick} className={opcionesVisibles ? "FiltroClientes-btnAgregarProducto FiltroClientesactive-btn" : "FiltroClientes-btnAgregarProducto"}>
-                                        <span className="material-symbols-outlined">
-                                            expand_more
-                                        </span>
-                                    </button>
-                                </div>
-                                <div className="lineagris"></div>
-                                {
-                                    opcionesVisibles &&
-                                    <>
-                                        <div className="FiltroClientes-RenovaciónOption">
-                                            <div className="FiltroClientes-Renovadoinicio">
-                                                <span>Renovado hasta en</span>
-                                                <Contador onIncrementar={handleDecrementar} onDecrementar={handleIncrementar} />
-                                            </div>
-                                            <div className="FiltroClientes-Renovadoinicio">
-                                                <span>Renovado hasta en</span>
-                                                <Contador onIncrementar={handleDecrementar} onDecrementar={handleIncrementar} />
-                                            </div>
-                                        </div>
-                                    </>
-                                }
-                            </div>
-                            <div className="FiltroPrestamos-FechaContainer">
+                            <div className="FiltroEgresosGastos-FechaContainer">
                                 <div className="FiltroVenta-titulos">
                                     <span>Fechas</span>
                                 </div>
@@ -94,87 +54,76 @@ const FiltroPrestamos: FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="FiltroPrestamos-container">
-                                    <div className="FiltroPrestamos-containercheck">
-                                        <div className="FiltroPrestamos-titulos">
-                                            <span>Préstamos</span>
-                                        </div>
-                                        <div className="FiltroPrestamos-itemCheckContainerColum">
-                                            <div className="FiltroVenta-itemCheck">
-                                                <div className="FiltroVenta-item">
-                                                    <input
-                                                        className="input-check"
-                                                        type="checkbox"
-                                                    />
-                                                    <img src="./ConContrato.svg" alt="" />
-                                                    <span>Con contrato</span>
-                                                </div>
-                                            </div>
-                                            <div className="FiltroVenta-itemCheck">
-                                                <div className="FiltroVenta-item">
-                                                    <input
-                                                        className="input-check"
-                                                        type="checkbox"
-                                                    />
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
-                                                        <image xlinkHref="./ConContrato.svg" x="4" y="5" width="21" height="21" />
-                                                        <circle cx="14.5" cy="14.5" r="13" stroke="#FF0000" strokeWidth="3" />
-                                                        <path d="M7.0 22.9L23.1 6" stroke="#FF0000" strokeWidth="3" />
-                                                    </svg>
-                                                    <span>Sin contrato</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="FiltroPrestamos-containercheck">
-                                        <div className="FiltroPrestamos-titulos">
-                                            <span>Contratos</span>
-                                        </div>
-                                        <div className="FiltroPrestamos-itemCheckContainerColum">
-                                            <div className="FiltroVenta-itemCheck">
-                                                <div className="FiltroVenta-item">
-                                                    <input
-                                                        className="input-check"
-                                                        type="checkbox"
-                                                    />
-                                                    <span>Contratos Vigentes</span>
-                                                </div>
-                                            </div>
-                                            <div className="FiltroVenta-itemCheck">
-                                                <div className="FiltroVenta-item">
-                                                    <input
-                                                        className="input-check"
-                                                        type="checkbox"
-                                                    />
-                                                    <span>Contratos Vencidos</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div className="FiltroEgresosGastos-selectContainer">
+                                    <label>Egreso o gasto</label>
+                                    <select name="" id="">
+                                        <option value="Egreso">Egreso</option>
+                                    </select> 
                                 </div>
-                                <div className="FiltroPrestamos-titulos">
-                                    <span>Distribuidores</span>
+                                <div className="FiltroEgresosGastos-selectContainer">
+                                    <label>Egreso o gasto</label>
+                                    <select name="" id="">
+                                        <option value="Egreso">Proveedor</option>
+                                    </select> 
                                 </div>
-                                <div className="FiltroPrestamos-itemCheckContainerColum">
-                                    <div className="FiltroPrestamos-itemCheckColum">
-                                        <div className="FiltroPrestamos-item">
+                                <div className="FiltroEgresosGastos-selectContainer">
+                                    <label>Egreso o gasto</label>
+                                    <select name="" id="">
+                                        <option value="Egreso">Medio de Pago</option>
+                                    </select> 
+                                </div>
+                                <div className="FiltroEgresosGastos-titulos">
+                                    <span>Factura</span>
+                                </div>
+                                <div className="FiltroEgresosGastos-itemCheckContainerColum">
+                                    <div className="FiltroEgresosGastos-itemCheckColum">
+                                        <div className="FiltroEgresosGastos-item">
                                             <input
                                                 className="input-check"
                                                 type="checkbox"
                                             />
-                                            <span>Edilberto Parraga</span>
+                                            <img src="../../archivo-factura-dolar.svg" alt="" />
+                                            <span>Con Factura</span>
+                                        </div>
+                                    </div>
+                                    <div className="FiltroEgresosGastos-itemCheckColum">
+                                        <div className="FiltroEgresosGastos-item">
+                                            <input
+                                                className="input-check"
+                                                type="checkbox"
+                                            />
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="12" r="11" stroke="#F40101" strokeWidth="2" />
+                                                <image xlinkHref="../../archivo-factura-dolar-mini.svg" x="6" y="5" width="14" height="14" />
+                                                <line x1="6" y1="6" x2="18" y2="18" stroke="#FF0000" strokeWidth="3" />
+                                            </svg>
+                                            <span>Sin Factura</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="FiltroCuentasPorCobrar-titulos">
+                                    <span>Distribuidores</span>
+                                </div>
+                                <div className="FiltroCuentasPorCobrar-itemCheckContainerColum">
+                                    <div className="FiltroCuentasPorCobrar-itemCheckColum">
+                                        <div className="FiltroCuentasPorCobrar-item">
+                                            <input
+                                                className="input-check"
+                                                type="checkbox"
+                                            />
+                                            <span>Distribuidor 1</span>
                                         </div>
                                         <div className="FiltroVenta-itemNumero">
                                             <span>22</span>
                                         </div>
                                     </div>
-                                    <div className="FiltroPrestamos-itemCheckColum">
-                                        <div className="FiltroPrestamos-item">
+                                    <div className="FiltroCuentasPorCobrar-itemCheckColum">
+                                        <div className="FiltroCuentasPorCobrar-item">
                                             <input
                                                 className="input-check"
                                                 type="checkbox"
                                             />
-                                            <span>Caleb Zerraga</span>
+                                            <span>Distribuidor 2</span>
                                         </div>
                                         <div className="FiltroVenta-itemNumero">
                                             <span>22</span>
@@ -247,4 +196,4 @@ const FiltroPrestamos: FC = () => {
     );
 }
 
-export { FiltroPrestamos }
+export { FiltroEgresosGastos }

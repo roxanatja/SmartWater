@@ -253,8 +253,8 @@ const FiltroVenta: FC = () => {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                            <button type="button" className="btn-registrar">Filtrar</button>
+                            <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Quitar filtros</button>
+                            <button type="button" className="btn-registrar">Aplicar filtros</button>
                         </div>
                     </div>
                 </div>

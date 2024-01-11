@@ -1,11 +1,11 @@
 import { FC, useContext } from "react";
-import "./FiltroHistorialCuentasPorCobrar.css";
-import { CuentasPorCobrarContext } from "../../CuentasPorCobrarContext";
+import "./FiltroHistorialCuentasPorPagar.css";
 import { SmartwaterContext } from "../../../../../../SmartwaterContext";
+import { CuentasPorPagarContext } from "../../CuentasPorPagarContext";
 
-const FiltroHistorialCuentasPorCobrar: FC = () => {
+const FiltroHistorialCuentasPorPagar: FC = () => {
 
-    const { setShowFiltro } = useContext(CuentasPorCobrarContext);
+    const { setShowFiltro } = useContext(CuentasPorPagarContext);
     const { selectedOption } = useContext(SmartwaterContext);
 
     const handleCloseModal = () => {
@@ -32,7 +32,7 @@ const FiltroHistorialCuentasPorCobrar: FC = () => {
                             </div>
                         </div>
                         <div className="modal-body">
-                            <div className="FiltroHistorialCuentasPorCobrar-FechaContainer">
+                            <div className="FiltroHistorialCuentasPorPagar-FechaContainer">
                                 <div className="FiltroVenta-titulos">
                                     <span>Fechas</span>
                                 </div>
@@ -87,4 +87,4 @@ const FiltroHistorialCuentasPorCobrar: FC = () => {
     );
 }
 
-export { FiltroHistorialCuentasPorCobrar }
+export { FiltroHistorialCuentasPorPagar }

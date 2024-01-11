@@ -7,15 +7,20 @@ import { CuentasContales } from "./CuentasContales/CuentasContales";
 import { RegistrosEyG } from "./RegistrosEyG/RegistrosEyG";
 import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
 import { EgresosGastosContext } from "./EgresosGastosContext";
+import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
 
 const EgresosGastos: FC = () => {
 
     const {selectedOption, setSelectedOption } = useContext(SmartwaterContext);
 
-    const {showModal, setShowModal} = useContext(EgresosGastosContext);
+    const {showModal, setShowModal, showFiltro, setShowFiltro} = useContext(EgresosGastosContext);
 
     const handleModal = () => {
         setShowModal(true)
+    }
+
+    const Onfilter = () => {
+        setShowFiltro(true)
     }
 
     useEffect(() => {
@@ -38,7 +43,8 @@ const EgresosGastos: FC = () => {
                     :
                     <FiltroPaginado filtro swith finanzas add onAdd={handleModal}
                             opcionesSwitch1="Cuentas contables" 
-                            opcionesSwitch2="Registros Egresos y Gastos">
+                            opcionesSwitch2="Registros Egresos y Gastos"
+                            onFilter={Onfilter}>
                         <div style={{display:"flex", flexWrap: "wrap", gap: "23px", paddingLeft: "5px"}}>
                             <RegistrosEyG/>
                         </div>
@@ -46,6 +52,7 @@ const EgresosGastos: FC = () => {
                 }
             
         </div>
+        {showFiltro && <FiltroEgresosGastos/>}
         {showModal && <AddEgresosGastos/>}
         </>
     )
