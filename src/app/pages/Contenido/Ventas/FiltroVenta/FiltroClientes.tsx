@@ -1,27 +1,12 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext } from "react";
 import "./FiltroVenta.css";
-import { Contador } from "../../../components/Contador/Contador";
 import { VentasContext } from "../VentasContext";
 
 const FiltroVenta: FC = () => {
     const { setShowFiltro } = useContext(VentasContext);
-    const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
 
     const handleCloseModal = () => {
         setShowFiltro(false);
-    };
-
-    const handleOpcionesClick = () => {
-        setOpcionesVisibles(!opcionesVisibles);
-    };
-
-    const handleDecrementar = (cantidad: number) => {
-        console.log(`Decrementar: ${cantidad}`);
-    };
-
-    const handleIncrementar = (cantidad: number) => {
-        console.log(`Incrementar: ${cantidad}`);
-        // Aquí puedes colocar la lógica adicional si es necesario
     };
 
     return (
