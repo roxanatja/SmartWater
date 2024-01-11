@@ -7,11 +7,16 @@ import { PedidosCurso } from "./CuadroPedidos/PedidosCurso";
 import { PedidosAtendidos } from "./CuadroPedidos/PedidosAtendidos";
 import { OpcionesPedidos } from "./CuadroPedidos/OpcionesPedidos/OpcionesPedidos";
 import { SmartwaterContext } from "../../../SmartwaterContext";
+import { FiltroPedidos } from "./FiltroPedidos/FiltroPedidos";
 
 const Pedidos: FC = () => {
 
-    const { showMiniModal} = useContext(PedidosContext);
+    const { showMiniModal, showFiltro, setShowFiltro} = useContext(PedidosContext);
     const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     useEffect(() => {
         setSelectedOption(false);
@@ -21,7 +26,7 @@ const Pedidos: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Pedidos" icon="./Pedidos-icon.svg"/>
-                <FiltroPaginado filtro swith={true} opcionesSwitch1="En curso" opcionesSwitch2="Atendidos">
+                <FiltroPaginado filtro swith={true} opcionesSwitch1="En curso" opcionesSwitch2="Atendidos" onFilter={Onfilter}>
                     {
                         selectedOption === false ?
                         <div style={{display:"flex", flexWrap: "wrap"}}>
@@ -34,6 +39,7 @@ const Pedidos: FC = () => {
                     }
                 </FiltroPaginado>
             </div>
+            {showFiltro && <FiltroPedidos/>}
             {showMiniModal && <OpcionesPedidos/>}
         </>
     )
