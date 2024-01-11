@@ -5,7 +5,7 @@ import { SmartwaterContext } from "../../../../SmartwaterContext";
 
 const FiltroPedidos: FC = () => {
     const { setShowFiltro } = useContext(PedidosContext);
-    const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+    const { selectedOption } = useContext(SmartwaterContext);
 
     const handleCloseModal = () => {
         setShowFiltro(false);
@@ -99,7 +99,6 @@ const FiltroPedidos: FC = () => {
                                         </div>
                                     </>
                                 }
-
                                 <div className="FiltroPedidos-titulos">
                                     <span>Distribuidores</span>
                                 </div>
@@ -127,7 +126,7 @@ const FiltroPedidos: FC = () => {
                                     <span>Clientes</span>
                                 </div>
                                 <div className="FiltroPedidos-itemCheckContainer">
-                                    <form className="search__container" onSubmit={(e) => e.preventDefault()} role="Buscar">
+                                    <form className="search__container" onSubmit={(e) => e.preventDefault()}>
                                         <button type="submit" className="searchButton">
                                             <i className="material-icons">search</i>
                                         </button>
