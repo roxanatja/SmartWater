@@ -9,7 +9,7 @@ import { GoogleMaps } from "../../components/GoogleMaps/GoogleMaps";
 const MapaClientes: FC = () => {
 
     const { showMiniModal ,setShowMiniModal } = useContext(MapaClientesContext);
-    const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
+    const api: string = "AIzaSyBwAtYn_94-SPOL7aHETL86g6QLkuH5V74";
 
     const AddUbicacion = () => {
         setShowMiniModal(true)
