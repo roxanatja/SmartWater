@@ -1,4 +1,3 @@
-import { FormEvent } from "react";
 import "./CuadroRealizarPedido.css";
 
 const CuadroRealizarPedido = () => {
@@ -18,7 +17,7 @@ const CuadroRealizarPedido = () => {
                             <span className="RealizarPedido-title">Realizar Pedido</span>
                         </div>
                         <div className="opciones-svg">
-                            <img src="./Opciones-icon.svg" />
+                            <img src="./Opciones-icon.svg" alt=""/>
                         </div>
                     </div>
                     <div>
@@ -32,11 +31,11 @@ const CuadroRealizarPedido = () => {
                             <div className="cantidad-pedido">
                                 <span style={{ marginLeft: "10px" }}>Cantidad</span>
                                 <div className="numero-pedido">
-                                    <button type="button" className="boton"><img src="./BotonMenos-icon.svg" /></button>
+                                    <button type="button" className="boton"><img src="./BotonMenos-icon.svg" alt=""/></button>
                                     <div>
                                         <input type="text" defaultValue="1" className="numero-solicitado"/>
                                     </div>
-                                    <button type="button" className="boton"><img src="./BotonMas-icon.svg" /></button>
+                                    <button type="button" className="boton"><img src="./BotonMas-icon.svg" alt=""/></button>
                                 </div>
                             </div>
                             <div style={{ display: "flex" }}>

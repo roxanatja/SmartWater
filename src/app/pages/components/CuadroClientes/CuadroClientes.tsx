@@ -38,7 +38,7 @@ const CuadroClientes = () => {
                         <span className="Cliente-title">Clientes <span className="Cliente-title2">vista rapida</span> </span>
                     </div>
                     <div className="opciones-svg">
-                        <img src="./Opciones-icon.svg" />
+                        <img src="./Opciones-icon.svg" alt=""/>
                     </div>
                 </div>
                 <div className="todos-clientes">
@@ -46,7 +46,7 @@ const CuadroClientes = () => {
                         return (
                             <div className="cliente" key={item.id}>
                                 <div className="perfil-cliente">
-                                    <img src={item.img} className="img-cliente" />
+                                    <img src={item.img} className="img-cliente" alt=""/>
                                     <div>
                                         <span>{item.nombre}</span>
                                     </div>
@@ -56,7 +56,7 @@ const CuadroClientes = () => {
                                         <span>20/01/2023</span>
                                     </div>
                                     <div className="moneda-cliente">
-                                        <img src="./Moneda-icon.svg" />
+                                        <img src="./Moneda-icon.svg" alt=""/>
                                         <div>
                                             <span>100 Bs.</span>
                                         </div>

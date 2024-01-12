@@ -76,7 +76,7 @@ const InfoCliente: FC = () => {
             </div>
             <div className="infoClientes-footer">
                 <img src="./Location-azul-icon.svg" alt=""/>
-                <a className="infoClientes-ubi" href="#">Ver ubicación en el mapa</a>
+                <a className="infoClientes-ubi" href="https://www.google.com/maps">Ver ubicación en el mapa</a>
             </div>
         </div>
         </>
