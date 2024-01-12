@@ -9,3 +9,10 @@
     font-weight: 500;
     line-height: normal;
 }
+
+.Mapaclientes-googleubicacion{
+    width: 100%;
+    height: 97%;
+    margin-bottom: 5px;
+    background: #000;
+}

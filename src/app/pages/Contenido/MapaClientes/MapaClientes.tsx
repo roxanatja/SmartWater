@@ -4,10 +4,12 @@ import "./MapaClientes.css";
 import { FC, useContext } from "react";
 import { RegistrarNuevo } from "./RegistrarNuevo/RegistrarNuevo";
 import { MapaClientesContext } from "./MapaClientesContext";
+import { GoogleMaps } from "../../components/GoogleMaps/GoogleMaps";
 
 const MapaClientes: FC = () => {
 
     const { showMiniModal ,setShowMiniModal } = useContext(MapaClientesContext);
+    const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
 
     const AddUbicacion = () => {
         setShowMiniModal(true)
@@ -18,8 +20,8 @@ const MapaClientes: FC = () => {
             <div>
                 <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
                 <FiltroPaginado filtro paginacion={false} add={true} exportar={false} onAdd={AddUbicacion} iconUbicacion>
-                    <div>
-
+                    <div className="Mapaclientes-googleubicacion">
+                        <GoogleMaps apiKey={api}/>
                     </div>
                 </FiltroPaginado>
             </div>
