@@ -7,17 +7,22 @@ import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPagi
 import { CuadroPagosProveedor } from "../CuadroPagosProveedor/CuadroPagosProveedor";
 import { CuadroHistorialCredito } from "./CuadroHistorialCredito/CuadroHistorialCredito";
 import { CuentasPorPagarContext } from "../CuentasPorPagarContext";
+import { FiltroHistorialCuentasPorPagar } from "./FiltroHistorialCuentasPorPagar/FiltroHistorialCuentasPorPagar";
 
 const HistorialCuentas: FC = () => {
 
     const {selectedOption} = useContext(SmartwaterContext);
-    const {setShowMiniModal} = useContext(CuentasPorPagarContext);
+    const {setShowMiniModal, showFiltro, setShowFiltro} = useContext(CuentasPorPagarContext);
     const navigate = useNavigate();
 
     const handleClick = () => {
         navigate('/Finanzas/CuentasPorPagar');
         setShowMiniModal(false);
     };
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     return(
         <>
@@ -30,7 +35,7 @@ const HistorialCuentas: FC = () => {
                 </button>
             </div>
             <PageTitle titulo="Historial" icon="../../Finanzas-icon.svg"/>
-            <FiltroPaginado swith infoPedidos opcionesSwitch1="Compras al crédito" opcionesSwitch2="Pagos a cuenta">
+            <FiltroPaginado filtro swith infoPedidos opcionesSwitch1="Compras al crédito" opcionesSwitch2="Pagos a cuenta" onFilter={Onfilter}>
                 {
                     selectedOption === false ?
                     <div style={{display:"flex", flexWrap: "wrap", gap: "24px"}}>
@@ -44,6 +49,7 @@ const HistorialCuentas: FC = () => {
                 }
             </FiltroPaginado>
         </div>
+        {showFiltro && <FiltroHistorialCuentasPorPagar/>}
         </>
     )
 }

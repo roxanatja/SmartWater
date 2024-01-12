@@ -1,0 +1,149 @@
+.FiltroPedidos-FechaContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+}
+
+.FiltroPedidos-titulos{
+    color: #1A3D7D;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.FiltroPedidos-Fechascontainer{
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+.FiltroPedidos-Fecha{
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 32px;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.FiltroPedidos-FechaInput{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 150px;
+    height: 32px;
+    padding: 8px 6px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    border: 1px solid #F9F8F8;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.FiltroPedidos-FechaInput input {
+    border: none;
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.FiltroPedidos-itemCheckContainer{
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    flex-wrap: wrap;
+}
+
+.FiltroPedidos-itemCheck{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 48%;
+}
+
+.FiltroPedidos-item{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1 0 0;
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.FiltroPedidossearch__container {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border: none;
+    border-radius: 0px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #D6D5D5;
+    transition: all 250ms ease-in-out;
+}
+
+.FiltroPedidossearch__input {
+    width: 100%;
+    margin-left: 10px;
+    color: #D6D5D5;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    background-color: transparent;
+    border: none;
+    transition: all 250ms ease-in-out;
+
+    &::placeholder {
+        color: color(#D6D5D5);
+    }
+
+    &:hover,
+    &:focus {
+        outline: 0;
+        border: none;
+        color: #000;
+    }
+
+}
+
+.FiltroPedidossearchButton {
+    color: #D6D5D5;
+    width: 20px;
+    height: 10px;
+    margin-right: 5px;
+    border: none;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.4s;
+
+    &:hover,
+    &:focus {
+        border: none;
+        color: #D6D5D5;
+    }
+}

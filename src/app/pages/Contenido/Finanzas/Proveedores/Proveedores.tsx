@@ -5,10 +5,15 @@ import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginad
 import { AgregarProveedor } from "./AgregarProveedor/AgregarProveedor";
 import { CuadroProveedor } from "./CuadroProveedor/CuadroProveedor";
 import { ProveedoresContext } from "./ProveedoresContext";
+import { FiltroProveedores } from "./FiltroProveedores/FiltroProveedores";
 
 const Proveedores: FC = () => {
     
-    const { showModal, setShowModal } = useContext(ProveedoresContext);
+    const { showModal, setShowModal, showFiltro, setShowFiltro } = useContext(ProveedoresContext);
+
+    const Onfilter = () => {
+        setShowFiltro(true)
+    }
 
     const handleModal = () => {
         setShowModal(true)
@@ -18,7 +23,7 @@ const Proveedores: FC = () => {
         <>
         <div>
             <PageTitle titulo="Proveedores" icon="../../Finanzas-icon.svg"/>
-            <FiltroPaginado filtro resultados add onAdd={handleModal}>
+            <FiltroPaginado filtro resultados add onAdd={handleModal} onFilter={Onfilter}>
                 <div style={{display:"flex", flexWrap: "wrap", gap: "16px"}}>
                     <CuadroProveedor/>
                     <CuadroProveedor/>
@@ -26,6 +31,7 @@ const Proveedores: FC = () => {
                 </div>
             </FiltroPaginado>
         </div>
+        {showFiltro && <FiltroProveedores/>}
         {showModal && <AgregarProveedor/>}
         </>
     )

@@ -14,6 +14,7 @@ type Componentes = {
     opcionesSwitch1?: string;
     opcionesSwitch2?: string;
     onAdd?: () => void;
+    onFilter?: () => void;
     finanzas?: boolean;
     iconUbicacion?: boolean;
     filtro?: boolean;
@@ -21,7 +22,7 @@ type Componentes = {
 
 const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children, onAdd, infoPedidos, 
                                             resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
-                                            finanzas, iconUbicacion, filtro}) => {
+                                            finanzas, iconUbicacion, filtro, onFilter}) => {
 
     return(
         <>
@@ -74,7 +75,7 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                     {
                         filtro &&
                         <div>
-                            <button type="button" className="boton-filtro">
+                            <button type="button" className="boton-filtro" onClick={onFilter}>
                                 <span style={{marginRight: "5px"}}>Filtrar</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <g clipPath="url(#clip0_35_4995)">
