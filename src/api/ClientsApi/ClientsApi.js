@@ -1,4 +1,4 @@
-import smartwaterApi from "../SmartwaterAPI";
+import smartwaterApi from "../SmartWaterApi";
 
 export const loadClients = async () => {
     try{
