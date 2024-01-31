@@ -65,6 +65,18 @@ const RegistrarVenta: FC = () => {
         setProductosAgregados(TodosProductos);
     }
 
+    const registerSale = () => {
+        const allProducts = productosAgregados;
+
+        if(allProducts.length === 0){
+            window.alert('No hay productos agregados para vender');
+            console.log('There is no products to sale ', allProducts);
+        } else {
+            //TODO: Save data with the api
+            console.log('Sale successfully registered');
+        }
+    }
+
     return (
         <>
             <form onSubmit={(e) => e.preventDefault()}>
@@ -230,7 +242,7 @@ const RegistrarVenta: FC = () => {
                             placeholder="Agregar Comentario" />
                     </div>
                 </div>
-                <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }}>
+                <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }} onClick={registerSale}>
                     <button className="RegistrarVenta-btnVender">
                         <span>Vender</span>
                     </button>
