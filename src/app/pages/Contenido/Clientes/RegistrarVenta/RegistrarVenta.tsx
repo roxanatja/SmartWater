@@ -1,8 +1,9 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import "./RegistrarVenta.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
+import { ClientesContext } from "../ClientesContext";
 
 type ProductosAdd = {
     id: number,
@@ -13,6 +14,7 @@ type ProductosAdd = {
 
 const RegistrarVenta: FC = () => {
 
+    const { selectedClient } = useContext(ClientesContext)
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
     const [checkbox2, setCheckbox2] = useState<boolean>(false);
