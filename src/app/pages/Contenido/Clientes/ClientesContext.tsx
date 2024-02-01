@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { Client } from "../../../../type/Cliente/Client";
 
 type ClientesContextType = {
     showModal: boolean;
@@ -8,7 +9,9 @@ type ClientesContextType = {
     selectedOption: boolean;
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
-    setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>
+    setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedClient: Client;
+    setSelectedClient: React.Dispatch<React.SetStateAction<Client>>;
 }
 
 export const ClientesContext = createContext<ClientesContextType>(
@@ -20,7 +23,38 @@ export const ClientesProvider = ({ children }: any) => {
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
-
+    
+    const client:Client = {
+        "_id": "",
+        "code": "",
+        "user": "",
+        "storeImage": "",
+        "fullName": "",
+        "phoneNumber": "",
+        "address": "",
+        "comment": "",
+        "ciFrontImage": "",
+        "ciBackImage": "",
+        "zone": "",
+        "district": "",
+        "location": {
+          "latitude": "",
+          "longitude": ""
+        },
+        "hasOrder": false,
+        "hasLoan": true,
+        "hasContract": false,
+        "renewInDays": 1,
+        "renewDate": "",
+        "isClient": true,
+        "contracts": [],
+        "created": "",
+        "updated": "",
+        "lastSale": "",
+        "hasExpiredContract": false,
+        "credit": 1
+      }
+      const[selectedClient, setSelectedClient] = useState<Client>(client)
 
     return (
         <ClientesContext.Provider value={{
@@ -31,7 +65,9 @@ export const ClientesProvider = ({ children }: any) => {
             selectedOption, 
             setSelectedOption,
             showFiltro,
-            setShowFiltro
+            setShowFiltro,
+            selectedClient,
+            setSelectedClient
         }}>
             {children}
         </ClientesContext.Provider>
