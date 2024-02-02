@@ -3,6 +3,7 @@ import "./AgregarCliente.css";
 //import { GoogleMapComponent } from "../../../components/GoogleMaps/GoogleMapComponent";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
+import { GoogleMaps } from "../../../components/GoogleMaps/GoogleMaps";
 
 const AgregarCliente = () => {
     const { setShowModal } = useContext(ClientesContext);
@@ -20,7 +21,7 @@ const AgregarCliente = () => {
     //const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLng | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
-    //const apiKey = 'TU_API_KEY';
+    const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -183,7 +184,7 @@ return (
                             </div>
                             <div className="grupo-input">
                             <div className="Ubi-Google">
-                                {/* <GoogleMapComponent apiKey={apiKey} onLocationSelect={handleLocationSelect} /> */}
+                                <GoogleMaps apiKey={api}/>
                             </div>
                             {/* {selectedLocation && (
                                 <div className="Ubi-Google">
