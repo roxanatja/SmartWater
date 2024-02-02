@@ -9,7 +9,6 @@ import { ClientesContext } from "./ClientesContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../api/ClientsApi/ClientsApi";
 import { Client } from '../../../../type/Cliente/Client';
-import { click } from "@testing-library/user-event/dist/click";
 
 const Clientes: FC = () => {
 
@@ -49,10 +48,6 @@ const Clientes: FC = () => {
     }
     const Onfilter = () => {
         setShowFiltro(true)
-    }
-
-    const selectClient = ( id:String ) => {
-        console.log(id)
     }
 
     return (

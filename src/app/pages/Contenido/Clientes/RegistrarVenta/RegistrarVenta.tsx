@@ -1,14 +1,18 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import "./RegistrarVenta.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
 import { ClientesContext } from "../ClientesContext";
+import { saveSale } from "../../../../../api/Sale/SaleApi";
+import { GetProducts } from "../../../../../api/Products/ProductsApi";
+import Product from "../../../../../type/Products/Products";
+import { Sale, DetailData } from "../../../../../type/Sale/Sale";
 
 type ProductosAdd = {
     id: number,
     cantidadSeleccionada: string,
-    productoSeleccionado: string,
+    productoSeleccionado: Product,
     precioSeleccionado: string
 }
 
@@ -20,13 +24,25 @@ const RegistrarVenta: FC = () => {
     const [checkbox2, setCheckbox2] = useState<boolean>(false);
     const [productosAgregados, setProductosAgregados] = useState<Array<ProductosAdd>>([]);
     const [selectedCantidad, setSelectedCantidad] = useState<string>('');
-    const [selectedProducto, setSelectedProducto] = useState<string>('');
+    const [selectedProducto, setSelectedProducto] = useState<Product>();
     const [selectedPrecio, setSelectedPrecio] = useState<string>('');
+    const [comment, setComment] = useState<string>('');
+    const [products, setProducts] = useState<Product[]>([]);
     const navigate = useNavigate();
 
     const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-    const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"];
+    // const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"];
     const Precio = ["5000", "10000", "300", "4000", "20000"];
+
+    useEffect(() => {
+        getProduct();
+    }, []);
+
+    const getProduct = async () => {
+        await GetProducts().then((resp) => {
+            setProducts(resp.data);
+        });
+    }
 
     const handleOpcionesClick = () => {
         setOpcionesVisibles(!opcionesVisibles);
@@ -50,34 +66,71 @@ const RegistrarVenta: FC = () => {
         }
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setComment(e.target.value);
+    };
+
     const AgregarProducto = () => {
         var TodosProductos = [...productosAgregados]
         var ProductoNew: ProductosAdd = {
             id: productosAgregados.length + 1,
             cantidadSeleccionada: selectedCantidad,
-            productoSeleccionado: selectedProducto,
+            productoSeleccionado: selectedProducto as Product,
             precioSeleccionado: selectedPrecio
         }
         TodosProductos.push(ProductoNew);
         setProductosAgregados(TodosProductos);
-    }
+    };
 
     const DeleteProducto = (id: number) => {
         var TodosProductos = productosAgregados.filter(P => P.id !== id);
         setProductosAgregados(TodosProductos);
+    };
+
+    const editProduct = () => {
+        
     }
 
-    const registerSale = () => {
+    const registerSale = async () => {
         const allProducts = productosAgregados;
 
-        if(allProducts.length === 0){
+        if (allProducts.length === 0) {        // Check if there are products to sale
             window.alert('No hay productos agregados para vender');
             console.log('There is no products to sale ', allProducts);
         } else {
-            //TODO: Save data with the api
-            console.log('Sale successfully registered');
+            try{
+                var dataToSave: Sale = {
+                    client: selectedClient._id,
+                    user: selectedClient.user,
+                    comment: comment,
+                    detail: [],
+                    creditSale: false
+                };
+    
+                allProducts.map((item) => {
+                    var data: DetailData = {
+                        product: "",
+                        quantity: "",
+                        price: ""
+                    };
+                    data.quantity = item.cantidadSeleccionada;
+                    data.product = item.productoSeleccionado._id;
+                    data.price = item.precioSeleccionado;
+    
+                    dataToSave.detail.push(data);
+                });
+    
+                const resp = await saveSale(dataToSave);
+    
+                if(resp === 200){
+                    console.log('Sale successfully registered', dataToSave);
+                }
+
+            } catch(e) {
+                console.error('Error registering sale', e);
+            }
         }
-    }
+    };
 
     return (
         <>
@@ -94,7 +147,7 @@ const RegistrarVenta: FC = () => {
                 <div className="RegistrarVenta-scrooll">
                     <div className="RegistrarVenta-NombreCliente">
                         <img src="../Cliente2.svg" alt="" />
-                        <span>Daniela Ayala</span>
+                        <span>{selectedClient.fullName}</span>
                     </div>
                     <div className="RegistrarVenta-AgregarProducto">
                         <div className="RegistrarVenta-AgregarProductoTitulo">
@@ -165,8 +218,8 @@ const RegistrarVenta: FC = () => {
                                                 <td>
                                                     <div className="RegistrarVenta-TablaBody" style={{ borderRadius: "0px 0px 0px 0px" }}>
                                                         <OptionScrooll
-                                                            options={Producto}
-                                                            onOptionChange={(selectedOption) => setSelectedProducto(selectedOption)} />
+                                                            options={products.map((product) => product.name)}
+                                                            onOptionChange={(selectedOption) => setSelectedProducto(products.find((product) => product.name === selectedOption))} />
                                                     </div>
                                                 </td>
                                                 <td>
@@ -209,14 +262,14 @@ const RegistrarVenta: FC = () => {
                                                 productosAgregados.map((item, index) => (
                                                     <div className="RegistrarVenta-productoAgregado">
                                                         <div className="RegistrarVenta-productoAgregado1">
-                                                            <span>{item.productoSeleccionado}</span>
+                                                            <span>{item.productoSeleccionado.name}</span>
                                                             <div className="RegistrarVenta-productoAgregadobtncontainer">
                                                                 <button className="RegistrarVenta-productoAgregadoBTN" onClick={() => DeleteProducto(item.id)}>
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                                         <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#C50000" />
                                                                     </svg>
                                                                 </button>
-                                                                <button className="RegistrarVenta-productoAgregadoBTN">
+                                                                <button className="RegistrarVenta-productoAgregadoBTN" onClick={() => editProduct()}>
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                                         <path d="M3 17.46V20.5C3 20.78 3.22 21 3.5 21H6.54C6.67 21 6.8 20.95 6.89 20.85L17.81 9.94L14.06 6.19L3.15 17.1C3.05 17.2 3 17.32 3 17.46ZM20.71 7.04C20.8027 6.94749 20.8762 6.8376 20.9264 6.71663C20.9766 6.59565 21.0024 6.46597 21.0024 6.335C21.0024 6.20403 20.9766 6.07435 20.9264 5.95338C20.8762 5.83241 20.8027 5.72252 20.71 5.63L18.37 3.29C18.2775 3.1973 18.1676 3.12375 18.0466 3.07357C17.9257 3.02339 17.796 2.99756 17.665 2.99756C17.534 2.99756 17.4043 3.02339 17.2834 3.07357C17.1624 3.12375 17.0525 3.1973 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z" fill="#1A3D7D" />
                                                                     </svg>
@@ -241,7 +294,9 @@ const RegistrarVenta: FC = () => {
                             <path d="M3 0C1.34531 0 0 1.23423 0 2.75229V15.1376C0 16.6557 1.34531 17.8899 3 17.8899H7.5V21.3303C7.5 21.5926 7.65938 21.8291 7.9125 21.9452C8.16563 22.0614 8.47031 22.0355 8.7 21.8807L14.4984 17.8899H21C22.6547 17.8899 24 16.6557 24 15.1376V2.75229C24 1.23423 22.6547 0 21 0H3Z" fill="#1A3D7D" />
                         </svg>
                         <input type="text"
-                            placeholder="Agregar Comentario" />
+                            placeholder="Agregar Comentario"
+                            value={comment} 
+                            onChange={handleInputChange} />
                     </div>
                 </div>
                 <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }} onClick={registerSale}>
