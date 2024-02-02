@@ -1,11 +1,12 @@
-import { FC, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import "./InfoCliente.css"
 import { Option } from "../../../components/Option/Option"
 import { ClientesContext } from "../ClientesContext"
+import { Client } from "../../../../../type/Cliente/Client"
 
-const InfoCliente: FC = () => {
+const InfoCliente = (client:Client) => {
 
-    const { setShowMiniModal } = useContext(ClientesContext)
+    const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -21,6 +22,11 @@ const InfoCliente: FC = () => {
         setShowOptions(false);
     }
 
+    const showMiniModal = () => {
+        setShowMiniModal(true);
+        setSelectedClient(client);
+    }
+
     return(
         <>
         <div className="infoClientes-container">
@@ -28,7 +34,7 @@ const InfoCliente: FC = () => {
                 <div className="infoClientes-datoscontainer">
                     <div className="infoClientes-datos" style={{fontWeight: "500"}}>
                         <img src="./Cliente2.svg" alt="" />
-                        <span>Rubén González</span>
+                        <span>{client.fullName}</span>
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./Location-icon.svg" alt="" />
@@ -40,11 +46,11 @@ const InfoCliente: FC = () => {
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./whap-icon.svg" alt="" />
-                        <span>78 25 48 96 87</span>
+                        <span>{client.phoneNumber}</span>
                     </div>
                 </div>
                 <div>
-                    <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
+                    <button type="button" className="btn" onClick={showMiniModal}>
                         <img src="./Opciones-icon.svg" alt=""/>
                     </button>
                 </div>
@@ -55,6 +61,7 @@ const InfoCliente: FC = () => {
                         <span>última venta</span>
                         <div className="infoClientes-ultimaventa">
                             <span>20/01/2023</span>
+                            {/* <span>{client.lastSale}</span> */}
                         </div>
                     </div>
                     <div className="infoClientes-ventas" >
