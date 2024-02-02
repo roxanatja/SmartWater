@@ -6,7 +6,7 @@ import { Client } from "../../../../../type/Cliente/Client"
 
 const InfoCliente = (client:Client) => {
 
-    const { setShowMiniModal, setSelectedClient, selectedClient } = useContext(ClientesContext)
+    const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
 
