@@ -22,17 +22,18 @@ const RegistrarVenta: FC = () => {
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
     const [checkbox2, setCheckbox2] = useState<boolean>(false);
+    const [selectedEdit, setSelectedEdit] = useState<boolean>(false);
     const [productosAgregados, setProductosAgregados] = useState<Array<ProductosAdd>>([]);
     const [selectedCantidad, setSelectedCantidad] = useState<string>('');
     const [selectedProducto, setSelectedProducto] = useState<Product>();
     const [selectedPrecio, setSelectedPrecio] = useState<string>('');
     const [comment, setComment] = useState<string>('');
     const [products, setProducts] = useState<Product[]>([]);
+    const [editId, setEditId] = useState<number>(0);
     const navigate = useNavigate();
 
-    const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-    // const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"];
-    const Precio = ["5000", "10000", "300", "4000", "20000"];
+    let Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    let Precio = ["5000", "10000", "300", "4000", "20000"];
 
     useEffect(() => {
         getProduct();
@@ -87,8 +88,24 @@ const RegistrarVenta: FC = () => {
         setProductosAgregados(TodosProductos);
     };
 
-    const editProduct = () => {
-        
+    const editProduct = (id: number) => {
+        setSelectedEdit(true);
+        setEditId(id);
+    }
+
+    const saveEditProduct = () => {
+        const updatedProducts = productosAgregados.map((product) => {
+            if (product.id === editId) {
+                product.cantidadSeleccionada = selectedCantidad;
+                product.productoSeleccionado = selectedProducto as Product;
+                product.precioSeleccionado = selectedPrecio;
+
+                setSelectedEdit(false);
+            }
+            return product;
+        });
+
+        setProductosAgregados(updatedProducts);
     }
 
     const registerSale = async () => {
@@ -104,7 +121,7 @@ const RegistrarVenta: FC = () => {
                     user: selectedClient.user,
                     comment: comment,
                     detail: [],
-                    creditSale: false
+                    creditSale: checkbox2,
                 };
     
                 allProducts.map((item) => {
@@ -116,7 +133,7 @@ const RegistrarVenta: FC = () => {
                     data.quantity = item.cantidadSeleccionada;
                     data.product = item.productoSeleccionado._id;
                     data.price = item.precioSeleccionado;
-    
+
                     dataToSave.detail.push(data);
                 });
     
@@ -211,14 +228,14 @@ const RegistrarVenta: FC = () => {
                                                 <td>
                                                     <div className="RegistrarVenta-TablaBody" style={{ borderRadius: "0px 0px 0px 20px" }}>
                                                         <OptionScrooll
-                                                            options={Cantidad}
+                                                            options={ Cantidad }
                                                             onOptionChange={(selectedOption) => setSelectedCantidad(selectedOption)} />
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div className="RegistrarVenta-TablaBody" style={{ borderRadius: "0px 0px 0px 0px" }}>
                                                         <OptionScrooll
-                                                            options={products.map((product) => product.name)}
+                                                            options={ products.map((product) => product.name)}
                                                             onOptionChange={(selectedOption) => setSelectedProducto(products.find((product) => product.name === selectedOption))} />
                                                     </div>
                                                 </td>
@@ -233,7 +250,7 @@ const RegistrarVenta: FC = () => {
                                         </tbody>
                                     </table>
                                 </div>
-                                <button className="RegistrarVenta-agregarproducto" onClick={AgregarProducto}>
+                                <button className="RegistrarVenta-agregarproducto" onClick={selectedEdit ? saveEditProduct : AgregarProducto}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="49" height="48" viewBox="0 0 49 48" fill="none">
                                         <g filter="url(#filter0_d_9_26327)">
                                             <circle cx="24.5" cy="20" r="20" fill="#1A3D7D" />
@@ -269,7 +286,7 @@ const RegistrarVenta: FC = () => {
                                                                         <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#C50000" />
                                                                     </svg>
                                                                 </button>
-                                                                <button className="RegistrarVenta-productoAgregadoBTN" onClick={() => editProduct()}>
+                                                                <button className="RegistrarVenta-productoAgregadoBTN" onClick={() => editProduct(item.id)}>
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                                         <path d="M3 17.46V20.5C3 20.78 3.22 21 3.5 21H6.54C6.67 21 6.8 20.95 6.89 20.85L17.81 9.94L14.06 6.19L3.15 17.1C3.05 17.2 3 17.32 3 17.46ZM20.71 7.04C20.8027 6.94749 20.8762 6.8376 20.9264 6.71663C20.9766 6.59565 21.0024 6.46597 21.0024 6.335C21.0024 6.20403 20.9766 6.07435 20.9264 5.95338C20.8762 5.83241 20.8027 5.72252 20.71 5.63L18.37 3.29C18.2775 3.1973 18.1676 3.12375 18.0466 3.07357C17.9257 3.02339 17.796 2.99756 17.665 2.99756C17.534 2.99756 17.4043 3.02339 17.2834 3.07357C17.1624 3.12375 17.0525 3.1973 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z" fill="#1A3D7D" />
                                                                     </svg>
@@ -299,7 +316,7 @@ const RegistrarVenta: FC = () => {
                             onChange={handleInputChange} />
                     </div>
                 </div>
-                <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }} onClick={registerSale}>
+                <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }} onClick={registerSale} >
                     <button className="RegistrarVenta-btnVender">
                         <span>Vender</span>
                     </button>
