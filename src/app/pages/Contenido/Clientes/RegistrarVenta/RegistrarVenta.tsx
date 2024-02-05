@@ -7,7 +7,6 @@ import { ClientesContext } from "../ClientesContext";
 import { saveSale } from "../../../../../api/Sale/SaleApi";
 import { GetProducts } from "../../../../../api/Products/ProductsApi";
 import Product from "../../../../../type/Products/Products";
-import { Sale, DetailData } from "../../../../../type/Sale/Sale";
 
 type ProductosAdd = {
     id: number,
@@ -38,6 +37,10 @@ const RegistrarVenta: FC = () => {
     useEffect(() => {
         getProduct();
     }, []);
+
+    /*
+        This is my first big project, and I'm not sure if this is the best way to do the back-ends, sorry for all my mistakes.   
+    */
 
     const getProduct = async () => {
         await GetProducts().then((resp) => {
@@ -89,11 +92,11 @@ const RegistrarVenta: FC = () => {
     };
 
     const editProduct = (id: number) => {
-        setSelectedEdit(true);
+        setSelectedEdit(!selectedEdit);
         setEditId(id);
     }
 
-    const saveEditProduct = () => {
+    const saveEditProduct = () => {      // Save the edited product
         const updatedProducts = productosAgregados.map((product) => {
             if (product.id === editId) {
                 product.cantidadSeleccionada = selectedCantidad;
@@ -108,7 +111,7 @@ const RegistrarVenta: FC = () => {
         setProductosAgregados(updatedProducts);
     }
 
-    const registerSale = async () => {
+    const registerSale = async () => {    
         const allProducts = productosAgregados;
 
         if (allProducts.length === 0) {        // Check if there are products to sale
@@ -116,31 +119,23 @@ const RegistrarVenta: FC = () => {
             console.log('There is no products to sale ', allProducts);
         } else {
             try{
-                var dataToSave: Sale = {
+                const dataToSave = {
                     client: selectedClient._id,
-                    user: selectedClient.user,
-                    comment: comment,
-                    detail: [],
-                    creditSale: checkbox2,
-                };
-    
-                allProducts.map((item) => {
-                    var data: DetailData = {
-                        product: "",
-                        quantity: "",
-                        price: ""
-                    };
-                    data.quantity = item.cantidadSeleccionada;
-                    data.product = item.productoSeleccionado._id;
-                    data.price = item.precioSeleccionado;
-
-                    dataToSave.detail.push(data);
-                });
+                     user: selectedClient.user,
+                     comment: comment,
+                     detail: allProducts.map((item) => ({
+                         product: item.productoSeleccionado._id,
+                         quantity: item.cantidadSeleccionada,
+                         price: item.precioSeleccionado
+                     })),
+                     creditSale: checkbox2,
+                }
     
                 const resp = await saveSale(dataToSave);
     
                 if(resp === 200){
                     console.log('Sale successfully registered', dataToSave);
+                    window.alert('Venta registrada correctamente');
                 }
 
             } catch(e) {
@@ -270,14 +265,14 @@ const RegistrarVenta: FC = () => {
                                             </filter>
                                         </defs>
                                     </svg>
-                                    <span>Agregar producto</span>
+                                    <span>{selectedEdit ? 'Actualizar producto' : 'Agregar producto'}</span>
                                 </button>
                                 {
                                     productosAgregados.length > 0 ?
                                         <>
                                             {
                                                 productosAgregados.map((item, index) => (
-                                                    <div className="RegistrarVenta-productoAgregado">
+                                                    <div className="RegistrarVenta-productoAgregado" style={{border: item.id === editId && selectedEdit ? "2px solid blue" : "none"}}>
                                                         <div className="RegistrarVenta-productoAgregado1">
                                                             <span>{item.productoSeleccionado.name}</span>
                                                             <div className="RegistrarVenta-productoAgregadobtncontainer">
