@@ -4,6 +4,7 @@ import "./AgregarCliente.css";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
 import { GoogleMaps } from "../../../components/GoogleMaps/GoogleMaps";
+import { saveClient } from "../../../../../services/ClientsService";
 
 const AgregarCliente = () => {
     const { setShowModal } = useContext(ClientesContext);
@@ -23,6 +24,8 @@ const AgregarCliente = () => {
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
     const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
 
+    const [fullName, setFullName] = useState<string>("");
+
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
@@ -33,6 +36,18 @@ const AgregarCliente = () => {
     const handleSelectImage = () => {
         const fileInput = document.getElementById("fileInput") as HTMLInputElement;
         fileInput.click();
+    };
+
+    const capitalize = (value: string) => {
+        return value.replace(/(^|\s)\S/g, (char) => char.toUpperCase());
+    };
+
+    const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+
+        const capitalizedValue = capitalize(value);
+
+        setFullName(capitalizedValue);
     };
 
     const handleCheckbox1Change = () => {
@@ -59,6 +74,10 @@ const AgregarCliente = () => {
     const toggleSwitch2 = () => {
         setIsChecked2(!isChecked2);
     };
+
+    const saveClient = () => {
+
+    }
 
 return (
     <>
@@ -95,7 +114,7 @@ return (
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Nombre</label>
-                                <input type="text" className="input-text"/>
+                                <input type="text" className="input-text" value={fullName} onChange={handleNameChange}/>
                             </div>
                             <div className="input-grup">
                                 <label className="label-grup">Datos de facturación</label>

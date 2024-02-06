@@ -7,8 +7,8 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment'
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
-import { saveLoans } from "../../../../../api/Loans/LoansApi";
-import { GetProducts } from "../../../../../api/Products/ProductsApi";
+import { saveLoans } from "../../../../../services/LoansService";
+import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
 
 type ProductosAdd = {

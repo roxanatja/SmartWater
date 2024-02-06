@@ -7,7 +7,7 @@ import { FC, useContext, useEffect, useState } from "react";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
 import { ClientesContext } from "./ClientesContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
-import { loadClients } from "../../../../api/ClientsApi/ClientsApi";
+import { loadClients } from "../../../../services/ClientsService";
 import { Client } from '../../../../type/Cliente/Client';
 
 const Clientes: FC = () => {

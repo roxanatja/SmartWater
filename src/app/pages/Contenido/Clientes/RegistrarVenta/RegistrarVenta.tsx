@@ -4,8 +4,8 @@ import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
 import { ClientesContext } from "../ClientesContext";
-import { saveSale } from "../../../../../api/Sale/SaleApi";
-import { GetProducts } from "../../../../../api/Products/ProductsApi";
+import { saveSale } from "../../../../../services/SaleService";
+import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
 
 type ProductosAdd = {

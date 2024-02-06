@@ -1,9 +1,9 @@
-import smartwaterApi from "../SmartWaterApi";
+import smartwaterApi from "../api/SmartWaterApi";
 
-export const saveSale = async (dataToSave) => {
+export const saveOrder = async (dataToSave) => {
     let resp = null;
     try {
-        await smartwaterApi.post('/sales/register', dataToSave)
+        await smartwaterApi.post('/orders/register', dataToSave)
                 .then((respuesta) => {
                     resp = respuesta.status;
                 })

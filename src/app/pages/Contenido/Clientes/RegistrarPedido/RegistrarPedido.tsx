@@ -6,8 +6,8 @@ import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
 import moment from 'moment'
 import DatePicker from 'react-datepicker';
 import { ClientesContext } from "../ClientesContext";
-import { saveOrder } from "../../../../../api/Orders/OrdersApi";
-import { GetProducts } from "../../../../../api/Products/ProductsApi";
+import { saveOrder } from "../../../../../services/OrdersService";
+import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
 
 type ProductosAdd = {
