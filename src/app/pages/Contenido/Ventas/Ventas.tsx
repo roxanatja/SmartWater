@@ -4,6 +4,7 @@ import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { OpcionesVentas } from "./OpcionesVentas/OpcionesVentas";
 import "./Ventas.css";
 import { FC, useContext, useEffect, useState } from "react";
+import moment from "moment";
 import { VentasContext } from "./VentasContext";
 import { FiltroVenta } from "./FiltroVenta/FiltroVenta";
 import { Sale } from "../../../../type/Sale/Sale";
@@ -13,24 +14,35 @@ const Ventas: FC = () => {
 
     const { showModal, setShowFiltro, showFiltro } = useContext(VentasContext);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false)
-    const [sales, setSales] = useState<Array<Sale>>([])
+    const [error, setError] = useState(false);
+    const [sales, setSales] = useState<Array<Sale>>([]);
 
     const getSales = async () => {
         try{
             await GetSales()
                 .then((resp) => {
                     setSales(resp.data);
+                    setLoading(false);
                 });
         }catch(e){
             console.error(e);
+            setLoading(false);
             setError(true);
+        };
+    };
+
+    const orderArray = (orden: string) => {
+        let salesOrdenadas = [...sales];
+        if (orden === 'new') {
+            salesOrdenadas.sort((a, b) => moment(b.updated, 'YYYY-MM-DD').valueOf() - moment(a.updated, 'YYYY-MM-DD').valueOf());
+        } else if (orden === 'older') {
+            salesOrdenadas.sort((a, b) => moment(a.updated, 'YYYY-MM-DD').valueOf() - moment(b.updated, 'YYYY-MM-DD').valueOf());
         }
+        setSales(salesOrdenadas);
     };
 
     useEffect(() => {
-        getSales();
-        setLoading(false);
+            getSales();
     }, []);
 
     if (loading) {
@@ -49,7 +61,7 @@ const Ventas: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Ventas" icon="./Ventas-icon.svg" />
-                <FiltroPaginado filtro exportar={true} add={false} paginacion={false} infoPedidos={true} resultados={true} onFilter={Onfilter}>
+                <FiltroPaginado filtro exportar={true} typeDataToExport={'sales'} add={false} paginacion={false} infoPedidos={true} resultados={true} total={sales.length} orderArray={orderArray} onFilter={Onfilter}>
                     <div style={{ display: "flex", gap: "20px", justifyContent: "start", flexWrap: "wrap"}}>
                         {sales.map((sale) =>{
                             return <CuadroVentaCliente {...sale} key={sale._id}/>

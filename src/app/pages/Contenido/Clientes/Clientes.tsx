@@ -9,6 +9,7 @@ import { ClientesContext } from "./ClientesContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from '../../../../type/Cliente/Client';
+import moment from "moment";
 
 const Clientes: FC = () => {
 
@@ -50,14 +51,24 @@ const Clientes: FC = () => {
         setShowFiltro(true)
     }
 
+    const orderArray = (orden: string) => {
+        let clientesOrdenados = [...clients];
+        if (orden === 'new') {
+            clientesOrdenados.sort((a, b) => moment(b.updated, 'YYYY-MM-DD').valueOf() - moment(a.updated, 'YYYY-MM-DD').valueOf());
+        } else if (orden === 'older') {
+            clientesOrdenados.sort((a, b) => moment(a.updated, 'YYYY-MM-DD').valueOf() - moment(b.updated, 'YYYY-MM-DD').valueOf());
+        }
+        setClients(clientesOrdenados);
+    };
+
     return (
         <>
             <div>
                 <PageTitle titulo="Clientes" icon="./clientes-icon.svg" />
-                <FiltroPaginado add={true} exportar={true} paginacion={true} onAdd={AddCliente} resultados={true} filtro onFilter={Onfilter}>
+                <FiltroPaginado add={true} exportar={true} paginacion={true} onAdd={AddCliente} resultados={true} filtro total={clients.length} orderArray={orderArray} onFilter={Onfilter}>
                     <div style={{ display: "flex", gap: "20px", justifyContent: "start", flexWrap: "wrap"}}>
                         {clients.map(client => { 
-                            return <InfoCliente {...client}/>
+                            return <InfoCliente {...client} key={client._id}/>
                         })}
                     </div>
                 </FiltroPaginado>

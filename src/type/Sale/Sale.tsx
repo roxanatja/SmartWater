@@ -12,7 +12,7 @@ type Sale = {
     }>,
     total: number,
     credtSale: boolean,
-    createdAt: string,
+    created: string,
     updated: string
 };
 

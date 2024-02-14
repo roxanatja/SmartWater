@@ -1,13 +1,23 @@
 import { Switch } from "../Switch/Switch";
 import "./FiltroPaginado.css";
 import { FC, ReactNode } from "react";
+import * as XLSX from 'xlsx';
+import { Sale } from "../../../../type/Sale/Sale";
+import { GetSales } from "../../../../services/SaleService";
+import { GetClientById } from "../../../../services/ClientsService";
+import { Client } from "../../../../type/Cliente/Client";
+import { GetUser } from "../../../../services/UserService";
+import { formatDateTime } from "../../../../utils/helpers";
+import { GetZone } from "../../../../services/ZonesService";
+import { GetProducts } from "../../../../services/ProductsService";
 
 type Componentes = {
-    exportar?: boolean;
+    exportar?: boolean;                               //Para que se active la opcion de exportar
+    typeDataToExport?: string;                        //Tipo de datos a exportar
     add?: boolean;
     paginacion?: boolean;
     infoPedidos?: boolean;
-    resultados?: boolean;
+    resultados?: boolean;                             //Para que se active la opcion de ver los resultados
     resultadosPrestamo?: boolean;
     children?: ReactNode;
     swith?: boolean;
@@ -18,12 +28,82 @@ type Componentes = {
     finanzas?: boolean;
     iconUbicacion?: boolean;
     filtro?: boolean;
+    total?: number;                                   //Total de resultados
+    orderArray?: (order: string) => void;             //Funcion para ordenar por antiguedad o reciente
 };
 
-const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children, onAdd, infoPedidos, 
+const FiltroPaginado: FC<Componentes> = ({  exportar, typeDataToExport, add, paginacion, children, onAdd, infoPedidos, 
                                             resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
-                                            finanzas, iconUbicacion, filtro, onFilter}) => {
+                                            finanzas, iconUbicacion, filtro, total, orderArray, onFilter}) => {
 
+const searchUser = async (id: string) => {        //Busca el nombre del usuario 
+    const userList = await GetUser();
+    const user = userList.find((user: any) => user._id === id);
+    return user.fullName;
+};
+
+const searchZone = async (id: string) => {        //Busca la zona del cliente
+    const zones = await GetZone().then((resp) => { return resp.data });
+    const zone = zones.find((zone: any) => zone._id === id);
+    return zone.name;
+};
+
+const setDetail = async (sale: Sale) => {        //Guarda los detalles de la venta
+    const products = await GetProducts().then((resp) => { return resp.data });
+    var detailsProduct: string = '';
+    await Promise.all(
+        sale.detail.map(async (detail: any) => {
+            const product = products.find((product: any) => product._id === detail.product);
+            detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} Precio: ${detail.price}\n`;
+            return {
+                detailsProduct
+            };
+        })
+    );
+    return detailsProduct;
+}
+
+const getDataWithClientNames = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
+    const { data } = await GetSales();
+    const dataWithClientNames = await Promise.all(
+        data.map(async (sale: Sale) => {
+            const client: Client = await GetClientById(sale.client);
+
+            const typeDataToExport = {
+                "cliente" : client.fullName,
+                "usuario" : await searchUser(sale.user),
+                "comentario" : sale.comment ? sale.comment : "Sin comentario",
+                "detalle" : await setDetail(sale),
+                "Total" : sale.total,
+                "zona" : await searchZone(sale.zone),
+                "Pago" : sale.credtSale ? "Credito" : "Al contado",
+                "creado" : formatDateTime(sale.created, 'numeric', 'long', '2-digit'),
+                "actualizado" : formatDateTime(sale.updated, 'numeric', 'long', '2-digit'),
+            }
+
+            return typeDataToExport;
+        })
+    );
+
+    return dataWithClientNames;
+};
+
+
+const exportData = (fileName: string, data: any) => {    //Exporta los datos a un archivo excel
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, fileName);
+};
+
+const exportToExcel = async() => {
+    if(typeDataToExport === "sales"){
+        const fileName = "ReporteVenta.xlsx";
+        const data = await getDataWithClientNames();
+        exportData(fileName, data);
+    }
+};
+                                                
     return(
         <>
         <div className="filtro-contenido" style={{marginTop: "2em", maxHeight: "100vh"}}>
@@ -42,13 +122,13 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
                         <div style={{ width:"100%", display: "flex", justifyContent: "end", gap: "50px"}}>
                             <div className="resultado-busqueda">
                                 <span>Resultados:</span>
-                                <span style={{color: "#1A3D7D"}}> 42</span>
+                                <span style={{color: "#1A3D7D"}}> {total}</span>
                             </div>
                             <div className="resultado-busqueda">
                                 <span>Ordenar por: </span>
-                                <select className="select-filtro" name="filter">
-                                    <option value="">Más reciente</option>
-                                    <option value="">Más antiguos</option>
+                                <select className="select-filtro" name="filter" onChange={(event) => orderArray && orderArray(event.target.value)}>
+                                    <option value="new">Más reciente</option>
+                                    <option value="older">Más antiguos</option>
                                 </select>
                             </div>
                         </div>
@@ -231,7 +311,7 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, add, paginacion, children,
             <div style={{width: "100%", height: "100%", display:"flex", justifyContent: exportar && add === true ? "space-between" : exportar === true ? "start" : "end", alignItems: "end"}}>
                 {exportar && 
                     <div className="boton-exportar">
-                        <button type="button" className="btn-export">
+                        <button type="button" className="btn-export" onClick={exportToExcel}>
                             <img src="./IconDocumento.svg" alt="" />
                         </button>
                         <span style={{textAlign: "center"}}>Exportar</span>
