@@ -1,27 +1,51 @@
-import { FC, useState } from "react";
+import { FC, useState, useContext, useEffect } from "react";
 import "./RegistrarPrestamo.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
+import DatePicker from 'react-datepicker';
+import moment from 'moment'
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
+import { ClientesContext } from "../ClientesContext";
+import { saveLoans } from "../../../../../services/LoansService";
+import { GetProducts } from "../../../../../services/ProductsService";
+import Product from "../../../../../type/Products/Products";
 
 type ProductosAdd = {
     id: number,
     cantidadSeleccionada: string,
-    productoSeleccionado: string,
+    productoSeleccionado: Product,
 }
 
 const RegistrarPrestamo: FC = () => {
 
+    const { selectedClient } = useContext(ClientesContext)
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
     const [productosAgregados, setProductosAgregados] = useState<Array<ProductosAdd>>([]);
     const [selectedCantidad, setSelectedCantidad] = useState<string>('');
-    const [selectedProducto, setSelectedProducto] = useState<string>('');
+    const [selectedProducto, setSelectedProducto] = useState<Product>();
     const [imageContrato, setImageContrato] = useState<string | null>(null);
+
+    const [date, setDate] = useState<Date | null>(null);
+    const [showCalendar, setShowCalendar] = useState(false);
+
+    const [selectedEdit, setSelectedEdit] = useState<boolean>(false);
+    const [editId, setEditId] = useState<number>(0);
+    const [comment, setComment] = useState<string>('');
     const navigate = useNavigate();
 
     const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-    const Producto = ["Botellón de 20 Lts", "Botellón de 10 Lts", "Botellón de 5 Lts"];
+    const [products, setProducts] = useState<Product[]>([]);
+
+    useEffect(() => {
+        getProduct();
+    }, []);
+
+    const getProduct = async () => {
+        await GetProducts().then((resp) => {
+            setProducts(resp.data);
+        });
+    }
 
     const handleOpcionesClick = () => {
         setOpcionesVisibles(!opcionesVisibles);
@@ -31,20 +55,85 @@ const RegistrarPrestamo: FC = () => {
         navigate('/Clientes');
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setComment(e.target.value);
+    };
+
     const AgregarProducto = () => {
         var TodosProductos = [...productosAgregados]
         var ProductoNew: ProductosAdd = {
             id: productosAgregados.length + 1,
             cantidadSeleccionada: selectedCantidad,
-            productoSeleccionado:  selectedProducto,
+            productoSeleccionado:  selectedProducto as Product,
         }
         TodosProductos.push(ProductoNew);
         setProductosAgregados(TodosProductos);
     }
 
+    const editProduct = (id: number) => {
+        setSelectedEdit(!selectedEdit);
+        setEditId(id);
+    }
+
+    const saveEditProduct = () => {       //Saves the edited product by updating the list of added products.
+        var TodosProductos = productosAgregados.filter(P => P.id !== editId);
+        var ProductoNew: ProductosAdd = {
+            id: editId,
+            cantidadSeleccionada: selectedCantidad,
+            productoSeleccionado: selectedProducto as Product,
+        }
+        TodosProductos.push(ProductoNew);
+        setProductosAgregados(TodosProductos);
+        setSelectedEdit(false);
+    }
+
     const DeleteProducto = (id: number) => {
         var TodosProductos = productosAgregados.filter(P => P.id !== id);
         setProductosAgregados(TodosProductos);
+    }
+
+    const toggleCalendario = () => {
+        setDate(null);
+        setShowCalendar(!showCalendar);
+    };
+
+    const handleDateChange = (date: Date | null) => {
+        setDate(date);
+        setShowCalendar(false);
+    };
+
+    const saveLoansData = async () => {    //Saves the loan data in the database
+        const allProducts = productosAgregados;
+
+        if(allProducts.length === 0){        // Check if there are products to sale
+            window.alert('No hay productos agregados para vender');
+            console.log('There is no products to sale ', allProducts);
+        } else {
+            try{    
+                const loansData = {     //Data to save in the database
+                    user: selectedClient.user,
+                    client: selectedClient._id,
+                    contract: {
+                        link: imageContrato,
+                        validUntil: date,
+                    },
+                    comment: comment,
+                    detail: productosAgregados.map((product) => ({
+                        item: product.productoSeleccionado._id,
+                        quantity: product.cantidadSeleccionada
+                    })),
+                }
+
+                const resp = await saveLoans(loansData);     
+
+                if(resp === 200){
+                    console.log('Loan successfully registered', loansData);
+                    window.alert('Prestamo registrado correctamente');
+                }
+            }catch(error){
+                console.log('Error al guardar el prestamo', error);
+            }
+        }
     }
 
     return(
@@ -63,7 +152,7 @@ const RegistrarPrestamo: FC = () => {
                 <div className="RegistrarPrestamo-NombreCliente">
                     <div className="RegistrarPrestamo-Nombre">
                         <img src="../Cliente2.svg" alt="" />
-                        <span>Daniela Ayala</span>
+                        <span>{selectedClient.fullName}</span>
                     </div>
                     <div className="RegistrarPrestamo-Nombre" style={{gap: "10px", fontWeight: "400"}}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -86,7 +175,7 @@ const RegistrarPrestamo: FC = () => {
                                 </clipPath>
                             </defs>
                         </svg>
-                        <span>78 25 48 96 87</span>
+                        <span>{selectedClient.phoneNumber}</span>
                     </div>
                 </div>
                 <div className="RegistrarPrestamo-AgregarProducto">
@@ -130,15 +219,15 @@ const RegistrarPrestamo: FC = () => {
                                             <td>
                                                 <div className="RegistrarPrestamo-TablaBody" style={{borderRadius: "0px 0px 20px 0px"}}>
                                                     <OptionScrooll 
-                                                        options={Producto}
-                                                        onOptionChange={(selectedOption) => setSelectedProducto(selectedOption)}/>
+                                                        options={ products.map((product) => product.name)}
+                                                        onOptionChange={(selectedOption) => setSelectedProducto(products.find((product) => product.name === selectedOption))}/>
                                                 </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <button className="RegistrarPrestamo-agregarproducto" onClick={AgregarProducto}>
+                            <button className="RegistrarPrestamo-agregarproducto" onClick={selectedEdit ? saveEditProduct : AgregarProducto}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="49" height="48" viewBox="0 0 49 48" fill="none">
                                     <g filter="url(#filter0_d_9_26327)">
                                         <circle cx="24.5" cy="20" r="20" fill="#1A3D7D"/>
@@ -158,23 +247,23 @@ const RegistrarPrestamo: FC = () => {
                                         </filter>
                                     </defs>
                                 </svg>
-                                <span>Agregar producto</span>
+                                <span>{selectedEdit ? 'Actualizar producto' : 'Agregar producto'}</span>
                             </button>
                             {
                                 productosAgregados.length > 0 ?
                                 <>
                                 {
                                     productosAgregados.map((item, index) => (
-                                        <div className="RegistrarPrestamo-productoAgregado">
+                                        <div className="RegistrarPrestamo-productoAgregado" style={{border: item.id === editId && selectedEdit ? "2px solid blue" : "none"}}>
                                             <div className="RegistrarPrestamo-productoAgregado1">
-                                                <span>{item.productoSeleccionado}</span>
+                                                <span>{item.productoSeleccionado.name}</span>
                                                 <div className="RegistrarPrestamo-productoAgregadobtncontainer">
                                                     <button className="RegistrarPrestamo-productoAgregadoBTN" onClick={() => DeleteProducto(item.id)}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                             <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#C50000"/>
                                                         </svg>
                                                     </button>
-                                                    <button className="RegistrarPrestamo-productoAgregadoBTN">
+                                                    <button className="RegistrarPrestamo-productoAgregadoBTN" onClick={() => editProduct(item.id)}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                                             <path d="M3 17.46V20.5C3 20.78 3.22 21 3.5 21H6.54C6.67 21 6.8 20.95 6.89 20.85L17.81 9.94L14.06 6.19L3.15 17.1C3.05 17.2 3 17.32 3 17.46ZM20.71 7.04C20.8027 6.94749 20.8762 6.8376 20.9264 6.71663C20.9766 6.59565 21.0024 6.46597 21.0024 6.335C21.0024 6.20403 20.9766 6.07435 20.9264 5.95338C20.8762 5.83241 20.8027 5.72252 20.71 5.63L18.37 3.29C18.2775 3.1973 18.1676 3.12375 18.0466 3.07357C17.9257 3.02339 17.796 2.99756 17.665 2.99756C17.534 2.99756 17.4043 3.02339 17.2834 3.07357C17.1624 3.12375 17.0525 3.1973 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z" fill="#1A3D7D"/>
                                                         </svg>
@@ -196,25 +285,46 @@ const RegistrarPrestamo: FC = () => {
                 </div>
                 <div className="RegistrarPrestamo-FechaComentario">
                     <div className="RegistrarPrestamo-AgregarComentario">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="27" viewBox="0 0 25 27" fill="none">
-                            <g clipPath="url(#clip0_9_28590)">
-                                <path d="M7.47098 0C8.3928 0 9.13755 0.754102 9.13755 1.6875V3.375H15.8038V1.6875C15.8038 0.754102 16.5486 0 17.4704 0C18.3922 0 19.137 0.754102 19.137 1.6875V3.375H21.6368C23.017 3.375 24.1367 4.50879 24.1367 5.90625V8.4375H0.804688V5.90625C0.804688 4.50879 1.92442 3.375 3.30455 3.375H5.8044V1.6875C5.8044 0.754102 6.54915 0 7.47098 0ZM0.804688 10.125H24.1367V24.4688C24.1367 25.8662 23.017 27 21.6368 27H3.30455C1.92442 27 0.804688 25.8662 0.804688 24.4688V10.125ZM4.97112 13.5C4.51281 13.5 4.13783 13.8797 4.13783 14.3438V19.4062C4.13783 19.8703 4.51281 20.25 4.97112 20.25H9.97083C10.4291 20.25 10.8041 19.8703 10.8041 19.4062V14.3438C10.8041 13.8797 10.4291 13.5 9.97083 13.5H4.97112Z" fill="#1A3D7D"/>
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_9_28590">
-                                <rect width="23.332" height="27" fill="white" transform="translate(0.804688)"/>
-                                </clipPath>
-                            </defs>
-                        </svg>
-                        <span>Valido hasta</span>
+                        <label htmlFor="FechaPedido" onClick={toggleCalendario} style={{ cursor: "pointer" }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="27" viewBox="0 0 25 27" fill="none">
+                                <g clipPath="url(#clip0_9_28590)">
+                                    <path d="M7.47098 0C8.3928 0 9.13755 0.754102 9.13755 1.6875V3.375H15.8038V1.6875C15.8038 0.754102 16.5486 0 17.4704 0C18.3922 0 19.137 0.754102 19.137 1.6875V3.375H21.6368C23.017 3.375 24.1367 4.50879 24.1367 5.90625V8.4375H0.804688V5.90625C0.804688 4.50879 1.92442 3.375 3.30455 3.375H5.8044V1.6875C5.8044 0.754102 6.54915 0 7.47098 0ZM0.804688 10.125H24.1367V24.4688C24.1367 25.8662 23.017 27 21.6368 27H3.30455C1.92442 27 0.804688 25.8662 0.804688 24.4688V10.125ZM4.97112 13.5C4.51281 13.5 4.13783 13.8797 4.13783 14.3438V19.4062C4.13783 19.8703 4.51281 20.25 4.97112 20.25H9.97083C10.4291 20.25 10.8041 19.8703 10.8041 19.4062V14.3438C10.8041 13.8797 10.4291 13.5 9.97083 13.5H4.97112Z" fill="#1A3D7D"/>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_9_28590">
+                                    <rect width="23.332" height="27" fill="white" transform="translate(0.804688)"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </label>
+                        <div style={{ display: showCalendar !== true ? "none" : "" }}>
+                                <DatePicker
+                                minDate={new Date()}
+                                    id="FechaPedido"
+                                    selected={date}
+                                    onChange={handleDateChange}
+                                    dateFormat={"dd-mm-yyyy"}
+                                    dropdownMode="select"
+                                    onClickOutside={() => setShowCalendar(false)}
+                                />
+                            </div>
+                            <span>{date === null ? "Valido hasta" : moment(date).format('DD/MM/YYYY')}</span>
                     </div>
+                    <div className="RegistrarPedido-AgregarComentario">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="23" viewBox="0 0 24 23" fill="none">
+                                <path d="M3 0C1.34531 0 0 1.23423 0 2.75229V15.1376C0 16.6557 1.34531 17.8899 3 17.8899H7.5V21.3303C7.5 21.5926 7.65938 21.8291 7.9125 21.9452C8.16563 22.0614 8.47031 22.0355 8.7 21.8807L14.4984 17.8899H21C22.6547 17.8899 24 16.6557 24 15.1376V2.75229C24 1.23423 22.6547 0 21 0H3Z" fill="#1A3D7D" />
+                            </svg>
+                            <input type="text"
+                                placeholder="Agregar Comentario"
+                                onChange={handleInputChange} />
+                        </div>
                     <div style={{width: "100%"}}>
                         <ImagenInsertar texto="Porfavor, adjunta la imagen del contrato" imagenSelect={imageContrato} onImagenSeleccionada={setImageContrato} id="contrato"/>
                     </div>
                 </div>
             </div>
             <div style={{width: "100%", textAlign: "end", marginTop: "10px"}}>
-                <button className="RegistrarPrestamo-btnVender">
+                <button className="RegistrarPrestamo-btnVender" onClick={saveLoansData}>
                     <span>Registrar pedido </span> 
                 </button>
             </div>
