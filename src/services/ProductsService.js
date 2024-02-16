@@ -8,4 +8,16 @@ export const GetProducts = async () => {
     }catch (e) {
         console.error(e);
     }
+};
+
+export const GetProductsById = async (id) => {
+    try{
+        const {data} = await GetProducts();
+
+        const product = data.find(product => product._id === id);
+    
+        return product;
+    }catch (e) {
+        console.error(e);
+    }
 }

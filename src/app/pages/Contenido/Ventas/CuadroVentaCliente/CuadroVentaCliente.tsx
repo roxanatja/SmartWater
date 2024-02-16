@@ -7,7 +7,6 @@ import { Client } from "../../../../../type/Cliente/Client";
 import { GetClientById } from "../../../../../services/ClientsService";
 import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
-import { format } from "path";
 import { formatDateTime } from "../../../../../utils/helpers";
 
 const CuadroVentaCliente = (sale: Sale) => {
@@ -32,7 +31,7 @@ const CuadroVentaCliente = (sale: Sale) => {
             await GetClientById(sale.client)
                 .then((resp) => {
                     setClient(resp);
-                    var date = formatDateTime(sale.updated, 'numeric', 'long', 'numeric');
+                    var date = formatDateTime(sale.created, 'numeric', 'long', 'numeric');
                     setDate(date);
                 });
         }catch(e){
