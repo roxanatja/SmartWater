@@ -17,6 +17,7 @@ export const GetClientById = async (id) => {
         return data;
     }catch (e) {
         console.error(e);
+        return null;
     }
 };
 

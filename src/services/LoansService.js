@@ -1,5 +1,16 @@
 import smartwaterApi from "../api/SmartWaterApi";
 
+export const GetLoans = async () => {
+    try{
+        const {data} = await smartwaterApi.get('/loans');
+
+        return data;
+    }catch(e){
+        console.error(e);
+        return null;
+    }
+};
+
 export const saveLoans = async (dataToSave) => {
     let resp = null;
     try {
@@ -13,4 +24,4 @@ export const saveLoans = async (dataToSave) => {
         console.error(e);
         return resp;
     }
-}
+};
