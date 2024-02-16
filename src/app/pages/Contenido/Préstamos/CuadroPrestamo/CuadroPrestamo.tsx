@@ -1,17 +1,47 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useState, useEffect } from "react";
 import "./CuadroPrestamo.css";
 import { Option } from "../../../components/Option/Option";
 import { PrestamosContext } from "../PrestamosContext";
+import { Client } from "../../../../../type/Cliente/Client";
+import { formatDateTime } from "../../../../../utils/helpers";
+import Product from "../../../../../type/Products/Products";
+import { GetClientById } from "../../../../../services/ClientsService";
 
 type Prestamo = {
-    estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null
-}
+    estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null,
+    loan: any,
+    productos: Array<Product>,
+};
 
-const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
+const CuadroPrestamo: FC<Prestamo> = ({loan, productos, estadoContrato}) => {
 
     const { setShowMiniModal } = useContext(PrestamosContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
+    const [date, setDate] = useState<string>();
+    const [client, setClient] = useState<Client>();
+    const [error, setError] = useState<boolean>(false);
+
+    useEffect(() => {
+        getClient();
+    },);
+
+    const getClient = async () => {      //Obtiene el cliente de la venta y convierte la fecha a un formato mas legible
+        try{
+            await GetClientById(loan.client)
+                .then((resp) => {
+                    setClient(resp);
+                    var date = formatDateTime(loan.created, 'numeric', 'long', 'numeric');
+                    setDate(date);
+                    if (resp === null) {
+                        setError(true);
+                        console.log('ID del cliente no se ha encontrado en la base de datos');
+                    }
+                });
+        }catch(e){
+            console.error(e);
+        }
+    };
 
     const Opciones = () => {
         setShowOptions(!showOptions);
@@ -25,14 +55,18 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
         setShowOptions(false);
     }
 
-    return(
+    return( error ? 
+        <div className="CuadroPrestamo-container">
+<           p style={{ textAlign: "center" }}>Ocurrio un error al cargar los datos</p>
+        </div>
+        :
         <>
         <div className="CuadroPrestamo-container">
             <div style={{display: "flex", flexDirection: "column", gap: "5px", marginBottom: "10px"}}>
                 <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
                     <div className="CuadroVentaCliente-header">
                         <img src="./Cliente2.svg" alt="" />
-                        <span>Rubén González</span>
+                        <span>{client?.fullName}</span>
                     </div>
                     <div style={{display: "flex", alignItems: "center"}}>
                         <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
@@ -40,11 +74,11 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
                         </button>
                     </div>
                     <div className="infoClientes-ultimaventa">
-                        <span>20/01/2023</span>
+                        <span>{date}</span>
                     </div>
                 </div>
                 <div className="CuadroVentaCliente-text">
-                    <span>No. Cliente: <span style={{color: "#1A3D7D"}}>NREV5896</span></span>
+                    <span>No. Cliente: <span style={{color: "#1A3D7D"}}>{client?.code}</span></span>
                 </div>
             </div>
             <div style={{display: "flex", justifyContent: "space-between", alignItems: "end"}}>
@@ -60,33 +94,43 @@ const CuadroPrestamo: FC<Prestamo> = ({estadoContrato}) => {
             </div>
             <div className="CuadroVentaCliente-productos" style={{alignItems: "end", justifyContent: "left"}}>
                 <div style={{width: "70%"}}>
-                    <table style={{width: "90%"}}>
-                        <thead style={{textAlign: "left"}}>
-                            <tr>
-                                <th>
-                                    <span>Productos</span>
-                                </th>
-                                <th>
-                                    <span>Cantidad</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                                        <img src="./Botella-icon.svg" alt="" />
-                                        <span className="CuadroVentaCliente-text">20 lts</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="CuadroVentaCliente-TextContainer">
-                                        <span className="CuadroVentaCliente-text" style={{fontWeight: "600"}}>1</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    {loan.detail.length > 0 ? (
+                        <table style={{ width: "90%" }}>
+                            <thead style={{ textAlign: "left" }}>
+                                <tr>
+                                    <th>
+                                        <span>Productos</span>
+                                    </th>
+                                    <th>
+                                        <span>Cantidad</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loan.detail.map((detail: any, index: number) => {
+                                    let product = productos.find((product) => product._id === detail.item);
+                                    return (
+                                        <tr key={index}>
+                                            <td>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                                                    <img src="./Botella-icon.svg" alt="" />
+                                                    <span className="CuadroVentaCliente-text">{product ? product.name : 'Producto no encontrado'}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="CuadroVentaCliente-TextContainer">
+                                                    <span className="CuadroVentaCliente-text" style={{ fontWeight: "600" }}>{detail.quantity}</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>No hay items para mostrar</p>
+    
+                    )}
                 </div>
                 {
                     estadoContrato === "Con Contrato" ? 

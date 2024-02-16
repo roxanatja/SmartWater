@@ -11,7 +11,7 @@ type Sale = {
         _id: string
     }>,
     total: number,
-    credtSale: boolean,
+    creditSale: boolean,
     created: string,
     updated: string
 };

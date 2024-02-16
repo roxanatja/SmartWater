@@ -54,7 +54,7 @@ const setDetail = async (sale: Sale) => {        //Guarda los detalles de la ven
     await Promise.all(
         sale.detail.map(async (detail: any) => {
             const product = products.find((product: any) => product._id === detail.product);
-            detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} Precio: ${detail.price}\n`;
+            detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} Precio: ${detail.price} `;
             return {
                 detailsProduct
             };
@@ -76,10 +76,10 @@ const getDataWithClientNames = async () => {            //Guarda el nombre del c
                 "detalle" : await setDetail(sale),
                 "Total" : sale.total,
                 "zona" : await searchZone(sale.zone),
-                "Pago" : sale.credtSale ? "Credito" : "Al contado",
+                "Pago" : sale.creditSale ? "Credito" : "Al contado",
                 "creado" : formatDateTime(sale.created, 'numeric', 'long', '2-digit'),
                 "actualizado" : formatDateTime(sale.updated, 'numeric', 'long', '2-digit'),
-            }
+            };
 
             return typeDataToExport;
         })
@@ -138,7 +138,7 @@ const exportToExcel = async() => {
                         <div style={{ width:"100%", display: "flex", justifyContent: "end", gap: "50px"}}>
                             <div className="resultado-busqueda">
                                 <span>Resultados:</span>
-                                <span style={{color: "#1A3D7D"}}> 42</span>
+                                <span style={{color: "#1A3D7D"}}> {total}</span>
                             </div>
                             <div className="resultado-busqueda">
                                 <span>Dispensadores:</span>
