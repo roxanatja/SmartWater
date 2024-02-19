@@ -61,7 +61,6 @@ const InfoCliente = (client:Client) => {
                         <span>última venta</span>
                         <div className="infoClientes-ultimaventa">
                             <span>20/01/2023</span>
-                            {/* <span>{client.lastSale}</span> */}
                         </div>
                     </div>
                     <div className="infoClientes-ventas" >
