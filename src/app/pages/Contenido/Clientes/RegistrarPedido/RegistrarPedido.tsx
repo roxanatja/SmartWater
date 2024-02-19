@@ -26,6 +26,7 @@ const RegistrarPedido: FC = () => {
     const [selectedEdit, setSelectedEdit] = useState<boolean>(false);
     const [editId, setEditId] = useState<number>(0);
     const [comment, setComment] = useState<string>('');
+    const [loadingSale, setLoadingSale] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -41,7 +42,7 @@ const RegistrarPedido: FC = () => {
         await GetProducts().then((resp) => {
             setProducts(resp.data);
         });
-    }
+    };
 
     const handleOpcionesClick = () => {
         setOpcionesVisibles(!opcionesVisibles);
@@ -64,12 +65,12 @@ const RegistrarPedido: FC = () => {
         }
         TodosProductos.push(ProductoNew);
         setProductosAgregados(TodosProductos);
-    }
+    };
 
     const editProduct = (id: number) => {
         setSelectedEdit(!selectedEdit);
         setEditId(id);
-    }
+    };
 
     const saveEditProduct = () => {         //Saves the edited product by updating the list of added products.
         var TodosProductos = productosAgregados.filter(P => P.id !== editId);
@@ -81,12 +82,12 @@ const RegistrarPedido: FC = () => {
         TodosProductos.push(ProductoNew);
         setProductosAgregados(TodosProductos);
         setSelectedEdit(false);
-    }
+    };
 
     const DeleteProducto = (id: number) => {
         var TodosProductos = productosAgregados.filter(P => P.id !== id);
         setProductosAgregados(TodosProductos);
-    }
+    };
 
     const handleFechaChange = (date: Date | null) => {
         setFecha(date);
@@ -100,10 +101,12 @@ const RegistrarPedido: FC = () => {
 
     const saveOrderData = async () => {                // Save order data in the database
         const allProducts = productosAgregados;
+        setLoadingSale(true);
 
         if(allProducts.length === 0){        // Check if there are products to sale
             window.alert('No hay productos agregados para vender');
             console.log('There is no products to sale ', allProducts);
+            setLoadingSale(false);
         } else {
             try {
                 const orderData = {
@@ -120,14 +123,20 @@ const RegistrarPedido: FC = () => {
                 const resp = await saveOrder(orderData);
 
                 if(resp === 200){
-                    console.log('Sale successfully registered', orderData);
+                    console.log('Order successfully registered', orderData);
                     window.alert('Pedido registrado correctamente');
+                    setLoadingSale(false);
+                    navigate('/Clientes');
                 }
             } catch (error) {
                 console.error(error);
+                setLoadingSale(false);
+                navigate('/Clientes');
             }
         }
-    }
+        setLoadingSale(false);
+        navigate('/Clientes');
+    };
 
     return (
         <>
@@ -315,7 +324,7 @@ const RegistrarPedido: FC = () => {
                 </div>
                 <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }}>
                     <button className="RegistrarPedido-btnVender" onClick={saveOrderData}>
-                        <span>Registrar pedido </span>
+                        <span>{loadingSale ? 'Cargando' : 'Registrar Pedido'}</span>
                     </button>
                 </div>
             </form>
