@@ -9,6 +9,8 @@ type VentasContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>
+    selectedClient: string;
+    setSelectedClient: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const VentasContext = createContext<VentasContextType>(
@@ -20,6 +22,7 @@ export const VentasProvider = ({ children }: any) => {
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
+    const [selectedClient, setSelectedClient] = useState<string>("");
 
     return (
         <VentasContext.Provider value={{
@@ -30,7 +33,9 @@ export const VentasProvider = ({ children }: any) => {
             selectedOption, 
             setSelectedOption,
             showFiltro,
-            setShowFiltro
+            setShowFiltro,
+            selectedClient,
+            setSelectedClient
         }}>
             {children}
         </VentasContext.Provider>

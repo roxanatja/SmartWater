@@ -29,6 +29,7 @@ const RegistrarVenta: FC = () => {
     const [comment, setComment] = useState<string>('');
     const [products, setProducts] = useState<Product[]>([]);
     const [editId, setEditId] = useState<number>(0);
+    const [loadingSale, setLoadingSale] = useState<boolean>(false);
     const navigate = useNavigate();
 
     let Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -113,10 +114,12 @@ const RegistrarVenta: FC = () => {
 
     const registerSale = async () => {    
         const allProducts = productosAgregados;
+        setLoadingSale(true);
 
         if (allProducts.length === 0) {        // Check if there are products to sale
             window.alert('No hay productos agregados para vender');
             console.log('There is no products to sale ', allProducts);
+            setLoadingSale(false);
         } else {
             try{
                 const dataToSave = {
@@ -136,11 +139,16 @@ const RegistrarVenta: FC = () => {
                 if(resp === 200){
                     console.log('Sale successfully registered', dataToSave);
                     window.alert('Venta registrada correctamente');
+                    setLoadingSale(false);
+                    navigate('/Clientes');
                 }
 
             } catch(e) {
                 console.error('Error registering sale', e);
+                setLoadingSale(false);
+                navigate('/Clientes');
             }
+            
         }
     };
 
@@ -313,7 +321,7 @@ const RegistrarVenta: FC = () => {
                 </div>
                 <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }} onClick={registerSale} >
                     <button className="RegistrarVenta-btnVender">
-                        <span>Vender</span>
+                    <span>{loadingSale ? 'Cargando' : 'Vender'}</span>
                     </button>
                 </div>
             </form>

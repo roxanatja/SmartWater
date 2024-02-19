@@ -32,6 +32,7 @@ const RegistrarPrestamo: FC = () => {
     const [selectedEdit, setSelectedEdit] = useState<boolean>(false);
     const [editId, setEditId] = useState<number>(0);
     const [comment, setComment] = useState<string>('');
+    const [loadingSale, setLoadingSale] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -104,10 +105,12 @@ const RegistrarPrestamo: FC = () => {
 
     const saveLoansData = async () => {    //Saves the loan data in the database
         const allProducts = productosAgregados;
+        setLoadingSale(true);
 
         if(allProducts.length === 0){        // Check if there are products to sale
             window.alert('No hay productos agregados para vender');
             console.log('There is no products to sale ', allProducts);
+            setLoadingSale(false);
         } else {
             try{    
                 const loansData = {     //Data to save in the database
@@ -129,9 +132,13 @@ const RegistrarPrestamo: FC = () => {
                 if(resp === 200){
                     console.log('Loan successfully registered', loansData);
                     window.alert('Prestamo registrado correctamente');
+                    setLoadingSale(false);
+                    navigate('/Clientes');
                 }
             }catch(error){
                 console.log('Error al guardar el prestamo', error);
+                setLoadingSale(false);
+                navigate('/Clientes');
             }
         }
     }
@@ -325,7 +332,7 @@ const RegistrarPrestamo: FC = () => {
             </div>
             <div style={{width: "100%", textAlign: "end", marginTop: "10px"}}>
                 <button className="RegistrarPrestamo-btnVender" onClick={saveLoansData}>
-                    <span>Registrar pedido </span> 
+                    <span>{loadingSale ? 'Cargando' : 'Registrar Prestamo'}</span>
                 </button>
             </div>
         </form>

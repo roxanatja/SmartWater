@@ -11,7 +11,7 @@ import { formatDateTime } from "../../../../../utils/helpers";
 
 const CuadroVentaCliente = (sale: Sale) => {
 
-    const { setShowModal } = useContext(VentasContext);
+    const { setShowModal, setSelectedClient } = useContext(VentasContext);
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
@@ -56,10 +56,12 @@ const CuadroVentaCliente = (sale: Sale) => {
 
     const handleOpen = () => {
         setShowModal(true);
+        setSelectedClient(sale.client);
     }
 
     const Opciones = () => {
         setShowOptions(!showOptions);
+        setSelectedClient(sale.client);
     }
     
     const Edit = () => {
