@@ -9,3 +9,13 @@ export const GetUser = async () => {
         console.error(e);
     };
 };
+
+export const DeleteUser = async (id) => {
+    try{
+        const {data} = await smartwaterApi.delete(`/users/${id}/delete`);
+    
+        return data.data;
+    }catch (e) {
+        console.error(e);
+    };
+}

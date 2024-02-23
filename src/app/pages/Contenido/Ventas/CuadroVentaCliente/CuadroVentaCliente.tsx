@@ -31,7 +31,7 @@ const CuadroVentaCliente = (sale: Sale) => {
             await GetClientById(sale.client)
                 .then((resp) => {
                     setClient(resp);
-                    var date = formatDateTime(sale.created, 'numeric', 'long', 'numeric');
+                    var date = formatDateTime(sale.created, 'numeric', 'numeric', 'numeric');
                     setDate(date);
                 });
         }catch(e){
