@@ -1,14 +1,22 @@
-import { useContext, useState } from "react"
-import "./InfoCliente.css"
-import { Option } from "../../../components/Option/Option"
-import { ClientesContext } from "../ClientesContext"
-import { Client } from "../../../../../type/Cliente/Client"
+import { useContext, useEffect, useState } from "react";
+import "./InfoCliente.css";
+import { Option } from "../../../components/Option/Option";
+import { ClientesContext } from "../ClientesContext";
+import { Client } from "../../../../../type/Cliente/Client";
+import { formatDateTime } from "../../../../../utils/helpers";
+import { DeleteClient } from "../../../../../services/ClientsService";
 
 const InfoCliente = (client:Client) => {
 
     const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
+    const [date, setDate] = useState<string>();
+
+    useEffect(() => {
+        var date = formatDateTime(client.lastSale, 'numeric', 'numeric', 'numeric');
+        setDate(date);
+    }, [client.lastSale]);
 
     const Opciones = () => {
         setShowOptions(!showOptions);
@@ -18,7 +26,19 @@ const InfoCliente = (client:Client) => {
         setShowOptions(false);
     }
 
-    const Delete = () => {
+    const Delete = async () => {                  //Deleted client from the database, if the request is successful, the client is deleted from the list, if not, an error message is displayed
+        try {
+            const response = await DeleteClient(client._id);
+            console.log(response);
+            if (response.status === 200) {
+                console.log('Cliente eliminado', response);
+            } else {
+                console.log('Error al eliminar cliente', response.data);
+                window.alert(`Error al eliminar cliente: ${response.data.error}`);
+            }
+        } catch (error) {
+            console.error(error);
+        }
         setShowOptions(false);
     }
 
@@ -60,7 +80,7 @@ const InfoCliente = (client:Client) => {
                     <div className="infoClientes-ventas" >
                         <span>última venta</span>
                         <div className="infoClientes-ultimaventa">
-                            <span>20/01/2023</span>
+                            <span>{date}</span>
                         </div>
                     </div>
                     <div className="infoClientes-ventas" >

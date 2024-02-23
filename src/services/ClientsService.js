@@ -32,3 +32,14 @@ export const saveClient = async (client) => {
         return resp;
     }
 };
+
+export const DeleteClient = async (id) => {
+    try{
+        const {data} = await smartwaterApi.delete(`/clients/${id}`);
+    
+        return data;
+    }catch (e) {
+        console.error(e, e.response.data);
+        return e.response;
+    }
+};

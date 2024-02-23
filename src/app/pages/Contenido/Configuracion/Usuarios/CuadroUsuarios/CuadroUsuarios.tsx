@@ -3,18 +3,31 @@ import "./CuadroUsuarios.css";
 import { UsuariosContext } from "../UsuariosContext";
 import { Option } from "../../../../components/Option/Option";
 
-const CuadroUsuarios: FC = () => {
+const CuadroUsuarios: FC<any> = ({ user }) => {
 
     const { setShowMiniModal } = useContext(UsuariosContext);
     const [opciones, setOpciones] = useState<boolean>(false);
 
     const openModal = () => {
         setShowMiniModal(true);
-    }
+    };
 
     const openOpciones = () => {
         setOpciones(!opciones);
-    }
+    };
+
+    const roleToShow = () => {
+        if(user.role === "admin"){
+            return "Administrador";
+        }else if(user.role === "user"){
+            return "Distribudor";
+        }
+    };
+
+    const deletedUser = () => {
+        console.log("Usuario eliminado");
+    
+    };
 
     return(
         <>
@@ -30,7 +43,7 @@ const CuadroUsuarios: FC = () => {
                         </span>
                     </div>
                     <span>
-                        Distribuidor 1
+                        { roleToShow() }
                     </span>
                 </div>
                 <div>
@@ -54,7 +67,7 @@ const CuadroUsuarios: FC = () => {
                         <div style={{display: "flex", alignItems: "center", gap: "10px", fontWeight: "500"}}>
                             <img src="../Cliente2.svg" alt="" />
                             <span>
-                                Daniela Ayala
+                                {user.fullName}
                             </span>
                         </div>
                     </div>
@@ -81,7 +94,7 @@ const CuadroUsuarios: FC = () => {
                                     </defs>
                                 </svg>
                             <span>
-                                78 25 48 96 87
+                                {user.phoneNumber}
                             </span>
                         </div>
                     </div>
@@ -92,7 +105,7 @@ const CuadroUsuarios: FC = () => {
                             more_vert
                         </span>
                     </button>
-                    <Option editar eliminar visible={opciones} />
+                    <Option editar eliminar visible={opciones} deleteAction={deletedUser}/>
                 </div>
             </div>
         </div>

@@ -4,18 +4,22 @@ import { FC, ReactNode } from "react";
 import * as XLSX from 'xlsx';
 import { Sale } from "../../../../type/Sale/Sale";
 import { GetSales } from "../../../../services/SaleService";
-import { GetClientById } from "../../../../services/ClientsService";
+import { GetClientById, loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import { GetUser } from "../../../../services/UserService";
 import { formatDateTime } from "../../../../utils/helpers";
 import { GetZone } from "../../../../services/ZonesService";
 import { GetProducts } from "../../../../services/ProductsService";
+import { GetDistricts } from "../../../../services/DistrictsService";
 
 type Componentes = {
     exportar?: boolean;                               //Para que se active la opcion de exportar
     typeDataToExport?: string;                        //Tipo de datos a exportar
     add?: boolean;
     paginacion?: boolean;
+    totalPage?: number;                               //Total de paginas
+    currentPage?: number;                             //Pagina actual
+    handlePageChange?: (page: number) => void;        //Funcion para cambiar de pagina
     infoPedidos?: boolean;
     resultados?: boolean;                             //Para que se active la opcion de ver los resultados
     resultadosPrestamo?: boolean;
@@ -30,11 +34,12 @@ type Componentes = {
     filtro?: boolean;
     total?: number;                                   //Total de resultados
     orderArray?: (order: string) => void;             //Funcion para ordenar por antiguedad o reciente
+    search?: (e: string) => void;                     //Funcion para buscar un usuario/cliente
 };
 
-const FiltroPaginado: FC<Componentes> = ({  exportar, typeDataToExport, add, paginacion, children, onAdd, infoPedidos, 
+const FiltroPaginado: FC<Componentes> = ({  exportar, typeDataToExport, add, paginacion, totalPage, currentPage, handlePageChange, children, onAdd, infoPedidos, 
                                             resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
-                                            finanzas, iconUbicacion, filtro, total, orderArray, onFilter}) => {
+                                            finanzas, iconUbicacion, filtro, total, orderArray, onFilter, search}) => {
 
 const searchUser = async (id: string) => {        //Busca el nombre del usuario 
     const userList = await GetUser();
@@ -45,7 +50,14 @@ const searchUser = async (id: string) => {        //Busca el nombre del usuario
 const searchZone = async (id: string) => {        //Busca la zona del cliente
     const zones = await GetZone().then((resp) => { return resp.data });
     const zone = zones.find((zone: any) => zone._id === id);
-    return zone.name;
+    return zone?.name;
+};
+
+const searchDistrict = async (id: string) => {        //Busca el distrito del cliente
+    const districts = await GetDistricts().then((resp) => { return resp.data });
+    console.log(districts);
+    const district = districts.find((district: any) => district._id === id);
+    return district?.name;
 };
 
 const setDetail = async (sale: Sale) => {        //Guarda los detalles de la venta
@@ -61,7 +73,7 @@ const setDetail = async (sale: Sale) => {        //Guarda los detalles de la ven
         })
     );
     return detailsProduct;
-}
+};
 
 const getDataWithClientNames = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
     const { data } = await GetSales();
@@ -88,6 +100,32 @@ const getDataWithClientNames = async () => {            //Guarda el nombre del c
     return dataWithClientNames;
 };
 
+const getDataClients = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
+    const { data } = await loadClients();
+    const dataClientToExport = await Promise.all(
+        data.map(async (client: Client) => {
+            const typeDataToExport = {
+                "cliente" : client.fullName,
+                "telefono" : client.phoneNumber,
+                "direccion" : client.address ? client.address : "Sin direccion",
+                "codigo" : client.code ? client.code : "Sin codigo",
+                "usuario" : await searchUser(client.user),
+                "zona" : await searchZone(client.zone),
+                "distrito" : await searchDistrict(client.district),
+                "creado" : formatDateTime(client.created, 'numeric', 'long', '2-digit'),
+                "actualizado" : formatDateTime(client.updated, 'numeric', 'long', '2-digit'),
+                "ultimaVenta" : client.lastSale ? formatDateTime(client.lastSale, 'numeric', 'long', '2-digit') : "Sin ventas",
+
+            };
+
+            return typeDataToExport;
+        })
+    );
+
+    return dataClientToExport;
+
+};
+
 
 const exportData = (fileName: string, data: any) => {    //Exporta los datos a un archivo excel
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -101,6 +139,10 @@ const exportToExcel = async() => {
         const fileName = "ReporteVenta.xlsx";
         const data = await getDataWithClientNames();
         exportData(fileName, data);
+    } else if (typeDataToExport === "clients") {
+        const fileName = "ReporteClientes.xlsx";
+        const data = await getDataClients();
+        exportData(fileName, data);
     }
 };
                                                 
@@ -110,7 +152,7 @@ const exportToExcel = async() => {
             <div style={{ width:"100%", display: "flex"}}>
                 <div style={{ width:"70%", minWidth: "70%", marginRight: "2em", display: "flex", flexDirection: "column"}}>
                     <form className="search__container" onSubmit={(e) => e.preventDefault()}>
-                        <input className="search__input" type="text" placeholder="Buscar" required />
+                        <input className="search__input" type="text" placeholder="Buscar" required onChange={(event: React.ChangeEvent<HTMLInputElement>) => search && search(event.target.value)} />
                         <button type="submit" className="boton-buscar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M19.5 9.75C19.5 11.9016 18.8016 13.8891 17.625 15.5016L23.5594 21.4406C24.1453 22.0266 24.1453 22.9781 23.5594 23.5641C22.9734 24.15 22.0219 24.15 21.4359 23.5641L15.5016 17.625C13.8891 18.8062 11.9016 19.5 9.75 19.5C4.36406 19.5 0 15.1359 0 9.75C0 4.36406 4.36406 0 9.75 0C15.1359 0 19.5 4.36406 19.5 9.75ZM9.75 16.5C10.6364 16.5 11.5142 16.3254 12.3331 15.9862C13.1521 15.647 13.8962 15.1498 14.523 14.523C15.1498 13.8962 15.647 13.1521 15.9862 12.3331C16.3254 11.5142 16.5 10.6364 16.5 9.75C16.5 8.86358 16.3254 7.98583 15.9862 7.16689C15.647 6.34794 15.1498 5.60382 14.523 4.97703C13.8962 4.35023 13.1521 3.85303 12.3331 3.51381C11.5142 3.17459 10.6364 3 9.75 3C8.86358 3 7.98583 3.17459 7.16689 3.51381C6.34794 3.85303 5.60382 4.35023 4.97703 4.97703C4.35023 5.60382 3.85303 6.34794 3.51381 7.16689C3.17459 7.98583 3 8.86358 3 9.75C3 10.6364 3.17459 11.5142 3.51381 12.3331C3.85303 13.1521 4.35023 13.8962 4.97703 14.523C5.60382 15.1498 6.34794 15.647 7.16689 15.9862C7.98583 16.3254 8.86358 16.5 9.75 16.5Z" fill="black"/>
@@ -168,23 +210,6 @@ const exportToExcel = async() => {
                                     </defs>
                                 </svg>
                             </button>
-                        </div>
-                    }
-                    {paginacion && 
-                        <div style={{display: "flex", gap: "15px", width: "145px", minWidth: "145px"}}>
-                            <div>
-                                <button type="button" className="boton-paginado">
-                                    <img style={{transform: "rotate(90deg)"}} src="./Desplegable-icon.svg" alt="" />
-                                </button>
-                            </div>
-                            <div style={{display: "flex", alignItems: "center"}}>
-                                <span className="text-paginado">3 De 20</span>
-                            </div>
-                            <div>
-                                <button type="button" className="boton-paginado">
-                                    <img style={{transform: "rotate(-0.25turn)"}} src="./Desplegable-icon.svg" alt="" />
-                                </button>
-                            </div>
                         </div>
                     }
                 </div>
@@ -289,23 +314,23 @@ const exportToExcel = async() => {
             <div className="filtroScroll" style={{height: exportar && add ? "62vh" : "65vh", maxHeight: exportar && add ? "62vh" : "75vh", marginTop: swith ? "auto" : "1em" }}>
                 {children}
             </div>
-            {paginacion &&
-                <div style={{width: "100%", display: "flex", justifyContent: "end"}}>
-                    <div style={{display: "flex", gap: "15px", width: "145px", minWidth: "145px"}}>
+            {paginacion && totalPage && currentPage &&
+                <div style={{display: "flex", gap: "15px", width: "145px", minWidth: "145px"}}>
+                    <>
                         <div>
-                            <button type="button" className="boton-paginado">
-                                <img style={{transform: "rotate(90deg)"}} src="./Desplegable-icon.svg" alt="" />
+                            <button type="button" className="boton-paginado" onClick={() => handlePageChange && handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                                <img style={{ transform: "rotate(90deg)" }} src="./Desplegable-icon.svg" alt="" />
                             </button>
                         </div>
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <span className="text-paginado">3 De 20</span>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <span className="text-paginado">{`${currentPage} de ${totalPage}`}</span>
                         </div>
                         <div>
-                            <button type="button" className="boton-paginado">
-                                <img style={{transform: "rotate(-0.25turn)"}} src="./Desplegable-icon.svg" alt="" />
+                            <button type="button" className="boton-paginado" onClick={() => handlePageChange && handlePageChange(currentPage + 1)} disabled={currentPage === totalPage} >
+                                <img style={{ transform: "rotate(-0.25turn)" }} src="./Desplegable-icon.svg" alt="" />
                             </button>
                         </div>
-                    </div>
+                    </>
                 </div>
             }
             <div style={{width: "100%", height: "100%", display:"flex", justifyContent: exportar && add === true ? "space-between" : exportar === true ? "start" : "end", alignItems: "end"}}>
