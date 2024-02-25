@@ -25,3 +25,14 @@ export const saveLoans = async (dataToSave) => {
         return resp;
     }
 };
+
+export const DeleteLoan = async (id) => {
+    try {
+        await smartwaterApi.delete(`/loans/${id}/delete`);
+
+        return 200;
+    } catch (e) {
+        console.error(e);
+        return e.response;
+    }
+};

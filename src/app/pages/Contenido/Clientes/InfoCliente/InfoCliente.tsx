@@ -15,6 +15,10 @@ const InfoCliente = (client:Client) => {
 
     useEffect(() => {
         var date = formatDateTime(client.lastSale, 'numeric', 'numeric', 'numeric');
+        if (date === 'Invalid Date') {
+            date = 'Sin ventas';
+        };
+
         setDate(date);
     }, [client.lastSale]);
 
@@ -32,6 +36,8 @@ const InfoCliente = (client:Client) => {
             console.log(response);
             if (response.status === 200) {
                 console.log('Cliente eliminado', response);
+                window.alert(`Cliente eliminado`);
+                window.location.reload();
             } else {
                 console.log('Error al eliminar cliente', response.data);
                 window.alert(`Error al eliminar cliente: ${response.data.error}`);
@@ -62,7 +68,7 @@ const InfoCliente = (client:Client) => {
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./CasaUbi-icon.svg" alt="" />
-                        <span>N° 125451215</span>
+                        <span>{client.code}</span>
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./whap-icon.svg" alt="" />
@@ -88,7 +94,7 @@ const InfoCliente = (client:Client) => {
                         <div className="infoClientes-moneda">
                             <img src="./Moneda-icon.svg" alt=""/>
                             <div>
-                                <span>100 Bs.</span>
+                                <span>{client.credit.toString()} Bs.</span>
                             </div>
                         </div>
                     </div>
