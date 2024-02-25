@@ -6,6 +6,7 @@ import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
 import Product from "../../../../../type/Products/Products";
 import { GetClientById } from "../../../../../services/ClientsService";
+import { DeleteLoan } from "../../../../../services/LoansService";
 
 type Prestamo = {
     estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null,
@@ -45,15 +46,24 @@ const CuadroPrestamo: FC<Prestamo> = ({loan, productos, estadoContrato}) => {
 
     const Opciones = () => {
         setShowOptions(!showOptions);
-    }
+    };
     
     const Edit = () => {
         setShowOptions(false);
-    }
+    };
 
-    const Delete = () => {
-        setShowOptions(false);
-    }
+    const Delete = async () => {
+
+        const response = await DeleteLoan(loan._id);
+
+        if(response === 200){
+            console.log('Préstamo devuelto con éxito');
+            window.alert('Préstamo devuelto con éxito');
+            window.location.reload();
+        } else {
+            console.error('ERROR: ', response.statusText);
+        }
+    };
 
     return( error ? 
         <div className="CuadroPrestamo-container">

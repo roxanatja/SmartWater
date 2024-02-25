@@ -13,4 +13,16 @@ export const saveOrder = async (dataToSave) => {
         console.error(e);
         return resp;
     }
-}
+};
+
+export const DeleteOrder = async (id) => {
+    try {
+        await smartwaterApi.delete(`/orders/${id}/delete`)
+                .then((respuesta) => {
+                    return respuesta.status;
+                })
+    } catch (e) {
+        console.error(e);
+        return e.response;
+    }
+};
