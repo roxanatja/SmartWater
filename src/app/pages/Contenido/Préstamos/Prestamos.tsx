@@ -8,6 +8,7 @@ import { PrestamosContext } from "./PrestamosContext";
 import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
 import { GetLoans } from "../../../../services/LoansService";
 import { GetProducts } from "../../../../services/ProductsService";
+import { loadClients } from "../../../../services/ClientsService";
 import Product from "../../../../type/Products/Products";
 
 const Prestamos: FC = () => {
@@ -15,6 +16,7 @@ const Prestamos: FC = () => {
     const { showMiniModal, showFiltro, setShowFiltro } = useContext(PrestamosContext);
     const [loans, setLoans] = useState<Array<any>>([]);
     const [products, setProducts] = useState<Array<Product>>([]);
+    const [clients, setClients] = useState<Array<any>>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
@@ -35,6 +37,17 @@ const Prestamos: FC = () => {
             console.log(e);
             setError(true);
             setLoading(false);
+        }
+    };
+
+    const getClients = async () => {
+        try {
+            await loadClients()
+                .then((resp) => {
+                    setClients(resp.data);
+                });
+        }catch(e) {
+            console.error(e);
         }
     };
 
@@ -61,6 +74,22 @@ const Prestamos: FC = () => {
         setShowFiltro(true)
     };
 
+    const searchLoans = (e: string) => {
+        const value = e;
+        
+        if(value === ""){
+            getLoans();
+            getClients();
+            return;
+        } else {
+            let clientFilter = clients.filter(client => client.fullName?.toLowerCase().includes(value.toLowerCase()));
+            let loanfilter = clientFilter.flatMap((client) => {
+                return loans.filter(loan => loan.client === client._id);
+            });
+            setLoans(loanfilter);
+        }
+    };
+
     const getContractState = (hasContract: boolean, hasExpiredContract: boolean) => {               // This function is used to determine the state of the contract
         if (hasExpiredContract) {
             return "Contrato Vencido"
@@ -75,7 +104,7 @@ const Prestamos: FC = () => {
         <>
             <div>
                 <PageTitle titulo="Préstamos" icon="./Prestamos-icon.svg"/>
-                <FiltroPaginado filtro resultadosPrestamo onFilter={Onfilter} total={loans.length}>
+                <FiltroPaginado filtro search={searchLoans} resultadosPrestamo onFilter={Onfilter} total={loans.length}>
                     <div style={{display: "flex", flexWrap: "wrap", gap: "30px"}}>
                         {loans.map((loan, index) => {
                             const contratcEstate = getContractState(loan.hasContract, loan.hasExpiredContract);
