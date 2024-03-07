@@ -47,6 +47,12 @@ export const ClientesProvider = ({ children }: any) => {
         "renewInDays": 1,
         "renewDate": "",
         "isClient": true,
+        "isAgency": true,
+        "billingInfo": {
+          "nit": "",
+          "phoneNumber": ""
+        },
+        "averageRenewal": false,
         "contracts": [],
         "created": "",
         "updated": "",
