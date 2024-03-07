@@ -10,3 +10,14 @@ export const DevolutionsRegister = async (devolution) => {
         return e.response;
     }
 };
+
+export const GetDevolutions = async () => {
+    try{
+        const { data } = await smartwaterApi.get('/devolutions?pageSize=3000');
+    
+        return data;
+    }catch (e) {
+        console.error(e);
+        return e.response;
+    }
+};

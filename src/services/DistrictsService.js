@@ -2,7 +2,7 @@ import smartwaterApi from "../api/SmartWaterApi";
 
 export const GetDistricts = async () => {
     try{
-        const {data} = await smartwaterApi.get('/districts');
+        const {data} = await smartwaterApi.get('/districts?pageSize=3000');
         
         return data;
     }catch (e) {

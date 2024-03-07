@@ -5,22 +5,42 @@ import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
 import { DeleteClient } from "../../../../../services/ClientsService";
+import { GetZone } from "../../../../../services/ZonesService";
 
 const InfoCliente = (client:Client) => {
 
     const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext)
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
+    const [zone, setZone] = useState<string>('');
     const [date, setDate] = useState<string>();
+    const location = client.location;
+    const url = `https://www.google.com/maps/place/${(location.latitude)} ${(location.longitude)}`;
 
     useEffect(() => {
+        const getZone = async () => {
+            try {
+                const response = await GetZone();
+                
+                response.data.forEach((element: any) => {
+                    if (element._id === client.zone) {
+                        setZone(element.name);
+                    };
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        getZone();
+
         var date = formatDateTime(client.lastSale, 'numeric', 'numeric', 'numeric');
         if (date === 'Invalid Date') {
             date = 'Sin ventas';
         };
 
         setDate(date);
-    }, [client.lastSale]);
+    }, [client.lastSale, client.zone]);
 
     const Opciones = () => {
         setShowOptions(!showOptions);
@@ -59,12 +79,16 @@ const InfoCliente = (client:Client) => {
             <div className="infoClientes-header">
                 <div className="infoClientes-datoscontainer">
                     <div className="infoClientes-datos" style={{fontWeight: "500"}}>
-                        <img src="./Cliente2.svg" alt="" />
+                        {client.storeImage.length > 1 ? (
+                            <img src={client.storeImage} alt="" className="infoClientes-imgStore" />
+                        ) : (
+                            <img src="./Cliente2.svg" alt="" />
+                        )}
                         <span>{client.fullName}</span>
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./Location-icon.svg" alt="" />
-                        <span>zona norte</span>
+                        <span>{zone}</span>
                     </div>
                     <div className="infoClientes-datos">
                         <img src="./CasaUbi-icon.svg" alt="" />
@@ -108,7 +132,7 @@ const InfoCliente = (client:Client) => {
             </div>
             <div className="infoClientes-footer">
                 <img src="./Location-azul-icon.svg" alt=""/>
-                <a className="infoClientes-ubi" href="https://www.google.com/maps">Ver ubicación en el mapa</a>
+                <a className="infoClientes-ubi" rel="noreferrer" target="_blank" href={url}>Ver ubicación en el mapa</a>
             </div>
         </div>
         </>

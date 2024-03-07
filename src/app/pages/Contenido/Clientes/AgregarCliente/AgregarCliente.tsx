@@ -1,10 +1,8 @@
 import { ChangeEvent, useContext, useState, useEffect } from "react";
 import "./AgregarCliente.css";
-//import { GoogleMapComponent } from "../../../components/GoogleMaps/GoogleMapComponent";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
 import { GoogleMaps } from "../../../components/GoogleMaps/GoogleMaps";
-// import { GetDistricts } from "../../../../../services/DistrictsService";
 import { GetZone } from "../../../../../services/ZonesService";
 import { saveClient } from "../../../../../services/ClientsService";
 
@@ -40,28 +38,32 @@ const AgregarCliente = () => {
     };
 
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [storeImage, setStoreImage] = useState<File | null>(null);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
     const [checkbox2, setCheckbox2] = useState<boolean>(false);
     const [imageCarnetTrasero, setImageCarnetTrasero] = useState<string | null>(null);
     const [imageCarnetDelantero, setImageCarnetDelantero] = useState<string | null>(null);
-    const [imageCasa, setImageCasa] = useState<string | null>(null);
-    //const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLng | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
     const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
+    const [showMap, setShowMap] = useState<boolean>(false);
 
     const [fullName, setFullName] = useState<string>("");
     const [bill, setBill] = useState<string>("");
     const [nit, setNit] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [phoneNumber, setPhoneNumber] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
+    let url = `https://www.google.com/maps/place/${(address)}`;
     const [zoneSelected, setZoneSelected] = useState<string>("");
     const [districts, setDistricts] = useState<District[]>([]);
     const [districtSelected, setDistrictSelected] = useState<string>("");
+    const [comment, setComment] = useState<string>("");
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            setStoreImage(file);
             setSelectedImage(URL.createObjectURL(file));
         }
     };
@@ -71,12 +73,26 @@ const AgregarCliente = () => {
         fileInput.click();
     };
 
+    const saveImage = async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'nn9rw8nv');
+        formData.append('api_key', '799292358463167');
+
+        const response = await fetch("https://api.cloudinary.com/v1_1/ddpagwxh6/image/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const responseData = await response.json();
+        return responseData;
+    };
+
     const capitalize = (value: string) => {   //Función para capitalizar la primera letra de cada palabra.
         return value.replace(/(^|\s)\S/g, (char) => char.toUpperCase());
     };
 
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log(zones)
         const value = event.target.value;
 
         const capitalizedValue = capitalize(value);
@@ -108,13 +124,35 @@ const AgregarCliente = () => {
         setPhoneNumber(value);
     };
 
+    const verifyPhoneNumber = (value: string) => {
+        if (!value.startsWith("+")) {
+            var newValue = "+" + value;
+
+            return newValue;
+        } else {
+            return value;
+        }
+    }
+
+    const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        
+        setAddress(value);
+    };
+
+    const handleCommentChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+
+        setComment(value);
+    };
+
     const handleZoneChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
 
         // eslint-disable-next-line
-        zones.map((zone) => {
+        zones.map((zone: any) => {
             if(zone.name === value){
-                setZoneSelected(zone.id);
+                setZoneSelected(zone._id);
                 setDistricts(zone.districts);
             }
         });
@@ -122,10 +160,10 @@ const AgregarCliente = () => {
 
     const handleDistricChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
-        
+
         // eslint-disable-next-line
         districts.map((district) => {
-            if(district.name === value){
+            if(district._id === value){
                 setDistrictSelected(district._id);
             }
         });
@@ -145,10 +183,6 @@ const AgregarCliente = () => {
         }
     };
 
-    /*const handleLocationSelect = (location: google.maps.LatLng) => {
-        setSelectedLocation(location);
-    };*/
-
     const toggleSwitch = () => {
         setIsChecked(!isChecked);
     };
@@ -157,32 +191,60 @@ const AgregarCliente = () => {
     };
 
     const saveData = async() => {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        let latitude = "0", longitude = "0";
+        let urlStoreImg;
+
+        if (storeImage) {
+            urlStoreImg = await saveImage(storeImage);
+        } else {
+            console.error("No se encontró imagen");
+            return window.alert("Porfavor, adjunte una imagen");
+        }
+        
+        if(data.length > 0){
+            latitude = data[0].lat;
+            longitude = data[0].lon;
+        } else {
+            console.error("No se encontraron coordenadas");
+        };
+
         try{
             const dataToSave = {
                 user: "63d955b101f27eac0197bb16",
-                storeImage: selectedImage,
+                storeImage: urlStoreImg.secure_url,
                 fullName: fullName,
-                phoneNumber: phoneNumber,
+                phoneNumber: await verifyPhoneNumber(phoneNumber),
                 email: email,
+                address: address,
+                comment: comment,
+                ciFrontImage: imageCarnetTrasero,
+                ciBackImage: imageCarnetDelantero,
                 zone: zoneSelected,
                 district: districtSelected,
-                // isFrequent: checkbox1,
-                // isAgency: checkbox2,
-                // renewalPeriod: isChecked,
-                // renewalAverage: isChecked2,
-                // image: selectedImage,
-                cidFrontImage: imageCarnetTrasero,
-                cidBackImage: imageCarnetDelantero,
-                // imageCasa: imageCasa
-                // bill: bill,
-                // nit: nit,
+                location: {
+                    latitude: latitude,
+                    longitude: longitude,
+                },
+                renewInDays: "10",
+                billingInfo: {
+                    NIT: nit,
+                    phoneNumber: phoneNumber,
+                },
+                isAgency: checkbox2,
             };
-    
+
             const resp = await saveClient(dataToSave);
 
-            if(resp && resp.status === 200){
-                console.log('Sale successfully registered', dataToSave);
-                window.alert('Venta registrada correctamente');
+            if(resp === 200){
+                console.log('Client successfully registered', dataToSave);
+                window.alert('Cliente registrado correctamente');
+                window.location.reload();
+            }else{
+                console.error('Error registering client', dataToSave);
+                window.alert('Error al registrar el cliente');
             };
         }catch(e){
             console.log(e);
@@ -224,7 +286,7 @@ return (
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Nombre</label>
-                                <input type="text" className="input-text" value={fullName} onChange={handleNameChange}/>
+                                <input type="text" className="input-text" placeholder="Juan Alvarez" value={fullName} onChange={handleNameChange}/>
                             </div>
                             <div className="input-grup">
                                 <label className="label-grup">Datos de facturación</label>
@@ -234,11 +296,11 @@ return (
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Número de NIT</label>
-                                <input type="text" className="input-text" value={nit} onChange={handleNitChange}/>
+                                <input type="text" className="input-text" placeholder="" value={nit} onChange={handleNitChange}/>
                             </div>
                             <div className="input-grup">
                                 <label className="label-grup">Correo electronico</label>
-                                <input type="email" className="input-text" value={email} onChange={handleEmailChange}/>
+                                <input type="email" className="input-text" placeholder="juanAlvares@gmail.com" value={email} onChange={handleEmailChange}/>
                             </div>
                         </div>
                         <div className="grupo-input">
@@ -248,24 +310,24 @@ return (
                                     <div style={{width: "15%", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px", border: "1px solid #000", borderEndEndRadius: "0px", borderStartEndRadius: "0px"}}>
                                         <img src="./Telefono-icon.svg" alt="" />
                                     </div>
-                                    <input type="text" className="input-text" style={{width: "100%", borderStartStartRadius: "0px", borderEndStartRadius: "0px", textAlign: "start"}} value={phoneNumber} onChange={handlePhoneNumberChange}/>
+                                    <input type="text" className="input-text" style={{width: "100%", borderStartStartRadius: "0px", borderEndStartRadius: "0px", textAlign: "start"}} placeholder="591 7510584" value={phoneNumber} onChange={handlePhoneNumberChange}/>
                                 </div>
                             </div>
                         </div>
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Dirección</label>
-                                <input type="text" className="input-text"/>
-                                <div className="ubicacion" style={{marginTop: "10px"}}>
-                                    <img src="./Googlemap-Icon.svg" alt="" />
-                                    <a className="text-ubi" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/@10.3649143,-75.4927273,15z?entry=ttu">Ver ubicación en Google Maps</a>
+                                <input type="text" className="input-text" placeholder="Av. Abel Iturralde 1067, La Paz" value={address} onChange={handleAddressChange} />
+                                        <div className="ubicacion" style={{marginTop: "10px"}}>
+                                            <img src="./Googlemap-Icon.svg" alt="" />
+                                            <a className="text-ubi" target="_blank" rel="noopener noreferrer" href={url}>Ver ubicación en Google Maps</a>
+                                        </div>
+                                    </div>
+                                    <div className="input-grup">
+                                        <label className="label-grup">Referencia</label>
+                                        <input type="text" className="input-text" value={comment} onChange={handleCommentChange} />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="input-grup">
-                                <label className="label-grup">Referencia</label>
-                                <input type="text" className="input-text"/>
-                            </div>
-                        </div>
                         <div className="grupo-input" style={{gap: "20px"}}>
                             <div className="input-grup">
                                 <label className="label-grup">Zona</label>
@@ -315,17 +377,17 @@ return (
                                 <ImagenInsertar texto="Porfavor, adjunta foto del carnet (Delantero)" imagenSelect={imageCarnetDelantero} onImagenSeleccionada={setImageCarnetDelantero} id="delantero" />
                             </div>
                             <div className="grupo-input">
-                                <ImagenInsertar texto="Foto de la fachada del domicilio" imagenSelect={imageCasa} onImagenSeleccionada={setImageCasa} id="casa" />
-                            </div>
-                            <div className="grupo-input">
                             <div className="Ubi-Google">
-                                <GoogleMaps apiKey={api}/>
+                                {
+                                    showMap ? 
+                                        <>
+                                            <button onClick={() => setShowMap(false)} className="btn-ubi">Ocultar mapa</button>
+                                            <GoogleMaps apiKey={api} />
+                                        </>
+                                    : 
+                                        <button onClick={() => setShowMap(true)} className="btn-ubi">Mostrar mapa</button>
+                                }
                             </div>
-                            {/* {selectedLocation && (
-                                <div className="Ubi-Google">
-                                    Ubicación seleccionada: {selectedLocation.lat()}, {selectedLocation.lng()}
-                                </div>
-                            )} */}
                         </div>
                         <div className="grupo-input" style={{flexDirection: "column"}}>
                             <div className="switch-input">

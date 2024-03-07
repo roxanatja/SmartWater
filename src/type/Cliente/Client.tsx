@@ -21,6 +21,12 @@ export interface Client {
     renewInDays: Number,
     renewDate: string,
     isClient: boolean,
+    isAgency: boolean,
+    billingInfo: {
+      nit: string,
+      phoneNumber: string
+    },
+    averageRenewal: boolean,
     contracts: [],
     created: string,
     updated: string,

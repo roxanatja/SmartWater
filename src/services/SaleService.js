@@ -2,7 +2,7 @@ import smartwaterApi from "../api/SmartWaterApi";
 
 export const GetSales = async () => {
     try{
-        const {data} = await smartwaterApi.get('/sales');
+        const {data} = await smartwaterApi.get('/sales?pageSize=3000');
     
         return data;
     }catch (e) {

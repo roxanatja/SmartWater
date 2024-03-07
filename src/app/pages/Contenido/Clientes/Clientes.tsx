@@ -86,7 +86,6 @@ const Clientes: FC = () => {
 
     const searchUser = (e: string) => {
         const value = e;
-        console.log(value);
         
         if(value === ""){
             getClient();
