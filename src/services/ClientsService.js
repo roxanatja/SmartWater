@@ -2,7 +2,7 @@ import smartwaterApi from "../api/SmartWaterApi";
 
 export const loadClients = async () => {
     try{
-        const {data} = await smartwaterApi.get('/clients');
+        const {data} = await smartwaterApi.get('/clients?pageSize=3000');
     
         return data;
     }catch (e) {
@@ -21,15 +21,14 @@ export const GetClientById = async (id) => {
     }
 };
 
-export const saveClient = async (client) => {
-    let resp;
+export const saveClient = async (client) => {   
     try{
-        resp = await smartwaterApi.post('/clients', client);
+         await smartwaterApi.post('/clients/register', client);
     
-        return resp;
+        return 200;
     }catch (e) {
         console.error(e);
-        return resp;
+        return e.response;
     }
 };
 

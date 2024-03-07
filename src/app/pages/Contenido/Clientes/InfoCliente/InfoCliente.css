@@ -109,3 +109,11 @@
     line-height: normal;
     text-decoration: none;
 }
+
+.infoClientes-imgStore{
+    width: 30px;
+    height: 31px;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
+}

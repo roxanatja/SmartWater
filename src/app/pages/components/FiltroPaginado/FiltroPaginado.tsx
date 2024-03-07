@@ -11,6 +11,9 @@ import { formatDateTime } from "../../../../utils/helpers";
 import { GetZone } from "../../../../services/ZonesService";
 import { GetProducts } from "../../../../services/ProductsService";
 import { GetDistricts } from "../../../../services/DistrictsService";
+import { GetLoans } from "../../../../services/LoansService";
+import { GetDevolutions } from "../../../../services/DevolutionsService";
+import { GetItems } from "../../../../services/ItemsService";
 
 type Componentes = {
     exportar?: boolean;                               //Para que se active la opcion de exportar
@@ -41,32 +44,28 @@ const FiltroPaginado: FC<Componentes> = ({  exportar, typeDataToExport, add, pag
                                             resultados, swith, opcionesSwitch1, opcionesSwitch2, resultadosPrestamo,
                                             finanzas, iconUbicacion, filtro, total, orderArray, onFilter, search}) => {
 
-const searchUser = async (id: string) => {        //Busca el nombre del usuario 
-    const userList = await GetUser();
+const searchUser = async (id: string, userList: any) => {        //Busca el nombre del usuario 
     const user = userList.find((user: any) => user._id === id);
     return user.fullName;
 };
 
-const searchZone = async (id: string) => {        //Busca la zona del cliente
-    const zones = await GetZone().then((resp) => { return resp.data });
+const searchZone = async (id: string, zones: any) => {        //Busca la zona del cliente
     const zone = zones.find((zone: any) => zone._id === id);
     return zone?.name;
 };
 
-const searchDistrict = async (id: string) => {        //Busca el distrito del cliente
-    const districts = await GetDistricts().then((resp) => { return resp.data });
-    console.log(districts);
+const searchDistrict = async (id: string, districts: any) => {        //Busca el distrito del cliente
     const district = districts.find((district: any) => district._id === id);
     return district?.name;
 };
 
-const setDetail = async (sale: Sale) => {        //Guarda los detalles de la venta
-    const products = await GetProducts().then((resp) => { return resp.data });
+const setDetailSale = async (details: Array<any>, products: any) => {        //Guarda los detalles de la venta
     var detailsProduct: string = '';
     await Promise.all(
-        sale.detail.map(async (detail: any) => {
+        details.map(async (detail: any) => {
             const product = products.find((product: any) => product._id === detail.product);
-            detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} Precio: ${detail.price} `;
+
+            detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} `;
             return {
                 detailsProduct
             };
@@ -75,19 +74,96 @@ const setDetail = async (sale: Sale) => {        //Guarda los detalles de la ven
     return detailsProduct;
 };
 
+const setDetailClient = async (loans: Array<any>, products: Array<any>) => {        //Guarda los detalles del cliente
+    if(loans.length > 0) {
+        var detailsProduct: string = '';
+        loans.map(async (loan: any) => {
+            await Promise.all(
+                loan.detail.map((detail: any) => {
+                    const product = products.find((product: any) => product._id === detail.item);
+
+                    if(product === undefined) return console.log("No hay productos");
+                    
+                    detailsProduct += `${detail.quantity} ${product.name}`;
+                    return {
+                        detailsProduct
+                    };
+                })
+            );
+        });
+
+        return detailsProduct;
+    } else {
+        return "SIN MOVIMIENTO";
+    }
+};
+
+const setContract = async (client: Client, loans: Array<any>) => {        //Guarda los detalles del contrato
+    if(client.hasContract) {
+        if(client.hasExpiredContract) {
+            return "CONTRATO VENCIDO";
+        } else {
+            if (loans.some((loan: any) => loan.client === client._id)) {
+                return "PRESTAMO CON CONTRATO";
+            } else {
+                return "CONTRATO VIGENTE";
+            };
+        };
+    } else {
+        return "SIN CONTRATO";
+    };
+};
+
+const setDevolutions = async (id: string, devolutions: Array<any>, products: Array<any>) => {        //Guarda los detalles de las devoluciones
+    const devolution = devolutions.filter((devolution: any) => devolution.client === id);
+
+    if(devolution.length > 0) {
+        var devolutionDetails: string = '';
+
+        await Promise.all(
+            devolution.map(async (devolution: any) => {
+                devolution.detail.map((detail: any) => {
+                    const product = products.find((product: any) => product._id === detail.item);
+
+                    if(product === undefined) return console.log("No hay productos");
+
+                    devolutionDetails += `${devolution.quantity} ${devolution.product} `;
+                    return {
+                        devolutionDetails
+                    };
+                });
+            })
+        );
+        return devolutionDetails;
+    } else {
+        return "SIN MOVIMIENTO";
+    };
+};
+
+const setSaldo = async (id: string, loans: any, devolutions: any) => {           //Guarda el saldo del cliente
+    const filteredLoans = loans.filter((loan: any) => loan.id === id);
+    const filteredDevolutions = devolutions.filter((devolution: any) => devolution.id === id);
+
+    const filteredSaldo = filteredLoans.filter((loan: any) => !filteredDevolutions.some((devolution: any) => devolution.id === loan.id));
+    // console.log("loans ",filteredLoans, "devolutions",filteredDevolutions, "saldo",filteredSaldo);
+};
+
 const getDataWithClientNames = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
     const { data } = await GetSales();
+    const userList = await GetUser();
+    const products = await GetProducts().then((resp) => { return resp.data });
+    const zones = await GetZone().then((resp) => { return resp.data });
     const dataWithClientNames = await Promise.all(
         data.map(async (sale: Sale) => {
             const client: Client = await GetClientById(sale.client);
 
             const typeDataToExport = {
                 "cliente" : client.fullName,
-                "usuario" : await searchUser(sale.user),
+                "usuario" : await searchUser(sale.user, userList),
                 "comentario" : sale.comment ? sale.comment : "Sin comentario",
-                "detalle" : await setDetail(sale),
+                "detalle" : await setDetailSale(sale.detail, products),
                 "Total" : sale.total,
-                "zona" : await searchZone(sale.zone),
+                "zona" : await searchZone(sale.zone, zones),
                 "Pago" : sale.creditSale ? "Credito" : "Al contado",
                 "creado" : formatDateTime(sale.created, 'numeric', 'long', '2-digit'),
                 "actualizado" : formatDateTime(sale.updated, 'numeric', 'long', '2-digit'),
@@ -100,22 +176,36 @@ const getDataWithClientNames = async () => {            //Guarda el nombre del c
     return dataWithClientNames;
 };
 
-const getDataClients = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
+const getDataClients = async () => {            //Guarda todos los campos para exportar en el archivo excel
     const { data } = await loadClients();
+    const userList = await GetUser();
+    const loans = await GetLoans().then((resp) => { return resp.data });
+    const zones = await GetZone().then((resp) => { return resp.data });
+    const districts = await GetDistricts().then((resp) => { return resp.data });
+    const items = await GetItems().then((resp) => { return resp.data });
+    const devolutions = await GetDevolutions().then((resp) => { return resp.data });
+
     const dataClientToExport = await Promise.all(
         data.map(async (client: Client) => {
-            const typeDataToExport = {
-                "cliente" : client.fullName,
-                "telefono" : client.phoneNumber,
-                "direccion" : client.address ? client.address : "Sin direccion",
-                "codigo" : client.code ? client.code : "Sin codigo",
-                "usuario" : await searchUser(client.user),
-                "zona" : await searchZone(client.zone),
-                "distrito" : await searchDistrict(client.district),
-                "creado" : formatDateTime(client.created, 'numeric', 'long', '2-digit'),
-                "actualizado" : formatDateTime(client.updated, 'numeric', 'long', '2-digit'),
-                "ultimaVenta" : client.lastSale ? formatDateTime(client.lastSale, 'numeric', 'long', '2-digit') : "Sin ventas",
+            const filteredLoans = loans.filter((loan: any) => loan.client === client._id);
 
+            const typeDataToExport = {
+                "NOMBRE" : client.fullName,
+                "TELEFONO" : client.phoneNumber ? client.phoneNumber : "S/Numero",
+                "CODIGO" : client.code ? client.code : "Sin codigo",
+                "DIRECCION" : client.address ? client.address : "Sin direccion",
+                "REFERENCIA" : client.comment,
+                "USUARIO" : await searchUser(client.user, userList),
+                "ZONA" : await searchZone(client.zone, zones),
+                "BARRIO" : await searchDistrict(client.district, districts),
+                "TIEMPO DE RENOVACION": client.renewInDays,
+                "FECHA DE REGISTRO" : formatDateTime(client.created, 'numeric', 'long', '2-digit'),
+                "CONTRATOS": await setContract(client, loans),
+                "PRESTAMOS": await setDetailClient(filteredLoans, items),
+                "DEVOLUCIONES": await setDevolutions(client._id, devolutions, items),
+                "SALDOS": await setSaldo(client._id, loans, devolutions),
+                "FECHA DE ULTIMA VENTA" : client.lastSale ? formatDateTime(client.lastSale, 'numeric', 'long', '2-digit') : "Sin ventas",
+                "SALDOS POR COBRAR BS" : client.credit,
             };
 
             return typeDataToExport;
