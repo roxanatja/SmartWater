@@ -17,7 +17,7 @@ type ProductosAdd = {
 
 const RegistrarVenta: FC = () => {
 
-    const { selectedClient } = useContext(ClientesContext)
+    const { selectedClient } = useContext(ClientesContext);
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
     const [checkbox2, setCheckbox2] = useState<boolean>(false);

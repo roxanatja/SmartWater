@@ -6,6 +6,7 @@ import { RegistrarVenta } from "./RegistrarVenta/RegistrarVenta";
 import { RegistrarPedido } from "./RegistrarPedido/RegistrarPedido";
 import { RegistrarPrestamo } from "./RegistrarPrestamo/RegistrarPrestamo";
 import { RegistrarDevolucion } from "./RegistrarDevolucion/RegistrarDevolucion";
+import { ClientEdit } from "./EditClient/EditClient";
 
 
 const ClientesWrapper: FC = () => {
@@ -19,6 +20,7 @@ const ClientesWrapper: FC = () => {
                     <Route path='/RegistrarPedido' element={<RegistrarPedido />}/>
                     <Route path='/RegistrarPrestamo' element={<RegistrarPrestamo />}/>
                     <Route path='/RegistrarDevolucion' element={<RegistrarDevolucion />}/>
+                    <Route path='/EditarCliente' element={<ClientEdit/>}/>
                 </Routes>
             </ClientesProvider>
         </>

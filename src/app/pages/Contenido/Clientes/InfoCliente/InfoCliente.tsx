@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./InfoCliente.css";
+import { ClientEdit } from "../EditClient/EditClient";
 import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
@@ -9,7 +11,8 @@ import { GetZone } from "../../../../../services/ZonesService";
 
 const InfoCliente = (client:Client) => {
 
-    const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext)
+    const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
+    const navigate = useNavigate();
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const [zone, setZone] = useState<string>('');
@@ -47,6 +50,8 @@ const InfoCliente = (client:Client) => {
     }
     
     const Edit = () => {
+        setSelectedClient(client);
+        navigate('/Clientes/EditarCliente');
         setShowOptions(false);
     }
 
