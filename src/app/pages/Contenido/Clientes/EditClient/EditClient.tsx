@@ -1,4 +1,5 @@
 import { ChangeEvent, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./EditClient.css";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
@@ -20,6 +21,7 @@ interface Zone {
 
 const ClientEdit = () => {
     const { setShowModal, selectedClient } = useContext(ClientesContext);
+    const navigate = useNavigate();
     const [zones, setZones] = useState<Array<Zone>>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [storeImage, setStoreImage] = useState<File | null>(null);
@@ -74,7 +76,7 @@ const ClientEdit = () => {
     }, []);
 
     const handleCloseModal = () => {
-        setShowModal(false);
+        navigate('/Clientes');
     };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +105,12 @@ const ClientEdit = () => {
 
         const responseData = await response.json();
         return responseData;
+    };
+
+    const convertUrlToFile = async (url: string, fileName: string): Promise<File> => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new File([blob], fileName);
     };
 
     const capitalize = (value: string) => {   //Función para capitalizar la primera letra de cada palabra.
@@ -232,13 +240,25 @@ const ClientEdit = () => {
     };
 
     const saveData = async() => {
-        let urlStoreImg;
+        let urlStoreImg, urlCarnetTrasero, urlCarnetDelantero;
+        let frontCarnetImage: File | undefined;
+        let backCarnetImage:  File | undefined;
 
-        if (storeImage) {
-            urlStoreImg = await saveImage(storeImage);
+        if (imageCarnetTrasero && imageCarnetDelantero) {
+            backCarnetImage = await convertUrlToFile(imageCarnetTrasero, `${fullName}-carnetTrasero.jpg`);
+            frontCarnetImage = await convertUrlToFile(imageCarnetDelantero, `${fullName}-carnetDelantero.jpg`);
         } else {
-            console.error("No se encontró imagen");
-            return window.alert("Porfavor, adjunte una imagen");
+            console.error("No se encontró imagen del carnet");
+            return window.alert("Porfavor, adjunte una imagen del carnet trasero/delantero de identidad.");
+        };
+
+        if (storeImage && backCarnetImage && frontCarnetImage) {
+            urlStoreImg = await saveImage(storeImage);
+            urlCarnetTrasero = await saveImage(backCarnetImage);
+            urlCarnetDelantero = await saveImage(frontCarnetImage);
+        } else {
+            console.error("No se encontró imagen de la tienda");
+            return window.alert("Porfavor, adjunte una imagen de la tienda.");
         };
 
         try{
@@ -250,8 +270,8 @@ const ClientEdit = () => {
                 email: email,
                 address: address,
                 comment: comment,
-                ciFrontImage: imageCarnetTrasero,
-                ciBackImage: imageCarnetDelantero,
+                ciFrontImage: urlCarnetDelantero.secure_url,
+                ciBackImage: urlCarnetTrasero.secure_url,
                 zone: zoneSelected,
                 district: districtSelected,
                 location: {

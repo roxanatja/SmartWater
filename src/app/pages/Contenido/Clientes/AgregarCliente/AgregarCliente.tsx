@@ -90,6 +90,12 @@ const AgregarCliente = () => {
         return responseData;
     };
 
+    const convertUrlToFile = async (url: string, fileName: string): Promise<File> => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new File([blob], fileName);
+    };
+
     const capitalize = (value: string) => {   //Función para capitalizar la primera letra de cada palabra.
         return value.replace(/(^|\s)\S/g, (char) => char.toUpperCase());
     };
@@ -217,13 +223,25 @@ const AgregarCliente = () => {
     };
 
     const saveData = async() => {
-        let urlStoreImg;
+        let urlStoreImg, urlCarnetTrasero, urlCarnetDelantero;
+        let frontCarnetImage: File | undefined;
+        let backCarnetImage:  File | undefined;
 
-        if (storeImage) {
-            urlStoreImg = await saveImage(storeImage);
+        if (imageCarnetTrasero && imageCarnetDelantero) {
+            backCarnetImage = await convertUrlToFile(imageCarnetTrasero, `${fullName}-carnetTrasero.jpg`);
+            frontCarnetImage = await convertUrlToFile(imageCarnetDelantero, `${fullName}-carnetDelantero.jpg`);
         } else {
-            console.error("No se encontró imagen");
-            return window.alert("Porfavor, adjunte una imagen");
+            console.error("No se encontró imagen del carnet");
+            return window.alert("Porfavor, adjunte una imagen del carnet trasero/delantero de identidad.");
+        };
+
+        if (storeImage && backCarnetImage && frontCarnetImage) {
+            urlStoreImg = await saveImage(storeImage);
+            urlCarnetTrasero = await saveImage(backCarnetImage);
+            urlCarnetDelantero = await saveImage(frontCarnetImage);
+        } else {
+            console.error("No se encontró imagen de la tienda");
+            return window.alert("Porfavor, adjunte una imagen de la tienda.");
         };
 
         try{
@@ -235,8 +253,8 @@ const AgregarCliente = () => {
                 email: email,
                 address: address,
                 comment: comment,
-                ciFrontImage: imageCarnetTrasero,
-                ciBackImage: imageCarnetDelantero,
+                ciFrontImage: urlCarnetDelantero.secure_url,
+                ciBackImage: urlCarnetTrasero.secure_url,
                 zone: zoneSelected,
                 district: districtSelected,
                 location: {

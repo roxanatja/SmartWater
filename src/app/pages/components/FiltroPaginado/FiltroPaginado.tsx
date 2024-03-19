@@ -76,22 +76,32 @@ const setDetailSale = async (details: Array<any>, products: any) => {        //G
 
 const setDetailClient = async (loans: Array<any>, products: Array<any>) => {        //Guarda los detalles del cliente
     if(loans.length > 0) {
+        const prod: Array<string> = []; 
+        const dataToSend: Array<{ itemName: string, quantity: number }> = [];
         var detailsProduct: string = '';
         loans.map(async (loan: any) => {
             await Promise.all(
                 loan.detail.map((detail: any) => {
                     const product = products.find((product: any) => product._id === detail.item);
 
-                    if(product === undefined) return console.log("No hay productos");
-                    
-                    detailsProduct += `${detail.quantity} ${product.name}`;
-                    return {
-                        detailsProduct
-                    };
+                    if(product === undefined) return
+
+                    if(prod.includes(product.name)) {
+                        const existingProduct = dataToSend.find((item) => item.itemName === product.name);
+                        if(existingProduct) {
+                            existingProduct.quantity += detail.quantity;
+                        } else {
+                            dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                        }
+                    } else {
+                        prod.push(product.name);
+                        dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                    }
                 })
             );
         });
 
+        detailsProduct = dataToSend.map((item) => `${item.quantity} ${item.itemName}`).join('\n');
         return detailsProduct;
     } else {
         return "SIN MOVIMIENTO";
@@ -118,34 +128,117 @@ const setDevolutions = async (id: string, devolutions: Array<any>, products: Arr
     const devolution = devolutions.filter((devolution: any) => devolution.client === id);
 
     if(devolution.length > 0) {
+        const prod: Array<string> = []; 
+        const dataToSend: Array<{ itemName: string, quantity: number }> = [];
         var devolutionDetails: string = '';
 
         await Promise.all(
             devolution.map(async (devolution: any) => {
                 devolution.detail.map((detail: any) => {
                     const product = products.find((product: any) => product._id === detail.item);
+                    if(product === undefined) return
 
-                    if(product === undefined) return console.log("No hay productos");
-
-                    devolutionDetails += `${devolution.quantity} ${devolution.product} `;
-                    return {
-                        devolutionDetails
-                    };
+                    if(prod.includes(product.name)) {
+                        const existingProduct = dataToSend.find((item) => item.itemName === product.name);
+                        if(existingProduct) {
+                            existingProduct.quantity += detail.quantity;
+                        } else {
+                            dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                        }
+                    } else {
+                        prod.push(product.name);
+                        dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                    }
                 });
             })
         );
+
+        devolutionDetails = dataToSend.map((item) => `${item.quantity} ${item.itemName}`).join('\n');
         return devolutionDetails;
     } else {
         return "SIN MOVIMIENTO";
     };
 };
 
-const setSaldo = async (id: string, loans: any, devolutions: any) => {           //Guarda el saldo del cliente
-    const filteredLoans = loans.filter((loan: any) => loan.id === id);
-    const filteredDevolutions = devolutions.filter((devolution: any) => devolution.id === id);
+const setLoans = async (id: string, loans: Array<any>, devolutions: Array<any>, products: Array<any>) => {        //Guarda los detalles de los prestamos
+    let devolution = devolutions.filter((devolution: any) => devolution.client === id);
+    var loansDetails: string = '';
+    const prod: Array<string> = []; 
+    const dataToSend: Array<{ itemName: string, quantity: number }> = [];
 
-    const filteredSaldo = filteredLoans.filter((loan: any) => !filteredDevolutions.some((devolution: any) => devolution.id === loan.id));
-    // console.log("loans ",filteredLoans, "devolutions",filteredDevolutions, "saldo",filteredSaldo);
+    if(loans.length > 0 || devolution.length > 0) {
+        if(loans.length > 0) {
+            loans.forEach((loan: any) => {
+                const devolutionFiltered = devolution.filter((devolution: any) => devolution.loan === loan._id);
+                devolution = devolution.filter((devolution: any) => devolution.loan !== loan._id);
+    
+                loan.detail.forEach((detail: any) => {
+                    const product = products.find((product: any) => product._id === detail.item);
+                    
+                    if(product) {
+                        if(prod.includes(product.name)) {
+                            const existingProduct = dataToSend.find((item) => item.itemName === product.name);
+                            if(existingProduct) {
+                                existingProduct.quantity += detail.quantity;
+                            } else {
+                                dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                            }
+                        } else {
+                            prod.push(product.name);
+                            dataToSend.push({ itemName: product.name, quantity: detail.quantity });
+                        }
+                    };
+
+                    devolutionFiltered.forEach((devolution: any) => {
+                        devolution.detail.forEach((devolutionDetail: any) => {
+                            const item = products.find((product: any) => product._id === devolutionDetail.item);
+        
+                            if(item) {
+                                if(prod.includes(item.name)) {
+                                    const existingProduct = dataToSend.find((itemDats) => itemDats.itemName === item.name);
+                                    if(existingProduct) {
+                                        existingProduct.quantity += devolutionDetail.quantity;
+                                    } else {
+                                        dataToSend.push({ itemName: item.name, quantity: devolutionDetail.quantity });
+                                    }
+                                } else {
+                                    prod.push(item.name);
+                                    dataToSend.push({ itemName: item.name, quantity: devolutionDetail.quantity });
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        };
+
+        if(devolution.length > 0) {
+            devolution.forEach((devolution: any) => {
+                devolution.detail.forEach((devolutionDetail: any) => {
+                    const item = products.find((product: any) => product._id === devolutionDetail.item);
+
+                    if(item) {
+                        if(prod.includes(item.name)) {
+                            const existingProduct = dataToSend.find((itemDats) => itemDats.itemName === item.name);
+                            if(existingProduct) {
+                                existingProduct.quantity += devolutionDetail.quantity;
+                            } else {
+                                dataToSend.push({ itemName: item.name, quantity: devolutionDetail.quantity });
+                            }
+                        } else {
+                            prod.push(item.name);
+                            dataToSend.push({ itemName: item.name, quantity: devolutionDetail.quantity });
+                        }
+                    }
+                });
+            });
+        };
+    
+        loansDetails = dataToSend.map((item) => `${item.quantity} ${item.itemName}`).join('\n');
+        return loansDetails;
+    } else {
+        return "SIN MOVIMIENTO";
+    };
 };
 
 const getDataWithClientNames = async () => {            //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
@@ -199,12 +292,12 @@ const getDataClients = async () => {            //Guarda todos los campos para e
                 "ZONA" : await searchZone(client.zone, zones),
                 "BARRIO" : await searchDistrict(client.district, districts),
                 "TIEMPO DE RENOVACION": client.renewInDays,
-                "FECHA DE REGISTRO" : formatDateTime(client.created, 'numeric', 'long', '2-digit'),
+                "FECHA DE REGISTRO" : formatDateTime(client.created, 'numeric', 'numeric', '2-digit'),
                 "CONTRATOS": await setContract(client, loans),
-                "PRESTAMOS": await setDetailClient(filteredLoans, items),
+                "PRESTAMOS": await setLoans(client._id, filteredLoans, devolutions, items),
                 "DEVOLUCIONES": await setDevolutions(client._id, devolutions, items),
-                "SALDOS": await setSaldo(client._id, loans, devolutions),
-                "FECHA DE ULTIMA VENTA" : client.lastSale ? formatDateTime(client.lastSale, 'numeric', 'long', '2-digit') : "Sin ventas",
+                "SALDOS": await setDetailClient(filteredLoans, items),
+                "FECHA DE ULTIMA VENTA" : client.lastSale ? formatDateTime(client.lastSale, 'numeric', 'numeric', '2-digit') : "Sin ventas",
                 "SALDOS POR COBRAR BS" : client.credit,
             };
 
