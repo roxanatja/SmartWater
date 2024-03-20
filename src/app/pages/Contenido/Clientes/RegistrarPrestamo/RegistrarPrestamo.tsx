@@ -8,8 +8,8 @@ import moment from 'moment'
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
 import { saveLoans } from "../../../../../services/LoansService";
-import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
+import { GetItems } from "../../../../../services/ItemsService";
 
 type ProductosAdd = {
     id: number,
@@ -43,7 +43,7 @@ const RegistrarPrestamo: FC = () => {
     }, []);
 
     const getProduct = async () => {
-        await GetProducts().then((resp) => {
+        await GetItems().then((resp) => {
             setProducts(resp.data);
         });
     }
@@ -130,7 +130,7 @@ const RegistrarPrestamo: FC = () => {
                 const resp = await saveLoans(loansData);     
 
                 if(resp === 200){
-                    console.log('Loan successfully registered', loansData);
+                    console.log('Loan successfully registered');
                     window.alert('Prestamo registrado correctamente');
                     setLoadingSale(false);
                     navigate('/Clientes');

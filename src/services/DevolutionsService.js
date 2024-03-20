@@ -21,3 +21,28 @@ export const GetDevolutions = async () => {
         return e.response;
     }
 };
+
+export const GetDevolutionsByUser = async (userId) => {
+    try{
+        const { data } = await smartwaterApi.get(`/devolutions?client=${userId}`);
+    
+        return data;
+    }catch (e) {
+        console.error(e);
+        return e.response;
+    }
+};
+
+export const registerDevolutions = async (devolution) => {
+    try {
+        const resp = await smartwaterApi.post('/devolutions/register', devolution)
+                .then((respuesta) => {
+                    return respuesta.status;
+                });
+                
+        return resp;
+    } catch (e) {
+        console.error(e);
+        return e.response;
+    }
+};
