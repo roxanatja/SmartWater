@@ -11,6 +11,18 @@ export const GetLoans = async () => {
     }
 };
 
+export const GetLoansByClientId = async (id) => {
+    try{
+        const {data} = await smartwaterApi.get(`/loans?client=${id}`);
+
+        return data;
+    }catch(e){
+        console.error(e);
+        return null;
+    }
+
+};
+
 export const saveLoans = async (dataToSave) => {
     let resp = null;
     try {

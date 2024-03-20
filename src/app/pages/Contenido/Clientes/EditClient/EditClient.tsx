@@ -1,5 +1,6 @@
 import { ChangeEvent, useContext, useState, useEffect } from "react";
-import "./AgregarCliente.css";
+import { useNavigate } from "react-router-dom";
+import "./EditClient.css";
 import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInsertar";
 import { ClientesContext } from "../ClientesContext";
 import { GoogleMaps } from "../../../components/GoogleMaps/GoogleMaps";
@@ -18,25 +19,10 @@ interface Zone {
     districts: Array<District>;
 };
 
-const AgregarCliente = () => {
-    const { setShowModal } = useContext(ClientesContext);
+const ClientEdit = () => {
+    const { setShowModal, selectedClient } = useContext(ClientesContext);
+    const navigate = useNavigate();
     const [zones, setZones] = useState<Array<Zone>>([]);
-
-    const loadZones = async () => {
-        await GetZone().then((resp) => {
-            setZones(resp.data);
-            setDistricts(resp.data[0].districts);
-        });
-    }
-
-    useEffect(() => {
-        loadZones();
-    }, []);
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
-
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [storeImage, setStoreImage] = useState<File | null>(null);
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
@@ -61,6 +47,37 @@ const AgregarCliente = () => {
     const [districts, setDistricts] = useState<District[]>([]);
     const [districtSelected, setDistrictSelected] = useState<string>("");
     const [comment, setComment] = useState<string>("");
+
+    const loadZones = async () => {
+        await GetZone().then((resp) => {
+            setZones(resp.data);
+            setDistricts(resp.data[0].districts);
+        });
+    };
+
+    const LoadDataClient = () => {
+        console.log(selectedClient);
+        setFullName(selectedClient.fullName);
+        setNit(selectedClient.billingInfo.nit);
+        // setEmail(selectedClient.email);
+        setPhoneNumber(selectedClient.phoneNumber);
+        setAddress(selectedClient.address);
+        setComment(selectedClient.comment);
+        setZoneSelected(selectedClient.zone);
+        setDistrictSelected(selectedClient.district);
+        setSelectedImage(selectedClient.storeImage);
+        setImageCarnetTrasero(selectedClient.ciFrontImage);
+        setImageCarnetDelantero(selectedClient.ciBackImage);
+    };
+
+    useEffect(() => {
+        loadZones();
+        LoadDataClient();
+    }, []);
+
+    const handleCloseModal = () => {
+        navigate('/Clientes');
+    };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -292,7 +309,7 @@ return (
                     <div className="modal-header">
                         <div className="Titulo-Modal">
                             <div>
-                                <span>Regitrar cliente</span>
+                                <span>Editar cliente</span>
                             </div>
                             <div>
                                 <button type="button" className="btn" onClick={handleCloseModal}><img src="./cerrar.svg" alt="" /></button>
@@ -319,17 +336,17 @@ return (
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Nombre</label>
-                                <input type="text" className="input-text" placeholder="Juan Alvarez" value={fullName} onChange={handleNameChange}/>
+                                <input type="text" className="input-text" placeholder={fullName} value={fullName} onChange={handleNameChange}/>
                             </div>
                             <div className="input-grup">
                                 <label className="label-grup">Datos de facturación</label>
-                                <input type="text" className="input-text" value={bill} onChange={handleBillChange}/>
+                                <input type="text" className="input-text" placeholder={bill} value={bill} onChange={handleBillChange}/>
                             </div>
                         </div>
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Número de NIT</label>
-                                <input type="text" className="input-text" placeholder="" value={nit} onChange={handleNitChange}/>
+                                <input type="text" className="input-text" placeholder={nit} value={nit} onChange={handleNitChange}/>
                             </div>
                             <div className="input-grup">
                                 <label className="label-grup">Correo electronico</label>
@@ -343,14 +360,14 @@ return (
                                     <div style={{width: "15%", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px", border: "1px solid #000", borderEndEndRadius: "0px", borderStartEndRadius: "0px"}}>
                                         <img src="./Telefono-icon.svg" alt="" />
                                     </div>
-                                    <input type="text" className="input-text" style={{width: "100%", borderStartStartRadius: "0px", borderEndStartRadius: "0px", textAlign: "start"}} placeholder="591 7510584" value={phoneNumber} onChange={handlePhoneNumberChange}/>
+                                    <input type="text" className="input-text" style={{width: "100%", borderStartStartRadius: "0px", borderEndStartRadius: "0px", textAlign: "start"}} placeholder={phoneNumber} value={phoneNumber} onChange={handlePhoneNumberChange}/>
                                 </div>
                             </div>
                         </div>
                         <div className="grupo-input">
                             <div className="input-grup">
                                 <label className="label-grup">Dirección</label>
-                                <input type="text" className="input-text" placeholder="Av. Abel Iturralde 1067, La Paz" value={address} onChange={handleAddressChange} />
+                                <input type="text" className="input-text" placeholder={address} value={address} onChange={handleAddressChange} />
                                         <div className="ubicacion" style={{marginTop: "10px"}}>
                                             <img src="./Googlemap-Icon.svg" alt="" />
                                             <a className="text-ubi" target="_blank" rel="noopener noreferrer" href={url}>Ver ubicación en Google Maps</a>
@@ -358,7 +375,7 @@ return (
                                     </div>
                                     <div className="input-grup">
                                         <label className="label-grup">Referencia</label>
-                                        <input type="text" className="input-text" value={comment} onChange={handleCommentChange} />
+                                        <input type="text" className="input-text" placeholder={comment} value={comment} onChange={handleCommentChange} />
                                     </div>
                                 </div>
                         <div className="grupo-input" style={{gap: "20px"}}>
@@ -461,7 +478,7 @@ return (
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                        <button type="button" className="btn-registrar" onClick={saveData}>Registrar cliente</button>
+                        <button type="button" className="btn-registrar" onClick={saveData}>Editar cliente</button>
                     </div>
                 </div>
             </div>
@@ -470,4 +487,4 @@ return (
 );
 };
 
-export { AgregarCliente };
+export { ClientEdit };
