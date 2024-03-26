@@ -33,6 +33,7 @@ export const ClientesProvider = ({ children }: any) => {
         "phoneNumber": "",
         "address": "",
         "comment": "",
+        "email": "",
         "ciFrontImage": "",
         "ciBackImage": "",
         "zone": "",
@@ -49,7 +50,7 @@ export const ClientesProvider = ({ children }: any) => {
         "isClient": true,
         "isAgency": true,
         "billingInfo": {
-          "nit": "",
+          "NIT": "",
           "phoneNumber": ""
         },
         "averageRenewal": false,

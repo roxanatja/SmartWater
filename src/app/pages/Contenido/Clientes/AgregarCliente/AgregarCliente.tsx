@@ -266,6 +266,7 @@ const AgregarCliente = () => {
                     NIT: nit,
                     phoneNumber: phoneNumber,
                 },
+                isClient: checkbox1,
                 isAgency: checkbox2,
             };
 
