@@ -7,6 +7,7 @@ export interface Client {
     phoneNumber: string,
     address: string,
     comment: string,
+    email: string,
     ciFrontImage: string,
     ciBackImage: string,
     zone: string,
@@ -23,7 +24,7 @@ export interface Client {
     isClient: boolean,
     isAgency: boolean,
     billingInfo: {
-      nit: string,
+      NIT: string,
       phoneNumber: string
     },
     averageRenewal: boolean,
