@@ -5,7 +5,7 @@ import { ImagenInsertar } from "../../../components/ImagenInsertar/ImagenInserta
 import { ClientesContext } from "../ClientesContext";
 import { GoogleMaps } from "../../../components/GoogleMaps/GoogleMaps";
 import { GetZone } from "../../../../../services/ZonesService";
-import { saveClient } from "../../../../../services/ClientsService";
+import { updateClient } from "../../../../../services/ClientsService";
 
 interface District {
     _id: string;
@@ -20,15 +20,17 @@ interface Zone {
 };
 
 const ClientEdit = () => {
-    const { setShowModal, selectedClient } = useContext(ClientesContext);
+    const { selectedClient } = useContext(ClientesContext);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [zones, setZones] = useState<Array<Zone>>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImageDuplicated, setSelectedImageDuplicated] = useState<string | null>(null);
     const [storeImage, setStoreImage] = useState<File | null>(null);
-    const [checkbox1, setCheckbox1] = useState<boolean>(false);
-    const [checkbox2, setCheckbox2] = useState<boolean>(false);
     const [imageCarnetTrasero, setImageCarnetTrasero] = useState<string | null>(null);
     const [imageCarnetDelantero, setImageCarnetDelantero] = useState<string | null>(null);
+    const [imageCarnetTraseroDuplicated, setImageCarnetTraseroDuplicated] = useState<string | null>(null);
+    const [imageCarnetDelanteroDuplicated, setImageCarnetDelanteroDuplicated] = useState<string | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isChecked2, setIsChecked2] = useState<boolean>(false);
     const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
@@ -48,33 +50,60 @@ const ClientEdit = () => {
     const [districtSelected, setDistrictSelected] = useState<string>("");
     const [comment, setComment] = useState<string>("");
 
-    const loadZones = async () => {
-        await GetZone().then((resp) => {
-            setZones(resp.data);
-            setDistricts(resp.data[0].districts);
-        });
-    };
-
-    const LoadDataClient = () => {
-        console.log(selectedClient);
-        setFullName(selectedClient.fullName);
-        setNit(selectedClient.billingInfo.nit);
-        // setEmail(selectedClient.email);
-        setPhoneNumber(selectedClient.phoneNumber);
-        setAddress(selectedClient.address);
-        setComment(selectedClient.comment);
-        setZoneSelected(selectedClient.zone);
-        setDistrictSelected(selectedClient.district);
-        setSelectedImage(selectedClient.storeImage);
-        setImageCarnetTrasero(selectedClient.ciFrontImage);
-        setImageCarnetDelantero(selectedClient.ciBackImage);
-    };
-
     useEffect(() => {
-        loadZones();
-        LoadDataClient();
-    }, []);
+        const getCoordinatesClient = async () => {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            let latitude = "0", longitude = "0";
+    
+            if(data.length > 0){
+                latitude = data[0].lat;
+                longitude = data[0].lon;
+    
+            } else {
+                console.error("No se encontraron coordenadas");
+            };
+    
+            setLatitude(latitude);
+            setLongitude(longitude);
+        };
 
+        const loadZones = async () => {
+            await GetZone().then((resp) => {
+                setZones(resp.data);
+                setDistricts(resp.data[0].districts);
+                setIsLoading(false);
+            });
+        };
+    
+        const LoadDataClient = () => {
+            setFullName(selectedClient.fullName);
+            setNit(selectedClient.billingInfo.NIT);
+            setEmail(selectedClient.email);
+            setPhoneNumber(selectedClient.phoneNumber);
+            setAddress(selectedClient.address);
+            setLatitude(selectedClient.location.latitude);
+            setLongitude(selectedClient.location.longitude);
+            setComment(selectedClient.comment);
+            setZoneSelected(selectedClient.zone);
+            setDistrictSelected(selectedClient.district);
+            setSelectedImage(selectedClient.storeImage);
+            setImageCarnetTrasero(selectedClient.ciBackImage);
+            setImageCarnetTraseroDuplicated(selectedClient.ciBackImage);
+            setImageCarnetDelantero(selectedClient.ciFrontImage);
+            setImageCarnetDelanteroDuplicated(selectedClient.ciFrontImage);
+        };
+
+        LoadDataClient();
+        loadZones();
+        getCoordinatesClient();
+    },  [selectedClient]);
+
+    if (isLoading) {
+        return <p>Cargando Informaciond del cliente</p>
+    }
+    
     const handleCloseModal = () => {
         navigate('/Clientes');
     };
@@ -83,7 +112,7 @@ const ClientEdit = () => {
         const file = event.target.files?.[0];
         if (file) {
             setStoreImage(file);
-            setSelectedImage(URL.createObjectURL(file));
+            setSelectedImageDuplicated(URL.createObjectURL(file));
         }
     };
     
@@ -157,12 +186,6 @@ const ClientEdit = () => {
         } else {
             return value;
         }
-    }
-
-    const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        
-        setAddress(value);
     };
 
     const getCoordinates = async () => {
@@ -181,6 +204,12 @@ const ClientEdit = () => {
 
         setLatitude(latitude);
         setLongitude(longitude);
+    };
+
+    const handleAddressChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        
+        setAddress(value);
     };
 
     const showMapLocation = () => {
@@ -218,20 +247,6 @@ const ClientEdit = () => {
         });
     };
 
-    const handleCheckbox1Change = () => {
-        setCheckbox1(!checkbox1);
-        if (checkbox2) {
-        setCheckbox2(false);
-        }
-    };
-
-    const handleCheckbox2Change = () => {
-        setCheckbox2(!checkbox2);
-        if (checkbox1) {
-        setCheckbox1(false);
-        }
-    };
-
     const toggleSwitch = () => {
         setIsChecked(!isChecked);
     };
@@ -240,61 +255,61 @@ const ClientEdit = () => {
     };
 
     const saveData = async() => {
-        let urlStoreImg, urlCarnetTrasero, urlCarnetDelantero;
+        let urlStoreImg, urlCarnetTrasero, urlCarnetDelantero, urlStoreImgCloud, urlCarnetDelanteroCLOUD, urlCarnetTraseroCLOUD;
         let frontCarnetImage: File | undefined;
         let backCarnetImage:  File | undefined;
-
-        if (imageCarnetTrasero && imageCarnetDelantero) {
-            backCarnetImage = await convertUrlToFile(imageCarnetTrasero, `${fullName}-carnetTrasero.jpg`);
+        if(imageCarnetDelantero !== imageCarnetDelanteroDuplicated && imageCarnetDelantero){
             frontCarnetImage = await convertUrlToFile(imageCarnetDelantero, `${fullName}-carnetDelantero.jpg`);
+            urlCarnetDelanteroCLOUD = await saveImage(frontCarnetImage);
+            urlCarnetDelantero = urlCarnetDelanteroCLOUD.secure_url;
         } else {
-            console.error("No se encontró imagen del carnet");
-            return window.alert("Porfavor, adjunte una imagen del carnet trasero/delantero de identidad.");
+            urlCarnetDelantero = imageCarnetDelantero;
         };
 
-        if (storeImage && backCarnetImage && frontCarnetImage) {
-            urlStoreImg = await saveImage(storeImage);
-            urlCarnetTrasero = await saveImage(backCarnetImage);
-            urlCarnetDelantero = await saveImage(frontCarnetImage);
+        if(imageCarnetTrasero !== imageCarnetTraseroDuplicated && imageCarnetTrasero){
+            backCarnetImage = await convertUrlToFile(imageCarnetTrasero, `${fullName}-carnetTrasero.jpg`);
+            urlCarnetTraseroCLOUD = await saveImage(backCarnetImage);
+            urlCarnetTrasero = urlCarnetTraseroCLOUD.secure_url;
         } else {
-            console.error("No se encontró imagen de la tienda");
-            return window.alert("Porfavor, adjunte una imagen de la tienda.");
+            urlCarnetTrasero = imageCarnetTrasero;
+        };
+
+        if (selectedImageDuplicated !== selectedImage && storeImage) {
+            urlStoreImgCloud = await saveImage(storeImage);
+            urlStoreImg = urlStoreImgCloud.secure_url;
+        } else {
+            urlStoreImg = selectedImage;
         };
 
         try{
             const dataToSave = {
-                user: "63d955b101f27eac0197bb16",
-                storeImage: urlStoreImg.secure_url,
+                storeImage: urlStoreImg,
                 fullName: fullName,
                 phoneNumber: await verifyPhoneNumber(phoneNumber),
                 email: email,
                 address: address,
                 comment: comment,
-                ciFrontImage: urlCarnetDelantero.secure_url,
-                ciBackImage: urlCarnetTrasero.secure_url,
                 zone: zoneSelected,
                 district: districtSelected,
+                ciFrontImage: urlCarnetDelantero,
+                ciBackImage: urlCarnetTrasero,
                 location: {
                     latitude: latitude,
                     longitude: longitude,
                 },
                 renewInDays: "10",
-                billingInfo: {
-                    NIT: nit,
-                    phoneNumber: phoneNumber,
-                },
-                isAgency: checkbox2,
+                averageRenewal: false,
             };
 
-            const resp = await saveClient(dataToSave);
+            const resp = await updateClient(selectedClient._id, dataToSave);
 
             if(resp === 200){
-                console.log('Client successfully registered', dataToSave);
-                window.alert('Cliente registrado correctamente');
+                console.log('Client successfully updated', dataToSave);
+                window.alert('Cliente actualizado correctamente');
                 window.location.reload();
             }else{
-                console.error('Error registering client', dataToSave);
-                window.alert('Error al registrar el cliente');
+                console.error('Error to update the client', dataToSave);
+                window.alert('Error al actualizar el cliente');
             };
         }catch(e){
             console.log(e);
@@ -400,26 +415,6 @@ return (
                                 </select>
                             </div>
                         </div>
-                            <div className="grupo-checbox">
-                                <div className="grupo-check">
-                                    <input
-                                    className="input-check"
-                                    type="checkbox"
-                                    checked={checkbox1}
-                                    onChange={handleCheckbox1Change}
-                                    />
-                                    <label className="text-check">Cliente habitual</label>
-                                </div>
-                                <div className="grupo-check">
-                                    <input
-                                    className="input-check"
-                                    type="checkbox"
-                                    checked={checkbox2}
-                                    onChange={handleCheckbox2Change}
-                                    />
-                                    <label className="text-check">Agencia</label>
-                                </div>
-                            </div>
                             <div className="grupo-input">
                                 <ImagenInsertar texto="Porfavor, adjunta foto del carnet (trasero)" imagenSelect={imageCarnetTrasero} onImagenSeleccionada={setImageCarnetTrasero} id="trasero" />
                             </div>
