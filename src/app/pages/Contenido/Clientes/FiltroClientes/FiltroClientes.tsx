@@ -1,13 +1,33 @@
-import { FC, useContext, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import "./FiltroClientes.css";
 import { ClientesContext } from "../ClientesContext";
+import { FilterContext } from "../../../components/FilterContexr/FilterContext";
 import { Contador } from "../../../components/Contador/Contador";
+import { GetZone } from "../../../../../services/ZonesService";
 
 const FiltroClientes: FC = () => {
     const { setShowFiltro } = useContext(ClientesContext);
+    const { setApplicatedFilters, setNotApplicatedFilters, fromDate, setFromDate, toDate, setToDate, withLoans, setWithLoans, withoutLoans, setWithoutLoans, withCredit, setWithCredit, withoutCredit, setWithoutCredit, dealers, setDealers, zone, setZone } = useContext(FilterContext);
     const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
+    const [withLoansSelected, setWithLoansSelected] = useState<boolean>(false);
+    const [withoutLoansSelected, setWithoutLoansSelected] = useState<boolean>(false);
+    const [withCreditSelected, setWithCreditSelected] = useState<boolean>(false);
+    const [withoutCreditSelected, setWithoutCreditSelected] = useState<boolean>(false);
+    const [dealersList, setDealersList] = useState<any[]>([]);
+    const [selectedDealers, setSelectedDealers] = useState<any[]>([]);
+    const [zonesList, setZonesList] = useState<any[]>([]);
+    const [selectedZones, setSelectedZones] = useState<any[]>([]);
+
+    useEffect(() => {
+        GetZone()
+            .then((resp) => {
+                setZonesList(resp.data);
+            });
+    }, []);
 
     const handleCloseModal = () => {
+        setApplicatedFilters(false);
+        setNotApplicatedFilters(true);
         setShowFiltro(false);
     };
 
@@ -22,6 +42,54 @@ const FiltroClientes: FC = () => {
     const handleIncrementar = (cantidad: number) => {
         console.log(`Incrementar: ${cantidad}`);
         // Aquí puedes colocar la lógica adicional si es necesario
+    };
+
+    const handleWithLoansSelectedChange = () => {
+        setWithLoansSelected(!withLoansSelected);
+        if (withoutLoansSelected) {
+            setWithoutLoansSelected(false);
+        }
+    };
+
+    const handleWithoutLoansSelectedChange = () => {
+        setWithoutLoansSelected(!withoutLoansSelected);
+        if (withLoansSelected) {
+            setWithLoansSelected(false);
+        }
+    };
+
+    const handleWithCreditSelectedChange = () => {
+        setWithCreditSelected(!withCreditSelected);
+        if (withoutCreditSelected) {
+            setWithoutCreditSelected(false);
+        }
+    };
+
+    const handleWithoutCreditSelectedChange = () => {
+        setWithoutCreditSelected(!withoutCreditSelected);
+        if (withCreditSelected) {
+            setWithCreditSelected(false);
+        }
+    };
+
+    const handleZoneSelectedChange = (id: string) => {
+        const index = selectedZones.indexOf(id);
+        if (index !== -1) {
+            selectedZones.splice(index, 1);
+        } else {
+            selectedZones.push(id);
+        }
+    };
+
+    const saveFilters = () => {
+        setApplicatedFilters(true);
+        setNotApplicatedFilters(false);
+        setWithLoans(withLoansSelected);
+        setWithoutLoans(withoutLoansSelected);
+        setWithCredit(withCreditSelected);
+        setWithoutCredit(withoutCreditSelected);
+        setZone(selectedZones);
+        setShowFiltro(false);
     };
 
     return (
@@ -112,6 +180,8 @@ const FiltroClientes: FC = () => {
                                                     <input
                                                         className="input-check"
                                                         type="checkbox"
+                                                        checked={withLoansSelected}
+                                                        onChange={handleWithLoansSelectedChange}
                                                     />
                                                     <div className="FiltroClientes-CuentasOptionTitulo">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="24" viewBox="0 0 11 24" fill="none">
@@ -149,6 +219,8 @@ const FiltroClientes: FC = () => {
                                                     <input
                                                         className="input-check"
                                                         type="checkbox"
+                                                        checked={withoutLoansSelected}
+                                                        onChange={handleWithoutLoansSelectedChange}
                                                     />
                                                     <div className="FiltroClientes-CuentasOptionTitulo">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -168,6 +240,8 @@ const FiltroClientes: FC = () => {
                                                     <input
                                                         className="input-check"
                                                         type="checkbox"
+                                                        checked={withCreditSelected}
+                                                        onChange={handleWithCreditSelectedChange}
                                                     />
                                                     <div className="FiltroClientes-CuentasOptionTitulo">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="24" viewBox="0 0 27 24" fill="none">
@@ -189,6 +263,8 @@ const FiltroClientes: FC = () => {
                                                     <input
                                                         className="input-check"
                                                         type="checkbox"
+                                                        checked={withoutCreditSelected}
+                                                        onChange={handleWithoutCreditSelectedChange}
                                                     />
                                                     <div className="FiltroClientes-CuentasOptionTitulo">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -196,7 +272,7 @@ const FiltroClientes: FC = () => {
                                                             <image xlinkHref="./monedadenegada-icon.svg" x="5" y="6" width="14" height="14" />
                                                             <line x1="6" y1="6" x2="18" y2="18" stroke="#FF0000" strokeWidth="3" />
                                                         </svg>
-                                                        <span>Sin préstamo</span>
+                                                        <span>Sin saldo</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -240,34 +316,18 @@ const FiltroClientes: FC = () => {
                                             <span>Zonas</span>
                                         </div>
                                         <div className="FiltroClientes-zona">
-                                            <div className="FiltroClientes-CuentasOptionTitulo">
-                                                <input
-                                                    className="input-check"
-                                                    type="checkbox"
-                                                />
-                                                <span>Zona 1</span>
-                                            </div>
-                                            <div className="FiltroClientes-CuentasOptionTitulo">
-                                                <input
-                                                    className="input-check"
-                                                    type="checkbox"
-                                                />
-                                                <span>Zona 2</span>
-                                            </div>
-                                            <div className="FiltroClientes-CuentasOptionTitulo">
-                                                <input
-                                                    className="input-check"
-                                                    type="checkbox"
-                                                />
-                                                <span>Zona 3</span>
-                                            </div>
-                                            <div className="FiltroClientes-CuentasOptionTitulo">
-                                                <input
-                                                    className="input-check"
-                                                    type="checkbox"
-                                                />
-                                                <span>Zona 4</span>
-                                            </div>
+                                            {
+                                                zonesList.map((zone, index) => (
+                                                    <div key={index} className="FiltroClientes-CuentasOptionTitulo">
+                                                        <input
+                                                            className="input-check"
+                                                            type="checkbox"
+                                                            onChange={() => handleZoneSelectedChange(zone._id)}
+                                                        />
+                                                        <span>{zone.name}</span>
+                                                    </div>
+                                                ))
+                                            }
                                         </div>
                                     </>
                                 }
@@ -275,7 +335,7 @@ const FiltroClientes: FC = () => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Quitar filtros</button>
-                            <button type="button" className="btn-registrar">Aplicar filtros</button>
+                            <button type="button" className="btn-registrar" onClick={saveFilters}>Aplicar filtros</button>
                         </div>
                     </div>
                 </div>
