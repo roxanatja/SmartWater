@@ -6,6 +6,7 @@ import "./Clientes.css";
 import { FC, useContext, useEffect, useState } from "react";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
 import { ClientesContext } from "./ClientesContext";
+import { FilterContext } from "../../components/FilterContexr/FilterContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from '../../../../type/Cliente/Client';
@@ -14,7 +15,9 @@ import moment from "moment";
 const Clientes: FC = () => {
 
     const { showModal, setShowModal, showMiniModal, showFiltro, setShowFiltro } = useContext(ClientesContext);
+    const { applicatedFilters, notApplicatedFilters,fromDate, toDate, withLoans, withoutLoans, withCredit, withoutCredit, dealers, zone } = useContext(FilterContext);
     const [clients, setClients] = useState<Client[]>([]);
+    const [clientsFiltered, setClientsFiltered] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,11 +30,11 @@ const Clientes: FC = () => {
         let currentPage = page - 1;
         const startIndex = currentPage * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        setCurrentData(clients.slice(startIndex, endIndex));
+        setCurrentData(clientsFiltered.slice(startIndex, endIndex));
     };
 
     const orderArray = (orden: string) => {
-        let clientesOrdenados = [...clients];
+        let clientesOrdenados = [...clientsFiltered];
         if (orden === 'new') {
             clientesOrdenados.sort((a, b) => moment(b.lastSale, 'YYYY-MM-DD').valueOf() - moment(a.lastSale, 'YYYY-MM-DD').valueOf());
         } else if (orden === 'older') {
@@ -45,7 +48,8 @@ const Clientes: FC = () => {
         try{
             await loadClients()
                     .then((resp) => {
-                        setClients(resp.data)
+                        setClients(resp.data);
+                        setClientsFiltered(resp.data);
                         setLoading(false);
                         setPagesData();
                     });
@@ -58,7 +62,7 @@ const Clientes: FC = () => {
     };
 
     const setPagesData = () => {
-        const pages = Math.ceil(clients.length / itemsPerPage);
+        const pages = Math.ceil(clientsFiltered.length / itemsPerPage);
         setTotalPage(pages);
         setCurrentData(clients.slice(0, 10));
     };
@@ -66,8 +70,17 @@ const Clientes: FC = () => {
     useEffect(() => {
         if(loading){
             getClient();
-        }
-    });
+        };
+        
+        if (applicatedFilters) {
+            console.log(applicatedFilters);
+            console.log(fromDate, toDate, withLoans, withoutLoans, withCredit, withoutCredit, dealers, zone);
+        };
+
+        if (notApplicatedFilters) {
+            console.log(notApplicatedFilters);
+        };
+    }, [applicatedFilters, notApplicatedFilters]);
 
     if (loading) {
         return <p>Cargando Clientes</p>
@@ -76,6 +89,16 @@ const Clientes: FC = () => {
     if (error) {
         return <p>Ha ocurrido un error en la carga, intentelo de nuevo en unos minutos</p>
     }
+
+    
+
+    //if(applicatedFilters){
+    //    console.log(applicatedFilters);
+    //    console.log(fromDate, toDate, withLoans, withoutLoans, withCredit, withoutCredit, dealers, zone);
+    //};
+    //if(notApplicatedFilters){
+    //    console.log(notApplicatedFilters);
+    //};
 
     const AddCliente = () => {
         setShowModal(true)
