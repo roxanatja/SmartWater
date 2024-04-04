@@ -1,3 +1,4 @@
+// store/appStore.ts
 import create from "zustand";
 import { Client } from "../type/Cliente/Client";
 
@@ -6,7 +7,7 @@ interface AppState {
   clients: Client[];
   loadingClients: boolean;
   errorClients: boolean;
-  fetchClients: () => void;
+  fetchClients: () => Promise<void>;
   addClient: (client: Client) => void;
   updateClient: (client: Client) => void;
   deleteClient: (clientId: string) => void;
@@ -29,11 +30,9 @@ interface AppState {
   dealers: string[];
   zone: string;
   setFilters: (filters: Partial<AppState>) => void;
-
-  // Agrega aquí más estado y acciones relacionadas con otras partes de la aplicación
 }
 
-const useAppStore = create<AppState>((set, get) => ({
+const useAppStore = create<AppState>((set) => ({
   // Estado inicial y acciones relacionadas con los clientes
   clients: [],
   loadingClients: true,
