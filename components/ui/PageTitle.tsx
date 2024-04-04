@@ -7,7 +7,7 @@ type Item = {
 
 export const PageTitle = ({ titulo, icon }: Item) => {
   return (
-    <div className="flex justify-between items-center mb-8">
+    <div className="flex justify-between items-center  m-5">
       <div className="flex items-center">
         {icon && <>{icon}</>}
         <h1 className="ml-4 text-3xl font-bold">{titulo}</h1>

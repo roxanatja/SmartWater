@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import ClientCard from "./ClientCard";
 import { Client } from "@/type/Cliente/Client";
 import { OpenIcon } from "../icons/Icons";
+import { Download, Plus } from "lucide-react";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
 interface FiltroPaginadoProps {
   zoneAndDistrictNames: Record<string, string>;
@@ -57,38 +60,52 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
       : [];
   const totalPages = Math.ceil((filteredData?.length || 0) / itemsPerPage);
 
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(clients);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(data, "clientes.xlsx");
+  };
+
   return (
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
+        <div className="flex items-center ">
           <input
             type="text"
             placeholder="Buscar clientes"
             value={searchTerm}
             onChange={handleSearch}
-            className="border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-400 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button className="bg-blue-500 text-white rounded-r-md px-4 py-2">
             Buscar
           </button>
         </div>
         <div className="flex content-baseline items-baseline">
-          Filtrar
-          <OpenIcon />
+          <p className="mx-2"> Filtrar</p>
+          <OpenIcon className="mx-2" />
         </div>
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="bg-white text-gray-500 hover:bg-gray-100 rounded-md border border-gray-300 px-2 py-1"
+              className="bg-blue-800 text-gray-500 hover:bg-blue-400  rounded-md border border-gray-300 px-2 py-1"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
+                stroke="white"
               >
                 <path
                   strokeLinecap="round"
@@ -98,20 +115,20 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
                 />
               </svg>
             </button>
-            <span className="text-gray-500">
+            <span className="text-black">
               {currentPage} de {totalPages}
             </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="bg-white text-gray-500 hover:bg-gray-100 rounded-md border border-gray-300 px-2 py-1"
+              className="bg-blue-800 text-gray-500 hover:bg-blue-400 rounded-md border border-gray-300 px-2 py-1"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
+                stroke="white"
               >
                 <path
                   strokeLinecap="round"
@@ -133,12 +150,16 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
           />
         ))}
       </div>
-      <div className="flex justify-between mt-5">
-        <button className="bg-green-500 text-white rounded-md px-4 py-2">
-          Exportar Excel
+      <div className="flex justify-between mt-5 mx-5">
+        <button
+          onClick={exportToExcel}
+          className="bg-blue-800 text-white rounded-full p-4 w-24 h-24 flex flex-col items-center justify-center"
+        >
+          <Download />
+          Exportar
         </button>
-        <button className="bg-blue-500 text-white rounded-md px-4 py-2">
-          Añadir Cliente
+        <button className="bg-blue-800 text-white rounded-full p-4 w-24 h-24 flex flex-col items-center justify-center">
+          <Plus />
         </button>
       </div>
     </div>
