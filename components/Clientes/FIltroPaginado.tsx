@@ -1,13 +1,16 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import ClientCard from "./ClientCard";
 import { Client } from "@/type/Cliente/Client";
-import { loadClients } from "@/lib/services/ClientsService";
+import { OpenIcon } from "../icons/Icons";
 
-interface FiltroPaginadoProps {}
+interface FiltroPaginadoProps {
+  zoneAndDistrictNames: Record<string, string>;
+}
 
-export const FiltroPaginado: React.FC<FiltroPaginadoProps> = () => {
+export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
+  zoneAndDistrictNames,
+}) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,6 +72,10 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = () => {
             Buscar
           </button>
         </div>
+        <div className="flex content-baseline items-baseline">
+          Filtrar
+          <OpenIcon />
+        </div>
         <div className="flex justify-between items-center mt-4">
           <div className="flex items-center space-x-2">
             <button
@@ -119,7 +126,11 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = () => {
       </div>
       <div className="grid shadow-md rounded-lg grid-cols-1 sm:grid-cols-2 gap-4">
         {currentData.map((client) => (
-          <ClientCard key={client._id} client={client} />
+          <ClientCard
+            key={client._id}
+            client={client}
+            zoneAndDistrictNames={zoneAndDistrictNames}
+          />
         ))}
       </div>
       <div className="flex justify-between mt-5">

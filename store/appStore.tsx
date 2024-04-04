@@ -30,6 +30,14 @@ interface AppState {
   dealers: string[];
   zone: string;
   setFilters: (filters: Partial<AppState>) => void;
+
+  // Estado relacionado con las zonas
+  zones: any[];
+  setZones: (zones: any[]) => void;
+  zoneAndDistrictNames: Record<string, string>;
+  setZoneAndDistrictNames: (
+    zoneAndDistrictNames: Record<string, string>
+  ) => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
@@ -84,6 +92,13 @@ const useAppStore = create<AppState>((set) => ({
   dealers: [],
   zone: "",
   setFilters: (filters: Partial<AppState>) => set(filters),
+
+  // Asignar zonas
+  zones: [],
+  setZones: (zones) => set({ zones }),
+  zoneAndDistrictNames: {},
+  setZoneAndDistrictNames: (zoneAndDistrictNames) =>
+    set({ zoneAndDistrictNames }),
 }));
 
 export default useAppStore;
