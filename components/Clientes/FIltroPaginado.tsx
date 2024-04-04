@@ -17,7 +17,11 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const data = await loadClients();
+        const response = await fetch("/api/clients");
+        if (!response.ok) {
+          throw new Error("Failed to fetch clients");
+        }
+        const data = await response.json();
         setClients(data.data);
         setFilteredData(data.data);
       } catch (error) {
