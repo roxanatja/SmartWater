@@ -8,19 +8,25 @@ interface ClientProps {
 
 const ClientDetailPage = async ({ params }: ClientProps) => {
   const { id } = params;
-  const client = await GetClientById(id);
 
-  if (!client) {
-    return <div>Cliente no encontrado</div>;
+  try {
+    const response = await fetch(`/api/clients?id=${id}`);
+    const client = await response.json();
+
+    if (!client) {
+      return <div>Cliente no encontrado</div>;
+    }
+
+    return (
+      <div>
+        <h2>{client.nombre}</h2>
+        <p>{client.email}</p>
+      </div>
+    );
+  } catch (error) {
+    console.error(error);
+    return <div>Error al obtener los detalles del cliente</div>;
   }
-
-  return (
-    <div>
-      <h2>{client.nombre}</h2>
-      <p>{client.email}</p>
-      {/* Renderizar otros detalles del cliente */}
-    </div>
-  );
 };
 
 export default ClientDetailPage;
