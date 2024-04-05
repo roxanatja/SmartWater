@@ -10,9 +10,7 @@ interface GoogleMapsProviderProps {
     googleMapsApiKey: string;
   }
   
-  const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({ children, googleMapsApiKey }) => {
-    console.log("API Key establecida:", googleMapsApiKey);
-  
+  const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({ children, googleMapsApiKey }) => {  
     return <APIProvider apiKey={googleMapsApiKey}>{children}</APIProvider>;
   };
   

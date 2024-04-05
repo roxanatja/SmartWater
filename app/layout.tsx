@@ -25,7 +25,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || "";
   return (
     <GoogleMapsProvider googleMapsApiKey={googleMapsApiKey}>
       <html lang="en">
