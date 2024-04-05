@@ -83,8 +83,8 @@ export const ClientCard: React.FC<ClientCardProps> = ({
       </div>
       <div className="client-stats flex flex-row justify-between items-center  m-4">
         <div className="flex items-center justify-between">
-          <p className="font-bold">Última venta:</p>
-          <div className="rounded-lg  mx-8 px-5 py-1 shadow-md border-blue-800 border">
+          <p className="font-bold">última venta:</p>
+          <div className="rounded-lg  mx-8 px-5 py-1 shadow-md border-blue-700  text-blue-700 border">
             {moment(client.lastSale).format("DD/MM/YYYY")}
           </div>
         </div>
