@@ -63,7 +63,8 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
     setFilteredData(sorted);
   };
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(currentData);
+    //Todo Darle formato a los datos y dejar los importantes
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
     const excelBuffer = XLSX.write(workbook, {
@@ -74,8 +75,7 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(data, "clientes.xlsx");
-  };
-
+};
 
   return (
     <div className="bg-white p-4">
