@@ -35,3 +35,17 @@ export interface Client {
     hasExpiredContract: boolean
     credit: Number
 }
+
+
+export interface ClientResponse {
+  metadata: {
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    previousPage: number | null;
+    nextPage: number | null;
+    year: number | null;
+    month: number | null;
+  };
+  data: Client[];
+}

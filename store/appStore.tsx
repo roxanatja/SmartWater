@@ -7,7 +7,7 @@ interface AppState {
   clients: Client[];
   loadingClients: boolean;
   errorClients: boolean;
-  fetchClients: () => Promise<void>;
+  fetchClients: (clients: Client[]) => void;
   addClient: (client: Client) => void;
   updateClient: (client: Client) => void;
   deleteClient: (clientId: string) => void;
@@ -45,18 +45,11 @@ const useAppStore = create<AppState>((set) => ({
   clients: [],
   loadingClients: true,
   errorClients: false,
-  fetchClients: async () => {
-    // Lógica para obtener los clientes desde el servidor
-    // Actualiza el estado de loadingClients y errorClients según corresponda
-    set({ loadingClients: true, errorClients: false });
-    try {
-      const response = await fetch("/api/clients");
-      const clients = await response.json();
-      set({ clients, loadingClients: false });
-    } catch (error) {
-      set({ errorClients: true, loadingClients: false });
-    }
-  },
+
+
+fetchClients: (clients: Client[]) => {
+  set({ clients, loadingClients: false, errorClients: false });
+},
   addClient: (client: Client) => {
     // Lógica para agregar un nuevo cliente al estado
     set((state) => ({ clients: [...state.clients, client] }));

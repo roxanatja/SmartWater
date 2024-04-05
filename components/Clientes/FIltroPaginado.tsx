@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ClientCard from "./ClientCard";
-import { Client } from "@/type/Cliente/Client";
+import { ClientResponse, Client } from "@/type/Cliente/Client";
 import { OpenIcon } from "../icons/Icons";
 import { Download, Plus, Search, ChevronDown } from "lucide-react";
 import { saveAs } from "file-saver";
@@ -9,35 +9,23 @@ import * as XLSX from "xlsx";
 
 interface FiltroPaginadoProps {
   zoneAndDistrictNames: Record<string, string>;
+  clients: Client[];
 }
 
 export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
   zoneAndDistrictNames,
+  clients,
 }) => {
-  const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredData, setFilteredData] = useState<Client[]>([]);
+  const [filteredData, setFilteredData] = useState<Client[]>(clients);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const itemsPerPage = 8;
 
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch("/api/clients");
-        if (!response.ok) {
-          throw new Error("Failed to fetch clients");
-        }
-        const data = await response.json();
-        setClients(data.data);
-        setFilteredData(data.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchClients();
-  }, []);
+    console.log("Actualizando filteredData con nuevos clientes:", clients);
+    setFilteredData(clients);
+  }, [clients]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -55,14 +43,30 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
+  console.log("Index", endIndex, startIndex);
   const currentData =
     filteredData && filteredData.length > 0
       ? filteredData.slice(startIndex, endIndex)
       : [];
+  console.log("Clientes en la página actual:", currentData);
   const totalPages = Math.ceil((filteredData?.length || 0) / itemsPerPage);
 
+  const handleSortOrderChange = () => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+
+    const sorted = [...filteredData].sort((a, b) => {
+      if (newSortOrder === "asc") {
+        return new Date(a.created).getTime() - new Date(b.created).getTime();
+      } else {
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      }
+    });
+
+    setFilteredData(sorted);
+  };
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(clients);
+    const worksheet = XLSX.utils.json_to_sheet(currentData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
     const excelBuffer = XLSX.write(workbook, {
@@ -75,18 +79,6 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
     saveAs(data, "clientes.xlsx");
   };
 
-  const handleSortOrderChange = () => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-    const sorted = [...filteredData].sort((a, b) => {
-      if (newSortOrder === "asc") {
-        return new Date(a.created).getTime() - new Date(b.created).getTime();
-      } else {
-        return new Date(b.created).getTime() - new Date(a.created).getTime();
-      }
-    });
-    setFilteredData(sorted);
-  };
 
   return (
     <div className="bg-white p-4">
