@@ -14,15 +14,11 @@ export default async function Clientes() {
   try {
     const response = await smartwaterApi.get("/clients?pageSize=3000");
     const clients: ClientResponse = response.data;
-    console.log("Clientes obtenidos desde la API:", clients);
     fetchClients(clients.data);
   } catch (error) {
-    console.error("Error al obtener los clientes desde la API:", error);
-    // Maneja el error de alguna manera, por ejemplo, mostrando un mensaje de error al usuario
   }
 
   const clients = useAppStore.getState().clients;
-  console.log("Clientes en la página Clientes:", clients);
 
   return (
     <div>

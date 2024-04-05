@@ -2,6 +2,7 @@
 import create from "zustand";
 import { Client } from "../type/Cliente/Client";
 
+
 interface AppState {
   // Estado relacionado con los clientes
   clients: Client[];
@@ -38,6 +39,11 @@ interface AppState {
   setZoneAndDistrictNames: (
     zoneAndDistrictNames: Record<string, string>
   ) => void;
+   // Estado y acciones relacionadas con la carga de la API de Google Maps
+   isGoogleMapsApiLoaded: boolean;
+   setIsGoogleMapsApiLoaded: (isLoaded: boolean) => void;
+   googleMapsApiKey: string;
+   setGoogleMapsApiKey: (apiKey: string) => void;
 }
 
 const useAppStore = create<AppState>((set) => ({
@@ -92,6 +98,12 @@ fetchClients: (clients: Client[]) => {
   zoneAndDistrictNames: {},
   setZoneAndDistrictNames: (zoneAndDistrictNames) =>
     set({ zoneAndDistrictNames }),
+ // Estado inicial y acciones relacionadas con la carga de la API de Google Maps
+ isGoogleMapsApiLoaded: false,
+ setIsGoogleMapsApiLoaded: (isLoaded: boolean) => set({ isGoogleMapsApiLoaded: isLoaded }),
+ googleMapsApiKey: "",
+ setGoogleMapsApiKey: (apiKey: string) => set({ googleMapsApiKey: apiKey }),
 }));
+
 
 export default useAppStore;

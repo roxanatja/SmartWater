@@ -17,7 +17,6 @@ export const getZoneAndDistrictNames = (
     });
   });
 
-  console.log("zoneAndDistrictNames:", zoneAndDistrictNames);
   return zoneAndDistrictNames;
 };
 

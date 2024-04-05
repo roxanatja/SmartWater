@@ -23,7 +23,6 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
   const itemsPerPage = 8;
 
   useEffect(() => {
-    console.log("Actualizando filteredData con nuevos clientes:", clients);
     setFilteredData(clients);
   }, [clients]);
 
@@ -43,12 +42,10 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  console.log("Index", endIndex, startIndex);
   const currentData =
     filteredData && filteredData.length > 0
       ? filteredData.slice(startIndex, endIndex)
       : [];
-  console.log("Clientes en la página actual:", currentData);
   const totalPages = Math.ceil((filteredData?.length || 0) / itemsPerPage);
 
   const handleSortOrderChange = () => {

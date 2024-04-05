@@ -116,11 +116,12 @@ export const ClientCard: React.FC<ClientCardProps> = ({
         </button>
       </div>
       {showMap && (
-        <MapModal
-          latitude={client.location.latitude}
-          longitude={client.location.longitude}
-          onClose={toggleMap}
-        />
+     <MapModal
+     isOpen={showMap}
+     latitude={client.location.latitude}
+     longitude={client.location.longitude}
+     onClose={toggleMap}
+   />
       )}
     </div>
   );
