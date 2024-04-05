@@ -38,7 +38,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
 }) => {
   const [showMap, setShowMap] = useState(false);
   const zoneAndDistrictName = zoneAndDistrictNames[client.district] || "";
-  const defaultImage = "/daniela.png"; // Todo conseguir default imag <
+  const defaultImage = "/user.svg"; // Todo conseguir default imag <
 
   const imageUrl =
     client.storeImage && client.storeImage.startsWith("http")
