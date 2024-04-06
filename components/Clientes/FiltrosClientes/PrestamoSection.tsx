@@ -26,13 +26,6 @@ export const PrestamoSection: FC<{
     selectedFilters.withoutCredit
   );
 
-  useEffect(() => {
-    setWithLoans(selectedFilters.withLoans);
-    setWithoutLoans(selectedFilters.withoutLoans);
-    setWithCredit(selectedFilters.withCredit);
-    setWithoutCredit(selectedFilters.withoutCredit);
-  }, [selectedFilters]);
-
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
   };
@@ -58,6 +51,13 @@ export const PrestamoSection: FC<{
   };
 
   useEffect(() => {
+    setWithLoans(selectedFilters.withLoans);
+    setWithoutLoans(selectedFilters.withoutLoans);
+    setWithCredit(selectedFilters.withCredit);
+    setWithoutCredit(selectedFilters.withoutCredit);
+  }, [selectedFilters]);
+  
+  useEffect(() => {
     setSelectedFilters({
       ...selectedFilters,
       withLoans,
@@ -65,7 +65,7 @@ export const PrestamoSection: FC<{
       withCredit,
       withoutCredit,
     });
-  }, [withLoans, withoutLoans, withCredit, withoutCredit]);
+  }, [withLoans, withoutLoans, withCredit, withoutCredit, selectedFilters, setSelectedFilters]);
 
   return (
     <div className="space-y-4">

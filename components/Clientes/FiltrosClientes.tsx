@@ -15,14 +15,14 @@ export const FiltrosClientes = () => {
         setShowFiltro(false);
       }
     };
-
+  
     window.addEventListener("keydown", handleCloseOnEsc);
-
+  
     return () => {
       window.removeEventListener("keydown", handleCloseOnEsc);
     };
   }, [setShowFiltro]);
-
+  
   if (!showFiltro) {
     return null;
   }

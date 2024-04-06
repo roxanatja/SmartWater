@@ -12,11 +12,6 @@ export const RenovacionSection: FC<{
   const [renewFromDate, setRenewFromDate] = useState<string>(selectedFilters.renewFromDate);
   const [renewToDate, setRenewToDate] = useState<string>(selectedFilters.renewToDate);
 
-  useEffect(() => {
-    setRenewInDays(selectedFilters.renewInDays);
-    setRenewFromDate(selectedFilters.renewFromDate);
-    setRenewToDate(selectedFilters.renewToDate);
-  }, [selectedFilters]);
 
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
@@ -35,13 +30,19 @@ export const RenovacionSection: FC<{
   };
 
   useEffect(() => {
+    setRenewInDays(selectedFilters.renewInDays);
+    setRenewFromDate(selectedFilters.renewFromDate);
+    setRenewToDate(selectedFilters.renewToDate);
+  }, [selectedFilters]);
+  
+  useEffect(() => {
     setSelectedFilters({
       ...selectedFilters,
       renewInDays,
       renewFromDate,
       renewToDate,
     });
-  }, [renewInDays, renewFromDate, renewToDate]);
+  }, [renewInDays, renewFromDate, renewToDate, selectedFilters, setSelectedFilters]);
 
   return (
     <div className="space-y-4">

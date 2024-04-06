@@ -9,11 +9,11 @@ export const DistribuidoresSection: FC<{
 }> = ({ selectedFilters, setSelectedFilters }) => {
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(false);
   const [selectedDealers, setSelectedDealers] = useState<string[]>(selectedFilters.dealers);
-  const [selectedZones, setSelectedZones] = useState<string[]>(selectedFilters.zone);
+  const [selectedZone, setSelectedZone] = useState<string[]>(selectedFilters.zone);
 
   useEffect(() => {
     setSelectedDealers(selectedFilters.dealers);
-    setSelectedZones(selectedFilters.zone);
+    setSelectedZone(selectedFilters.zone);
   }, [selectedFilters]);
 
   const handleOpcionesClick = () => {
@@ -28,19 +28,19 @@ export const DistribuidoresSection: FC<{
   };
 
   const handleZoneChange = (zone: string) => {
-    const updatedZones = selectedZones.includes(zone)
-      ? selectedZones.filter((z) => z !== zone)
-      : [...selectedZones, zone];
-    setSelectedZones(updatedZones);
+    const updatedZones = selectedZone.includes(zone)
+      ? selectedZone.filter((z) => z !== zone)
+      : [...selectedZone, zone];
+    setSelectedZone(updatedZones);
   };
 
   useEffect(() => {
     setSelectedFilters({
       ...selectedFilters,
       dealers: selectedDealers,
-      zone: selectedZones,
+      zone: selectedZone,
     });
-  }, [selectedDealers, selectedZones]);
+  }, [selectedDealers, selectedZone, selectedFilters, setSelectedFilters]);
 
   return (
     <div className="space-y-4">
@@ -131,7 +131,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona1")}
+                    checked={selectedZone.includes("zona1")}
                     onChange={() => handleZoneChange("zona1")}
                     className="mr-3"
                   />
@@ -145,7 +145,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona2")}
+                    checked={selectedZone.includes("zona2")}
                     onChange={() => handleZoneChange("zona2")}
                     className="mr-3"
                   />
@@ -159,7 +159,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona3")}
+                    checked={selectedZone.includes("zona3")}
                     onChange={() => handleZoneChange("zona3")}
                     className="mr-3"
                   />
@@ -173,7 +173,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona4")}
+                    checked={selectedZone.includes("zona4")}
                     onChange={() => handleZoneChange("zona4")}
                     className="mr-3"
                   />
@@ -187,7 +187,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona5")}
+                    checked={selectedZone.includes("zona5")}
                     onChange={() => handleZoneChange("zona5")}
                     className="mr-3"
                   />
