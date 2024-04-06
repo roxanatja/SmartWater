@@ -3,9 +3,11 @@ import React, { useState, useEffect } from "react";
 import ClientCard from "./ClientCard";
 import { ClientResponse, Client } from "@/type/Cliente/Client";
 import { OpenIcon } from "../icons/Icons";
+import { FiltrosClientes } from "./FiltrosClientes";
 import { Download, Plus, Search, ChevronDown } from "lucide-react";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import useAppStore from "@/store/appStore";
 
 interface FiltroPaginadoProps {
   zoneAndDistrictNames: Record<string, string>;
@@ -16,25 +18,97 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
   zoneAndDistrictNames,
   clients,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const { filters, setFilters, showFiltro, setShowFiltro } = useAppStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredData, setFilteredData] = useState<Client[]>(clients);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    setFilteredData(clients);
-  }, [clients]);
+  const handleOpenFiltros = () => {
+    setShowFiltro(true);
+  };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+  useEffect(() => {
     const filtered = clients.filter((client) =>
-      client.fullName?.toLowerCase().includes(value.toLowerCase())
+      client.fullName?.toLowerCase().includes(filters.searchTerm.toLowerCase())
     );
     setFilteredData(filtered);
     setCurrentPage(1);
+  }, [clients, filters.searchTerm]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFilters({ ...filters, searchTerm: value });
   };
+//useEffect para filtrar
+  useEffect(() => {
+    let filtered = clients;
+
+    const zoneMap: Record<string, string> = {
+      zona1: "63057bf2e40e0517cf200abc",
+      zona2: "6312ae1d62243d2e5daa759d",
+      zona3: "63d9548401f27eac0197bb14",
+      zona4: "63e6eed01208c7606d9555b6",
+      zona5: "65a6f028bf28adc143424acd",
+    };
+  
+    if (filters.searchTerm) {
+      filtered = filtered.filter((client) =>
+        client.fullName?.toLowerCase().includes(filters.searchTerm.toLowerCase())
+      );
+    }
+  
+    if (filters.renewInDays > 0) {
+      filtered = filtered.filter(
+        (client) => client.renewInDays <= filters.renewInDays
+      );
+    }
+  
+    if (filters.renewFromDate) {
+      const fromDate = new Date(filters.renewFromDate);
+      filtered = filtered.filter(
+        (client) => new Date(client.renewDate) >= fromDate
+      );
+    }
+  
+    if (filters.renewToDate) {
+      const toDate = new Date(filters.renewToDate);
+      filtered = filtered.filter(
+        (client) => new Date(client.renewDate) <= toDate
+      );
+    }
+  
+    if (filters.withLoans) {
+      filtered = filtered.filter((client) => client.hasLoan);
+    }
+  
+    if (filters.withoutLoans) {
+      filtered = filtered.filter((client) => !client.hasLoan);
+    }
+  
+    if (filters.withCredit) {
+      filtered = filtered.filter((client) => client.hasLoan);
+    }
+  
+    if (filters.withoutCredit) {
+      filtered = filtered.filter((client) => !client.hasLoan);
+    }
+  //falta para ver si son distribuidores no esta claro en la DB
+    // if (filters.dealers.length > 0) {
+    //   filtered = filtered.filter((client) =>
+    //     filters.dealers.includes(client.dealer)
+    //   );
+    // }
+  
+    if (filters.zone.length > 0) {
+      filtered = filtered.filter((client) =>
+        filters.zone.some((zone) => client.zone === zoneMap[zone])
+      );
+    }
+    
+    setFilteredData(filtered);
+    setCurrentPage(1);
+  }, [clients, filters]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -62,8 +136,9 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
 
     setFilteredData(sorted);
   };
+
   const exportToExcel = () => {
-    //Todo Darle formato a los datos y dejar los importantes
+    //TODO Darle formato a los datos y dejar los importantes
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
@@ -75,7 +150,19 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(data, "clientes.xlsx");
-};
+  };
+
+  //count de filtros
+  const appliedFiltersCount = Object.values(filters).reduce((count: number, value) => {
+    if (Array.isArray(value) && value.length > 0) {
+      return count + 1;
+    }
+    else if (value && !Array.isArray(value)) {
+      return count + 1;
+    }
+    return count;
+  }, 0); 
+  
 
   return (
     <div className="bg-white p-4">
@@ -84,7 +171,7 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
           <input
             type="text"
             placeholder="Buscar"
-            value={searchTerm}
+            value={filters.searchTerm}
             onChange={handleSearch}
             className="w-full focus:outline-none"
           />
@@ -92,10 +179,19 @@ export const FiltroPaginado: React.FC<FiltroPaginadoProps> = ({
             <Search size={20} />
           </button>
         </div>
-        <div className="flex content-baseline items-baseline ml-4">
+        <button
+          className="flex content-baseline items-baseline ml-4"
+          onClick={handleOpenFiltros}
+        >
           <p className="mx-2">Filtrar</p>
           <OpenIcon className="mx-2" />
-        </div>
+          {appliedFiltersCount > 0 && (
+            <span className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs">
+              {appliedFiltersCount}
+            </span>
+          )}
+        </button>
+        {showFiltro && <FiltrosClientes />}
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handlePageChange(currentPage - 1)}

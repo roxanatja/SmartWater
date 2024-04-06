@@ -51,7 +51,7 @@ const Sidebar = () => {
           />
           <AsideItem
             tituloItem="Mapa de clientes"
-            to="/mapaclientes"
+            to="/mapa"
             icon={<MapaIcon />}
           />
           <AsideItem

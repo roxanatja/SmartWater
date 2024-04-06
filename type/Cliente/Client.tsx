@@ -19,7 +19,7 @@ export interface Client {
     hasOrder: boolean,
     hasLoan: boolean,
     hasContract: boolean,
-    renewInDays: Number,
+    renewInDays: number,
     renewDate: string,
     isClient: boolean,
     isAgency: boolean,

@@ -3,7 +3,7 @@ import create from "zustand";
 import { Client } from "../type/Cliente/Client";
 
 
-interface AppState {
+export interface AppState {
   // Estado relacionado con los clientes
   clients: Client[];
   loadingClients: boolean;
@@ -16,21 +16,29 @@ interface AppState {
   // Estado relacionado con la interfaz de usuario
   showModal: boolean;
   setShowModal: (show: boolean) => void;
-  showFiltro: boolean;
-  setShowFiltro: (show: boolean) => void;
 
-  // Estado relacionado con los filtros
-  applicatedFilters: string[];
-  notApplicatedFilters: string[];
-  fromDate: string;
-  toDate: string;
-  withLoans: boolean;
-  withoutLoans: boolean;
-  withCredit: boolean;
-  withoutCredit: boolean;
-  dealers: string[];
-  zone: string;
-  setFilters: (filters: Partial<AppState>) => void;
+
+    // Estado relacionado con los filtros
+    showFiltro: boolean;
+    setShowFiltro: (show: boolean) => void;
+    filters: {
+      searchTerm: string;
+      fromDate: string;
+      toDate: string;
+      withLoans: boolean;
+      withoutLoans: boolean;
+      withCredit: boolean;
+      withoutCredit: boolean;
+      dealers: string[];
+      zone: string[];
+      applicatedFilters: boolean;
+      renewInDays: number;
+      renewFromDate: string;
+      renewToDate: string;
+    };
+    setFilters: (filters: Partial<AppState['filters']>) => void;
+  
+
 
   // Estado relacionado con las zonas
   zones: any[];
@@ -76,21 +84,32 @@ fetchClients: (clients: Client[]) => {
   // Estado inicial y acciones relacionadas con la interfaz de usuario
   showModal: false,
   setShowModal: (show: boolean) => set({ showModal: show }),
-  showFiltro: false,
-  setShowFiltro: (show: boolean) => set({ showFiltro: show }),
-
+ 
   // Estado inicial y acciones relacionadas con los filtros
   applicatedFilters: [],
   notApplicatedFilters: [],
-  fromDate: "",
-  toDate: "",
-  withLoans: false,
-  withoutLoans: false,
-  withCredit: false,
-  withoutCredit: false,
-  dealers: [],
-  zone: "",
-  setFilters: (filters: Partial<AppState>) => set(filters),
+ 
+   // Estado inicial y acciones relacionadas con los filtros
+   showFiltro: false,
+   setShowFiltro: (show: boolean) => set({ showFiltro: show }),
+ 
+   filters: {
+    searchTerm: '',
+    fromDate: "",
+    toDate: "",
+    withLoans: false,
+    withoutLoans: false,
+    withCredit: false,
+    withoutCredit: false,
+    dealers: [],
+    zone: [],
+    applicatedFilters: false,
+    renewInDays: 0,
+    renewFromDate: "",
+    renewToDate: "",
+  },
+  setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),
+
 
   // Asignar zonas
   zones: [],

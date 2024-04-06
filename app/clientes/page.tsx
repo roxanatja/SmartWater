@@ -1,7 +1,7 @@
 // app/clientes/page.tsx
 import { PageTitle } from "@/components/ui/PageTitle";
 import { ClientesIcon } from "@/components/icons/Icons";
-import { FiltroPaginado } from "@/components/Clientes/FIltroPaginado";
+import { FiltroPaginado } from "@/components/Clientes/FiltroPaginado";
 import { useZones } from "@/hooks/useZones";
 import useAppStore from "@/store/appStore";
 import smartwaterApi from "@/lib/SmartWaterApi";
@@ -19,7 +19,6 @@ export default async function Clientes() {
   }
 
   const clients = useAppStore.getState().clients;
-
   return (
     <div>
       <PageTitle
