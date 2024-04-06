@@ -15,26 +15,22 @@ export const FiltrosClientes = () => {
         setShowFiltro(false);
       }
     };
-  
+
     window.addEventListener("keydown", handleCloseOnEsc);
-  
+
     return () => {
       window.removeEventListener("keydown", handleCloseOnEsc);
     };
   }, [setShowFiltro]);
-  
-  if (!showFiltro) {
-    return null;
-  }
+
+  useEffect(() => {
+    setSelectedFilters(filters);
+  }, [filters]);
 
   const handleCloseModal = () => {
     setSelectedFilters(filters);
     setShowFiltro(false);
   };
-
-  useEffect(() => {
-    setSelectedFilters(filters);
-  }, [filters]);
 
   const saveFilters = () => {
     setFilters(selectedFilters);
@@ -51,13 +47,17 @@ export const FiltrosClientes = () => {
       withCredit: false,
       withoutCredit: false,
       dealers: [],
-      zone:  [],
+      zone: [],
       applicatedFilters: false,
       renewInDays: 0,
       renewFromDate: "",
       renewToDate: "",
     });
   };
+
+  if (!showFiltro) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
