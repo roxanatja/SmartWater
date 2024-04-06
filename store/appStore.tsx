@@ -37,6 +37,8 @@ export interface AppState {
       renewToDate: string;
     };
     setFilters: (filters: Partial<AppState['filters']>) => void;
+    filteredClients: Client[];
+    setFilteredClients: (clients: Client[]) => void;
   
 
 
@@ -109,7 +111,8 @@ fetchClients: (clients: Client[]) => {
     renewToDate: "",
   },
   setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),
-
+  filteredClients: [],
+  setFilteredClients: (clients) => set({ filteredClients: clients }),
 
   // Asignar zonas
   zones: [],
