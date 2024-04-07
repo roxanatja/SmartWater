@@ -58,6 +58,9 @@ export const ClientCard: React.FC<ClientCardProps> = ({
     alert("¡Hola!");
   };
 
+  const handleDelete = () => {
+    alert("¡nada por ahora!");
+  };
   return (
     <div className="border-gray-500 flex flex-col rounded-lg shadow-lg border">
       <div className="client-details flex flex-row items-center space-x-4 m-4">
