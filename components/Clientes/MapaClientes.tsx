@@ -1,5 +1,5 @@
 // components/Clientes/MapaClientes.tsx
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { Map, Marker } from "@vis.gl/react-google-maps";
@@ -7,18 +7,22 @@ import { Client } from "@/type/Cliente/Client";
 import useAppStore from "@/store/appStore";
 import ClienteInfo from "../ui/ClienteInfo";
 
+const isValidCoordinate = (coordinate: string): boolean => {
+  const value = parseFloat(coordinate);
+  return !isNaN(value) && Math.abs(value) <= 90;
+};
+
 export const MapaClientes: React.FC = () => {
-  const clients = useAppStore((state) => state.clients);
-  const filteredClients = useAppStore((state) => state.filteredClients);
-  const [mapClients, setMapClients] = useState<Client[]>([]);
+  const { filteredClients, clients } = useAppStore((state) => ({
+    filteredClients: state.filteredClients,
+    clients: state.clients,
+  }));
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setMapClients(filteredClients.length > 0 ? filteredClients : clients);
-    setIsLoading(false);
-  }, [clients, filteredClients]);
+  const mapClients = filteredClients.length > 0 ? filteredClients : clients;
+
+  console.log(mapClients);
 
   const handleMarkerClick = (client: Client) => {
     setSelectedClient(client);
@@ -39,10 +43,6 @@ export const MapaClientes: React.FC = () => {
     lat: -21.539032997369453,
     lng: -64.7281390028208,
   };
-
-  if (isLoading) {
-    return <div>Cargando...</div>;
-  }
 
   return (
     <div>

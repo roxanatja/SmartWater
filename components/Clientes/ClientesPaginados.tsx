@@ -34,18 +34,13 @@ export const ClientesPaginados: React.FC<ClientesPaginadosProps> = ({
   const handleSortOrderChange = () => {
     const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSortOrder(newSortOrder);
+}
 
-    const sorted = [...filteredClients].sort((a, b) => {
-      if (newSortOrder === "asc") {
-        return new Date(a.created).getTime() - new Date(b.created).getTime();
-      } else {
-        return new Date(b.created).getTime() - new Date(a.created).getTime();
-      }
-    });
+    const sortedCurrentData = sortOrder === "asc"
+  ? currentData.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+  : currentData.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 
-    // No es necesario actualizar el estado de filteredClients aquí
-    // ya que se obtiene directamente del store de Zustand
-  };
+
 
   const exportToExcel = () => {
     // TODO: Darle formato a los datos y dejar los importantes
@@ -126,7 +121,7 @@ export const ClientesPaginados: React.FC<ClientesPaginadosProps> = ({
       </div>
 
       <div className="grid shadow-md rounded-lg grid-cols-1 sm:grid-cols-2 gap-4">
-        {currentData.map((client) => (
+      {sortedCurrentData.map((client) => (
           <ClientCard
             key={client._id}
             client={client}
