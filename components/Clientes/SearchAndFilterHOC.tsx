@@ -77,9 +77,9 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({ children
       filtered = filtered.filter((client) => !client.hasLoan);
     }
 
-    if (filters.zone.length > 0) {
+    if (filters.zones.length > 0) {
       filtered = filtered.filter((client) =>
-        filters.zone.some((zone) => client.zone === zoneMap[zone])
+        filters.zones.some((zone) => client.zone === zoneMap[zone])
       );
     }
 

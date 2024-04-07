@@ -1,48 +1,27 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import Contador from "@/components/ui/Contador";
-import { AppState } from "@/store/appStore";
 import { ShaperonIcon, DesdeIcon, HastaIcon } from "@/components/icons/Icons";
+import useAppStore from "@/store/appStore";
 
-export const RenovacionSection: FC<{
-  selectedFilters: AppState["filters"];
-  setSelectedFilters: (filters: AppState["filters"]) => void;
-}> = ({ selectedFilters, setSelectedFilters }) => {
+export const RenovacionSection: FC = () => {
+  const { filters, setFilters } = useAppStore();
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
-  const [renewInDays, setRenewInDays] = useState<number>(selectedFilters.renewInDays);
-  const [renewFromDate, setRenewFromDate] = useState<string>(selectedFilters.renewFromDate);
-  const [renewToDate, setRenewToDate] = useState<string>(selectedFilters.renewToDate);
-
 
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
   };
 
   const handleRenewInDaysChange = (value: number) => {
-    setRenewInDays(value);
+    setFilters({ ...filters, renewInDays: value });
   };
 
   const handleFromDateChange = (date: string) => {
-    setRenewFromDate(date);
+    setFilters({ ...filters, renewFromDate: date });
   };
 
   const handleToDateChange = (date: string) => {
-    setRenewToDate(date);
+    setFilters({ ...filters, renewToDate: date });
   };
-
-  useEffect(() => {
-    setRenewInDays(selectedFilters.renewInDays);
-    setRenewFromDate(selectedFilters.renewFromDate);
-    setRenewToDate(selectedFilters.renewToDate);
-  }, [selectedFilters]);
-  
-  useEffect(() => {
-    setSelectedFilters({
-      ...selectedFilters,
-      renewInDays,
-      renewFromDate,
-      renewToDate,
-    });
-  }, [renewInDays, renewFromDate, renewToDate, selectedFilters, setSelectedFilters]);
 
   return (
     <div className="space-y-4">
@@ -63,10 +42,8 @@ export const RenovacionSection: FC<{
           <div className="flex items-center justify-between">
             <span>Renovado hasta en</span>
             <Contador
-              count={selectedFilters.renewInDays}
-              setCount={(value) =>
-                setSelectedFilters({ ...selectedFilters, renewInDays: value })
-              }
+              count={filters.renewInDays}
+              setCount={handleRenewInDaysChange}
             />
           </div>
 
@@ -85,7 +62,7 @@ export const RenovacionSection: FC<{
                   type="date"
                   id="renewFromDate"
                   className="bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-4 py-2 block w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={selectedFilters.renewFromDate}
+                  value={filters.renewFromDate}
                   onChange={(e) => handleFromDateChange(e.target.value)}
                 />
               </div>
@@ -103,7 +80,7 @@ export const RenovacionSection: FC<{
                   type="date"
                   id="renewToDate"
                   className="bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-4 py-2 block w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={selectedFilters.renewToDate}
+                  value={filters.renewToDate}
                   onChange={(e) => handleToDateChange(e.target.value)}
                 />
               </div>

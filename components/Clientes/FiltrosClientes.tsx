@@ -34,7 +34,7 @@ export const FiltrosClientes = () => {
 
   const saveFilters = () => {
     setFilters(selectedFilters);
-    // setShowFiltro(false);
+    setShowFiltro(false);
   };
 
   const resetFilters = () => {
@@ -47,7 +47,7 @@ export const FiltrosClientes = () => {
       withCredit: false,
       withoutCredit: false,
       dealers: [],
-      zone: [],
+      zones: [],
       applicatedFilters: false,
       renewInDays: 0,
       renewFromDate: "",
@@ -79,13 +79,10 @@ export const FiltrosClientes = () => {
         </div>
         <div className="space-y-8">
           <RenovacionSection
-            selectedFilters={selectedFilters}
-            setSelectedFilters={setSelectedFilters}
           />
-          <PrestamoSection  selectedFilters={selectedFilters}
-            setSelectedFilters={setSelectedFilters}/>
-          <DistribuidoresSection    selectedFilters={selectedFilters}
-            setSelectedFilters={setSelectedFilters} />
+          <PrestamoSection  />
+          <DistribuidoresSection   
+            />
         </div>
         <div className="flex justify-end space-x-4 mt-8">
           <button

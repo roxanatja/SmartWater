@@ -1,5 +1,4 @@
-import { FC, useState, useEffect } from "react";
-import { AppState } from "@/store/appStore";
+import { FC, useState} from "react";
 import { ShaperonIcon } from "@/components/icons/Icons";
 import {
   ConprestamoIcon,
@@ -7,66 +6,34 @@ import {
   DineroIcon,
   SinDinero,
 } from "@/components/icons/Icons";
+import useAppStore from "@/store/appStore";
 
-export const PrestamoSection: FC<{
-  selectedFilters: AppState["filters"];
-  setSelectedFilters: (filters: AppState["filters"]) => void;
-}> = ({ selectedFilters, setSelectedFilters }) => {
+export const PrestamoSection: FC = () => {
+  const { filters, setFilters } = useAppStore();
+
+  const handleWithLoansChange = (checked: boolean) => {
+    setFilters({ ...filters, withLoans: checked, withoutLoans: false });
+  };
+
+  const handleWithoutLoansChange = (checked: boolean) => {
+    setFilters({ ...filters, withoutLoans: checked, withLoans: false });
+  };
+
+  const handleWithCreditChange = (checked: boolean) => {
+    setFilters({ ...filters, withCredit: checked, withoutCredit: false });
+  };
+
+  const handleWithoutCreditChange = (checked: boolean) => {
+    setFilters({ ...filters, withoutCredit: checked, withCredit: false });
+  };
+
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(false);
-  const [withLoans, setWithLoans] = useState<boolean>(
-    selectedFilters.withLoans
-  );
-  const [withoutLoans, setWithoutLoans] = useState<boolean>(
-    selectedFilters.withoutLoans
-  );
-  const [withCredit, setWithCredit] = useState<boolean>(
-    selectedFilters.withCredit
-  );
-  const [withoutCredit, setWithoutCredit] = useState<boolean>(
-    selectedFilters.withoutCredit
-  );
 
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
   };
 
-  const handleWithLoansChange = (checked: boolean) => {
-    setWithLoans(checked);
-    setWithoutLoans(false);
-  };
-
-  const handleWithoutLoansChange = (checked: boolean) => {
-    setWithoutLoans(checked);
-    setWithLoans(false);
-  };
-
-  const handleWithCreditChange = (checked: boolean) => {
-    setWithCredit(checked);
-    setWithoutCredit(false);
-  };
-
-  const handleWithoutCreditChange = (checked: boolean) => {
-    setWithoutCredit(checked);
-    setWithCredit(false);
-  };
-
-  useEffect(() => {
-    setWithLoans(selectedFilters.withLoans);
-    setWithoutLoans(selectedFilters.withoutLoans);
-    setWithCredit(selectedFilters.withCredit);
-    setWithoutCredit(selectedFilters.withoutCredit);
-  }, [selectedFilters]);
   
-  useEffect(() => {
-    setSelectedFilters({
-      ...selectedFilters,
-      withLoans,
-      withoutLoans,
-      withCredit,
-      withoutCredit,
-    });
-  }, [withLoans, withoutLoans, withCredit, withoutCredit, selectedFilters, setSelectedFilters]);
-
   return (
     <div className="space-y-4">
       <div
@@ -91,7 +58,7 @@ export const PrestamoSection: FC<{
             <label className="m-3">
               <input
                 type="checkbox"
-                checked={withLoans}
+                checked={filters.withLoans}
                 onChange={(e) => handleWithLoansChange(e.target.checked)}
                 className="mr-3"
               />
@@ -105,7 +72,7 @@ export const PrestamoSection: FC<{
             <label className="m-3">
               <input
                 type="checkbox"
-                checked={withoutLoans}
+                checked={filters.withoutLoans}
                 onChange={(e) => handleWithoutLoansChange(e.target.checked)}
                 className="mr-3"
               />
@@ -119,7 +86,7 @@ export const PrestamoSection: FC<{
             <label className="ml-3">
               <input
                 type="checkbox"
-                checked={withCredit}
+                checked={filters.withCredit}
                 onChange={(e) => handleWithCreditChange(e.target.checked)}
                 className="mr-3"
               />
@@ -133,7 +100,7 @@ export const PrestamoSection: FC<{
             <label className="ml-3">
               <input
                 type="checkbox"
-                checked={withoutCredit}
+                checked={filters.withoutCredit}
                 onChange={(e) => handleWithoutCreditChange(e.target.checked)}
                 className="mr-3"
               />

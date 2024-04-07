@@ -1,49 +1,36 @@
-import { FC, useState, useEffect } from "react";
-import { AppState } from "@/store/appStore";
-import { EnviosIcon, MapaIcon, ShaperonIcon } from "@/components/icons/Icons";
+import { FC, useState } from "react";
+import { ShaperonIcon } from "@/components/icons/Icons";
 import { Truck } from "lucide-react";
+import useAppStore from "@/store/appStore";
+import { MapaIcon } from "@/components/icons/Icons";
 
-export const DistribuidoresSection: FC<{
-  selectedFilters: AppState["filters"];
-  setSelectedFilters: (filters: AppState["filters"]) => void;
-}> = ({ selectedFilters, setSelectedFilters }) => {
+export const DistribuidoresSection: FC = () => {
+  const { filters, setFilters } = useAppStore();
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(false);
-  const [selectedDealers, setSelectedDealers] = useState<string[]>(selectedFilters.dealers);
-  const [selectedZones, setSelectedZones] = useState<string[]>(selectedFilters.zone);
-
-  useEffect(() => {
-    setSelectedDealers(selectedFilters.dealers);
-    setSelectedZones(selectedFilters.zone);
-  }, [selectedFilters]);
 
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
   };
 
   const handleDealerChange = (dealer: string) => {
-    const updatedDealers = selectedDealers.includes(dealer)
-      ? selectedDealers.filter((d) => d !== dealer)
-      : [...selectedDealers, dealer];
-    setSelectedDealers(updatedDealers);
-    updateSelectedFilters(updatedDealers, selectedZones);
-  };
-
-  const handleZoneChange = (zone: string) => {
-    const updatedZones = selectedZones.includes(zone)
-      ? selectedZones.filter((z) => z !== zone)
-      : [...selectedZones, zone];
-    setSelectedZones(updatedZones);
-    updateSelectedFilters(selectedDealers, updatedZones);
-  };
-
-  const updateSelectedFilters = (dealers: string[], zones: string[]) => {
-    setSelectedFilters({
-      ...selectedFilters,
-      dealers,
-      zone: zones,
+    const updatedDealers = filters.dealers.includes(dealer)
+      ? filters.dealers.filter((d) => d !== dealer)
+      : [...filters.dealers, dealer];
+    setFilters({
+      ...filters,
+      dealers: updatedDealers,
     });
   };
 
+  const handleZoneChange = (zone: string) => {
+    const updatedZones = filters.zones.includes(zone)
+      ? filters.zones.filter((z) => z !== zone)
+      : [...filters.zones, zone];
+    setFilters({
+      ...filters,
+      zones: updatedZones,
+    });
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between border-b pb-2"           onClick={handleOpcionesClick}
@@ -70,7 +57,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedDealers.includes("distribuidor1")}
+                    checked={filters.dealers.includes("distribuidor1")}
                     onChange={() => handleDealerChange("distribuidor1")}
                     className="mr-3"
                   />
@@ -84,7 +71,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedDealers.includes("distribuidor2")}
+                    checked={filters.dealers.includes("distribuidor2")}
                     onChange={() => handleDealerChange("distribuidor2")}
                     className="mr-3"
                   />
@@ -98,7 +85,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedDealers.includes("distribuidor3")}
+                    checked={filters.dealers.includes("distribuidor3")}
                     onChange={() => handleDealerChange("distribuidor3")}
                     className="mr-3"
                   />
@@ -112,7 +99,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedDealers.includes("distribuidor4")}
+                    checked={filters.dealers.includes("distribuidor4")}
                     onChange={() => handleDealerChange("distribuidor4")}
                     className="mr-3"
                   />
@@ -133,7 +120,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona1")}
+                    checked={filters.zones.includes("zona1")}
                     onChange={() => handleZoneChange("zona1")}
                     className="mr-3"
                   />
@@ -147,7 +134,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona2")}
+                    checked={filters.zones.includes("zona2")}
                     onChange={() => handleZoneChange("zona2")}
                     className="mr-3"
                   />
@@ -161,7 +148,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona3")}
+                    checked={filters.zones.includes("zona3")}
                     onChange={() => handleZoneChange("zona3")}
                     className="mr-3"
                   />
@@ -175,7 +162,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona4")}
+                    checked={filters.zones.includes("zona4")}
                     onChange={() => handleZoneChange("zona4")}
                     className="mr-3"
                   />
@@ -189,7 +176,7 @@ export const DistribuidoresSection: FC<{
                 <label className="ml-3">
                   <input
                     type="checkbox"
-                    checked={selectedZones.includes("zona5")}
+                    checked={filters.zones.includes("zona5")}
                     onChange={() => handleZoneChange("zona5")}
                     className="mr-3"
                   />
