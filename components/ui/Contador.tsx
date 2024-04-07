@@ -15,17 +15,17 @@ const Contador: React.FC<CounterProps> = ({ count, setCount }) => {
   return (
     <div className="flex items-center">
       <button
-        className="bg-blue-500 text-white p-2 rounded-full"
+        className="border-blue-500 border-2 text-blue-500 p-1 rounded-full"
         onClick={decrement}
         disabled={count === 0}
       >
         <Minus className="w-4 h-4" />
       </button>
-      <div className="mx-2 border-2 border-blue-500 text-center w-12">
+      <div className=" rounded-lg mx-5 border-2 border-blue-500 text-center w-12">
         {count}
       </div>
       <button
-        className="bg-blue-500 text-white p-2 rounded-full"
+        className="border-blue-500 border-2 text-blue-500 p-1 rounded-full"
         onClick={increment}
       >
         <Plus className="w-4 h-4" />
