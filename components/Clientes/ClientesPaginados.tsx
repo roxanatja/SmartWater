@@ -6,6 +6,7 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import ClientCard from "./ClientCard";
 import useAppStore from "@/store/appStore";
+import AgregarCliente from "./AgregarCliente";
 
 interface ClientesPaginadosProps {
   zoneAndDistrictNames: Record<string, string>;
@@ -16,6 +17,7 @@ export const ClientesPaginados: React.FC<ClientesPaginadosProps> = ({
 }) => {
   const filteredClients = useAppStore((state) => state.filteredClients);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const itemsPerPage = 8;
 
@@ -56,6 +58,9 @@ export const ClientesPaginados: React.FC<ClientesPaginadosProps> = ({
     });
     saveAs(data, "clientes.xlsx");
   };
+  
+  const handleOpenModal = () => setShowModal(true); // Función para abrir el modal
+  const handleCloseModal = () => setShowModal(false); // Función para cerrar el modal
 
   return (
     <div className="m-5">
@@ -137,10 +142,17 @@ export const ClientesPaginados: React.FC<ClientesPaginadosProps> = ({
           <Download />
           Exportar
         </button>
-        <button className="bg-blue-800 text-white rounded-full p-4 w-24 h-24 flex flex-col items-center justify-center">
+        <button 
+          className="bg-blue-800 text-white rounded-full p-4 w-24 h-24 flex flex-col items-center justify-center" 
+          onClick={handleOpenModal}
+        >
           <Plus />
+          Agregar
         </button>
       </div>
+      {showModal && (
+        <AgregarCliente onClose={handleCloseModal} />
+      )}
     </div>
   );
 };

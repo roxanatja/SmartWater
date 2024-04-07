@@ -12,8 +12,12 @@ import {
   DollarSign,
   CreditCard,
   EllipsisVertical,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { OpenIcon } from "../icons/Icons";
+import * as Popover from "@radix-ui/react-popover";
+import ConfirmDelete from "../ui/ConfirmDelete";
 
 interface ClientCardProps {
   client: Client;
@@ -39,6 +43,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
   const [showMap, setShowMap] = useState(false);
   const zoneAndDistrictName = zoneAndDistrictNames[client.district] || "";
   const defaultImage = "/user.svg"; // Todo conseguir default imag <
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const imageUrl =
     client.storeImage && client.storeImage.startsWith("http")
@@ -47,6 +52,10 @@ export const ClientCard: React.FC<ClientCardProps> = ({
 
   const toggleMap = () => {
     setShowMap(!showMap);
+  };
+
+  const handleEdit = () => {
+    alert("¡Hola!");
   };
 
   return (
@@ -102,9 +111,28 @@ export const ClientCard: React.FC<ClientCardProps> = ({
             )}
           </div>
         </div>
-        <button className="font-bold">
-          <EllipsisVertical />
-        </button>
+        <Popover.Root>
+          <Popover.Trigger>
+            <button className="font-bold">
+              <EllipsisVertical />
+            </button>
+          </Popover.Trigger>
+          <Popover.Content className="flex flex-col bg-gray-300 rounded-md p-4">
+            <button onClick={handleEdit}>
+              <Pencil />
+              Editar
+            </button>
+            <button onClick={() => setIsDeleteDialogOpen(true)}>
+              <Trash2 />
+              Eliminar
+            </button>
+          </Popover.Content>
+        </Popover.Root>
+        <ConfirmDelete
+          isOpen={isDeleteDialogOpen}
+          onConfirm={() => handleDelete(client._id)}
+          onCancel={() => setIsDeleteDialogOpen(false)}
+        />
       </div>
       <div className="flex justify-center pb-2">
         <button
@@ -116,12 +144,12 @@ export const ClientCard: React.FC<ClientCardProps> = ({
         </button>
       </div>
       {showMap && (
-     <MapModal
-     isOpen={showMap}
-     latitude={client.location.latitude}
-     longitude={client.location.longitude}
-     onClose={toggleMap}
-   />
+        <MapModal
+          isOpen={showMap}
+          latitude={client.location.latitude}
+          longitude={client.location.longitude}
+          onClose={toggleMap}
+        />
       )}
     </div>
   );
