@@ -133,7 +133,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
         </Popover.Root>
         <ConfirmDelete
           isOpen={isDeleteDialogOpen}
-          onConfirm={() => handleDelete(client._id)}
+          onConfirm={() => handleDelete()}
           onCancel={() => setIsDeleteDialogOpen(false)}
         />
       </div>
