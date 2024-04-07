@@ -1,5 +1,5 @@
 // SearchAndFilterHOC.tsx
-"use client"
+"use client";
 import React, { useEffect } from "react";
 import { OpenIcon } from "../icons/Icons";
 import { Search } from "lucide-react";
@@ -12,8 +12,12 @@ interface SearchAndFilterHOCProps {
   clients: Client[];
 }
 
-export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({ children, clients }) => {
-  const { filters, setFilters, showFiltro, setShowFiltro, setFilteredClients } = useAppStore();
+export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({
+  children,
+  clients,
+}) => {
+  const { filters, setFilters, showFiltro, setShowFiltro, setFilteredClients } =
+    useAppStore();
 
   const handleOpenFiltros = () => {
     setShowFiltro(true);
@@ -37,7 +41,9 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({ children
 
     if (filters.searchTerm) {
       filtered = filtered.filter((client) =>
-        client.fullName?.toLowerCase().includes(filters.searchTerm.toLowerCase())
+        client.fullName
+          ?.toLowerCase()
+          .includes(filters.searchTerm.toLowerCase())
       );
     }
 
@@ -86,19 +92,22 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({ children
     setFilteredClients(filtered);
   }, [clients, filters, setFilteredClients]);
 
-  const appliedFiltersCount = Object.values(filters).reduce((count: number, value) => {
-    if (Array.isArray(value) && value.length > 0) {
-      return count + 1;
-    } else if (value && !Array.isArray(value)) {
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  const appliedFiltersCount = Object.values(filters).reduce(
+    (count: number, value) => {
+      if (Array.isArray(value) && value.length > 0) {
+        return count + 1;
+      } else if (value && !Array.isArray(value)) {
+        return count + 1;
+      }
+      return count;
+    },
+    0
+  );
 
   return (
     <div>
-      <div className="flex justify-evenly items-center mb-4 mx-10">
-        <div className="flex items-center w-3/4 border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div className="flex justify-between items-center mb-4 m-5">
+        <div className="flex items-center w-3/4 border border-gray-400 rounded-md px-4 ml-5 focus:outline-none focus:ring-2 focus:ring-blue-500">
           <input
             type="text"
             placeholder="Buscar"
@@ -111,13 +120,13 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({ children
           </button>
         </div>
         <button
-          className="flex content-baseline items-center"
+          className="flex mx-auto content-baseline items-center"
           onClick={handleOpenFiltros}
         >
           <p className="mx-2">Filtrar</p>
           <OpenIcon className="mx-2" />
           {appliedFiltersCount > 0 && (
-            <span className="bg-blue-500 text-white rounded-full px-2 py-1 text-xs">
+            <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex justify-center items-center text-xs">
               {appliedFiltersCount}
             </span>
           )}
