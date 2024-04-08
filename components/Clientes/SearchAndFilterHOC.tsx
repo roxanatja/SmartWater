@@ -47,9 +47,25 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({
       );
     }
 
+    const moment = require("moment");
+
+    const currentDate = moment();
+
     if (filters.renewInDays > 0) {
-      filtered = filtered.filter(
-        (client) => client.renewInDays <= filters.renewInDays
+      const renewInDate = currentDate.clone().add(filters.renewInDays, "days");
+
+      filtered = filtered.filter((client) =>
+        moment(client.renewDate).isBetween(currentDate, renewInDate, null, "[]")
+      );
+    }
+
+    if (filters.renewFromDays > 0) {
+      const renewFromDate = currentDate
+        .clone()
+        .subtract(filters.renewFromDays, "days");
+
+      filtered = filtered.filter((client) =>
+        moment(client.lastSale).isSameOrBefore(renewFromDate)
       );
     }
 

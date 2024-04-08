@@ -14,6 +14,9 @@ export const RenovacionSection: FC = () => {
   const handleRenewInDaysChange = (value: number) => {
     setFilters({ ...filters, renewInDays: value });
   };
+  const handleRenewFromDaysChange = (value: number) => {
+    setFilters({ ...filters, renewFromDays: value });
+  };
 
   const handleFromDateChange = (date: string) => {
     setFilters({ ...filters, renewFromDate: date });
@@ -51,8 +54,8 @@ export const RenovacionSection: FC = () => {
           <div className="flex items-center justify-between">
             <span>Renovado hace mas de</span>
             <Contador
-              count={filters.renewInDays}
-              setCount={handleRenewInDaysChange}
+              count={filters.renewFromDays}
+              setCount={handleRenewFromDaysChange}
             />
           </div>
 

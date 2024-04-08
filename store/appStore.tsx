@@ -32,6 +32,7 @@ export interface AppState {
     zones: string[];
     applicatedFilters: boolean;
     renewInDays: number;
+    renewFromDays: number;
     renewFromDate: string;
     renewToDate: string;
     hasExpiredContracts: boolean;
@@ -96,6 +97,7 @@ const useAppStore = create<AppState>((set) => ({
     zones: [],
     applicatedFilters: false,
     renewInDays: 0,
+    renewFromDays: 0,
     renewFromDate: "",
     renewToDate: "",
     hasExpiredContracts: false,
