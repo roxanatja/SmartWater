@@ -34,8 +34,9 @@ export interface AppState {
     renewInDays: number;
     renewFromDate: string;
     renewToDate: string;
+    hasExpiredContracts: boolean;
   };
-  setFilters: (filters: Partial<AppState['filters']>) => void;
+  setFilters: (filters: Partial<AppState["filters"]>) => void;
   filteredClients: Client[];
   setFilteredClients: (clients: Client[]) => void;
 
@@ -43,7 +44,9 @@ export interface AppState {
   zones: any[];
   setZones: (zones: any[]) => void;
   zoneAndDistrictNames: Record<string, string>;
-  setZoneAndDistrictNames: (zoneAndDistrictNames: Record<string, string>) => void;
+  setZoneAndDistrictNames: (
+    zoneAndDistrictNames: Record<string, string>
+  ) => void;
 
   // Estado y acciones relacionadas con la carga de la API de Google Maps
   isGoogleMapsApiLoaded: boolean;
@@ -82,7 +85,7 @@ const useAppStore = create<AppState>((set) => ({
   showFiltro: false,
   setShowFiltro: (show: boolean) => set({ showFiltro: show }),
   filters: {
-    searchTerm: '',
+    searchTerm: "",
     fromDate: "",
     toDate: "",
     withLoans: false,
@@ -95,8 +98,10 @@ const useAppStore = create<AppState>((set) => ({
     renewInDays: 0,
     renewFromDate: "",
     renewToDate: "",
+    hasExpiredContracts: false,
   },
-  setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),
+  setFilters: (filters) =>
+    set((state) => ({ filters: { ...state.filters, ...filters } })),
   filteredClients: [],
   setFilteredClients: (clients) => set({ filteredClients: clients }),
 
@@ -104,11 +109,13 @@ const useAppStore = create<AppState>((set) => ({
   zones: [],
   setZones: (zones) => set({ zones }),
   zoneAndDistrictNames: {},
-  setZoneAndDistrictNames: (zoneAndDistrictNames) => set({ zoneAndDistrictNames }),
+  setZoneAndDistrictNames: (zoneAndDistrictNames) =>
+    set({ zoneAndDistrictNames }),
 
   // Estado inicial y acciones relacionadas con la carga de la API de Google Maps
   isGoogleMapsApiLoaded: false,
-  setIsGoogleMapsApiLoaded: (isLoaded: boolean) => set({ isGoogleMapsApiLoaded: isLoaded }),
+  setIsGoogleMapsApiLoaded: (isLoaded: boolean) =>
+    set({ isGoogleMapsApiLoaded: isLoaded }),
   googleMapsApiKey: "",
   setGoogleMapsApiKey: (apiKey: string) => set({ googleMapsApiKey: apiKey }),
 }));

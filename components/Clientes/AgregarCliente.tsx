@@ -450,7 +450,7 @@ const AgregarCliente: React.FC<AgregarClienteProps> = ({ onClose }) => {
               <div className="mt-2 flex items-center gap-2">
                 <MapIcon />
                 <a
-                  className="text-xs font-normal underline"
+                  className="text-xsfont-normal underline"
                   target="_blank"
                   rel="noopener noreferrer"
                   href={url}

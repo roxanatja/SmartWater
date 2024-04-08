@@ -37,7 +37,9 @@ const AsideItem = ({ tituloItem, icon, to }: Item) => {
               {icon}
             </span>
           )}
-          <span className="ml-2 flex-grow">{tituloItem}</span>
+          <span className="ml-2 flex-grow flex-wrap text-wrap">
+            {tituloItem}
+          </span>
         </div>
       </Button>
     </Link>

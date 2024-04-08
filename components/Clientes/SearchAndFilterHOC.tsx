@@ -39,8 +39,6 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({
       zona5: "65a6f028bf28adc143424acd",
     };
 
-  
-    
     if (filters.searchTerm) {
       filtered = filtered.filter((client) =>
         client.fullName
@@ -84,7 +82,9 @@ export const SearchAndFilterHOC: React.FC<SearchAndFilterHOCProps> = ({
     if (filters.withoutCredit) {
       filtered = filtered.filter((client) => !client.hasLoan);
     }
-
+    if (filters.hasExpiredContracts) {
+      filtered = filtered.filter((client) => client.hasExpiredContract);
+    }
     if (filters.zones.length > 0) {
       filtered = filtered.filter((client) =>
         filters.zones.some((zone) => client.zone === zoneMap[zone])

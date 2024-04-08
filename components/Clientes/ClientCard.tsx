@@ -96,7 +96,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
       <div className="client-stats flex flex-row justify-between items-center  m-4">
         <div className="flex items-center justify-between">
           <p className="font-bold">última venta:</p>
-          <div className="rounded-lg  mx-8 px-5 py-1 shadow-md border-blue-700  text-blue-700 border">
+          <div className="rounded-xl  mx-8 px-5 py-1 shadow-md border-2 border-blue-800  text-blue-800 ">
             {moment(client.lastSale).format("DD/MM/YYYY")}
           </div>
         </div>
@@ -140,7 +140,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({
       <div className="flex justify-center pb-2">
         <button
           onClick={toggleMap}
-          className="flex items-center px-4 py-1  text-black rounded"
+          className="flex items-center px-4 py-1  text-blue-800 rounded"
         >
           <MapPin size={18} fill="black" stroke="white" className="mr-2" />
           Ver ubicación en el mapa

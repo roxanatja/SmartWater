@@ -25,10 +25,12 @@ export const RenovacionSection: FC = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b pb-2 " onClick={handleOpcionesClick}>
+      <div
+        className="flex items-center justify-between border-b pb-2 "
+        onClick={handleOpcionesClick}
+      >
         <h2 className="text-lg font-semibold ">Renovación</h2>
         <button
-         
           className={`focus:outline-none transition-transform ${
             opcionesVisibles ? "rotate-180" : ""
           }`}
@@ -41,6 +43,13 @@ export const RenovacionSection: FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span>Renovado hasta en</span>
+            <Contador
+              count={filters.renewInDays}
+              setCount={handleRenewInDaysChange}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Renovado hace mas de</span>
             <Contador
               count={filters.renewInDays}
               setCount={handleRenewInDaysChange}

@@ -3,6 +3,7 @@ import { ShaperonIcon } from "@/components/icons/Icons";
 import { Truck } from "lucide-react";
 import useAppStore from "@/store/appStore";
 import { MapaIcon } from "@/components/icons/Icons";
+import CustomCheckbox from "@/components/ui/CustomCheckbox";
 
 export const DistribuidoresSection: FC = () => {
   const { filters, setFilters } = useAppStore();
@@ -55,24 +56,18 @@ export const DistribuidoresSection: FC = () => {
       </div>
       {opcionesVisibles && (
         <div className="space-y-4">
-          <div>
+          <div className="mt-4">
             <h3 className="text-lg font-semibold">Distribuidor</h3>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 ">
+              <div className="grid grid-cols-2 mt-4 gap-4">
                 {Object.entries(dealersMap).map(([dealerId, dealerName]) => (
                   <div key={dealerId} className="flex items-center">
-                    <div className="flex justify-center items-center w-14 h-14">
-                      <Truck className="text-black" />
-                    </div>
-                    <label className="ml-3">
-                      <input
-                        type="checkbox"
-                        checked={filters.dealers.includes(dealerId)}
-                        onChange={() => handleDealerChange(dealerId)}
-                        className="mr-3"
-                      />
-                      {dealerName}
-                    </label>
+                    <CustomCheckbox
+                      checked={filters.dealers.includes(dealerId)}
+                      onCheckedChange={() => handleDealerChange(dealerId)}
+                      label={dealerName}
+                      icon={<Truck className="text-black" />}
+                    />
                   </div>
                 ))}
               </div>
@@ -83,74 +78,44 @@ export const DistribuidoresSection: FC = () => {
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
-                  <div className="flex justify-center items-center w-14 h-14">
-                    <MapaIcon />
-                  </div>
-                  <label className="ml-3">
-                    <input
-                      type="checkbox"
-                      checked={filters.zones.includes("zona1")}
-                      onChange={() => handleZoneChange("zona1")}
-                      className="mr-3"
-                    />
-                    Zona 1
-                  </label>
+                  <CustomCheckbox
+                    checked={filters.zones.includes("zona1")}
+                    onCheckedChange={() => handleZoneChange("zona1")}
+                    label="Zona 1"
+                    icon={<MapaIcon />}
+                  />
                 </div>
                 <div className="flex items-center">
-                  <div className="flex justify-center items-center w-14 h-14">
-                    <MapaIcon />
-                  </div>
-                  <label className="ml-3">
-                    <input
-                      type="checkbox"
-                      checked={filters.zones.includes("zona2")}
-                      onChange={() => handleZoneChange("zona2")}
-                      className="mr-3"
-                    />
-                    Zona 2
-                  </label>
+                  <CustomCheckbox
+                    checked={filters.zones.includes("zona2")}
+                    onCheckedChange={() => handleZoneChange("zona2")}
+                    label="Zona 2"
+                    icon={<MapaIcon />}
+                  />
                 </div>
                 <div className="flex items-center">
-                  <div className="flex justify-center items-center w-14 h-14">
-                    <MapaIcon />
-                  </div>
-                  <label className="ml-3">
-                    <input
-                      type="checkbox"
-                      checked={filters.zones.includes("zona3")}
-                      onChange={() => handleZoneChange("zona3")}
-                      className="mr-3"
-                    />
-                    Zona 3
-                  </label>
+                  <CustomCheckbox
+                    checked={filters.zones.includes("zona3")}
+                    onCheckedChange={() => handleZoneChange("zona3")}
+                    label="Zona 3"
+                    icon={<MapaIcon />}
+                  />
                 </div>
                 <div className="flex items-center">
-                  <div className="flex justify-center items-center w-14 h-14">
-                    <MapaIcon />
-                  </div>
-                  <label className="ml-3">
-                    <input
-                      type="checkbox"
-                      checked={filters.zones.includes("zona4")}
-                      onChange={() => handleZoneChange("zona4")}
-                      className="mr-3"
-                    />
-                    Zona 4
-                  </label>
+                  <CustomCheckbox
+                    checked={filters.zones.includes("zona4")}
+                    onCheckedChange={() => handleZoneChange("zona4")}
+                    label="Zona 4"
+                    icon={<MapaIcon />}
+                  />
                 </div>
                 <div className="flex items-center">
-                  <div className="flex justify-center items-center w-14 h-14">
-                    <MapaIcon />
-                  </div>
-                  <label className="ml-3">
-                    <input
-                      type="checkbox"
-                      checked={filters.zones.includes("zona5")}
-                      onChange={() => handleZoneChange("zona5")}
-                      className="mr-3"
-                    />
-                    Zona 5
-                  </label>
+                  <CustomCheckbox
+                    checked={filters.zones.includes("zona5")}
+                    onCheckedChange={() => handleZoneChange("zona5")}
+                    label="Zona 5"
+                    icon={<MapaIcon />}
+                  />
                 </div>
               </div>
             </div>
