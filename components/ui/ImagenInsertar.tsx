@@ -32,7 +32,7 @@ const ImagenInsertar: React.FC<ImagenCarnetProps> = ({
   };
 
   return (
-    <div className="w-full p-4 self-stretch rounded-3xl bg-gray-300">
+    <div className="w-full min-h-[25vh] p-4 self-stretch rounded-3xl bg-gray-300">
       {imagenSelect !== null ? (
         <div className="w-full h-full flex flex-col items-center justify-center gap-3">
           <img
@@ -50,7 +50,7 @@ const ImagenInsertar: React.FC<ImagenCarnetProps> = ({
           onClick={CarnetImage}
         >
           <button onClick={CarnetImage} type="button" className="btn">
-            <Image />
+            <Image className="text-gray-600 w-32 h-32" />
           </button>
           <input
             type="file"

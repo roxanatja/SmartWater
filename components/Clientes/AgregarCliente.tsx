@@ -6,7 +6,7 @@ import { Map } from "@vis.gl/react-google-maps";
 import { saveClient } from "@/lib/services/ClientsService";
 import {
   X,
-  Image,
+  Camera,
   CalendarDays,
   MapIcon,
   Phone,
@@ -158,7 +158,14 @@ const AgregarCliente: React.FC<AgregarClienteProps> = ({ onClose }) => {
   };
 
   const handlePhoneNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+    let value = event.target.value;
+
+    if (!value.startsWith("+591")) {
+      value = "+591" + value;
+    }
+
+    value = value.slice(0, 12);
+
     setPhoneNumber(value);
   };
 
@@ -247,6 +254,12 @@ const AgregarCliente: React.FC<AgregarClienteProps> = ({ onClose }) => {
   };
 
   const saveData = async () => {
+    if (!phoneNumber.startsWith("+591") || phoneNumber.length !== 12) {
+      console.error("Formato de número de teléfono inválido");
+      return window.alert(
+        "Por favor, ingrese un número de teléfono válido con el formato '+591XXXXXXXX'."
+      );
+    }
     let urlStoreImg, urlCarnetTrasero, urlCarnetDelantero;
     let frontCarnetImage: File | undefined;
     let backCarnetImage: File | undefined;
@@ -354,17 +367,17 @@ const AgregarCliente: React.FC<AgregarClienteProps> = ({ onClose }) => {
               />
             ) : (
               <div
-                className="w-24 h-24 bg-blue-300 rounded-full flex items-center justify-center"
+                className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center"
                 onClick={handleSelectImage}
               >
                 <span className="text-5xl font-semibold text-white">LV</span>
               </div>
             )}
             <button
-              className="focus:outline-none absolute  mt-14 ml-14"
+              className="focus:outline-none absolute  mt-20 ml-20"
               onClick={handleSelectImage}
             >
-              <ImagePlus className="w-10 h-10 text-blue-800" />
+              <Camera className="w-7 h-7 text-black" />
             </button>
             <input
               type="file"
