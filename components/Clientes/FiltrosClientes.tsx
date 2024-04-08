@@ -50,6 +50,7 @@ export const FiltrosClientes = () => {
       zones: [],
       applicatedFilters: false,
       renewInDays: 0,
+      renewFromDays: 0,
       renewFromDate: "",
       renewToDate: "",
       hasExpiredContracts: false,
