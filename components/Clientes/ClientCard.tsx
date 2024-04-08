@@ -120,12 +120,18 @@ export const ClientCard: React.FC<ClientCardProps> = ({
               <EllipsisVertical />
             </button>
           </Popover.Trigger>
-          <Popover.Content className="flex flex-col bg-gray-300 rounded-md p-4">
-            <button onClick={handleEdit}>
+          <Popover.Content className="flex flex-col bg-white rounded-md shadow-lg">
+            <button
+              onClick={handleEdit}
+              className="hover:bg-gray-100 flex gap-4 p-4"
+            >
               <Pencil />
               Editar
             </button>
-            <button onClick={() => setIsDeleteDialogOpen(true)}>
+            <button
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="hover:bg-gray-100 flex gap-4 p-4"
+            >
               <Trash2 />
               Eliminar
             </button>
