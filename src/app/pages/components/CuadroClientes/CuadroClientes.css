@@ -1,101 +1,111 @@
 .cuadroClientes {
-    width: 450px;
-    height: 274px;
-    border-radius: 20px;
-    padding-top: 15px;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 20px;
-    border: 1px solid #D6D5D5;
-    background: #FFF;
-    font-family: 'Poppins', sans-serif;
+  width: 500px;
+  height: auto;
+  border-radius: 20px;
+  padding-top: 15px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 20px;
+  border: 1px solid #d6d5d5;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
 }
 
 .titulo-cliente {
-    width: 100%;
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 6px;
-    margin-left: 3px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 6px;
+  margin-left: 3px;
 }
 
 .Cliente-title {
-    color: #000;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
+  color: #000;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 }
 
 .Cliente-title2 {
-    color: #828282;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+  color: #828282;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .todos-clientes {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 19px;
-    margin-top: 15px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 19px;
+  margin-top: 10px;
 }
 
 .cliente {
-    display: flex;
-    align-items: center;
-    gap: 40px;
+  display: flex;
+  flex-direction: row;
+  gap: 19px;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 .perfil-cliente {
-    min-width: 137px;
-    min-height: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #000;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #000;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
 }
 
 .fecha-pago {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 19px;
 }
 
 .fecha-cliente {
-    display: flex;
-    padding: 5px 15px;
-    align-items: flex-start;
-    gap: 5px;
-    border-radius: 10px;
-    border: 1px solid #1A3D7D;
-    color: #1A3D7D;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+  display: flex;
+  padding: 5px 15px;
+  align-items: flex-start;
+  gap: 5px;
+  border-radius: 10px;
+  border: 1px solid #1a3d7d;
+  color: #1a3d7d;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  width: 100px;
 }
 
 .moneda-cliente {
-    display: flex;
-    padding: 5px 15px;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 10px;
-    border-radius: 10px;
-    border: 1px solid var(--Azul-oscuro, #1A3D7D);
-    background: var(--Azul-oscuro, #1A3D7D);
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    color: #FFF;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
+  display: flex;
+  padding: 5px 15px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--Azul-oscuro, #1a3d7d);
+  background: var(--Azul-oscuro, #1a3d7d);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  width: 130px;
+  height: 40px;
+  gap: 19px;
+}
+
+.img-cliente {
+  width: 40px; /* Ancho del avatar */
+  height: 40px; /* Alto del avatar */
+  border-radius: 50%; /* Hacer la imagen circular */
 }

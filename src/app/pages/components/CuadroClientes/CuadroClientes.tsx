@@ -1,74 +1,83 @@
 import "./CuadroClientes.css";
-
-type cliente = {
-    id: number,
-    nombre: string,
-    img: string
-}
-
-export const Clientes: Array<cliente> = [
-    {
-        id: 1,
-        nombre: "Daniela Anaya",
-        img: "./Cliente1.svg"
-    },
-    {
-        id: 2,
-        nombre: "Rubén González",
-        img: "./Cliente2.svg"
-    },
-    {
-        id: 3,
-        nombre: "Mariana Reyes",
-        img: "./Cliente3.svg"
-    },
-    {
-        id: 4,
-        nombre: "Julio Espinoza",
-        img: "./Cliente4.svg"
-    }
-];
+import { useEffect, useState } from "react";
+import { loadClients } from "../../../../services/ClientsService";
+import { Client } from "../../../../type/Cliente/Client";
+import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes";
 
 const CuadroClientes = () => {
-    return (
-        <>
-            <div className="cuadroClientes">
-                <div className="titulo-cliente">
-                    <div>
-                        <span className="Cliente-title">Clientes <span className="Cliente-title2">vista rapida</span> </span>
-                    </div>
-                    <div className="opciones-svg">
-                        <img src="./Opciones-icon.svg" alt=""/>
-                    </div>
-                </div>
-                <div className="todos-clientes">
-                    {Clientes.map((item) => {
-                        return (
-                            <div className="cliente" key={item.id}>
-                                <div className="perfil-cliente">
-                                    <img src={item.img} className="img-cliente" alt=""/>
-                                    <div>
-                                        <span>{item.nombre}</span>
-                                    </div>
-                                </div>
-                                <div className="fecha-pago">
-                                    <div className="fecha-cliente">
-                                        <span>20/01/2023</span>
-                                    </div>
-                                    <div className="moneda-cliente">
-                                        <img src="./Moneda-icon.svg" alt=""/>
-                                        <div>
-                                            <span>100 Bs.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-            </div>
-        </>
-    )
-}
+  const [clients, setClients] = useState<Client[]>([]);
+  const [showMiniModal, setShowMiniModal] = useState(false);
 
-export { CuadroClientes }
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const clientsData = await loadClients();
+        if (clientsData && clientsData.data) {
+          const validClients = clientsData.data
+            .slice(0, 4) // Mostrar solo los primeros 4 clientes
+            .map((client: Client) => ({
+              ...client,
+              credit:
+                typeof client.credit === "number"
+                  ? client.credit
+                  : Number(client.credit),
+            }));
+          setClients(validClients);
+        }
+      } catch (error) {
+        console.error("Error al cargar los clientes:", error);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  const handleOpcionesClick = () => {
+    setShowMiniModal(!showMiniModal);
+  };
+
+  return (
+    <>
+      <div className="cuadroClientes">
+        <div className="titulo-cliente">
+          <div>
+            <span className="Cliente-title">
+              Clientes <span className="Cliente-title2">vista rapida</span>{" "}
+            </span>
+          </div>
+          <div className="opciones-svg" onClick={handleOpcionesClick}>
+            <img src="./Opciones-icon.svg" alt="" />
+            {showMiniModal && <OpcionesClientes />}
+          </div>
+        </div>
+        <div className="todos-clientes">
+          {clients.map((item) => {
+            return (
+              <div className="cliente" key={item._id}>
+                <div className="perfil-cliente">
+                  <img src={item.storeImage} className="img-cliente" alt="" />
+                  <div>
+                    <span>{item.fullName}</span>
+                  </div>
+                </div>
+                <div className="fecha-pago">
+                  <div className="fecha-cliente">
+                    <span>{new Date(item.created).toLocaleDateString()}</span>
+                  </div>
+                  <div className="moneda-cliente">
+                    <img src="./Moneda-icon.svg" alt="" />
+                    <div>
+                      <span>{item.credit.toPrecision()} Bs.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export { CuadroClientes };

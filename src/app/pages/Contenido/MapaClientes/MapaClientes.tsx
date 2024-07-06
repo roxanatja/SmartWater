@@ -7,27 +7,33 @@ import { MapaClientesContext } from "./MapaClientesContext";
 import { GoogleMaps } from "../../components/GoogleMaps/GoogleMaps";
 
 const MapaClientes: FC = () => {
+  const { showMiniModal, setShowMiniModal } = useContext(MapaClientesContext);
+  const api: string = "AIzaSyBwAtYn_94-SPOL7aHETL86g6QLkuH5V74";
 
-    const { showMiniModal ,setShowMiniModal } = useContext(MapaClientesContext);
-    const api: string = "AIzaSyBwAtYn_94-SPOL7aHETL86g6QLkuH5V74";
+  const AddUbicacion = () => {
+    setShowMiniModal(true);
+  };
 
-    const AddUbicacion = () => {
-        setShowMiniModal(true)
-    }
+  return (
+    <>
+      <div>
+        <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
+        <FiltroPaginado
+          filtro
+          paginacion={false}
+          add={true}
+          exportar={false}
+          onAdd={AddUbicacion}
+          iconUbicacion
+        >
+          <div className="Mapaclientes-googleubicacion">
+            <GoogleMaps apiKey={api} />
+          </div>
+        </FiltroPaginado>
+      </div>
+      {showMiniModal && <RegistrarNuevo />}
+    </>
+  );
+};
 
-    return (
-        <>
-            <div>
-                <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
-                <FiltroPaginado filtro paginacion={false} add={true} exportar={false} onAdd={AddUbicacion} iconUbicacion>
-                    <div className="Mapaclientes-googleubicacion">
-                        <GoogleMaps apiKey={api}/>
-                    </div>
-                </FiltroPaginado>
-            </div>
-            {showMiniModal && <RegistrarNuevo/>}
-        </>
-    )
-}
-
-export { MapaClientes }
+export { MapaClientes };
