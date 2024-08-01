@@ -14,6 +14,7 @@ import { Sale } from "../../../../type/Sale/Sale";
 import { loadClients } from "../../../../services/ClientsService";
 import { GetLoans } from "../../../../services/LoansService";
 import { GetSales } from "../../../../services/SaleService";
+import PedidosResumido from "../Pedidos/CuadroPedidos/PedidosResumido";
 
 const Inicio: FC = () => {
   const [clientsCount, setClientsCount] = useState<number | undefined>(
@@ -189,6 +190,9 @@ const Inicio: FC = () => {
           </div>
           <div>
             <CuadroRealizarPedido />
+          </div>
+          <div>
+            <PedidosResumido />
           </div>
         </div>
         <BarChart />

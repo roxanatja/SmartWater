@@ -91,7 +91,7 @@ const InfoCliente = (client: Client) => {
                   className="infoClientes-imgStore"
                 />
               ) : (
-                <img src="./Cliente2.svg" alt="" />
+                <img src="" alt="" />
               )}
               <span>{client.fullName}</span>
             </div>
@@ -104,7 +104,14 @@ const InfoCliente = (client: Client) => {
               <span>{client.code}</span>
             </div>
             <div className="infoClientes-datos">
-              <img src="./whap-icon.svg" alt="" />
+              <a
+                href={`https://api.whatsapp.com/send?phone=${client?.phoneNumber}`}
+                className="btn-whatsapp"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
+              </a>
               <span>{client.phoneNumber}</span>
             </div>
           </div>

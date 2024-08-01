@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./CuadroRealizarPedido.css";
 import { loadClients } from "../../../../services/ClientsService";
 import { GetProducts } from "../../../../services/ProductsService";
@@ -7,13 +7,29 @@ import Product from "../../../../type/Products/Products";
 import { saveOrder } from "../../../../services/OrdersService";
 import { OpcionesPedidos } from "../../Contenido/Pedidos/CuadroPedidos/OpcionesPedidos/OpcionesPedidos";
 
+/**
+ * Componente `CuadroRealizarPedido` para realizar pedidos.
+ *
+ * Este componente permite a los usuarios seleccionar un cliente, producto, cantidad y precio para realizar un pedido.
+ * Se gestionan las solicitudes de carga de clientes y productos desde el servidor y se maneja el envío del pedido.
+ */
 const CuadroRealizarPedido = () => {
-  // Estado para almacenar la lista de clientes y productos disponibles
+  // Estado para almacenar la lista de clientes
   const [clientes, setClientes] = useState<Client[]>([]);
+  // Estado para almacenar la lista de productos
   const [productos, setProductos] = useState<Product[]>([]);
+  // Estado para controlar la visibilidad del modal de opciones
   const [showMiniModal, setShowMiniModal] = useState(false);
+  // Estado para manejar el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  // Estado para el cliente seleccionado
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  // Estado para mostrar u ocultar las opciones filtradas
+  const [showOptions, setShowOptions] = useState(false);
+  // Referencia para detectar clics fuera del componente
+  const optionsRef = useRef<HTMLDivElement>(null);
 
-  // Cargar clientes y productos al montar el componente
+  // Efecto para cargar los clientes y productos al montar el componente
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -37,48 +53,82 @@ const CuadroRealizarPedido = () => {
     fetchProducts();
   }, []);
 
-  // Función para manejar el envío del formulario de pedido
+  // Filtrar clientes según el término de búsqueda
+  const filteredClients = clientes.filter(
+    (cliente) =>
+      cliente.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.phoneNumber.includes(searchTerm)
+  );
+
+  // Manejador para enviar el formulario de pedido
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    // Obtener datos del formulario
-    const client = formData.get("cliente") as string;
+    const client = selectedClient?._id as string;
     const product = formData.get("producto") as string;
     const quantity = formData.get("cantidad") as string;
     const price = formData.get("precio") as string;
 
-    // Construir objeto de datos para enviar al servicio de orden
+    if (!client || !product || !quantity || !price) {
+      console.log("All fields are required");
+      return;
+    }
+
     const orderData = {
       client,
       detail: [
         {
           product,
           quantity: Number(quantity),
-          price: Number(price),
         },
       ],
       total: Number(quantity) * Number(price),
       creditSale: false,
     };
 
+    console.log("Order data being sent:", orderData); // Verifica los datos antes de enviarlos
+
     try {
-      // Llamar al servicio para guardar la orden
       const responseStatus = await saveOrder(orderData);
       if (responseStatus === 201) {
         console.log("Order saved successfully");
       } else {
-        console.log("Failed to save order");
+        console.log(`Failed to save order. Status code: ${responseStatus}`);
       }
     } catch (error) {
       console.error("Error saving order:", error);
     }
   };
 
-  // Función para manejar el clic en las opciones del pedido
+  // Manejador para alternar la visibilidad del modal de opciones
   const handleOpcionesClick = () => {
     setShowMiniModal(!showMiniModal);
   };
+
+  // Manejador para seleccionar un cliente de las opciones filtradas
+  const handleOptionClick = (cliente: Client) => {
+    setSelectedClient(cliente);
+    setSearchTerm(cliente.fullName);
+    setShowOptions(false);
+  };
+
+  // Cerrar las opciones al hacer clic fuera de ellas
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -94,12 +144,53 @@ const CuadroRealizarPedido = () => {
             </div>
           </div>
           <div>
-            {/* Selector de cliente */}
+            <div className="buscador-cliente-container">
+              <input
+                type="text"
+                placeholder="Buscar cliente por nombre o teléfono"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowOptions(true);
+                }}
+                className="buscador-cliente"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "10px",
+                  fontSize: "16px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
+              {showOptions && filteredClients.length > 0 && (
+                <div ref={optionsRef} className="options-list">
+                  {filteredClients.map((cliente) => (
+                    <div
+                      key={cliente._id}
+                      onClick={() => handleOptionClick(cliente)}
+                      className="option-item"
+                    >
+                      {cliente.fullName} / {cliente.phoneNumber}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <h5 className="separador-seccion"> o </h5>
             <select
               name="cliente"
               id="cliente"
               className="selec-pedido"
               required
+              value={selectedClient?._id || ""}
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                const client =
+                  clientes.find((c) => c._id === selectedId) || null;
+                setSelectedClient(client);
+              }}
             >
               <option value="">Seleccione un cliente</option>
               {clientes.map((cliente) => (
@@ -108,7 +199,6 @@ const CuadroRealizarPedido = () => {
                 </option>
               ))}
             </select>
-            {/* Selector de producto */}
             <select
               name="producto"
               id="producto"
@@ -122,7 +212,6 @@ const CuadroRealizarPedido = () => {
                 </option>
               ))}
             </select>
-            {/* Selección de cantidad y precio */}
             <div style={{ marginTop: "11px", gap: "15px", display: "flex" }}>
               <div className="cantidad-pedido">
                 <span style={{ marginLeft: "10px" }}>Cantidad</span>
@@ -168,7 +257,6 @@ const CuadroRealizarPedido = () => {
                 </div>
               </div>
             </div>
-            {/* Botón para realizar el pedido */}
             <div
               style={{
                 minWidth: "96%",

@@ -10,24 +10,25 @@ import { RegistrarDevolucion } from "./RegistrarDevolucion/RegistrarDevolucion";
 import { ClientEdit } from "./EditClient/EditClient";
 
 const ClientesWrapper: FC = () => {
+  return (
+    <>
+      <ClientesProvider>
+        <FilterProvider>
+          <Routes>
+            <Route path="/*" element={<Clientes />} />
+            <Route path="/RegistrarVenta" element={<RegistrarVenta />} />
+            <Route path="/RegistrarPedido" element={<RegistrarPedido />} />
+            <Route path="/RegistrarPrestamo" element={<RegistrarPrestamo />} />
+            <Route
+              path="/RegistrarDevolucion"
+              element={<RegistrarDevolucion />}
+            />
+            <Route path="/EditarCliente" element={<ClientEdit />} />
+          </Routes>
+        </FilterProvider>
+      </ClientesProvider>
+    </>
+  );
+};
 
-    return (
-        <>
-            <ClientesProvider>
-                <FilterProvider>
-                    <Routes>
-                        <Route path='/*' element={<Clientes />} />
-                        <Route path='/RegistrarVenta' element={<RegistrarVenta />}/>
-                        <Route path='/RegistrarPedido' element={<RegistrarPedido />}/>
-                        <Route path='/RegistrarPrestamo' element={<RegistrarPrestamo />}/>
-                        <Route path='/RegistrarDevolucion' element={<RegistrarDevolucion />}/>
-                        <Route path='/EditarCliente' element={<ClientEdit/>}/>
-                    </Routes>
-                </FilterProvider>
-            </ClientesProvider>
-        </>
-    )
-
-}
-
-export { ClientesWrapper }
+export { ClientesWrapper };

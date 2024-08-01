@@ -11,28 +11,22 @@ import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 
-/**
- * Componente funcional para gestionar la vista y lógica de la página de Clientes.
- */
-
 const Clientes: FC = () => {
-  // Contextos utilizados
   const { showModal, setShowModal, showMiniModal, showFiltro, setShowFiltro } =
     useContext(ClientesContext);
   const {
     applicatedFilters,
-    notApplicatedFilters,
     fromDate,
     toDate,
     withLoans,
     withoutLoans,
     withCredit,
     withoutCredit,
-    dealers,
     zone,
+    daysToRenew,
+    daysSinceRenewed,
   } = useContext(FilterContext);
 
-  // Estados locales
   const [clients, setClients] = useState<Client[]>([]);
   const [clientsFiltered, setClientsFiltered] = useState<Client[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -42,23 +36,86 @@ const Clientes: FC = () => {
   const itemsPerPage: number = 10;
   const [totalPage, setTotalPage] = useState<number>(0);
 
-  /**
-   * Efecto de lado para cargar los clientes al montar el componente.
-   */
   useEffect(() => {
-    let isMounted = true; // Variable para rastrear si el componente está montado
-
+    let isMounted = true;
     const getClients = async () => {
       try {
         const response = await loadClients();
         if (isMounted) {
-          // Verificar si el componente está montado antes de actualizar el estado
           if (response.data && response.data.length > 0) {
-            // Ordenar los clientes por la fecha de la última venta
-            const sortedClients = response.data.sort(
+            let sortedClients = response.data.sort(
               (a: Client, b: Client) =>
                 moment(b.lastSale).valueOf() - moment(a.lastSale).valueOf()
             );
+
+            const fromDateMoment = fromDate ? moment(fromDate) : null;
+            const toDateMoment = toDate ? moment(toDate) : null;
+
+            // Aplicar filtros
+            if (applicatedFilters) {
+              sortedClients = sortedClients.filter((client: Client) => {
+                // Filtrar por préstamos
+                if (
+                  (withLoans && !client.hasLoan) ||
+                  (withoutLoans && client.hasLoan)
+                ) {
+                  return false;
+                }
+
+                // Filtrar por crédito
+                if (
+                  (withCredit && !client.credit) ||
+                  (withoutCredit && client.credit)
+                ) {
+                  return false;
+                }
+
+                // Filtrar por zona
+                if (zone.length > 0 && !zone.includes(client.zone)) {
+                  return false;
+                }
+
+                // Filtrar por fechas de creación
+                if (fromDateMoment && toDateMoment) {
+                  const createdDate = moment(client.created);
+                  if (
+                    createdDate.isBefore(fromDateMoment) ||
+                    createdDate.isAfter(toDateMoment)
+                  ) {
+                    return false;
+                  }
+                } else if (fromDateMoment) {
+                  const createdDate = moment(client.created);
+                  if (createdDate.isBefore(fromDateMoment)) {
+                    return false;
+                  }
+                } else if (toDateMoment) {
+                  const createdDate = moment(client.created);
+                  if (createdDate.isAfter(toDateMoment)) {
+                    return false;
+                  }
+                }
+
+                // Filtrar por fecha de renovación
+                const today = moment();
+                const renewDateMoment = moment(client.renewDate);
+                if (daysToRenew != null) {
+                  const daysUntilRenewal = renewDateMoment.diff(today, "days");
+                  if (daysUntilRenewal > daysToRenew) {
+                    return false;
+                  }
+                }
+                if (daysSinceRenewed != null) {
+                  const daysSinceRenewed = today.diff(renewDateMoment, "days");
+                  if (daysSinceRenewed > daysSinceRenewed) {
+                    return false;
+                  }
+                }
+
+                return true;
+              });
+            }
+
             setClients(sortedClients);
             setClientsFiltered(sortedClients);
             setLoading(false);
@@ -72,7 +129,6 @@ const Clientes: FC = () => {
       } catch (e) {
         console.error("Error loading clients:", e);
         if (isMounted) {
-          // Verificar si el componente está montado antes de actualizar el estado
           setError(true);
           setLoading(false);
         }
@@ -81,15 +137,22 @@ const Clientes: FC = () => {
 
     getClients();
 
-    // Función de limpieza al desmontar el componente
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [
+    applicatedFilters,
+    fromDate,
+    toDate,
+    withLoans,
+    withoutLoans,
+    withCredit,
+    withoutCredit,
+    zone,
+    daysToRenew,
+    daysSinceRenewed,
+  ]);
 
-  /**
-   * Maneja el cambio de página en la paginación.
-   */
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     const startIndex: number = (page - 1) * itemsPerPage;
@@ -97,19 +160,8 @@ const Clientes: FC = () => {
     setCurrentData(clientsFiltered.slice(startIndex, endIndex));
   };
 
-  /**
-   * Ordena los clientes según el criterio especificado.
-   */
   const orderClients = (orden: string) => {
-    // Ordena por fecha de última venta de más reciente a más antigua
     let clientesOrdenados: Client[] = [...clientsFiltered];
-    console.log(
-      "Antes de ordenar:",
-      clientesOrdenados.map((client) => ({
-        fullName: client.fullName,
-        lastSale: client.lastSale,
-      }))
-    );
 
     if (orden === "new") {
       clientesOrdenados.sort(
@@ -123,43 +175,32 @@ const Clientes: FC = () => {
       );
     }
 
-    console.log(
-      "Después de ordenar:",
-      clientesOrdenados.map((client) => ({
-        fullName: client.fullName,
-        lastSale: client.lastSale,
-      }))
-    );
-
-    // Actualiza el estado de clientes filtrados y la página actual
     setClientsFiltered(clientesOrdenados);
-    setCurrentPage(1); // Vuelve a la primera página después de ordenar
+    setCurrentPage(1);
     setCurrentData(clientesOrdenados.slice(0, itemsPerPage));
   };
 
-  /**
-   * Maneja la búsqueda de clientes por nombre.
-   */
   const handleSearchUser = (searchValue: string) => {
     const value: string = searchValue.trim().toLowerCase();
     if (value === "") {
       setCurrentData(clientsFiltered.slice(0, itemsPerPage));
     } else {
-      const filteredClients: Client[] = clients.filter((client: Client) =>
-        client.fullName?.toLowerCase().includes(value)
+      const filteredClients: Client[] = clients.filter(
+        (client: Client) =>
+          client.fullName?.toLowerCase().includes(value) ||
+          client.phoneNumber.includes(value)
       );
+
       setClientsFiltered(filteredClients);
       setCurrentData(filteredClients.slice(0, itemsPerPage));
     }
     setCurrentPage(1);
   };
 
-  // Renderiza un mensaje de carga si los clientes están cargando
   if (loading) {
     return <p>Cargando Clientes...</p>;
   }
 
-  // Renderiza un mensaje de error si hubo un problema en la carga de clientes
   if (error) {
     return (
       <p>
@@ -195,14 +236,12 @@ const Clientes: FC = () => {
             flexWrap: "wrap",
           }}
         >
-          {/* Mapea y renderiza la información de cada cliente */}
           {currentData.map((client: Client) => (
             <InfoCliente key={client._id} {...client} />
           ))}
         </div>
       </FiltroPaginado>
 
-      {/* Renderiza componentes modales según el estado */}
       {showModal && <AgregarCliente />}
       {showMiniModal && <OpcionesClientes />}
       {showFiltro && <FiltroClientes />}

@@ -1,0 +1,130 @@
+.cuadroClientes {
+  width: 500px;
+  height: auto;
+  border-radius: 20px;
+  padding-top: 15px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 20px;
+  border: 1px solid #d6d5d5;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+.pedidosResumido-datos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 20px;
+}
+
+.pedidosResumido-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pedidosResumido-ventasContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.pedidosResumido-ventas {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.pedidosResumido-ultimaventa {
+  display: flex;
+  padding: 5px 15px;
+  align-items: flex-start;
+  border-radius: 10px;
+  border: 1px solid #1a3d7d;
+  color: #1a3d7d;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  font-family: "Poppins", sans-serif;
+  margin: 20px;
+}
+
+.pedidosResumido-moneda {
+  display: flex;
+  padding: 5px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  border: 1px solid #1a3d7d;
+  background: #1a3d7d;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.pedidosResumido-footer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pedidosResumido-imgStore,
+.pedidosResumido-productImage {
+  width: 40px; /* Ancho del avatar */
+  height: 40px; /* Alto del avatar */
+  border-radius: 50%; /* Hacer la imagen circular */
+}
+
+.titulo-pedidos {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 6px;
+  margin-left: 3px;
+}
+
+.Pedidos-title {
+  color: #000;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.Pedidos-title2 {
+  color: #828282;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.todos-clientes {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 19px;
+  margin-top: 10px;
+}
