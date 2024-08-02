@@ -1,0 +1,203 @@
+.cobro-mini-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cobro-mini-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 90%;
+  position: relative;
+}
+
+.cobro-mini-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  align-items: end;
+}
+
+.payment-method-modal-actions1 {
+  display: flex;
+  justify-content: center; /* Centra los botones horizontalmente */
+  gap: 10px; /* Espacio entre los botones */
+}
+
+.modal-datos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.modalInfoClients {
+  display: flex; /* Alinea en fila horizontal para la imagen y el nombre */
+  align-items: center; /* Alinea verticalmente en el centro */
+  gap: 10px; /* Espacio entre la imagen y el nombre */
+}
+
+.modalInfoClients-imgStore {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.modalInfoClients-name {
+  font-size: 12px; /* Tamaño del texto del nombre */
+  color: #000; /* Color del texto */
+}
+
+.infoClientes-saldo {
+  color: #1a3d7d;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-left: 10px;
+  display: flex; /* Alinea en fila horizontal */
+  flex-direction: column;
+}
+
+.infoClientes-ventas {
+  margin-bottom: 10px;
+}
+
+.infoClientes-moneda {
+  display: flex; /* Alinea en fila horizontal para la moneda y el valor */
+  align-items: center; /* Alinea verticalmente en el centro */
+}
+
+.infoClientes-moneda img {
+  width: 16px; /* Tamaño del icono de la moneda */
+  height: 16px; /* Tamaño del icono de la moneda */
+  margin-right: 5px; /* Espacio entre el icono y el valor */
+}
+
+.saldo {
+  display: row;
+}
+
+.botton {
+  display: flex;
+}
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.input-container input {
+  flex: 1;
+}
+
+.cobro-mini-modal-payment-methods {
+  margin: 10px 0;
+}
+
+.cobro-mini-modal-payment-methods label {
+  display: block;
+}
+
+.cobro-mini-modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.cobro-mini-modal-actions1 {
+  display: flex;
+
+  margin-top: 20px;
+}
+
+.btn-cancel-modal {
+  color: #367dfd;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  width: 150px;
+  height: 40px;
+  display: flex;
+  padding: 11px 24px;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 30px;
+  border: 1px solid #367dfd;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-cancel-modal:hover {
+  background: #ececec;
+}
+
+.btn-registrar-modal {
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  width: 150px;
+  height: 40px;
+  display: flex;
+  padding: 11px 24px;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 30px;
+  border: 1px solid #367dfd;
+  background: #367dfd;
+  text-align: center;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  justify-content: center;
+  cursor: pointer;
+}
+.btn-registrar-modal:hover {
+  background: #2150a7;
+  border: 1px solid #2150a7;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  display: row;
+}
+
+.payment-method-modal-options label {
+  display: block;
+  margin-bottom: 10px; /* Espacio entre las opciones */
+}
+
+.payment-method-modal-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  background: #367dfd;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin: 10px;
+}

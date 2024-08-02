@@ -55,7 +55,7 @@ const AgregarCliente = () => {
   const [renovationTime, setRenovationTime] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+  let url = `https://www.google.com/maps/place/${address}`;
   const loadZones = async () => {
     await GetZone().then((resp) => {
       setZones(resp.data);

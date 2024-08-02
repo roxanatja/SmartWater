@@ -213,21 +213,28 @@ const GoogleMaps: React.FC<MapProps> = ({
             onCloseClick={() => setActiveMarker(null)}
           >
             <div
-              style={{ width: "100%", height: "100%", position: "relative" }}
+              style={{
+                width: "800px", // Ajusta el ancho según sea necesario
+                height: "800px", // Ajusta la altura máxima para evitar desbordamientos
+                overflowY: "auto", // Permite el desplazamiento vertical
+                padding: "10px", // Agrega padding para el contenido
+              }}
             >
-              <h3>{activeMarker.fullName}</h3>
+              <p>{activeMarker.fullName}</p>
               <img
                 src={activeMarker.storeImage}
-                alt={activeMarker.name}
+                alt="imagen no disponible"
                 style={{
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
+                  width: "600px",
+                  height: "auto", // Ajusta la altura automáticamente
+                  maxHeight: "700px", // Limita la altura máxima de la imagen
+                  objectFit: "cover",
+                  borderRadius: "20px",
+                  padding: "10px",
                 }}
               />
               <div style={{ padding: "8px" }}>
-                <h1>{activeMarker.name}</h1>
-                <h3>{activeMarker.phoneNumber}</h3>
+                <p>{activeMarker.name}</p>
               </div>
             </div>
           </InfoWindow>

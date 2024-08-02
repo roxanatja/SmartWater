@@ -423,6 +423,12 @@ const FiltroPaginado: FC<Componentes> = ({
 
         const typeDataToExport = {
           NOMBRE: client.fullName,
+          "TIPO DE CLIENTE": client.isClient
+            ? "Cliente"
+            : client.isAgency
+            ? "Agencia"
+            : "Desconocido", // Añadido como tipo de cliente
+          WHATSAPP: client.phoneNumber ?? "S/Numero",
           TELEFONO: client.phoneNumber ? client.phoneNumber : "S/Numero",
           CODIGO: client.code ? client.code : "Sin codigo",
           DIRECCION: client.address ? client.address : "Sin direccion",

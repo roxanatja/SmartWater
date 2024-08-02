@@ -8,6 +8,7 @@ import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
 import { DeleteClient } from "../../../../../services/ClientsService";
 import { GetZone } from "../../../../../services/ZonesService";
+import CobroPopUp from "../../../components/CashRegister/CashRegister";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -16,6 +17,7 @@ const InfoCliente = (client: Client) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [zone, setZone] = useState<string>("");
   const [date, setDate] = useState<string>();
+  const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false); // Agregado el estado para el Pop-Up
   const location = client.location;
   const url = `https://www.google.com/maps/place/${location.latitude} ${location.longitude}`;
 
@@ -55,7 +57,6 @@ const InfoCliente = (client: Client) => {
   };
 
   const Delete = async () => {
-    //Deleted client from the database, if the request is successful, the client is deleted from the list, if not, an error message is displayed
     try {
       const response = await DeleteClient(client._id);
       console.log(response);
@@ -134,11 +135,17 @@ const InfoCliente = (client: Client) => {
               <div className="infoClientes-moneda">
                 <img src="./Moneda-icon.svg" alt="" />
                 <div>
-                  <span>{client.credit.toString()} Bs.</span>
+                  <span
+                    onClick={() => setShowCobroPopUp(true)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {client.credit.toString()} Bs.
+                  </span>
                 </div>
               </div>
             </div>
           </div>
+
           <div>
             <button type="button" className="btn" onClick={() => Opciones()}>
               <img src="./opcion-icon.svg" alt="" />
@@ -164,6 +171,10 @@ const InfoCliente = (client: Client) => {
           </a>
         </div>
       </div>
+
+      {showCobroPopUp && (
+        <CobroPopUp client={client} onClose={() => setShowCobroPopUp(false)} />
+      )}
     </>
   );
 };

@@ -34,5 +34,5 @@ export interface Client {
   updated: string;
   lastSale: string;
   hasExpiredContract: boolean;
-  credit: Number;
+  credit: number;
 }
