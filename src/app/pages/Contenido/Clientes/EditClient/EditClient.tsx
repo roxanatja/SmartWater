@@ -59,56 +59,74 @@ const ClientEdit = () => {
   const [comment, setComment] = useState<string>("");
 
   useEffect(() => {
-    const getCoordinatesClient = async () => {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      let latitude = "0",
-        longitude = "0";
+    const loadClientData = async () => {
+      if (selectedClient) {
+        console.log("Cliente seleccionado:", selectedClient);
 
-      if (data.length > 0) {
-        latitude = data[0].lat;
-        longitude = data[0].lon;
-      } else {
-        console.error("No se encontraron coordenadas");
+        // Función para obtener coordenadas
+        const getCoordinatesClient = async () => {
+          if (!selectedClient.address) return;
+          const url = `https://nominatim.openstreetmap.org/search?format=json&q=${selectedClient.address}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          let latitude = "0",
+            longitude = "0";
+
+          if (data.length > 0) {
+            latitude = data[0].lat;
+            longitude = data[0].lon;
+          } else {
+            console.error("No se encontraron coordenadas");
+          }
+
+          setLatitude(latitude);
+          setLongitude(longitude);
+        };
+
+        // Función para cargar zonas
+        const loadZones = async () => {
+          try {
+            const resp = await GetZone();
+            setZones(resp.data);
+            if (resp.data.length > 0) {
+              setDistricts(resp.data[0].districts); // Inicializa distritos según la primera zona
+            }
+          } catch (error) {
+            console.error("Error cargando zonas", error);
+          }
+        };
+
+        // Cargar datos del cliente
+        const loadClientData = () => {
+          if (selectedClient.billingInfo) {
+            console.log("Cargando datos del cliente:", selectedClient);
+            setFullName(selectedClient.fullName);
+            setNit(selectedClient.billingInfo.NIT);
+            setEmail(selectedClient.email);
+            setPhoneNumber(selectedClient.phoneNumber);
+            setAddress(selectedClient.address);
+            setLatitude(selectedClient.location.latitude);
+            setLongitude(selectedClient.location.longitude);
+            setComment(selectedClient.comment);
+            setZoneSelected(selectedClient.zone);
+            setDistrictSelected(selectedClient.district);
+            setSelectedImage(selectedClient.storeImage);
+            setImageCarnetTrasero(selectedClient.ciBackImage);
+            setImageCarnetTraseroDuplicated(selectedClient.ciBackImage);
+            setImageCarnetDelantero(selectedClient.ciFrontImage);
+            setImageCarnetDelanteroDuplicated(selectedClient.ciFrontImage);
+          }
+          setIsLoading(false);
+        };
+
+        loadClientData();
+        loadZones();
+        getCoordinatesClient();
       }
-
-      setLatitude(latitude);
-      setLongitude(longitude);
     };
 
-    const loadZones = async () => {
-      try {
-        const resp = await GetZone();
-        setZones(resp.data);
-        setDistricts(resp.data[0].districts); // Assuming you want to initialize districts based on the first zone
-      } catch (error) {
-        console.error("Error loading zones", error);
-      }
-    };
-
-    const LoadDataClient = () => {
-      setFullName(selectedClient.fullName);
-      setNit(selectedClient.billingInfo.NIT);
-      setEmail(selectedClient.email);
-      setPhoneNumber(selectedClient.phoneNumber);
-      setAddress(selectedClient.address);
-      setLatitude(selectedClient.location.latitude);
-      setLongitude(selectedClient.location.longitude);
-      setComment(selectedClient.comment);
-      setZoneSelected(selectedClient.zone);
-      setDistrictSelected(selectedClient.district);
-      setSelectedImage(selectedClient.storeImage);
-      setImageCarnetTrasero(selectedClient.ciBackImage);
-      setImageCarnetTraseroDuplicated(selectedClient.ciBackImage);
-      setImageCarnetDelantero(selectedClient.ciFrontImage);
-      setImageCarnetDelanteroDuplicated(selectedClient.ciFrontImage);
-    };
-
-    LoadDataClient();
-    loadZones();
-    getCoordinatesClient();
-  }, [selectedClient]);
+    loadClientData();
+  }, [selectedClient]); // Dependencia en selectedClient
 
   if (isLoading) {
     return <p>Cargando Informaciond del cliente</p>;

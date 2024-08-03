@@ -370,6 +370,10 @@ const FiltroPaginado: FC<Componentes> = ({
     const dataWithClientNames = await Promise.all(
       data.map(async (sale: Sale) => {
         const client: Client = await GetClientById(sale.client);
+        // Verifica que `client` no sea `null` o `undefined`
+        if (!client || !client.fullName) {
+          throw new Error(`Cliente no encontrado para la venta ${sale._id}`);
+        }
 
         const typeDataToExport = {
           cliente: client.fullName,
