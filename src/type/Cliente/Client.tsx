@@ -16,7 +16,6 @@ export interface Client {
     latitude: string;
     longitude: string;
   };
-
   hasOrder: boolean;
   hasLoan: boolean;
   hasContract: boolean;

@@ -10,6 +10,8 @@ import { FilterContext } from "../../components/FilterContexr/FilterContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
+import Modal from "../../EntryComponents/Modal";
+import ClientForm from "../../EntryComponents/Client.form";
 
 const Clientes: FC = () => {
   const { showModal, setShowModal, showMiniModal, showFiltro, setShowFiltro } =
@@ -242,7 +244,13 @@ const Clientes: FC = () => {
         </div>
       </FiltroPaginado>
 
-      {showModal && <AgregarCliente />}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <h2 className="text-blue-900 font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Registrar Cliente
+        </h2>
+        <ClientForm onCancel={() => setShowModal(false)} />
+      </Modal>
+
       {showMiniModal && <OpcionesClientes />}
       {showFiltro && <FiltroClientes />}
     </>
