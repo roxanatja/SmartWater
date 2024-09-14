@@ -14,6 +14,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
   const [disti, setDisti] = useState<District[]>([]);
   const [date, setDate] = useState(false);
   const [date2, setDate2] = useState(false);
+  const { selectedClient } = useContext(ClientesContext);
   const [uploading, setUploading] = useState(false);
   const {
     register,
@@ -22,8 +23,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
     setValue,
     reset,
     formState: { errors },
-  } = useForm<Client>();
-  const { selectedClient } = useContext(ClientesContext);
+  } = useForm<Client>({ defaultValues: selectedClient as unknown as Client });
 
   const verifyPhoneNumber = (value: string) => {
     if (!value.startsWith("+")) {
@@ -96,19 +96,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
   };
 
   useEffect(() => {
-    if (selectedClient._id !== "") {
-      const api = new GetApiMethod();
-      const fetchClient = async () => {
-        try {
-          const response = await api.GetClientById(selectedClient._id);
-          reset(response);
-          console.log("Valores asignados:", watch());
-        } catch (error) {
-          console.error("Error fetching client:", error);
-        }
-      };
-      fetchClient();
-    } else {
+    if (selectedClient._id === "") {
       setValue("isClient", true);
       setValue("isAgency", false);
       setValue("hasLoan", true);
@@ -160,8 +148,10 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
         >
           <img
             src={
-              watch("clientImage") ||
-              "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
+              selectedClient._id
+                ? watch("storeImage")
+                : watch("clientImage") ||
+                  "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
             }
             alt="logo.png"
             className="max-sm:w-56 max-sm:h-56 w-32 h-32 rounded-full shadow-md"
@@ -181,8 +171,11 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
                   try {
                     const uploadResponse = await saveImage(file);
                     const downloadURL = uploadResponse.secure_url;
-
-                    setValue("clientImage", downloadURL);
+                    if (selectedClient._id !== "") {
+                      setValue("storeImage", downloadURL);
+                    } else {
+                      setValue("clientImage", downloadURL);
+                    }
                   } catch (error) {
                     console.error("Error uploading to Cloudinary:", error);
                   } finally {
@@ -190,7 +183,11 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
                   }
                 }
               }}
-              required={!watch("clientImage")}
+              required={
+                selectedClient._id !== ""
+                  ? !watch("storeImage")
+                  : !watch("clientImage")
+              }
             />
           </label>
         </button>
@@ -200,14 +197,14 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           </div>
         )}
 
-        {errors.clientImage && (
+        {(selectedClient._id !== ""
+          ? errors.storeImage
+          : errors.clientImage) && (
           <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
-            {errors.clientImage && (
-              <>
-                <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                {errors.clientImage.message}
-              </>
-            )}
+            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+            {selectedClient._id !== ""
+              ? errors?.storeImage?.message
+              : errors?.clientImage?.message}
           </div>
         )}
       </motion.div>
@@ -398,15 +395,16 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           setValue={setValue}
           errors={errors}
         />
-        <ImageUploadField
-          watchField={watch}
-          fieldName={"storeImage"}
-          label={"Porfavor, adjunta foto de la tienda"}
-          register={register}
-          setValue={setValue}
-          errors={errors}
-        />
-
+        {selectedClient._id === "" && (
+          <ImageUploadField
+            watchField={watch}
+            fieldName={"storeImage"}
+            label={"Porfavor, adjunta foto de la tienda"}
+            register={register}
+            setValue={setValue}
+            errors={errors}
+          />
+        )}
         <div className="w-full col-span-2 max-sm:col-span-1">
           <h1>Selecciona una ubicación en el mapa</h1>
           <GoogleMapWithSelection
@@ -429,14 +427,18 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
                 onClick={() => {
                   handleCheckboxChangeReno("hasLoan");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${
                   watch("renewInDays") === 0
                     ? `text-zinc-300 hover:text-blue-900`
                     : "text-blue-900"
                 }`}
               ></i>
 
-              <p className={`${watch("hasOrder") ? "text-zinc-300" : ""}`}>
+              <p
+                className={`${watch("hasOrder") ? "text-zinc-300" : ""} ${
+                  date && "text-transparent"
+                }`}
+              >
                 Periodo de Renovacion
               </p>
             </div>
@@ -470,7 +472,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
               name="renewInDays"
               numericalOnly
               isVisibleLable
-              className="absolute w-48 -top-9 -translate-y-0.5 bg-white left-9"
+              className="absolute -top-9 -translate-y-0.5 bg-white left-9 w-20"
               errors={errors.renewInDays}
               required={date}
             />

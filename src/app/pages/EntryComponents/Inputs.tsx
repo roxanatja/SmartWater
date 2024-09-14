@@ -36,6 +36,7 @@ const Input = memo<InputProps>(
   }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       let inputValue = event.target.value;
+
       if (numericalOnly) {
         inputValue = inputValue.replace(/[^0-9.]/g, "");
         const dotIndex = inputValue.indexOf(".");
@@ -45,8 +46,11 @@ const Input = memo<InputProps>(
             inputValue.slice(dotIndex).replace(/\./g, "");
         }
       }
+
       if (onChange) {
         onChange({ ...event, target: { ...event.target, value: inputValue } });
+      } else {
+        event.target.value = inputValue;
       }
     };
 
