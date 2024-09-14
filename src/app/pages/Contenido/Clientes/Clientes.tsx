@@ -21,6 +21,7 @@ const Clientes: FC = () => {
     showFiltro,
     setShowFiltro,
     selectedClient,
+    setShowMiniModal,
     setSelectedClient,
   } = useContext(ClientesContext);
   const {
@@ -252,23 +253,39 @@ const Clientes: FC = () => {
       </FiltroPaginado>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h2 className="text-blue-900 font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
           Registrar Cliente
         </h2>
         <ClientForm onCancel={() => setShowModal(false)} />
       </Modal>
 
       <Modal
-        isOpen={selectedClient._id !== "" ? true : false}
+        isOpen={
+          selectedClient._id !== "" && showMiniModal === false ? true : false
+        }
         onClose={() => setSelectedClient(client)}
       >
-        <h2 className="text-blue-900 font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
           Editar Cliente
         </h2>
         <ClientForm onCancel={() => setSelectedClient(client)} />
       </Modal>
 
-      {showMiniModal && <OpcionesClientes />}
+      <Modal
+        isOpen={selectedClient._id !== "" && showMiniModal ? true : false}
+        onClose={() => {
+          setSelectedClient(client);
+          setShowMiniModal(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Opciones Cliente
+        </h2>
+        <div className="p-6">
+          <OpcionesClientes />
+        </div>
+      </Modal>
       {showFiltro && <FiltroClientes />}
     </>
   );

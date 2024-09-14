@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./InfoCliente.css";
 import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";

@@ -2,17 +2,20 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 type GoogleMapWithSelectionProps = {
   onChange: (coordinates: { lat: number; lng: number }) => void;
+  latitude?: number;
+  longitude?: number;
 };
 
 const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   onChange,
+  latitude,
+  longitude,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const apiKey = `${process.env.REACT_APP_API_GOOGLE}`;
 
-  // Obtener ubicación actual del usuario
   const getCurrentLocation = () =>
     new Promise<{ lat: number; lng: number }>((resolve, reject) => {
       if (navigator.geolocation) {
@@ -28,7 +31,6 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       }
     });
 
-  // Función para centrar el mapa en una posición
   const centerMap = useCallback(
     (position: { lat: number; lng: number }) => {
       if (map) {
@@ -48,7 +50,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
     },
     [marker, onChange]
   );
-  // Cargar y configurar el mapa
+
   useEffect(() => {
     const loadGoogleMapsScript = () => {
       if (!window.google) {
@@ -82,19 +84,14 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
 
         setMap(mapInstance);
 
-        // Crear el marcador fijo en el centro del mapa
         const centerMarker = new google.maps.Marker({
           position: mapInstance.getCenter(),
           map: mapInstance,
-          draggable: false,
+          draggable: true,
           clickable: false,
         });
         setMarker(centerMarker);
 
-        // Enviar las coordenadas iniciales al componente padre
-        onChange(initialPosition);
-
-        // Actualizar la posición del marcador y las coordenadas cuando el centro del mapa cambie
         mapInstance.addListener("center_changed", () => {
           const center = mapInstance.getCenter();
           if (center) {
@@ -107,7 +104,6 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
           }
         });
 
-        // Añadir botón para obtener la ubicación actual
         const locationButton = document.createElement("button");
         locationButton.classList.add("custom-map-control-button");
         locationButton.setAttribute("type", "button");
@@ -115,12 +111,10 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         locationButton.innerHTML =
           '<i class="fa-solid fa-location-crosshairs"></i>';
 
-        // Colocar el botón en la parte superior central del mapa
         mapInstance.controls[google.maps.ControlPosition.TOP_RIGHT].push(
           locationButton
         );
 
-        // Agregar evento de clic al botón de ubicación actual
         locationButton.addEventListener("click", async () => {
           try {
             const currentPosition = await getCurrentLocation();
@@ -139,9 +133,22 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
     loadGoogleMapsScript();
   }, [apiKey, map, onChange, centerMap, updateMarkerPosition]);
 
+  useEffect(() => {
+    if (map && latitude !== undefined && longitude !== undefined) {
+      const position = { lat: latitude, lng: longitude };
+      centerMap(position);
+      updateMarkerPosition(new google.maps.LatLng(latitude, longitude));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div style={{ position: "relative" }}>
-      <div ref={mapRef} style={{ width: "100%", height: "450px" }}></div>
+    <div style={{ position: "relative" }} className="rounded-lg">
+      <div
+        ref={mapRef}
+        style={{ width: "100%", height: "450px" }}
+        className="rounded-lg"
+      ></div>
     </div>
   );
 };

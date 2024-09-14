@@ -8,6 +8,7 @@ import GoogleMapWithSelection from "./GoogleInputMap";
 import GetApiMethod from "../../../Class/api.class";
 import { Client, District, Zone } from "../../../Class/types.data";
 import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
+import ApiMethodClient from "../../../Class/api.client";
 
 const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
   const [city, setCity] = useState<Zone[]>([]);
@@ -23,7 +24,12 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
     setValue,
     reset,
     formState: { errors },
-  } = useForm<Client>({ defaultValues: selectedClient as unknown as Client });
+  } = useForm<Client>({
+    defaultValues: {
+      ...selectedClient,
+      hasLoan: Number(selectedClient.renewInDays) > 0,
+    } as unknown as Client,
+  });
 
   const verifyPhoneNumber = (value: string) => {
     if (!value.startsWith("+")) {
@@ -37,7 +43,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
 
   const onSubmit: SubmitHandler<Client> = async (data) => {
     let values = data;
-    const api = new GetApiMethod();
+    const api = new ApiMethodClient();
     try {
       if (data.district === "null") {
         values = {
@@ -45,10 +51,10 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           district: null,
           whatsAppNumber: verifyPhoneNumber(data.whatsAppNumber),
         };
-        console.log(values);
       }
       if (selectedClient._id !== "") {
-        console.log(values);
+        await api.updateClient(selectedClient._id, values);
+        return toast.success("Cliente editado exitosamente");
       }
       await api.registerClient(values);
       toast.success("Cliente registrado exitosamente");
@@ -217,13 +223,16 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           errors={errors.fullName}
           required
         />
-        <Input
-          label="Datos de Factura"
-          name="billingInfo.name"
-          register={register}
-          errors={errors.billingInfo?.name}
-          required
-        />
+        {selectedClient._id === "" && (
+          <Input
+            label="Datos de Factura"
+            name="billingInfo.name"
+            register={register}
+            errors={errors.billingInfo?.name}
+            required
+          />
+        )}
+
         <Input
           label="Numero de NIT"
           name="billingInfo.NIT"
@@ -231,20 +240,22 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           errors={errors.billingInfo?.NIT}
           required
         />
-        <Input
-          label="Numero de whatsapp"
-          name="whatsAppNumber"
-          register={register}
-          errors={errors.whatsAppNumber}
-          className="pl-24"
-          icon={
-            <div className="flex items-center gap-2 justify-center py-1">
-              <i className="fa-brands fa-square-whatsapp text-green-500"></i>
-              <p className="text-sm">(591)</p>
-            </div>
-          }
-          required
-        />
+        {selectedClient._id === "" && (
+          <Input
+            label="Numero de whatsapp"
+            name="whatsAppNumber"
+            register={register}
+            errors={errors.whatsAppNumber}
+            className="pl-24"
+            icon={
+              <div className="flex items-center gap-2 justify-center py-1">
+                <i className="fa-brands fa-square-whatsapp text-green-500"></i>
+                <p className="text-sm">(591)</p>
+              </div>
+            }
+            required
+          />
+        )}
         <div className="col-span-2 max-sm:col-span-1">
           <Input
             label="Numero de Telefono"
@@ -255,20 +266,28 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
             required
           />
         </div>
-        <Input
-          label="Dirreccion"
-          name="address"
-          register={register}
-          errors={errors.address}
-          required
-        />
-        <Input
-          label="Referencia"
-          name="reference"
-          register={register}
-          errors={errors.reference}
-          required
-        />
+        <div
+          className={` ${
+            selectedClient._id !== "" && "col-span-2 max-sm:col-span-1"
+          } `}
+        >
+          <Input
+            label="Dirreccion"
+            name="address"
+            register={register}
+            errors={errors.address}
+            required
+          />
+        </div>
+        {selectedClient._id === "" && (
+          <Input
+            label="Referencia"
+            name="reference"
+            register={register}
+            errors={errors.reference}
+            required
+          />
+        )}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -406,8 +425,12 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
           />
         )}
         <div className="w-full col-span-2 max-sm:col-span-1">
-          <h1>Selecciona una ubicación en el mapa</h1>
+          <h1 className="text-sm font-medium">
+            Selecciona una ubicación en el mapa
+          </h1>
           <GoogleMapWithSelection
+            latitude={Number(watch("location.latitude"))}
+            longitude={Number(watch("location.longitude"))}
             onChange={(coordinates: { lat: number; lng: number }) => {
               setValue("location.latitude", `${coordinates.lat}`);
               setValue("location.longitude", `${coordinates.lng}`);

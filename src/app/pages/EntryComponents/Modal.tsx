@@ -37,7 +37,7 @@ const Modal: FunctionComponent<ModalProps> = ({
             animate={{ opacity: 1, right: 0, position: "relative" }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0 }}
-            className={`${className}  w-4/12 max-sm:w-10/12 modal-content bg-white p-0 text-black rounded-lg z-50 relative shadow-md overflow-auto max-h-[90vh]`}
+            className={`${className}  w-4/12 max-sm:w-10/12  bg-white p-0 text-black rounded-lg z-50 relative shadow-md overflow-auto max-h-[90vh]`}
           >
             <div className="absolute top-0 right-0 p-2 pt-4 z-50 font-bold flex justify-end">
               <button onClick={closeModal} className="flex justify-end">
