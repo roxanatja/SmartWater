@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 import { memo, useState } from "react";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from "../../SmartwaterWrapper";
 
 interface ImageUploadFieldProps {
   watchField: any;
@@ -12,6 +10,24 @@ interface ImageUploadFieldProps {
   errors: any;
 }
 
+const saveImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append(
+    "upload_preset",
+    `${process.env.REACT_APP_API_UPLOAD_PRESENT}`
+  );
+  formData.append("api_key", `${process.env.REACT_APP_API_UPLOAD_KEY}`);
+
+  const response = await fetch(`${process.env.REACT_APP_API_UPLOAD_FILE}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const responseData = await response.json();
+  return responseData;
+};
+
 const ImageUploadField = memo<ImageUploadFieldProps>(
   ({ watchField, fieldName, label, register, setValue, errors }) => {
     const [active, setActive] = useState(false);
@@ -21,25 +37,18 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
       const file = e.target.files?.[0];
       if (file) {
         setUploading(true);
-        const storageRef = ref(storage, `images/${fieldName}/${file.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
 
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            // Puedes manejar el progreso aquí si lo deseas
-          },
-          (error) => {
-            console.error("Error uploading file:", error);
-            setUploading(false);
-          },
-          async () => {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            setValue(fieldName, downloadURL);
-            setActive(true);
-            setUploading(false);
-          }
-        );
+        try {
+          const uploadResponse = await saveImage(file);
+          const downloadURL = uploadResponse.secure_url;
+
+          setValue(fieldName, downloadURL);
+          setActive(true);
+        } catch (error) {
+          console.error("Error uploading to Cloudinary:", error);
+        } finally {
+          setUploading(false);
+        }
       }
     };
 
@@ -57,11 +66,11 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
         >
           <img
             src={watchField(fieldName) || ""}
-            alt=""
+            alt="uploaded"
             className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] shadow-md bg-zinc-300"
           />
           <div className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] bg-zinc-800/50 absolute top-0 z-10 scale-0 group-hover:scale-100" />
-          {!active && !uploading && (
+          {!active && !uploading && !watchField(fieldName) && (
             <div className="absolute flex flex-col gap-4">
               <i className="fas fa-image text-9xl max-sm:text-8xl z-10 text-zinc-600"></i>
               <p className="text-sm tracking-wider max-sm:text-xs">{label}</p>

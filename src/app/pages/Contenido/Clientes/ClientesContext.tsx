@@ -18,6 +18,45 @@ type ClientesContextType = {
   setToDate: React.Dispatch<React.SetStateAction<Date | null>>; // Nueva función
 };
 
+export const client: Client = {
+  // Tu objeto de cliente
+  _id: "",
+  code: "",
+  user: "",
+  storeImage: "",
+  fullName: "",
+  phoneNumber: "",
+  address: "",
+  comment: "",
+  email: "",
+  ciFrontImage: "",
+  ciBackImage: "",
+  zone: "",
+  district: "",
+  location: {
+    latitude: "",
+    longitude: "",
+  },
+  hasOrder: false,
+  hasLoan: true,
+  hasContract: false,
+  renewInDays: 1,
+  renewDate: "",
+  isClient: true,
+  isAgency: true,
+  billingInfo: {
+    NIT: "",
+    phoneNumber: "",
+  },
+  averageRenewal: false,
+  contracts: [],
+  created: "",
+  updated: "",
+  lastSale: "",
+  hasExpiredContract: false,
+  credit: 1,
+};
+
 export const ClientesContext = createContext<ClientesContextType>(
   {} as ClientesContextType
 );
@@ -30,44 +69,6 @@ export const ClientesProvider = ({ children }: any) => {
   const [fromDate, setFromDate] = useState<Date | null>(null); // Inicialización de estado
   const [toDate, setToDate] = useState<Date | null>(null); // Inicialización de estado
 
-  const client: Client = {
-    // Tu objeto de cliente
-    _id: "",
-    code: "",
-    user: "",
-    storeImage: "",
-    fullName: "",
-    phoneNumber: "",
-    address: "",
-    comment: "",
-    email: "",
-    ciFrontImage: "",
-    ciBackImage: "",
-    zone: "",
-    district: "",
-    location: {
-      latitude: "",
-      longitude: "",
-    },
-    hasOrder: false,
-    hasLoan: true,
-    hasContract: false,
-    renewInDays: 1,
-    renewDate: "",
-    isClient: true,
-    isAgency: true,
-    billingInfo: {
-      NIT: "",
-      phoneNumber: "",
-    },
-    averageRenewal: false,
-    contracts: [],
-    created: "",
-    updated: "",
-    lastSale: "",
-    hasExpiredContract: false,
-    credit: 1,
-  };
   const [selectedClient, setSelectedClient] = useState<Client>(client);
 
   return (

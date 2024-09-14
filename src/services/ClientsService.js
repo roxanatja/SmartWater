@@ -3,7 +3,6 @@ import smartwaterApi from "../api/SmartWaterApi";
 export const loadClients = async () => {
     try {
         const { data } = await smartwaterApi.get('/clients?pageSize=3000');
-
         return data;
     } catch (e) {
         console.error(e);
@@ -13,7 +12,7 @@ export const loadClients = async () => {
 export const GetClientById = async (id) => {
     try {
         const { data } = await smartwaterApi.get(`/clients/${id}`);
-
+        console.log(data);
         return data;
     } catch (e) {
         console.error(e);

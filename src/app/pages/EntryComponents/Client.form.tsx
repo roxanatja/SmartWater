@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Input from "./Inputs";
 import { motion } from "framer-motion";
 import ImageUploadField from "./ImageUploadField";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import GoogleMapWithSelection from "./GoogleInputMap";
-import { storage } from "../../SmartwaterWrapper";
 import GetApiMethod from "../../../Class/api.class";
-import { City, District, Client } from "../../../Class/types.data";
+import { Client, District, Zone } from "../../../Class/types.data";
+import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 
-const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
-  const [city, setCity] = useState<City[]>([]);
+const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
+  const [city, setCity] = useState<Zone[]>([]);
   const [disti, setDisti] = useState<District[]>([]);
   const [date, setDate] = useState(false);
   const [date2, setDate2] = useState(false);
@@ -21,19 +20,37 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<Client>();
+  const { selectedClient } = useContext(ClientesContext);
+
+  const verifyPhoneNumber = (value: string) => {
+    if (!value.startsWith("+")) {
+      var newValue = "+" + value;
+
+      return newValue;
+    } else {
+      return value;
+    }
+  };
 
   const onSubmit: SubmitHandler<Client> = async (data) => {
-    const api = new GetApiMethod();
     let values = data;
+    const api = new GetApiMethod();
     try {
       if (data.district === "null") {
-        values = { ...data, district: null };
+        values = {
+          ...data,
+          district: null,
+          whatsAppNumber: verifyPhoneNumber(data.whatsAppNumber),
+        };
         console.log(values);
       }
-      const response = await api.registerClient(values);
-      console.log(response);
+      if (selectedClient._id !== "") {
+        console.log(values);
+      }
+      await api.registerClient(values);
       toast.success("Cliente registrado exitosamente");
     } catch (error) {
       console.error(error);
@@ -43,9 +60,12 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
 
   const getCitys = useCallback(async () => {
     const api = new GetApiMethod();
-    const data = await api.getCities();
+    const data = await api.getZone();
     setCity(data);
-  }, []);
+    let d = data[0];
+    setValue("zone", d._id);
+    setDisti(d.districts);
+  }, [setValue]);
 
   useEffect(() => {
     getCitys();
@@ -76,20 +96,50 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
   };
 
   useEffect(() => {
-    setValue("isClient", true);
-    setValue("isAgency", false);
-    setValue("hasLoan", true);
-    setValue("hasOrder", false);
-    // setValue("renewInDays", "");
-    // setValue("renewInDaysNumber", "");
-    setValue("zone", city?.[0]?._id);
-    setValue("address", "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setValue]);
+    if (selectedClient._id !== "") {
+      const api = new GetApiMethod();
+      const fetchClient = async () => {
+        try {
+          const response = await api.GetClientById(selectedClient._id);
+          reset(response);
+          console.log("Valores asignados:", watch());
+        } catch (error) {
+          console.error("Error fetching client:", error);
+        }
+      };
+      fetchClient();
+    } else {
+      setValue("isClient", true);
+      setValue("isAgency", false);
+      setValue("hasLoan", true);
+      setValue("hasOrder", false);
+      setValue("renewInDays", 0);
+      setValue("renewInDaysNumber", "");
+      setValue("address", "");
+    }
+  }, [reset, selectedClient, selectedClient._id, setValue]);
 
   const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(
     watch("address")
   )}`;
+
+  const saveImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append(
+      "upload_preset",
+      `${process.env.REACT_APP_API_UPLOAD_PRESENT}`
+    );
+    formData.append("api_key", `${process.env.REACT_APP_API_UPLOAD_KEY}`);
+
+    const response = await fetch(`${process.env.REACT_APP_API_UPLOAD_FILE}`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const responseData = await response.json();
+    return responseData;
+  };
 
   return (
     <form
@@ -124,33 +174,20 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
               className="absolute top-0 h-full w-full left-0 z-30 opacity-0 cursor-pointer"
               type="file"
               accept="image/jpeg,image/jpg"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
                   setUploading(true);
-                  const storageRef = ref(
-                    storage,
-                    `images/clientImage/${file.name}`
-                  );
-                  const uploadTask = uploadBytesResumable(storageRef, file);
+                  try {
+                    const uploadResponse = await saveImage(file);
+                    const downloadURL = uploadResponse.secure_url;
 
-                  uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                      // Puedes manejar el progreso aquí si lo deseas
-                    },
-                    (error) => {
-                      console.error("Error uploading file:", error);
-                      setUploading(false);
-                    },
-                    async () => {
-                      const downloadURL = await getDownloadURL(
-                        uploadTask.snapshot.ref
-                      );
-                      setValue("clientImage", downloadURL);
-                      setUploading(false);
-                    }
-                  );
+                    setValue("clientImage", downloadURL);
+                  } catch (error) {
+                    console.error("Error uploading to Cloudinary:", error);
+                  } finally {
+                    setUploading(false);
+                  }
                 }
               }}
               required={!watch("clientImage")}
@@ -243,7 +280,12 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
           className="col-span-2 max-sm:col-span-1 flex gap-1 items-center"
         >
           <i className="fa-solid fa-location-dot"></i>
-          <a href={googleMapsUrl} target="_blank" className="text-sm underline">
+          <a
+            href={googleMapsUrl}
+            target="_blank"
+            className="text-sm underline"
+            rel="noreferrer"
+          >
             Ver ubicacion en Google Maps
           </a>
         </motion.div>
@@ -260,8 +302,8 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
               required: "se requiere una zona",
               onChange: (e) => {
                 const da = city.find((x) => x._id === e.target.value);
-                if (da && da.districtsId.length > 0) {
-                  setDisti(da.districtsId);
+                if (da && da.districts.length > 0) {
+                  setDisti(da.districts);
                 } else {
                   setDisti([]);
                 }
@@ -269,11 +311,12 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black"
           >
-            {city.map((city, index) => (
-              <option value={city._id} key={index}>
-                {city.name}
-              </option>
-            ))}
+            {city.length > 0 &&
+              city.map((city, index) => (
+                <option value={city._id} key={index}>
+                  {city.name}
+                </option>
+              ))}
           </select>
           {errors.zone && (
             <span className="text-red-500 font-normal text-sm font-pricedown">
@@ -294,7 +337,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
             {...register("district")}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black"
           >
-            {disti.length > 0 ? (
+            {disti && disti.length > 0 ? (
               disti.map((row, index) => (
                 <option value={row._id} key={index}>
                   {row.name}
@@ -387,7 +430,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
                   handleCheckboxChangeReno("hasLoan");
                 }}
                 className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${
-                  watch("renewInDays") === ""
+                  watch("renewInDays") === 0
                     ? `text-zinc-300 hover:text-blue-900`
                     : "text-blue-900"
                 }`}
@@ -421,12 +464,13 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
           </div>
           {date && (
             <Input
-              type="date"
+              type="number"
               label="Periodo Renovacion"
               register={register}
-              name="fgdg"
+              name="renewInDays"
+              numericalOnly
               isVisibleLable
-              className="absolute w-44 -top-9 -translate-y-0.5 bg-white left-9"
+              className="absolute w-48 -top-9 -translate-y-0.5 bg-white left-9"
               errors={errors.renewInDays}
               required={date}
             />
@@ -499,8 +543,11 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void }) => {
           >
             Cancelar
           </button>
-          <button className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate">
-            Registrar cliente
+          <button
+            type="submit"
+            className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
+          >
+            {selectedClient._id !== "" ? "Editar" : "Registrar"} cliente
           </button>
         </div>
       </div>

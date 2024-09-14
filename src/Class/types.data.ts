@@ -9,6 +9,7 @@ export interface BillingInfo {
 }
 
 export interface Client {
+  _id?: string;
   user: string;
   isClient: boolean;
   storeImage: string;
@@ -35,7 +36,7 @@ export interface Client {
   hasOrder: boolean;
   hasContract: boolean;
   lastAttenderOrder: string;
-  renewInDays: string;
+  renewInDays: number;
   credit: string;
   billingInfo: BillingInfo;
   whatsAppNumber: string;
@@ -59,4 +60,10 @@ export interface City {
   updated: string;
   __v: number;
   districtsId: District[];
+}
+
+export interface Zone {
+  _id: string;
+  name: string;
+  districts: Array<District>;
 }

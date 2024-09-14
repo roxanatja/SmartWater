@@ -5,7 +5,7 @@ import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { AgregarCliente } from "./AgregarCliente/AgregarCliente";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
-import { ClientesContext } from "./ClientesContext";
+import { ClientesContext, client } from "./ClientesContext";
 import { FilterContext } from "../../components/FilterContexr/FilterContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
@@ -14,8 +14,15 @@ import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
 
 const Clientes: FC = () => {
-  const { showModal, setShowModal, showMiniModal, showFiltro, setShowFiltro } =
-    useContext(ClientesContext);
+  const {
+    showModal,
+    setShowModal,
+    showMiniModal,
+    showFiltro,
+    setShowFiltro,
+    selectedClient,
+    setSelectedClient,
+  } = useContext(ClientesContext);
   const {
     applicatedFilters,
     fromDate,
@@ -249,6 +256,16 @@ const Clientes: FC = () => {
           Registrar Cliente
         </h2>
         <ClientForm onCancel={() => setShowModal(false)} />
+      </Modal>
+
+      <Modal
+        isOpen={selectedClient._id !== "" ? true : false}
+        onClose={() => setSelectedClient(client)}
+      >
+        <h2 className="text-blue-900 font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Editar Cliente
+        </h2>
+        <ClientForm onCancel={() => setSelectedClient(client)} />
       </Modal>
 
       {showMiniModal && <OpcionesClientes />}

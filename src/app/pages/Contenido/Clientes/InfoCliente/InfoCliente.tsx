@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./InfoCliente.css";
-import { ClientEdit } from "../EditClient/EditClient";
 import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
@@ -12,14 +11,15 @@ import CobroPopUp from "../../../components/CashRegister/CashRegister";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
-  const navigate = useNavigate();
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [zone, setZone] = useState<string>("");
   const [date, setDate] = useState<string>();
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false); // Agregado el estado para el Pop-Up
   const location = client.location;
-  const url = `https://www.google.com/maps/place/${location.latitude} ${location.longitude}`;
+  const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${
+    location?.longitude || ""
+  }`;
 
   useEffect(() => {
     const getZone = async () => {
@@ -52,7 +52,6 @@ const InfoCliente = (client: Client) => {
 
   const Edit = () => {
     setSelectedClient(client);
-    navigate("/Clientes/EditarCliente");
     setShowOptions(false);
   };
 
