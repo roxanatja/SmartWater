@@ -3,7 +3,6 @@ import moment from "moment";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
-import { AgregarCliente } from "./AgregarCliente/AgregarCliente";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
 import { ClientesContext, client } from "./ClientesContext";
 import { FilterContext } from "../../components/FilterContexr/FilterContext";
@@ -238,14 +237,7 @@ const Clientes: FC = () => {
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            justifyContent: "start",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="grid grid-cols-2 gap-4">
           {currentData.map((client: Client) => (
             <InfoCliente key={client._id} {...client} />
           ))}

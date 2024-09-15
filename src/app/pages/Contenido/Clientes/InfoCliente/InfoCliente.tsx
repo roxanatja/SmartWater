@@ -79,9 +79,9 @@ const InfoCliente = (client: Client) => {
 
   return (
     <>
-      <div className="infoClientes-container">
+      <div className="infoClientes-container relative">
         <div className="infoClientes-header">
-          <div className="infoClientes-datoscontainer">
+          <div className="flex justify-between w-8/12">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
               {client.storeImage && client.storeImage.length > 1 ? (
                 <img
