@@ -65,7 +65,10 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
     };
 
     const initMap = async () => {
-      let initialPosition = { lat: 18.4861, lng: -69.9312 }; // Default a Santo Domingo
+      let initialPosition = {
+        lat: -16.702358987690342,
+        lng: -64.8647109444175,
+      }; // Default a Santo Domingo
 
       try {
         initialPosition = await getCurrentLocation();
