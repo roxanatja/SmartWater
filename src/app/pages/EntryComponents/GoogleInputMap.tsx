@@ -4,51 +4,56 @@ type GoogleMapWithSelectionProps = {
   onChange: (coordinates: { lat: number; lng: number }) => void;
   latitude?: number;
   longitude?: number;
+  visible: boolean; // Estado de visibilidad del modal
 };
 
 const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   onChange,
   latitude,
   longitude,
+  visible, // Recibe la prop visible del modal
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const apiKey = `${process.env.REACT_APP_API_GOOGLE}`;
 
-  const getCurrentLocation = () =>
-    new Promise<{ lat: number; lng: number }>((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            resolve({ lat: latitude, lng: longitude });
-          },
-          () => reject("No se pudo obtener la ubicación.")
-        );
-      } else {
-        reject("Geolocalización no soportada por el navegador.");
-      }
-    });
+  // Mover el callback fuera del efecto para evitar cambios infinitos
+  const getCurrentLocation = useCallback(
+    () =>
+      new Promise<{ lat: number; lng: number }>((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              resolve({ lat: latitude, lng: longitude });
+            },
+            () => reject("No se pudo obtener la ubicación.")
+          );
+        } else {
+          reject("Geolocalización no soportada por el navegador.");
+        }
+      }),
+    []
+  );
 
+  // Simplificar centerMap y updateMarkerPosition para evitar dependencias cambiantes
   const centerMap = useCallback(
     (position: { lat: number; lng: number }) => {
       if (map) {
         map.setCenter(position);
-        onChange(position);
       }
     },
-    [map, onChange]
+    [map]
   );
 
   const updateMarkerPosition = useCallback(
     (position: google.maps.LatLng | null) => {
       if (position && marker) {
         marker.setPosition(position);
-        onChange({ lat: position.lat(), lng: position.lng() });
       }
     },
-    [marker, onChange]
+    [marker]
   );
 
   useEffect(() => {
@@ -68,7 +73,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       let initialPosition = {
         lat: -16.702358987690342,
         lng: -64.8647109444175,
-      }; // Default a Santo Domingo
+      };
 
       try {
         initialPosition = await getCurrentLocation();
@@ -103,7 +108,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
               lng: center.lng(),
             };
             centerMarker.setPosition(center);
-            onChange(newPosition);
+            onChange(newPosition); // Solo llamar cuando cambia
           }
         });
 
@@ -121,7 +126,6 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         locationButton.addEventListener("click", async () => {
           try {
             const currentPosition = await getCurrentLocation();
-            console.log("Ubicación actual:", currentPosition); // Debug
             mapInstance.setCenter(currentPosition);
             updateMarkerPosition(
               new google.maps.LatLng(currentPosition.lat, currentPosition.lng)
@@ -133,8 +137,18 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       }
     };
 
-    loadGoogleMapsScript();
-  }, [apiKey, map, onChange, centerMap, updateMarkerPosition]);
+    if (visible && !map) {
+      loadGoogleMapsScript();
+    }
+
+    if (visible && map) {
+      google.maps.event.trigger(map, "resize");
+      if (latitude !== undefined && longitude !== undefined) {
+        map.setCenter({ lat: latitude, lng: longitude });
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, visible]);
 
   useEffect(() => {
     if (map && latitude !== undefined && longitude !== undefined) {
@@ -142,8 +156,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       centerMap(position);
       updateMarkerPosition(new google.maps.LatLng(latitude, longitude));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [map, latitude, longitude, centerMap, updateMarkerPosition]);
 
   return (
     <div style={{ position: "relative" }} className="rounded-lg">

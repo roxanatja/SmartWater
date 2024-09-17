@@ -10,7 +10,13 @@ import { Client, District, Zone } from "../../../Class/types.data";
 import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import ApiMethodClient from "../../../Class/api.client";
 
-const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
+const ClientForm = ({
+  isOpen,
+  onCancel,
+}: {
+  onCancel?: () => void;
+  isOpen: boolean;
+}) => {
   const [city, setCity] = useState<Zone[]>([]);
   const [disti, setDisti] = useState<District[]>([]);
   const [date, setDate] = useState(false);
@@ -429,6 +435,7 @@ const ClientForm = ({ onCancel }: { onCancel?: () => void; id?: string }) => {
             Selecciona una ubicación en el mapa
           </h1>
           <GoogleMapWithSelection
+            visible={isOpen}
             latitude={Number(watch("location.latitude"))}
             longitude={Number(watch("location.longitude"))}
             onChange={(coordinates: { lat: number; lng: number }) => {

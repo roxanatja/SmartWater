@@ -248,7 +248,7 @@ const Clientes: FC = () => {
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
           Registrar Cliente
         </h2>
-        <ClientForm onCancel={() => setShowModal(false)} />
+        <ClientForm isOpen={showModal} onCancel={() => setShowModal(false)} />
       </Modal>
 
       <Modal
@@ -260,7 +260,12 @@ const Clientes: FC = () => {
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
           Editar Cliente
         </h2>
-        <ClientForm onCancel={() => setSelectedClient(client)} />
+        <ClientForm
+          isOpen={
+            selectedClient._id !== "" && showMiniModal === false ? true : false
+          }
+          onCancel={() => setSelectedClient(client)}
+        />
       </Modal>
 
       <Modal
