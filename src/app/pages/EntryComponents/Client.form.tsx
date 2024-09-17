@@ -262,16 +262,20 @@ const ClientForm = ({
             required
           />
         )}
-        <div className="col-span-2 max-sm:col-span-1">
-          <Input
-            label="Numero de Telefono"
-            name="phoneNumber"
-            register={register}
-            icon={<i className="fa-solid fa-phone"></i>}
-            errors={errors.phoneNumber}
-            required
-          />
-        </div>
+        <Input
+          label="Numero de Telefono"
+          name="phoneNumber"
+          register={register}
+          icon={<i className="fa-solid fa-phone"></i>}
+          errors={errors.phoneNumber}
+          required
+        />
+        <Input
+          label="Correo Electronico"
+          name="email"
+          register={register}
+          icon={<i className="fa-solid fa-envelope"></i>}
+        />
         <div
           className={` ${
             selectedClient._id !== "" && "col-span-2 max-sm:col-span-1"
@@ -294,6 +298,15 @@ const ClientForm = ({
             required
           />
         )}
+        <div className="col-span-2 max-sm:col-span-1">
+          <Input
+            label="Enlace de ubicación"
+            name="linkAddress"
+            placeholder="(Opcional)"
+            register={register}
+            icon={<i className="fa-solid fa-location-dot"></i>}
+          />
+        </div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -436,6 +449,7 @@ const ClientForm = ({
           </h1>
           <GoogleMapWithSelection
             visible={isOpen}
+            linkAddress={watch("linkAddress")}
             latitude={Number(watch("location.latitude"))}
             longitude={Number(watch("location.longitude"))}
             onChange={(coordinates: { lat: number; lng: number }) => {

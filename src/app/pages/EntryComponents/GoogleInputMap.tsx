@@ -4,14 +4,16 @@ type GoogleMapWithSelectionProps = {
   onChange: (coordinates: { lat: number; lng: number }) => void;
   latitude?: number;
   longitude?: number;
-  visible: boolean; // Estado de visibilidad del modal
+  visible: boolean;
+  linkAddress?: string;
 };
 
 const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   onChange,
   latitude,
   longitude,
-  visible, // Recibe la prop visible del modal
+  visible,
+  linkAddress,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -108,7 +110,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
               lng: center.lng(),
             };
             centerMarker.setPosition(center);
-            onChange(newPosition); // Solo llamar cuando cambia
+            onChange(newPosition);
           }
         });
 
@@ -147,8 +149,8 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         map.setCenter({ lat: latitude, lng: longitude });
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, visible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey, getCurrentLocation, map, updateMarkerPosition, visible]);
 
   useEffect(() => {
     if (map && latitude !== undefined && longitude !== undefined) {
@@ -157,6 +159,90 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       updateMarkerPosition(new google.maps.LatLng(latitude, longitude));
     }
   }, [map, latitude, longitude, centerMap, updateMarkerPosition]);
+
+  const getCoordinatesFromLink = useCallback(
+    async (link: string): Promise<{ lat: number; lng: number } | null> => {
+      try {
+        const url = new URL(link);
+        const params = url.searchParams.get("q");
+
+        if (params) {
+          const [lat, lng] = params.split(",").map(Number);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            return { lat, lng };
+          }
+        }
+
+        // Manejo de URLs de Google Maps con formato @lat,lng
+        const path = url.pathname;
+        const match = path.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (match) {
+          const [, lat, lng] = match;
+          return { lat: parseFloat(lat), lng: parseFloat(lng) };
+        }
+      } catch (error) {
+        console.error("Error al analizar el enlace:", error);
+      }
+      return null;
+    },
+    []
+  );
+
+  const getCoordinatesFromAddress = async (
+    address: string
+  ): Promise<{ lat: number; lng: number } | null> => {
+    const apiKey = process.env.REACT_APP_API_GOOGLE;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+      address
+    )}&key=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === "OK" && data.results[0]) {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      }
+    } catch (error) {
+      console.error("Error al obtener coordenadas:", error);
+    }
+    return null;
+  };
+
+  // Uso en tu componente
+  useEffect(() => {
+    if (linkAddress) {
+      const fetchCoordinates = async () => {
+        const coordinates = await getCoordinatesFromAddress(linkAddress);
+        if (coordinates && map) {
+          console.log(coordinates);
+          centerMap(coordinates);
+          updateMarkerPosition(
+            new google.maps.LatLng(coordinates.lat, coordinates.lng)
+          );
+          onChange(coordinates);
+        }
+      };
+      fetchCoordinates();
+    }
+  }, [linkAddress, map, centerMap, updateMarkerPosition, onChange]);
+
+  useEffect(() => {
+    if (linkAddress) {
+      getCoordinatesFromLink(linkAddress).then(
+        (coordinates: { lat: number; lng: number } | null) => {
+          if (coordinates && map) {
+            centerMap(coordinates);
+            updateMarkerPosition(
+              new google.maps.LatLng(coordinates.lat, coordinates.lng)
+            );
+            onChange(coordinates);
+          }
+        }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkAddress, map, centerMap, updateMarkerPosition]);
 
   return (
     <div style={{ position: "relative" }} className="rounded-lg">

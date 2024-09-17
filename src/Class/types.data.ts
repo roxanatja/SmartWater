@@ -41,6 +41,7 @@ export interface Client {
   billingInfo: BillingInfo;
   whatsAppNumber: string;
   isAgency: boolean;
+  linkAddress?: string;
 }
 
 export interface District {
