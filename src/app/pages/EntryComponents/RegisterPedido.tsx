@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
 
-const RegisterPedido = () => {
+const RegisterPedidoForm = () => {
   const { selectedClient } = useContext(ClientesContext);
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
@@ -78,9 +78,9 @@ const RegisterPedido = () => {
     console.log(values);
     try {
       await api.saveOrder(values);
-      toast.success("Venta registrada");
+      toast.success("Pedido registrado");
     } catch (error) {
-      toast.error("Upss error al registrar venta");
+      toast.error("Upss error al registrar pedido");
       console.error(error);
     }
     setActive(false);
@@ -110,6 +110,7 @@ const RegisterPedido = () => {
           <div className="RegistrarPedido-AgregarProductoTitulo">
             <span>Agregar producto</span>
             <button
+              type="button"
               onClick={handleOpcionesClick}
               className={
                 opcionesVisibles
@@ -211,4 +212,4 @@ const RegisterPedido = () => {
   );
 };
 
-export default RegisterPedido;
+export default RegisterPedidoForm;
