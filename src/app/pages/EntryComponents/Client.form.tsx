@@ -298,15 +298,17 @@ const ClientForm = ({
             required
           />
         )}
-        <div className="col-span-2 max-sm:col-span-1">
-          <Input
-            label="Enlace de ubicación"
-            name="linkAddress"
-            placeholder="(Opcional)"
-            register={register}
-            icon={<i className="fa-solid fa-location-dot"></i>}
-          />
-        </div>
+        {selectedClient._id === "" && (
+          <div className="col-span-2 max-sm:col-span-1">
+            <Input
+              label="Enlace de ubicación"
+              name="linkAddress"
+              placeholder="(Opcional)"
+              register={register}
+              icon={<i className="fa-solid fa-location-dot"></i>}
+            />
+          </div>
+        )}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

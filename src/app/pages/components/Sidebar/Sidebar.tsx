@@ -1,26 +1,63 @@
 import { AsideItem } from "../AsideMenu/AsideItem";
 import { AsideSubMenu } from "../AsideSubMenu/AsideSubMenu";
 import "./Sidebar.css";
-import { FC } from "react";
+import { FC, useEffect, useRef, useState } from "react"; // Importar useState
 import AuthenticationService from "../../../../services/AuthenService";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar: FC = () => {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     AuthenticationService.logout();
     navigate("users/login");
   };
+
+  // Función para alternar el menú
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
-      <div className="Sidebar scrool">
+      {/* Botón de toggle para pantallas móviles con Font Awesome */}
+      <button
+        className="md:hidden text-white bg-blue_custom py-2 z-50 px-4 m-2 fixed -top-2 -left-2"
+        onClick={toggleMenu}
+      >
+        {/* Icono de hamburguesa de Font Awesome */}
+        <i className={`fas ${isOpen ? "fa-times" : "fa-bars"} text-2xl`}></i>
+      </button>
+
+      {/* Menú lateral */}
+      <div
+        ref={menuRef}
+        className={`Sidebar scrool bg-blue_custom text-white fixed z-50 inset-y-0 left-0 w-64 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out md:static md:translate-x-0`}
+      >
         <div className="Logo">
           <span className="smart">Smart</span>
           <span className="water">water</span>
         </div>
         <div>
-          <ul style={{ display: "flex", flexDirection: "column", gap: "17px" }}>
+          <ul className="flex flex-col gap-4 py-4 w-full">
             <AsideItem
               tituloItem="Inicio"
               to="/Inicio"
@@ -127,19 +164,10 @@ const Sidebar: FC = () => {
           </ul>
         </div>
 
-        <div
-          style={{
-            width: "100%",
-            display: "inline-flex",
-            justifyContent: "center",
-            alignItems: "end",
-            marginTop: "120px",
-            marginBottom: "30px",
-          }}
-        >
+        <div className="flex justify-center items-end mt-24 mb-6">
           <button className="btn-salir" onClick={handleLogout}>
-            <div style={{ display: "inline-flex", justifyContent: "center" }}>
-              <img src="../../../Salir-icon.svg" alt="" />
+            <div className="inline-flex justify-center">
+              <img src="../../../Salir-icon.svg" alt="Salir" />
             </div>
             <span>Salir</span>
           </button>

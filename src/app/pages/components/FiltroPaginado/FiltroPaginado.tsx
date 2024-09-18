@@ -510,8 +510,11 @@ const FiltroPaginado: FC<Componentes> = ({
 
   return (
     <>
-      <div className="flex justify-center flex-col pt-10 w-full">
-        <div style={{ width: "100%", display: "flex" }}>
+      <div className="flex justify-center flex-col pt-10 w-full ">
+        <div
+          style={{ width: "100%", display: "flex" }}
+          className="max-sm:flex-col"
+        >
           <div className="w-full">
             <form className="" onSubmit={(e) => e.preventDefault()}>
               <div className="relative w-full">
@@ -544,7 +547,7 @@ const FiltroPaginado: FC<Componentes> = ({
               </div>
             </form>
             {resultados && (
-              <div className="flex justify-end items-center gap-4 py-3 pb-6">
+              <div className="flex justify-end items-center gap-4 py-3 pb-6 max-sm:flex-col max-sm:items-start">
                 <div className="resultado-busqueda">
                   <span>Resultados:</span>
                   <span style={{ color: "#1A3D7D" }}> {total}</span>
@@ -588,7 +591,7 @@ const FiltroPaginado: FC<Componentes> = ({
               </div>
             )}
           </div>
-          <div className="flex w-4/12 items-center pt-2 justify-center h-full">
+          <div className="flex w-4/12 items-center pt-2 justify-center h-full max-sm:flex-col max-sm:pb-4 max-sm:w-full">
             <div className="flex justify-between items-center w-full pl-4">
               {filtro && (
                 <div className="w-full">
@@ -819,7 +822,7 @@ const FiltroPaginado: FC<Componentes> = ({
             </div>
           </div>
         )}
-        <div className="overflow-scroll max-h-[70vh]">{children}</div>
+        <div className="overflow-y-scroll max-h-[70vh]">{children}</div>
         <div className="flex justify-between bg-transparent sticky bottom-0">
           {exportar && (
             <div className="flex flex-col justify-center items-center -translate-y-5">

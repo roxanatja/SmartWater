@@ -14,7 +14,9 @@ interface InputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   numericalOnly?: boolean;
   isText?: boolean;
+  button?: React.ReactNode;
   icon?: React.ReactNode;
+  onClick?(): void;
   [key: string]: any;
 }
 
@@ -32,6 +34,8 @@ const Input = memo<InputProps>(
     icon,
     isVisibleLable,
     isText,
+    button,
+    onClick,
     ...rest
   }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +123,14 @@ const Input = memo<InputProps>(
                 !isText && "text-sm"
               }  p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
             />
+            {button && (
+              <button
+                className="absolute ps-4 py-1.5 bg-blue-500 text-white rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
+                onClick={onClick}
+              >
+                {button}
+              </button>
+            )}
           </div>
         )}
         {errors && (

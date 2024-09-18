@@ -11,6 +11,7 @@ import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
+import RegisterSalesForm from "../../EntryComponents/RegisterSalesForm";
 
 const Clientes: FC = () => {
   const {
@@ -22,6 +23,8 @@ const Clientes: FC = () => {
     selectedClient,
     setShowMiniModal,
     setSelectedClient,
+    registerSale,
+    setRegisterSale,
   } = useContext(ClientesContext);
   const {
     applicatedFilters,
@@ -237,7 +240,7 @@ const Clientes: FC = () => {
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
       >
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
           {currentData.map((client: Client) => (
             <InfoCliente key={client._id} {...client} />
           ))}
@@ -252,9 +255,7 @@ const Clientes: FC = () => {
       </Modal>
 
       <Modal
-        isOpen={
-          selectedClient._id !== "" && showMiniModal === false ? true : false
-        }
+        isOpen={selectedClient._id !== "" && !showMiniModal && !registerSale}
         onClose={() => setSelectedClient(client)}
       >
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
@@ -282,6 +283,19 @@ const Clientes: FC = () => {
         <div className="p-6">
           <OpcionesClientes />
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={registerSale}
+        onClose={() => {
+          setSelectedClient(client);
+          setRegisterSale(false);
+        }}
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 -translate-y-2 bg-white">
+          Registrar Ventas
+        </h2>
+        <RegisterSalesForm />
       </Modal>
       {showFiltro && <FiltroClientes />}
     </>

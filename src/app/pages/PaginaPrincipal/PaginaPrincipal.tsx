@@ -36,9 +36,9 @@ const PaginaPrincipal: FC = () => {
   return (
     <>
       <Router>
-        <div style={{ display: "flex" }}>
+        <div className="flex">
           <Sidebar />
-          <div className="Contenedor">
+          <div className="Contenedor max-sm:w-full">
             <Routes>
               <Route path="/users/login" element={<LoginFormWrapper />} />
 

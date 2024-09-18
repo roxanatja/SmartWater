@@ -16,6 +16,8 @@ type ClientesContextType = {
   setFromDate: React.Dispatch<React.SetStateAction<Date | null>>; // Nueva función
   toDate: Date | null; // Nueva propiedad
   setToDate: React.Dispatch<React.SetStateAction<Date | null>>; // Nueva función
+  registerSale: boolean;
+  setRegisterSale: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const client: Client = {
@@ -65,9 +67,10 @@ export const ClientesProvider = ({ children }: any) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<boolean>(false);
+  const [registerSale, setRegisterSale] = useState<boolean>(false);
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
   const [fromDate, setFromDate] = useState<Date | null>(null); // Inicialización de estado
-  const [toDate, setToDate] = useState<Date | null>(null); // Inicialización de estado
+  const [toDate, setToDate] = useState<Date | null>(null);
 
   const [selectedClient, setSelectedClient] = useState<Client>(client);
 
@@ -88,6 +91,8 @@ export const ClientesProvider = ({ children }: any) => {
         setFromDate,
         toDate,
         setToDate,
+        registerSale,
+        setRegisterSale,
       }}
     >
       {children}

@@ -157,16 +157,25 @@ const RegistrarVenta: FC = () => {
     <>
       <form onSubmit={(e) => e.preventDefault()}>
         <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
-        <div className="RegistrarVenta-titulo">
-          <button className="RegistrarVenta-btn" onClick={handleClick}>
-            <span className="material-symbols-outlined">arrow_back</span>
+        <div
+          className="RegistrarVenta-titulo flex items-start cursor-pointer"
+          onClick={handleClick}
+        >
+          <button className="RegistrarVenta-btn">
+            <span className="material-symbols-outlined translate-y-0.5">
+              arrow_back
+            </span>
           </button>
-          <span>Registrar venta</span>
+          <span>Regresar</span>
         </div>
         <div className="RegistrarVenta-scrooll">
           <div className="RegistrarVenta-NombreCliente">
-            <img src="../Cliente2.svg" alt="" />
-            <span>{selectedClient.fullName}</span>
+            <img
+              src={selectedClient?.storeImage || ""}
+              className="w-10 h-10 rounded-full"
+              alt=""
+            />
+            <p className="text-sm">{selectedClient.fullName}</p>
           </div>
           <div className="RegistrarVenta-AgregarProducto">
             <div className="RegistrarVenta-AgregarProductoTitulo">

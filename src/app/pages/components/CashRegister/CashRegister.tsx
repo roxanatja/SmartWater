@@ -3,6 +3,8 @@ import { Client } from "../../../../type/Cliente/Client";
 import crearRegistroCaja from "../../../../services/CashRegisters";
 import "./CashRegister.css";
 import Modal from "../../EntryComponents/Modal";
+import { useForm } from "react-hook-form";
+import Input from "../../EntryComponents/Inputs";
 
 interface CobroMiniModalProps {
   client: Client;
@@ -49,6 +51,8 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
     onClose();
   };
 
+  const { register } = useForm();
+
   return (
     <div>
       {!showSecondModal ? (
@@ -58,18 +62,20 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
           className="p-6 w-2/12"
         >
           <div className="modal-datos">
-            <div className="modalInfoClients">
-              {client.storeImage && client.storeImage.length > 1 ? (
-                <img
-                  src={client.storeImage}
-                  alt=""
-                  className="modalInfoClients-imgStore"
-                />
-              ) : (
-                <div className="cobro-mini-modal-image-placeholder"></div>
-              )}
-              <span className="modalInfoClients-name">{client.fullName}</span>
-              <div className="saldo">
+            <div className="flex justify-between gap-4 w-full">
+              <div className="flex justify gap-2 items-center">
+                {client.storeImage && client.storeImage.length > 1 ? (
+                  <img
+                    src={client.storeImage}
+                    alt=""
+                    className="modalInfoClients-imgStore"
+                  />
+                ) : (
+                  <div className="cobro-mini-modal-image-placeholder"></div>
+                )}
+                <span className="text-sm">{client.fullName}</span>
+              </div>
+              <div className="flex justify-start items-center gap-2">
                 <div className="infoClientes-saldo">
                   <span style={{ color: "#1A3D7D" }}>Saldo a cobrar:</span>
                 </div>
@@ -82,27 +88,24 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
           </div>
 
           <div className="infoClientes-ventas">
-            <div className="input-container">
-              <span>Pago a cuenta</span>
-              <input
+            <div className="input-container flex flex-col w-full">
+              <Input
+                label="Pago a cuenta"
+                register={register}
+                name="saldo"
                 type="number"
                 value={amount}
+                // className="text-center"
                 onChange={handleChange}
                 placeholder="Monto a cobrar"
                 min="0"
                 step="0.01"
+                icon={<span>Bs</span>}
+                onClick={handleSubmit}
+                button={"Registrar Cobro"}
               />
-              <span>Bs</span>
+              {error && <p className="error">{error}</p>}
             </div>
-            {error && <p className="error">{error}</p>}
-          </div>
-          <div className="cobro-mini-modal-actions">
-            <button
-              onClick={handleSubmit}
-              className="btn-registrar-modal w-full"
-            >
-              Registrar Cobro
-            </button>
           </div>
         </Modal>
       ) : (

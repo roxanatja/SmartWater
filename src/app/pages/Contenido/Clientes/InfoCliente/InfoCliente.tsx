@@ -7,6 +7,7 @@ import { formatDateTime } from "../../../../../utils/helpers";
 import { DeleteClient } from "../../../../../services/ClientsService";
 import { GetZone } from "../../../../../services/ZonesService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
+import toast from "react-hot-toast";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -55,20 +56,43 @@ const InfoCliente = (client: Client) => {
   };
 
   const Delete = async () => {
-    try {
-      const response = await DeleteClient(client._id);
-      console.log(response);
-      if (response.status === 200) {
-        console.log("Cliente eliminado", response);
-        window.alert(`Cliente eliminado`);
-        window.location.reload();
-      } else {
-        console.log("Error al eliminar cliente", response.data);
-        window.alert(`Error al eliminar cliente: ${response.data.error}`);
+    toast.error(
+      (t) => (
+        <span>
+          Se <b>eliminara</b> este cliente <br /> <b>pulsa</b> para continuar
+          <button
+            className="bg-red-500 px-2 py-1 rounded-lg ml-2"
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                const response = await DeleteClient(client._id);
+                if (response.status === 200) {
+                  toast.success("Cliente eliminado", {
+                    position: "top-center",
+                  });
+                  window.location.reload();
+                } else {
+                  toast.error("Error al eliminar cliente", {
+                    position: "top-center",
+                  });
+                  toast.error(response.data.error, {
+                    position: "top-center",
+                  });
+                  console.log("Error al eliminar cliente", response.data);
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+          >
+            <i className="fa-solid fa-xmark text-white"></i>
+          </button>
+        </span>
+      ),
+      {
+        position: "top-center",
       }
-    } catch (error) {
-      console.error(error);
-    }
+    );
     setShowOptions(false);
   };
 
@@ -81,7 +105,7 @@ const InfoCliente = (client: Client) => {
     <>
       <div className="infoClientes-container relative">
         <div className="infoClientes-header">
-          <div className="flex justify-between w-8/12">
+          <div className="flex justify-between w-8/12 max-sm:w-full">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
               {client.storeImage && client.storeImage.length > 1 ? (
                 <img
@@ -130,15 +154,13 @@ const InfoCliente = (client: Client) => {
             </div>
             <div className="infoClientes-ventas">
               <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
-              <div className="infoClientes-moneda">
+              <div
+                className="infoClientes-moneda cursor-pointer"
+                onClick={() => setShowCobroPopUp(true)}
+              >
                 <img src="./Moneda-icon.svg" alt="" />
                 <div>
-                  <span
-                    onClick={() => setShowCobroPopUp(true)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {client.credit.toString()} Bs.
-                  </span>
+                  <span>{client.credit.toString()} Bs.</span>
                 </div>
               </div>
             </div>

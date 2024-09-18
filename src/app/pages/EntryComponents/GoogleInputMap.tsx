@@ -19,6 +19,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const apiKey = `${process.env.REACT_APP_API_GOOGLE}`;
+  const [mapInteractive, setMapInteractive] = useState<boolean>(false);
 
   // Mover el callback fuera del efecto para evitar cambios infinitos
   const getCurrentLocation = useCallback(
@@ -215,12 +216,13 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
       const fetchCoordinates = async () => {
         const coordinates = await getCoordinatesFromAddress(linkAddress);
         if (coordinates && map) {
-          console.log(coordinates);
           centerMap(coordinates);
           updateMarkerPosition(
             new google.maps.LatLng(coordinates.lat, coordinates.lng)
           );
           onChange(coordinates);
+          setMapInteractive(true);
+          console.log(coordinates);
         }
       };
       fetchCoordinates();
@@ -237,6 +239,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
               new google.maps.LatLng(coordinates.lat, coordinates.lng)
             );
             onChange(coordinates);
+            setMapInteractive(true);
           }
         }
       );
@@ -245,12 +248,28 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   }, [linkAddress, map, centerMap, updateMarkerPosition]);
 
   return (
-    <div style={{ position: "relative" }} className="rounded-lg">
+    <div
+      style={{ position: "relative" }}
+      className={`rounded-lg ${mapInteractive ? "pointer-events-none" : ""}`}
+    >
       <div
         ref={mapRef}
         style={{ width: "100%", height: "450px" }}
         className="rounded-lg"
       ></div>
+      {mapInteractive && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            zIndex: 1000,
+          }}
+        />
+      )}
     </div>
   );
 };

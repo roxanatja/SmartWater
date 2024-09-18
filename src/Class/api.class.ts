@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { City, Client, Zone } from "./types.data";
+import { City, Zone } from "./types.data";
 
 class GetApiMethod {
   public axiosInstance: AxiosInstance;
