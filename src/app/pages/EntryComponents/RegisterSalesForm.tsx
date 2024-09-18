@@ -38,7 +38,12 @@ const RegisterSalesForm = () => {
     const api = new ApiMethodSales();
     const values: SaleBody = {
       ...data,
-      detail: addedProducts,
+      detail: addedProducts.map((item) => ({
+        product:
+          products?.find((p) => p.description === item.product)?._id || "",
+        quantity: item.quantity,
+        price: item.price,
+      })),
       user: selectedClient.code,
       client: selectedClient._id,
       paymentMethodCurrentAccount: false,
