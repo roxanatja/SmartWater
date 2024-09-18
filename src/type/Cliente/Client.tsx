@@ -25,7 +25,7 @@ export interface Client {
   isAgency: boolean;
   billingInfo: {
     NIT: string;
-    phoneNumber: string;
+    name: string;
   };
   averageRenewal: boolean;
   contracts: [];

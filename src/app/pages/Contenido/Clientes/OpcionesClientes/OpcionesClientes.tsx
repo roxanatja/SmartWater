@@ -4,20 +4,13 @@ import { Link } from "react-router-dom";
 import { ClientesContext, client } from "../ClientesContext";
 
 const OpcionesClientes: FC = () => {
-  const {
-    setShowMiniModal,
-    setSelectedOption,
-    setSelectedClient,
-    setRegisterSale,
-  } = useContext(ClientesContext);
+  const { setShowMiniModal, setSelectedOption, setSelectedClient } =
+    useContext(ClientesContext);
 
   return (
     <>
-      <div
-        onClick={() => {
-          setRegisterSale(true);
-          setShowMiniModal(false);
-        }}
+      <Link
+        to={"/Clientes/Registrarventa"}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -36,7 +29,7 @@ const OpcionesClientes: FC = () => {
             chevron_right
           </span>
         </button>
-      </div>
+      </Link>
       <Link
         to={"/Clientes/RegistrarPedido"}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"

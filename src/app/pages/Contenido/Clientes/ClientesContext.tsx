@@ -48,7 +48,7 @@ export const client: Client = {
   isAgency: true,
   billingInfo: {
     NIT: "",
-    phoneNumber: "",
+    name: "",
   },
   averageRenewal: false,
   contracts: [],

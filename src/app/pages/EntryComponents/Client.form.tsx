@@ -23,6 +23,15 @@ const ClientForm = ({
   const [date2, setDate2] = useState(false);
   const { selectedClient } = useContext(ClientesContext);
   const [uploading, setUploading] = useState(false);
+  const d =
+    selectedClient._id !== ""
+      ? {
+          defaultValues: {
+            ...selectedClient,
+            hasLoan: Number(selectedClient.renewInDays) > 0,
+          } as unknown as Client,
+        }
+      : {};
   const {
     register,
     handleSubmit,
@@ -30,12 +39,7 @@ const ClientForm = ({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<Client>({
-    defaultValues: {
-      ...selectedClient,
-      hasLoan: Number(selectedClient.renewInDays) > 0,
-    } as unknown as Client,
-  });
+  } = useForm<Client>(d);
 
   const verifyPhoneNumber = (value: string) => {
     if (!value.startsWith("+")) {
@@ -51,13 +55,11 @@ const ClientForm = ({
     let values = data;
     const api = new ApiMethodClient();
     try {
-      if (data.district === "null") {
-        values = {
-          ...data,
-          district: null,
-          whatsAppNumber: verifyPhoneNumber(data.whatsAppNumber),
-        };
-      }
+      values = {
+        ...data,
+        whatsAppNumber: verifyPhoneNumber(data.whatsAppNumber),
+      };
+      console.log(values);
       if (selectedClient._id !== "") {
         await api.updateClient(selectedClient._id, values);
         return toast.success("Cliente editado exitosamente");
@@ -114,7 +116,7 @@ const ClientForm = ({
       setValue("hasLoan", true);
       setValue("hasOrder", false);
       setValue("renewInDays", 0);
-      setValue("renewInDaysNumber", "");
+      setValue("renewInDaysNumber", "0");
       setValue("address", "");
     }
   }, [reset, selectedClient, selectedClient._id, setValue]);
@@ -341,6 +343,7 @@ const ClientForm = ({
                 const da = city.find((x) => x._id === e.target.value);
                 if (da && da.districts.length > 0) {
                   setDisti(da.districts);
+                  setValue("district", da.districts?.[0]?._id || "");
                 } else {
                   setDisti([]);
                 }
@@ -571,12 +574,12 @@ const ClientForm = ({
           </div>
           {date2 && (
             <Input
-              type="date"
+              type="number"
               label="Renovacion Promedio"
               register={register}
               isVisibleLable
               className="absolute w-44 -top-9 -translate-y-0.5 bg-white left-9"
-              name="fgdg"
+              name="renewInDaysNumber"
               errors={errors.renewInDaysNumber}
               required={date2}
             />

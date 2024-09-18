@@ -23,8 +23,6 @@ const Clientes: FC = () => {
     selectedClient,
     setShowMiniModal,
     setSelectedClient,
-    registerSale,
-    setRegisterSale,
   } = useContext(ClientesContext);
   const {
     applicatedFilters,
@@ -255,7 +253,7 @@ const Clientes: FC = () => {
       </Modal>
 
       <Modal
-        isOpen={selectedClient._id !== "" && !showMiniModal && !registerSale}
+        isOpen={selectedClient._id !== "" && !showMiniModal}
         onClose={() => setSelectedClient(client)}
       >
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
@@ -283,19 +281,6 @@ const Clientes: FC = () => {
         <div className="p-6">
           <OpcionesClientes />
         </div>
-      </Modal>
-
-      <Modal
-        isOpen={registerSale}
-        onClose={() => {
-          setSelectedClient(client);
-          setRegisterSale(false);
-        }}
-      >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 -translate-y-2 bg-white">
-          Registrar Ventas
-        </h2>
-        <RegisterSalesForm />
       </Modal>
       {showFiltro && <FiltroClientes />}
     </>
