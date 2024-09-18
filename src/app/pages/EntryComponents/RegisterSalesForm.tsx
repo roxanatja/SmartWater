@@ -4,36 +4,54 @@ import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import ApiMethodSales from "../../../Class/api.sales";
 import Product from "../../../type/Products/Products";
-import { Sale } from "../../../type/Sale/Sale";
+import { SaleBody } from "../../../type/Sale/Sale";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
 const RegisterSalesForm = () => {
   const { selectedClient } = useContext(ClientesContext);
   const [products, setProducts] = useState<Product[] | null>(null);
+  const [active, setActive] = useState(false);
   const [addedProducts, setAddedProducts] = useState<
-    { product: string; quantity: number; price: number }[]
+    { product: string; quantity: string; price: string }[]
   >([]);
 
-  const { register, handleSubmit, watch, setValue, control } = useForm<Sale>({
-    defaultValues: {
-      detail: [{ product: "", quantity: 1, price: 0, _id: "" }],
-      creditSale: false,
-    },
-  });
+  const { register, handleSubmit, watch, setValue, control } =
+    useForm<SaleBody>({
+      defaultValues: {
+        detail: [{ product: "", quantity: "0", price: "0" }],
+        creditSale: false,
+      },
+    });
 
   const { append } = useFieldArray({
     control,
     name: "detail",
   });
 
-  const onSubmit: SubmitHandler<Sale> = async (data) => {
+  const onSubmit: SubmitHandler<SaleBody> = async (data) => {
     if (addedProducts.length === 0) {
-      toast.error("Please add at least one product before submitting.");
+      toast.error("Por favor agrega un producto.");
       return;
     }
-
-    console.log(data);
+    setActive(true);
+    const api = new ApiMethodSales();
+    const values: SaleBody = {
+      ...data,
+      detail: addedProducts,
+      user: selectedClient.code,
+      client: selectedClient._id,
+      paymentMethodCurrentAccount: false,
+    };
+    console.log(values);
+    try {
+      await api.saveSale(values);
+      toast.success("Venta registrada");
+    } catch (error) {
+      toast.error("Upss error al registrar venta");
+      console.error(error);
+    }
+    setActive(false);
   };
 
   const getProduct = useCallback(async () => {
@@ -53,7 +71,7 @@ const RegisterSalesForm = () => {
 
     if (product && quantity && price) {
       setAddedProducts([...addedProducts, { product, quantity, price }]);
-      append({ product: "", quantity: 1, price: 0, _id: "" });
+      append({ product: "", quantity: "1", price: "0" });
     }
   };
 
@@ -89,8 +107,10 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox1"
-                checked={!watch("creditSale")}
-                onChange={() => setValue("creditSale", !watch("creditSale"))}
+                checked={!watch("hasInvoice")}
+                onChange={() => {
+                  setValue("hasInvoice", false);
+                }}
               />
               <label
                 htmlFor="checkbox1"
@@ -104,14 +124,31 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox2"
-                checked={watch("creditSale")}
-                onChange={() => setValue("creditSale", !watch("creditSale"))}
+                checked={watch("hasInvoice")}
+                onChange={() => {
+                  setValue("hasInvoice", true);
+                }}
               />
               <label
                 htmlFor="checkbox2"
                 className="text-check cursor-pointer text-md"
               >
                 Contado
+              </label>
+            </div>
+            <div className="RegistrarVenta-grupo-check">
+              <input
+                className="input-check cursor-pointer"
+                type="checkbox"
+                id="checkbox1"
+                checked={watch("creditSale")}
+                onChange={() => setValue("creditSale", !watch("creditSale"))}
+              />
+              <label
+                htmlFor="checkbox1"
+                className="text-check cursor-pointer text-md"
+              >
+                Cta. Cte
               </label>
             </div>
           </div>
@@ -128,7 +165,7 @@ const RegisterSalesForm = () => {
             options={["1", "2", "3", "4", "5"]}
             className="text-md"
             onOptionChange={(selectedOption) =>
-              setValue(`detail.0.quantity`, parseInt(selectedOption))
+              setValue(`detail.0.quantity`, selectedOption)
             }
           />
           <OptionScrooll
@@ -140,7 +177,6 @@ const RegisterSalesForm = () => {
                   (product) => product.name === selectedOption
                 );
                 setValue(`detail.0.product`, selectedProduct?.name || "");
-                setValue(`detail.0._id`, selectedProduct?._id || "");
               }
             }}
           />
@@ -158,7 +194,7 @@ const RegisterSalesForm = () => {
             onOptionChange={(selectedOption) =>
               setValue(
                 `detail.0.price`,
-                parseFloat(selectedOption.replace(/[^0-9.-]/g, ""))
+                selectedOption.replace(/[^0-9.-]/g, "")
               )
             }
           />
@@ -215,7 +251,11 @@ const RegisterSalesForm = () => {
           type="submit"
           className=" outline outline-2 outline-blue-500 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
-          Vender
+          {active ? (
+            <i className="fa-solid fa-spinner animate-spin"></i>
+          ) : (
+            "Vender"
+          )}
         </button>
       </div>
     </form>
