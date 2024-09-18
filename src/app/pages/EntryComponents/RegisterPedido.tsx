@@ -15,6 +15,7 @@ const RegisterPedidoForm = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
   const [active, setActive] = useState(false);
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
   >([]);
@@ -39,10 +40,16 @@ const RegisterPedidoForm = () => {
         detail: [{ product: "", quantity: "0" }],
       },
     });
+
   const { append } = useFieldArray({
     control,
     name: "detail",
   });
+
+  const toggleCalendario = () => {
+    setValue("deliverDate", "");
+    setMostrarCalendario(!mostrarCalendario);
+  };
 
   const handleAddProduct = () => {
     const product = watch("detail")[0].product;
@@ -167,6 +174,21 @@ const RegisterPedidoForm = () => {
               className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
+          <DatePicker
+                  minDate={new Date()}
+                  id="FechaPedido"
+                  selected={watch('deliverDate')}
+                  onChange={handleFechaChange}
+                  dateFormat={"dd-mm-yyyy"}
+                  dropdownMode="select"
+                  onClickOutside={() => setMostrarCalendario(false)}
+                />
+              </div>
+              <span>
+                {fecha === null
+                  ? "Fecha de entrega"
+                  : moment(fecha).format("DD/MM/YYYY")}
+              </span>
 
           <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
             <ul className="list-disc max-h-72 overflow-y-scroll">
