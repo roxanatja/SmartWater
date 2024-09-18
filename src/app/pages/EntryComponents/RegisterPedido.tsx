@@ -6,8 +6,10 @@ import Product from "../../../type/Products/Products";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { motion } from "framer-motion";
+import DatePicker from "react-datepicker";
 import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
+import moment from "moment";
 
 const RegisterPedidoForm = () => {
   const { selectedClient } = useContext(ClientesContext);
@@ -15,7 +17,6 @@ const RegisterPedidoForm = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
   const [active, setActive] = useState(false);
-  const [mostrarCalendario, setMostrarCalendario] = useState(false);
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
   >([]);
@@ -38,6 +39,7 @@ const RegisterPedidoForm = () => {
     useForm<OrdenBody>({
       defaultValues: {
         detail: [{ product: "", quantity: "0" }],
+        deliverDate: "",
       },
     });
 
@@ -45,11 +47,6 @@ const RegisterPedidoForm = () => {
     control,
     name: "detail",
   });
-
-  const toggleCalendario = () => {
-    setValue("deliverDate", "");
-    setMostrarCalendario(!mostrarCalendario);
-  };
 
   const handleAddProduct = () => {
     const product = watch("detail")[0].product;
@@ -174,21 +171,40 @@ const RegisterPedidoForm = () => {
               className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
-          <DatePicker
-                  minDate={new Date()}
-                  id="FechaPedido"
-                  selected={watch('deliverDate')}
-                  onChange={handleFechaChange}
-                  dateFormat={"dd-mm-yyyy"}
-                  dropdownMode="select"
-                  onClickOutside={() => setMostrarCalendario(false)}
-                />
-              </div>
-              <span>
-                {fecha === null
-                  ? "Fecha de entrega"
-                  : moment(fecha).format("DD/MM/YYYY")}
-              </span>
+          <div className="relative w-full flex items-center">
+            <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer"></i>
+            <div className="absolute cursor-pointer">
+              <DatePicker
+                minDate={new Date()}
+                id="FechaPedido"
+                selected={
+                  watch("deliverDate")
+                    ? new Date(watch("deliverDate") as string)
+                    : new Date()
+                }
+                className="opacity-0 w-2/12 cursor-pointer"
+                onChange={(date: Date | null) => {
+                  if (date) {
+                    const formattedDate = date
+                      .toISOString()
+                      .split("T")[0]
+                      .replace(/-/g, "/");
+                    setValue("deliverDate", formattedDate as string);
+                  }
+                }}
+                dateFormat={"yyyy/MM/dd"}
+                dropdownMode="select"
+              />
+            </div>
+            <input
+              {...register("deliverDate")}
+              name="deliverDate"
+              type={"text"}
+              placeholder="Fecha de entrega"
+              readOnly
+              className="placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+            />
+          </div>
 
           <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
             <ul className="list-disc max-h-72 overflow-y-scroll">
