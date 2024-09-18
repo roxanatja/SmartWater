@@ -1,14 +1,23 @@
 import React, { useState, useContext, useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import ApiMethodSales from "../../../Class/api.sales";
 import { OrdenBody } from "../../../type/Order/Order";
 import Product from "../../../type/Products/Products";
+import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
+import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
+import ApiMethodOrder from "../../../Class/api.order";
 
 const RegisterPedido = () => {
   const { selectedClient } = useContext(ClientesContext);
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
+  const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
+  const [active, setActive] = useState(false);
+  const [addedProducts, setAddedProducts] = useState<
+    { product: string; quantity: string }[]
+  >([]);
 
   const getProduct = useCallback(async () => {
     const api = new ApiMethodSales();
@@ -19,16 +28,66 @@ const RegisterPedido = () => {
   useEffect(() => {
     getProduct();
   }, [getProduct]);
-  
+
+  const handleOpcionesClick = () => {
+    setOpcionesVisibles(!opcionesVisibles);
+  };
+
   const { register, handleSubmit, watch, setValue, control } =
     useForm<OrdenBody>({
       defaultValues: {
         detail: [{ product: "", quantity: "0" }],
       },
     });
+  const { append } = useFieldArray({
+    control,
+    name: "detail",
+  });
+
+  const handleAddProduct = () => {
+    const product = watch("detail")[0].product;
+    const quantity = watch("detail")[0].quantity;
+
+    if (product && quantity) {
+      setAddedProducts([...addedProducts, { product, quantity }]);
+      append({ product: "", quantity: "1" });
+    }
+  };
+
+  const handleDeleteProduct = (index: number) => {
+    setAddedProducts(addedProducts.filter((_, i) => i !== index));
+  };
+
+  const onSubmit: SubmitHandler<OrdenBody> = async (data) => {
+    if (addedProducts.length === 0) {
+      toast.error("Por favor agrega un producto.");
+      return;
+    }
+    setActive(true);
+    const api = new ApiMethodOrder();
+    const values: OrdenBody = {
+      ...data,
+      detail: addedProducts.map((item) => ({
+        product:
+          products?.find((p) => p.description === item.product)?._id || "",
+        quantity: item.quantity,
+      })),
+      user: selectedClient.code,
+      client: selectedClient._id,
+    };
+    console.log(values);
+    try {
+      await api.saveOrder(values);
+      toast.success("Venta registrada");
+    } catch (error) {
+      toast.error("Upss error al registrar venta");
+      console.error(error);
+    }
+    setActive(false);
+  };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="">
         <div className="RegistrarPedido-NombreCliente">
           <div className="RegistrarPedido-Nombre">
@@ -72,167 +131,81 @@ const RegisterPedido = () => {
                 <OptionScrooll
                   options={Cantidad}
                   onOptionChange={(selectedOption) =>
-                    setSelectedCantidad(selectedOption)
+                    setValue(`detail.0.quantity`, selectedOption)
                   }
                 />
                 <OptionScrooll
                   options={products.map((product) => product.name)}
-                  onOptionChange={(selectedOption) =>
-                    setSelectedProducto(
-                      products.find(
+                  onOptionChange={(selectedOption) => {
+                    if (products) {
+                      const selectedProduct = products.find(
                         (product) => product.name === selectedOption
-                      )
-                    )
-                  }
+                      );
+                      setValue(`detail.0.product`, selectedProduct?.name || "");
+                    }
+                  }}
                 />
               </div>
+
               <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
                 <i
                   className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
-                  onClick={selectedEdit ? saveEditProduct : AgregarProducto}
+                  onClick={handleAddProduct}
                 ></i>
                 <p className="text-base font-semibold"> Agregar Producto</p>
               </div>
-              {productosAgregados.length > 0 ? (
-                <>
-                  {productosAgregados.map((item, index) => (
-                    <div
-                      className="RegistrarPedido-productoAgregado"
-                      style={{
-                        border:
-                          item.id === editId && selectedEdit
-                            ? "2px solid blue"
-                            : "none",
-                      }}
-                    >
-                      <div className="RegistrarPedido-productoAgregado1">
-                        <span>{item.productoSeleccionado.name}</span>
-                        <div className="RegistrarPedido-productoAgregadobtncontainer">
-                          <button
-                            className="RegistrarPedido-productoAgregadoBTN"
-                            onClick={() => DeleteProducto(item.id)}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"
-                                fill="#C50000"
-                              />
-                            </svg>
-                          </button>
-                          <button
-                            className="RegistrarPedido-productoAgregadoBTN"
-                            onClick={() => editProduct(item.id)}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M3 17.46V20.5C3 20.78 3.22 21 3.5 21H6.54C6.67 21 6.8 20.95 6.89 20.85L17.81 9.94L14.06 6.19L3.15 17.1C3.05 17.2 3 17.32 3 17.46ZM20.71 7.04C20.8027 6.94749 20.8762 6.8376 20.9264 6.71663C20.9766 6.59565 21.0024 6.46597 21.0024 6.335C21.0024 6.20403 20.9766 6.07435 20.9264 5.95338C20.8762 5.83241 20.8027 5.72252 20.71 5.63L18.37 3.29C18.2775 3.1973 18.1676 3.12375 18.0466 3.07357C17.9257 3.02339 17.796 2.99756 17.665 2.99756C17.534 2.99756 17.4043 3.02339 17.2834 3.07357C17.1624 3.12375 17.0525 3.1973 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                                fill="#1A3D7D"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="RegistrarPedido-productoAgregadoCantidad">
-                        <span>
-                          Cantidad:{" "}
-                          <span style={{ color: "#1A3D7D" }}>
-                            {item.cantidadSeleccionada}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </>
-              ) : null}
             </>
           )}
-        </div>
-        <div className="RegistrarPedido-FechaComentario">
-          <div className="RegistrarPedido-AgregarComentario">
-            <label
-              htmlFor="FechaPedido"
-              onClick={toggleCalendario}
-              style={{ cursor: "pointer" }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="25"
-                height="27"
-                viewBox="0 0 25 27"
-                fill="none"
-              >
-                <g clipPath="url(#clip0_9_28590)">
-                  <path
-                    d="M7.47098 0C8.3928 0 9.13755 0.754102 9.13755 1.6875V3.375H15.8038V1.6875C15.8038 0.754102 16.5486 0 17.4704 0C18.3922 0 19.137 0.754102 19.137 1.6875V3.375H21.6368C23.017 3.375 24.1367 4.50879 24.1367 5.90625V8.4375H0.804688V5.90625C0.804688 4.50879 1.92442 3.375 3.30455 3.375H5.8044V1.6875C5.8044 0.754102 6.54915 0 7.47098 0ZM0.804688 10.125H24.1367V24.4688C24.1367 25.8662 23.017 27 21.6368 27H3.30455C1.92442 27 0.804688 25.8662 0.804688 24.4688V10.125ZM4.97112 13.5C4.51281 13.5 4.13783 13.8797 4.13783 14.3438V19.4062C4.13783 19.8703 4.51281 20.25 4.97112 20.25H9.97083C10.4291 20.25 10.8041 19.8703 10.8041 19.4062V14.3438C10.8041 13.8797 10.4291 13.5 9.97083 13.5H4.97112Z"
-                    fill="#1A3D7D"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_9_28590">
-                    <rect
-                      width="23.332"
-                      height="27"
-                      fill="white"
-                      transform="translate(0.804688)"
-                    />
-                  </clipPath>
-                </defs>
-              </svg>
-            </label>
-            <div style={{ display: mostrarCalendario !== true ? "none" : "" }}>
-              <DatePicker
-                minDate={new Date()}
-                id="FechaPedido"
-                selected={fecha}
-                onChange={handleFechaChange}
-                dateFormat={"dd-mm-yyyy"}
-                dropdownMode="select"
-                onClickOutside={() => setMostrarCalendario(false)}
-              />
-            </div>
-            <span>
-              {fecha === null
-                ? "Fecha de entrega"
-                : moment(fecha).format("DD/MM/YYYY")}
-            </span>
-          </div>
-          <div className="RegistrarPedido-AgregarComentario">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="23"
-              viewBox="0 0 24 23"
-              fill="none"
-            >
-              <path
-                d="M3 0C1.34531 0 0 1.23423 0 2.75229V15.1376C0 16.6557 1.34531 17.8899 3 17.8899H7.5V21.3303C7.5 21.5926 7.65938 21.8291 7.9125 21.9452C8.16563 22.0614 8.47031 22.0355 8.7 21.8807L14.4984 17.8899H21C22.6547 17.8899 24 16.6557 24 15.1376V2.75229C24 1.23423 22.6547 0 21 0H3Z"
-                fill="#1A3D7D"
-              />
-            </svg>
+
+          <div className="relative w-full flex items-center">
+            <i className="fa-solid fa-message text-2xl text-blue_custom absolute"></i>
             <input
-              type="text"
+              {...register("comment")}
+              name="comment"
               placeholder="Agregar Comentario"
-              onChange={handleInputChange}
+              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
+
+          <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
+            <ul className="list-disc max-h-72 overflow-y-scroll">
+              {addedProducts.map((product, index) => (
+                <motion.li
+                  key={index}
+                  className="mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="flex flex-col gap-4 p-1">
+                    <p>
+                      <strong>{product.product}</strong>
+                    </p>
+                    <p className="text-sm">Cantidad:{product.quantity}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-red-700 hover:text-red-500 -translate-y-6"
+                    onClick={() => handleDeleteProduct(index)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+          <button
+            type="submit"
+            className=" outline outline-2 outline-blue-500 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
+          >
+            {active ? (
+              <i className="fa-solid fa-spinner animate-spin"></i>
+            ) : (
+              "Vender"
+            )}
+          </button>
         </div>
-      </div>
-      <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }}>
-        <button className="RegistrarPedido-btnVender" onClick={saveOrderData}>
-          <span>{loadingSale ? "Cargando" : "Registrar Pedido"}</span>
-        </button>
       </div>
     </form>
   );
