@@ -20,4 +20,26 @@ type Order = {
   };
 };
 
-export type { Order };
+type OrdenBody = {
+  user: string;
+  client: string;
+  comment: string;
+  deliverDate: string;
+  detail: {
+    product: string;
+    quantity: string;
+  }[];
+  clientNotRegistered: {
+    fullName: string;
+    phoneNumber: string;
+    address: string;
+    district: string;
+    zone: string;
+    location: {
+      latitude: string;
+      longitude: string;
+    };
+  };
+};
+
+export type { Order, OrdenBody };

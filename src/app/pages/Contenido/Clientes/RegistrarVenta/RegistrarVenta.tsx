@@ -1,14 +1,12 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import "./RegistrarVenta.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 
 import RegisterSalesForm from "../../../EntryComponents/RegisterSalesForm";
-import { ClientesContext, client } from "../ClientesContext";
 
 const RegistrarVenta: FC = () => {
   const navigate = useNavigate();
-  const { setSelectedClient } = useContext(ClientesContext);
 
   const handleClick = () => {
     navigate("/Clientes");
