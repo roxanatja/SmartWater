@@ -2,11 +2,15 @@ import "./RegistrarPedido.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import RegisterPedidoForm from "../../../EntryComponents/RegisterPedido";
+import { useContext } from "react";
+import { ClientesContext, client } from "../ClientesContext";
 
 const RegistrarPedido = () => {
+  const { setSelectedClient } = useContext(ClientesContext);
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/Clientes");
+    setSelectedClient(client);
   };
 
   return (

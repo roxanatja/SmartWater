@@ -11,7 +11,7 @@ import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
 import { useNavigate } from "react-router-dom";
 
-const RegisterPedidoForm = () => {
+const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
   const { selectedClient } = useContext(ClientesContext);
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,7 +33,7 @@ const RegisterPedidoForm = () => {
   }, [getProduct]);
 
   useEffect(() => {
-    if (selectedClient._id === "") {
+    if (!isNoClient && selectedClient._id === "") {
       navigate("/Clientes");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,13 +43,19 @@ const RegisterPedidoForm = () => {
     setOpcionesVisibles(!opcionesVisibles);
   };
 
-  const { register, handleSubmit, watch, setValue, control } =
-    useForm<OrdenBody>({
-      defaultValues: {
-        detail: [{ product: "", quantity: "0" }],
-        deliverDate: "",
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm<OrdenBody>({
+    defaultValues: {
+      detail: [{ product: "", quantity: "0" }],
+      deliverDate: "",
+    },
+  });
 
   const { append } = useFieldArray({
     control,
@@ -91,6 +97,9 @@ const RegisterPedidoForm = () => {
     }
     setActive(true);
     const api = new ApiMethodOrder();
+    if (isNoClient) {
+      return;
+    }
     const cl = selectedClient;
     const values: OrdenBody = {
       ...data,
@@ -125,23 +134,25 @@ const RegisterPedidoForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="">
-        <div className="RegistrarPedido-NombreCliente">
-          <div className="RegistrarPedido-Nombre">
-            <img
-              src={selectedClient.storeImage || ""}
-              alt=""
-              className="imagen-pequena"
-            />
-            <span>{selectedClient.fullName}</span>
+        {!isNoClient && (
+          <div className="RegistrarPedido-NombreCliente">
+            <div className="RegistrarPedido-Nombre">
+              <img
+                src={selectedClient.storeImage || ""}
+                alt=""
+                className="imagen-pequena"
+              />
+              <span>{selectedClient.fullName}</span>
+            </div>
+            <div
+              className="RegistrarPedido-Nombre"
+              style={{ gap: "10px", fontWeight: "400" }}
+            >
+              <i className="fa-brands fa-whatsapp text-xl text-green-500"></i>
+              <span>{selectedClient.phoneNumber}</span>
+            </div>
           </div>
-          <div
-            className="RegistrarPedido-Nombre"
-            style={{ gap: "10px", fontWeight: "400" }}
-          >
-            <i className="fa-brands fa-whatsapp text-xl text-green-500"></i>
-            <span>{selectedClient.phoneNumber}</span>
-          </div>
-        </div>
+        )}
         <div className="RegistrarPedido-AgregarProducto">
           <div className="RegistrarPedido-AgregarProductoTitulo">
             <span>Agregar producto</span>
@@ -189,6 +200,69 @@ const RegisterPedidoForm = () => {
             </>
           )}
 
+          {isNoClient && (
+            <>
+              <div className="grid grid-cols-3 max-sm:grid-cols-1 w-full gap-2">
+                <div className="relative w-full flex items-center">
+                  <i
+                    className={`fa-solid fa-user text-2xl text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.fullName && "text-red-500"
+                    }`}
+                  ></i>
+                  <input
+                    {...register("clientNotRegistered.fullName", {
+                      required: true,
+                    })}
+                    name="clientNotRegistered.fullName"
+                    placeholder="Nombre Completo"
+                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
+                      errors?.clientNotRegistered?.fullName &&
+                      "placeholder:text-red-500 border-red-500"
+                    }`}
+                  />
+                </div>
+
+                <div className="relative w-full flex items-center">
+                  <i
+                    className={`fa-solid fa-phone text-2xl text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.phoneNumber && "text-red-500"
+                    }`}
+                  ></i>
+                  <input
+                    {...register("clientNotRegistered.phoneNumber", {
+                      required: true,
+                    })}
+                    name="clientNotRegistered.phoneNumber"
+                    placeholder="Numero de Telefono"
+                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
+                      errors?.clientNotRegistered?.phoneNumber &&
+                      "placeholder:text-red-500 border-red-500"
+                    }`}
+                  />
+                </div>
+
+                <div className="relative w-full flex items-center">
+                  <i
+                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.address && "text-red-500"
+                    }`}
+                  ></i>
+                  <input
+                    {...register("clientNotRegistered.address", {
+                      required: true,
+                    })}
+                    name="clientNotRegistered.address"
+                    placeholder="Dirrecion"
+                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
+                      errors?.clientNotRegistered?.address &&
+                      "placeholder:text-red-500 border-red-500"
+                    }`}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="relative w-full flex items-center">
             <i className="fa-solid fa-message text-2xl text-blue_custom absolute"></i>
             <input
@@ -198,6 +272,7 @@ const RegisterPedidoForm = () => {
               className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
+
           <div className="relative w-full flex items-center">
             <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer"></i>
             <div className="absolute cursor-pointer">
@@ -232,6 +307,50 @@ const RegisterPedidoForm = () => {
               className="placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
+
+          {isNoClient && (
+            <>
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 w-full gap-2">
+                <div className="relative w-full flex items-center">
+                  <i
+                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.zone && "text-red-500"
+                    }`}
+                  ></i>
+                  <input
+                    {...register("clientNotRegistered.zone", {
+                      required: true,
+                    })}
+                    name="clientNotRegistered.zone"
+                    placeholder="Zona"
+                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
+                      errors?.clientNotRegistered?.zone &&
+                      "placeholder:text-red-500 border-red-500"
+                    }`}
+                  />
+                </div>
+
+                <div className="relative w-full flex items-center">
+                  <i
+                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.district && "text-red-500"
+                    }`}
+                  ></i>
+                  <input
+                    {...register("clientNotRegistered.district", {
+                      required: true,
+                    })}
+                    name="clientNotRegistered.district"
+                    placeholder="Districto"
+                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
+                      errors?.clientNotRegistered?.district &&
+                      "placeholder:text-red-500 border-red-500"
+                    }`}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
             <ul className="list-disc max-h-72 overflow-y-scroll">
