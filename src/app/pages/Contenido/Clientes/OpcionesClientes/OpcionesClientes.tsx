@@ -21,14 +21,7 @@ const OpcionesClientes: FC = () => {
           />
           <span>Registrar Ventas</span>
         </div>
-        <button type="button" className="btn" style={{ marginTop: "5px" }}>
-          <span
-            className="material-symbols-outlined"
-            style={{ color: "#1A3D7D" }}
-          >
-            chevron_right
-          </span>
-        </button>
+        <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
         to={"/Clientes/RegistrarPedido"}
@@ -43,14 +36,7 @@ const OpcionesClientes: FC = () => {
           <span>Registrar pedido</span>
         </div>
 
-        <button type="button" className="btn" style={{ marginTop: "5px" }}>
-          <span
-            className="material-symbols-outlined"
-            style={{ color: "#1A3D7D" }}
-          >
-            chevron_right
-          </span>
-        </button>
+        <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
         to={"/Clientes/RegistrarPedido"}
@@ -64,14 +50,7 @@ const OpcionesClientes: FC = () => {
           />
           <span>Registrar préstamo</span>
         </div>
-        <button type="button" className="btn" style={{ marginTop: "5px" }}>
-          <span
-            className="material-symbols-outlined"
-            style={{ color: "#1A3D7D" }}
-          >
-            chevron_right
-          </span>
-        </button>
+        <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
         to={"/Clientes/RegistrarDevolucion"}
