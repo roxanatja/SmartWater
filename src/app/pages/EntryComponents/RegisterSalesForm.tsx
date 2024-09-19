@@ -7,11 +7,13 @@ import Product from "../../../type/Products/Products";
 import { SaleBody } from "../../../type/Sale/Sale";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const RegisterSalesForm = () => {
   const { selectedClient } = useContext(ClientesContext);
   const [products, setProducts] = useState<Product[] | null>(null);
   const [active, setActive] = useState(false);
+  const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string; price: string }[]
   >([]);
@@ -20,9 +22,18 @@ const RegisterSalesForm = () => {
     useForm<SaleBody>({
       defaultValues: {
         detail: [{ product: "", quantity: "0", price: "0" }],
-        creditSale: false,
+        creditSale: true,
+        hasInvoice: false,
+        paymentMethodCurrentAccount: false,
       },
     });
+
+  useEffect(() => {
+    if (selectedClient._id === "") {
+      navigate("/Clientes");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClient]);
 
   const { append } = useFieldArray({
     control,
@@ -42,11 +53,10 @@ const RegisterSalesForm = () => {
         product:
           products?.find((p) => p.description === item.product)?._id || "",
         quantity: item.quantity,
-        price: item.price,
+        price: `${parseInt(item.price)}`,
       })),
-      user: selectedClient.code,
+      user: `${process.env.REACT_APP_USER_API}`,
       client: selectedClient._id,
-      paymentMethodCurrentAccount: false,
     };
     console.log(values);
     try {
@@ -73,7 +83,6 @@ const RegisterSalesForm = () => {
     const product = watch("detail")[0].product;
     const quantity = watch("detail")[0].quantity;
     const price = watch("detail")[0].price;
-
     if (product && quantity && price) {
       setAddedProducts([...addedProducts, { product, quantity, price }]);
       append({ product: "", quantity: "1", price: "0" });
@@ -112,8 +121,9 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox1"
-                checked={!watch("hasInvoice")}
+                checked={watch("creditSale")}
                 onChange={() => {
+                  setValue("creditSale", !watch("creditSale"));
                   setValue("hasInvoice", false);
                 }}
               />
@@ -131,7 +141,8 @@ const RegisterSalesForm = () => {
                 id="checkbox2"
                 checked={watch("hasInvoice")}
                 onChange={() => {
-                  setValue("hasInvoice", true);
+                  setValue("hasInvoice", !watch("hasInvoice"));
+                  setValue("creditSale", false);
                 }}
               />
               <label
@@ -146,8 +157,13 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox1"
-                checked={watch("creditSale")}
-                onChange={() => setValue("creditSale", !watch("creditSale"))}
+                checked={watch("paymentMethodCurrentAccount")}
+                onChange={() =>
+                  setValue(
+                    "paymentMethodCurrentAccount",
+                    !watch("paymentMethodCurrentAccount")
+                  )
+                }
               />
               <label
                 htmlFor="checkbox1"
@@ -196,12 +212,12 @@ const RegisterSalesForm = () => {
               }).format(number);
             })}
             className="text-md"
-            onOptionChange={(selectedOption) =>
+            onOptionChange={(selectedOption) => {
               setValue(
                 `detail.0.price`,
-                selectedOption.replace(/[^0-9.-]/g, "")
-              )
-            }
+                `${parseInt(selectedOption.replace(/[^0-9.-]/g, ""))}`
+              );
+            }}
           />
         </div>
 

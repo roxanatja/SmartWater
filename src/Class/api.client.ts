@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import GetApiMethod from "./api.class";
 import { Client } from "./types.data";
 
@@ -21,8 +22,11 @@ class ApiMethodClient extends GetApiMethod {
         clientData
       );
       return response.data as Client;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      if (error?.response?.data?.msg) {
+        toast.error(error.response.data.msg);
+      }
       throw new Error(`Error al registrar el cliente: ${error}`);
     }
   }
@@ -31,9 +35,12 @@ class ApiMethodClient extends GetApiMethod {
     try {
       await this.axiosInstance.put(`/clients/${id}`, client);
       return 200;
-    } catch (e) {
-      console.error(e);
-      throw new Error(`Error al registrar el cliente: ${e}`);
+    } catch (error: any) {
+      console.error(error);
+      if (error?.response?.data?.msg) {
+        toast.error(error.response.data.msg);
+      }
+      throw new Error(`Error al registrar el cliente: ${error}`);
     }
   }
 }

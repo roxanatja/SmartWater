@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import DatePicker from "react-datepicker";
 import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
-import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPedidoForm = () => {
   const { selectedClient } = useContext(ClientesContext);
@@ -17,6 +17,7 @@ const RegisterPedidoForm = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
   const [active, setActive] = useState(false);
+  const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
   >([]);
@@ -30,6 +31,13 @@ const RegisterPedidoForm = () => {
   useEffect(() => {
     getProduct();
   }, [getProduct]);
+
+  useEffect(() => {
+    if (selectedClient._id === "") {
+      navigate("/Clientes");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClient]);
 
   const handleOpcionesClick = () => {
     setOpcionesVisibles(!opcionesVisibles);
@@ -62,6 +70,20 @@ const RegisterPedidoForm = () => {
     setAddedProducts(addedProducts.filter((_, i) => i !== index));
   };
 
+  const handleOptionChange = useCallback(
+    (selectedOption: string, type: "quantity" | "product") => {
+      const currentProduct = watch("detail")[0].product;
+      const currentQuantity = watch("detail")[0].quantity;
+
+      if (type === "quantity" && currentQuantity !== selectedOption) {
+        setValue("detail.0.quantity", selectedOption);
+      } else if (type === "product" && currentProduct !== selectedOption) {
+        setValue("detail.0.product", selectedOption);
+      }
+    },
+    [setValue, watch]
+  );
+
   const onSubmit: SubmitHandler<OrdenBody> = async (data) => {
     if (addedProducts.length === 0) {
       toast.error("Por favor agrega un producto.");
@@ -69,6 +91,7 @@ const RegisterPedidoForm = () => {
     }
     setActive(true);
     const api = new ApiMethodOrder();
+    const cl = selectedClient;
     const values: OrdenBody = {
       ...data,
       detail: addedProducts.map((item) => ({
@@ -76,8 +99,17 @@ const RegisterPedidoForm = () => {
           products?.find((p) => p.description === item.product)?._id || "",
         quantity: item.quantity,
       })),
-      user: selectedClient.code,
+      user: `${process.env.REACT_APP_USER_API}`,
       client: selectedClient._id,
+      deliverDate: data.deliverDate.replace(/\//g, "-"),
+      clientNotRegistered: {
+        address: cl.address,
+        district: cl.district,
+        fullName: cl.fullName,
+        location: cl.location,
+        phoneNumber: cl.phoneNumber,
+        zone: cl.zone,
+      },
     };
     console.log(values);
     try {
@@ -136,19 +168,14 @@ const RegisterPedidoForm = () => {
                 <OptionScrooll
                   options={Cantidad}
                   onOptionChange={(selectedOption) =>
-                    setValue(`detail.0.quantity`, selectedOption)
+                    handleOptionChange(selectedOption, "quantity")
                   }
                 />
                 <OptionScrooll
                   options={products.map((product) => product.name)}
-                  onOptionChange={(selectedOption) => {
-                    if (products) {
-                      const selectedProduct = products.find(
-                        (product) => product.name === selectedOption
-                      );
-                      setValue(`detail.0.product`, selectedProduct?.name || "");
-                    }
-                  }}
+                  onOptionChange={(selectedOption) =>
+                    handleOptionChange(selectedOption, "product")
+                  }
                 />
               </div>
 
@@ -241,7 +268,7 @@ const RegisterPedidoForm = () => {
             {active ? (
               <i className="fa-solid fa-spinner animate-spin"></i>
             ) : (
-              "Vender"
+              "Realizar Pedido"
             )}
           </button>
         </div>

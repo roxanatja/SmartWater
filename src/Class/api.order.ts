@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { OrdenBody, Order } from "../type/Order/Order";
 import GetApiMethod from "./api.class";
 
@@ -9,8 +10,11 @@ class ApiMethodOrder extends GetApiMethod {
         dataToSave
       );
       return response.status;
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error in saveOrder:", e);
+      if (e?.response?.data?.msg) {
+        toast.error(e.response.data.msg);
+      }
       throw new Error(`Error al obtener salvar la Orden: ${e}`);
     }
   }
@@ -29,8 +33,11 @@ class ApiMethodOrder extends GetApiMethod {
     try {
       const response = await this.axiosInstance.get("/orders", { params });
       return response.data;
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error in saveOrder:", e);
+      if (e?.response?.data?.msg) {
+        toast.error(e.response.data.msg);
+      }
       throw new Error(`Error al borrar la Orden: ${e}`);
     }
   }

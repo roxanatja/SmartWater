@@ -41,14 +41,16 @@ const ClientForm = ({
     formState: { errors },
   } = useForm<Client>(d);
 
-  const verifyPhoneNumber = (value: string) => {
-    if (!value.startsWith("+")) {
-      var newValue = "+" + value;
-
-      return newValue;
-    } else {
-      return value;
+  const verifyPhoneNumber = (value: string | undefined) => {
+    if (!value) {
+      return "";
     }
+
+    if (!value.startsWith("+")) {
+      return "+" + value;
+    }
+
+    return value;
   };
 
   const onSubmit: SubmitHandler<Client> = async (data) => {
@@ -77,8 +79,13 @@ const ClientForm = ({
     const data = await api.getZone();
     setCity(data);
     let d = data[0];
-    setValue("zone", d._id);
     setDisti(d.districts);
+    if (selectedClient._id === "") {
+      setValue("zone", d._id);
+    } else {
+      setValue("zone", selectedClient.zone);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue]);
 
   useEffect(() => {
