@@ -17,9 +17,11 @@ const InfoCliente = (client: Client) => {
   const [date, setDate] = useState<string>();
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false); // Agregado el estado para el Pop-Up
   const location = client.location;
+  
   const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${
     location?.longitude || ""
   }`;
+
 
   useEffect(() => {
     const getZone = async () => {
