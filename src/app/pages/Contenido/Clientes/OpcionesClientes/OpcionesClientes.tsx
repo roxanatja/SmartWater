@@ -39,7 +39,7 @@ const OpcionesClientes: FC = () => {
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
-        to={"/Clientes/RegistrarPedido"}
+        to={"/Clientes/RegistrarPrestamo"}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>

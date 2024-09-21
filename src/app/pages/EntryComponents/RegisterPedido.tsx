@@ -10,17 +10,24 @@ import DatePicker from "react-datepicker";
 import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
 import { useNavigate } from "react-router-dom";
+import { District, Zone } from "../../../Class/types.data";
+import GetApiMethod from "../../../Class/api.class";
+import GoogleMapWithSelection from "./GoogleInputMap";
+import Input from "./Inputs";
 
 const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
   const { selectedClient } = useContext(ClientesContext);
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
+  const [mapview, setMapview] = useState(false);
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
   >([]);
+  const [city, setCity] = useState<Zone[]>([]);
+  const [disti, setDisti] = useState<District[]>([]);
 
   const getProduct = useCallback(async () => {
     const api = new ApiMethodSales();
@@ -62,6 +69,23 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
     name: "detail",
   });
 
+  const getCitys = useCallback(async () => {
+    const api = new GetApiMethod();
+    const data = await api.getZone();
+    setCity(data);
+    let d = data[0];
+    setDisti(d.districts);
+    if (isNoClient) {
+      setValue("clientNotRegistered.zone", d._id);
+      setValue("clientNotRegistered.district", d.districts[0]._id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setValue]);
+
+  useEffect(() => {
+    getCitys();
+  }, [getCitys]);
+
   const handleAddProduct = () => {
     const product = watch("detail")[0].product;
     const quantity = watch("detail")[0].quantity;
@@ -98,6 +122,24 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
     setActive(true);
     const api = new ApiMethodOrder();
     if (isNoClient) {
+      const values: OrdenBody = {
+        ...data,
+        detail: addedProducts.map((item) => ({
+          product:
+            products?.find((p) => p.description === item.product)?._id || "",
+          quantity: item.quantity,
+        })),
+        user: `${process.env.REACT_APP_USER_API}`,
+        deliverDate: data.deliverDate.replace(/\//g, "-"),
+      };
+      try {
+        await api.saveOrder(values);
+        toast.success("Pedido registrado");
+      } catch (error) {
+        toast.error("Upss error al registrar pedido");
+        console.error(error);
+      } 
+      setActive(false);
       return;
     }
     const cl = selectedClient;
@@ -263,6 +305,128 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
             </>
           )}
 
+          {isNoClient && (
+            <>
+              <div className="flex flex-row gap-4 w-full justify-start items-center">
+                <div className="relative flex items-center">
+                  <i
+                    className={`fa-solid fa-location-crosshairs text-2xl pl-2 text-blue_custom absolute `}
+                  ></i>
+                  <select
+                    {...register("clientNotRegistered.zone", {
+                      required: "se requiere una zona",
+                      onChange: (e) => {
+                        const da = city.find((x) => x._id === e.target.value);
+                        if (da && da.districts.length > 0) {
+                          setDisti(da.districts);
+                          setValue(
+                            "clientNotRegistered.district",
+                            da.districts?.[0]?._id || ""
+                          );
+                        } else {
+                          setDisti([]);
+                        }
+                      },
+                    })}
+                    className="p-2 px-6 ps-10 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-blue_custom font-medium  text-blue_custom"
+                  >
+                    {city.length > 0 &&
+                      city.map((city, index) => (
+                        <option value={city._id} key={index}>
+                          {city.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div className="relative flex items-center">
+                  <i
+                    className={`fa-solid fa-location-dot text-2xl pl-2 text-blue_custom absolute ${
+                      errors?.clientNotRegistered?.district && "text-red-500"
+                    }`}
+                  ></i>
+                  <select
+                    {...register("clientNotRegistered.district")}
+                    className="p-2 px-6 ps-10 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-blue_custom font-medium  text-blue_custom"
+                  >
+                    {disti && disti.length > 0 ? (
+                      disti.map((row, index) => (
+                        <option value={row._id} key={index}>
+                          {row.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={"null"}>Sin resultados</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
+
+          {isNoClient && (
+            <>
+              <div
+                className="RegistrarPedido-AgregarProductoTitulo border-b-2 border-blue_custom pb-2 cursor-pointer"
+                onClick={() => {
+                  setMapview(!mapview);
+                }}
+              >
+                <div className="text-md text-blue_custom flex gap-2 items-center">
+                  <i className="fa-solid text-xl fa-location-dot text-blue_custom"></i>
+                  <p className="text-base">Agregar ubicacion</p>
+                </div>
+                <button
+                  type="button"
+                  className={
+                    mapview
+                      ? "RegistrarPedido-btnAgregarProducto AgregarProductoactive-btn"
+                      : "RegistrarPedido-btnAgregarProducto"
+                  }
+                >
+                  <span className="material-symbols-outlined">expand_more</span>
+                </button>
+              </div>
+
+              {mapview && (
+                <div className="w-full col-span-2 max-sm:col-span-1">
+                  <div className="flex flex-col w-full gap-2">
+                    <Input
+                      label="Enlace de ubicación"
+                      name="linkAddress"
+                      placeholder="(Opcional)"
+                      register={register}
+                      icon={<i className="fa-solid fa-location-dot"></i>}
+                    />
+                    <h1 className="text-sm font-medium">
+                      Selecciona una ubicación en el mapa
+                    </h1>
+                    <GoogleMapWithSelection
+                      visible={isNoClient}
+                      linkAddress={watch("linkAddress")}
+                      latitude={Number(
+                        watch("clientNotRegistered.location.latitude")
+                      )}
+                      longitude={Number(
+                        watch("clientNotRegistered.location.longitude")
+                      )}
+                      onChange={(coordinates: { lat: number; lng: number }) => {
+                        setValue(
+                          "clientNotRegistered.location.latitude",
+                          `${coordinates.lat}`
+                        );
+                        setValue(
+                          "clientNotRegistered.location.longitude",
+                          `${coordinates.lng}`
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
           <div className="relative w-full flex items-center">
             <i className="fa-solid fa-message text-2xl text-blue_custom absolute"></i>
             <input
@@ -307,50 +471,6 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
               className="placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
-
-          {isNoClient && (
-            <>
-              <div className="grid grid-cols-2 max-sm:grid-cols-1 w-full gap-2">
-                <div className="relative w-full flex items-center">
-                  <i
-                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.zone && "text-red-500"
-                    }`}
-                  ></i>
-                  <input
-                    {...register("clientNotRegistered.zone", {
-                      required: true,
-                    })}
-                    name="clientNotRegistered.zone"
-                    placeholder="Zona"
-                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
-                      errors?.clientNotRegistered?.zone &&
-                      "placeholder:text-red-500 border-red-500"
-                    }`}
-                  />
-                </div>
-
-                <div className="relative w-full flex items-center">
-                  <i
-                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.district && "text-red-500"
-                    }`}
-                  ></i>
-                  <input
-                    {...register("clientNotRegistered.district", {
-                      required: true,
-                    })}
-                    name="clientNotRegistered.district"
-                    placeholder="Districto"
-                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
-                      errors?.clientNotRegistered?.district &&
-                      "placeholder:text-red-500 border-red-500"
-                    }`}
-                  />
-                </div>
-              </div>
-            </>
-          )}
 
           <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
             <ul className="list-disc max-h-72 overflow-y-scroll">

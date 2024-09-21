@@ -40,6 +40,7 @@ type OrdenBody = {
       longitude: string;
     };
   };
+  linkAddress?: string;
 };
 
 export type { Order, OrdenBody };

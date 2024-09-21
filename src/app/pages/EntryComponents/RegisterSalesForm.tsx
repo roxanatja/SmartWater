@@ -22,7 +22,7 @@ const RegisterSalesForm = () => {
     useForm<SaleBody>({
       defaultValues: {
         detail: [{ product: "", quantity: "0", price: "0" }],
-        creditSale: true,
+        creditSale: false,
         hasInvoice: false,
         paymentMethodCurrentAccount: false,
       },
@@ -121,10 +121,9 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox1"
-                checked={watch("creditSale")}
+                checked={watch("hasInvoice")}
                 onChange={() => {
-                  setValue("creditSale", !watch("creditSale"));
-                  setValue("hasInvoice", false);
+                  setValue("hasInvoice", !watch("hasInvoice"));
                 }}
               />
               <label
@@ -139,17 +138,17 @@ const RegisterSalesForm = () => {
                 className="input-check cursor-pointer"
                 type="checkbox"
                 id="checkbox2"
-                checked={watch("hasInvoice")}
+                checked={watch("creditSale")}
                 onChange={() => {
-                  setValue("hasInvoice", !watch("hasInvoice"));
-                  setValue("creditSale", false);
+                  setValue("creditSale", !watch("creditSale"));
+                  setValue("paymentMethodCurrentAccount", false);
                 }}
               />
               <label
                 htmlFor="checkbox2"
                 className="text-check cursor-pointer text-md"
               >
-                Contado
+                Credito
               </label>
             </div>
             <div className="RegistrarVenta-grupo-check">
@@ -158,12 +157,13 @@ const RegisterSalesForm = () => {
                 type="checkbox"
                 id="checkbox1"
                 checked={watch("paymentMethodCurrentAccount")}
-                onChange={() =>
+                onChange={() => {
                   setValue(
                     "paymentMethodCurrentAccount",
                     !watch("paymentMethodCurrentAccount")
-                  )
-                }
+                  );
+                  setValue("creditSale", false);
+                }}
               />
               <label
                 htmlFor="checkbox1"

@@ -66,7 +66,7 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
         >
           <img
             src={watchField(fieldName) || ""}
-            alt="uploaded"
+            alt=""
             className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] shadow-md bg-zinc-300"
           />
           <div className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] bg-zinc-800/50 absolute top-0 z-10 scale-0 group-hover:scale-100" />

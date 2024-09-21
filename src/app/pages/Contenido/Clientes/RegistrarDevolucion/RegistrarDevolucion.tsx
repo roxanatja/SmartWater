@@ -1,57 +1,38 @@
-import { FC, useContext } from "react";
-import "./RegistrarDevolucion.css";
+import "../RegistrarPedido/RegistrarPedido.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { DevolucionParcial } from "./DevolucionParcial";
-import { DevolucionTotal } from "./DevolucionTotal";
-import { ClientesContext } from "../ClientesContext";
+import { useContext } from "react";
+import { ClientesContext, client } from "../ClientesContext";
 
-const RegistrarDevolucion: FC = () => {
+import RegisterDevoluForm from "../../../EntryComponents/RegisterDevolu";
 
-    const {selectedOption, setSelectedOption} = useContext(ClientesContext);
-    const navigate = useNavigate();
+const RegistrarDevolucion = () => {
+  const { setSelectedClient } = useContext(ClientesContext);
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/Clientes");
+    setSelectedClient(client);
+  };
 
-    const handleClick = () => {
-        navigate('/Clientes');
-    };
-
-    const handleOptionChange = () => {
-        setSelectedOption(!selectedOption);
-    };
-
-    return(
-        <>
-        <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
-        <div className="RegistrarDevolucion-titulo">
-            <button className="RegistrarDevolucion-btn" onClick={handleClick}>
-                <span className="material-symbols-outlined">
-                    arrow_back
-                </span>
-            </button>
-            <span>Registrar devolución</span>
+  return (
+    <>
+      <div>
+        <PageTitle titulo="Clientes/Devolucion" icon="../clientes-icon.svg" />
+        <div
+          className="RegistrarVenta-titulo flex items-start cursor-pointer"
+          onClick={handleClick}
+        >
+          <button className="RegistrarVenta-btn">
+            <span className="material-symbols-outlined translate-y-0.5">
+              arrow_back
+            </span>
+          </button>
+          <span>Regresar</span>
         </div>
-        <div className="RegistrarDevolucion-switch-contenido">
-            <div
-                className={`RegistrarDevolucion-switch-option ${selectedOption === false ? "selected" : ""}`}
-                onClick={() => handleOptionChange()}
-            >
-                Parcial
-            </div>
-            <div
-                className={`RegistrarDevolucion-switch-option ${selectedOption === true ? "selected" : ""}`}
-                onClick={() => handleOptionChange()}
-            >
-                Total
-            </div>
-        </div>
-        {
-            selectedOption === false ?
-            <DevolucionParcial/>
-            :
-            <DevolucionTotal/>
-        }
-        </>
-    )
-}
+        <RegisterDevoluForm />
+      </div>
+    </>
+  );
+};
 
-export{RegistrarDevolucion}
+export { RegistrarDevolucion };
