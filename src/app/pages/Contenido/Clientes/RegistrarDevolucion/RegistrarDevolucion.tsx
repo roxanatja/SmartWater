@@ -7,7 +7,7 @@ import { ClientesContext, client } from "../ClientesContext";
 import RegisterDevoluForm from "../../../EntryComponents/RegisterDevolu";
 
 const RegistrarDevolucion = () => {
-  const { setSelectedClient } = useContext(ClientesContext);
+  const { setSelectedClient, selectedClient } = useContext(ClientesContext);
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/Clientes");
@@ -29,7 +29,7 @@ const RegistrarDevolucion = () => {
           </button>
           <span>Regresar</span>
         </div>
-        <RegisterDevoluForm />
+        <RegisterDevoluForm selectedClient={selectedClient} />
       </div>
     </>
   );

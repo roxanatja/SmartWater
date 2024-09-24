@@ -31,6 +31,7 @@ import { ZonasWrapper } from "../Contenido/Configuracion/Zonas/ZonasWrapper";
 import { ProductosWrapper } from "../Contenido/Configuracion/Productos/ProductosWrapper";
 import { ItemsWrapper } from "../Contenido/Configuracion/Items/ItemsWrapper";
 import LoginFormWrapper from "../Contenido/LoginForm/LoginPageWrapper";
+import ProtectedRoute from "../EntryComponents/ProtectRouter";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -40,101 +41,86 @@ const PaginaPrincipal: FC = () => {
           <Sidebar />
           <div className="Contenedor max-sm:w-full">
             <Routes>
+              {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
 
-              <Route path="" element={<Navigate to="/Inicio" />} />
+              {/* Protege todas las rutas que necesitan autenticación */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="" element={<Navigate to="/Inicio" />} />
+                <Route path="/Inicio" element={<InicioWrapper />} />
+                <Route path="/Clientes/*" element={<ClientesWrapper />} />
+                <Route
+                  path="/MapaClientes/*"
+                  element={<MapaClientesWrapper />}
+                />
+                <Route
+                  path="/MonitoreoDistribuidores"
+                  element={<MonitoreoDistribuidoresWrapper />}
+                />
+                <Route path="/Ventas/*" element={<VentasWrapper />} />
+                <Route path="/Pedidos/*" element={<PedidosWrapper />} />
+                <Route path="/Prestamos/*" element={<PrestamosWrapper />} />
+                <Route
+                  path="/Finanzas/ArqueoDeCajas"
+                  element={<ArqueoDeCajaWrapper />}
+                />
+                <Route
+                  path="/Finanzas/CuentasPorCobrarCobros/*"
+                  element={<CuentasPorCobrarWrapper />}
+                />
+                <Route
+                  path="/Finanzas/EgresosGastos"
+                  element={<EgresosGastosWrapper />}
+                />
+                <Route
+                  path="/Finanzas/Proveedores"
+                  element={<ProveedoresWrapper />}
+                />
+                <Route
+                  path="/Finanzas/CuentasPorPagar/*"
+                  element={<CuentasPorPagarWrapper />}
+                />
+                <Route
+                  path="/Reportes/Ingresos/*"
+                  element={<ReportesIngresosWrapper />}
+                />
+                <Route
+                  path="/Reportes/Ingresos/Graficos/*"
+                  element={<ReportesGraficosWrapper />}
+                />
+                <Route
+                  path="/Reportes/Egresos/*"
+                  element={<ReportesEgresosWrapper />}
+                />
+                <Route
+                  path="/Reportes/Egresos/Graficos/*"
+                  element={<ReportesEgresosGraficosWrapper />}
+                />
+                <Route
+                  path="/Reportes/Resultados/*"
+                  element={<ReportesResultadosWrapper />}
+                />
+                <Route
+                  path="/Configuracion/General"
+                  element={<ConfiguracionGeneralWrapper />}
+                />
+                <Route
+                  path="/Configuracion/Usuarios"
+                  element={<UsuariosWrapper />}
+                />
+                <Route
+                  path="/Configuracion/Barrios"
+                  element={<BarriosWrapper />}
+                />
+                <Route path="/Configuracion/Zonas" element={<ZonasWrapper />} />
+                <Route
+                  path="/Configuracion/Productos"
+                  element={<ProductosWrapper />}
+                />
+                <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
+              </Route>
 
-              <Route path="/Inicio" element={<InicioWrapper />} />
-
-              <Route path="/Clientes/*" element={<ClientesWrapper />} />
-
-              <Route path="/MapaClientes/*" element={<MapaClientesWrapper />} />
-
-              <Route
-                path="/MonitoreoDistribuidores"
-                element={<MonitoreoDistribuidoresWrapper />}
-              />
-
-              <Route path="/Ventas/*" element={<VentasWrapper />} />
-
-              <Route path="/Pedidos/*" element={<PedidosWrapper />} />
-
-              <Route path="/Prestamos/*" element={<PrestamosWrapper />} />
-
-              <Route
-                path="/Finanzas/ArqueoDeCajas"
-                element={<ArqueoDeCajaWrapper />}
-              />
-
-              <Route
-                path="/Finanzas/CuentasPorCobrarCobros/*"
-                element={<CuentasPorCobrarWrapper />}
-              />
-
-              <Route
-                path="/Finanzas/EgresosGastos"
-                element={<EgresosGastosWrapper />}
-              />
-
-              <Route
-                path="/Finanzas/Proveedores"
-                element={<ProveedoresWrapper />}
-              />
-
-              <Route
-                path="/Finanzas/CuentasPorPagar/*"
-                element={<CuentasPorPagarWrapper />}
-              />
-
-              <Route
-                path="/Reportes/Ingresos/*"
-                element={<ReportesIngresosWrapper />}
-              />
-
-              <Route
-                path="/Reportes/Ingresos/Graficos/*"
-                element={<ReportesGraficosWrapper />}
-              />
-
-              <Route
-                path="/Reportes/Egresos/*"
-                element={<ReportesEgresosWrapper />}
-              />
-
-              <Route
-                path="/Reportes/Egresos/Graficos/*"
-                element={<ReportesEgresosGraficosWrapper />}
-              />
-
-              <Route
-                path="/Reportes/Resultados/*"
-                element={<ReportesResultadosWrapper />}
-              />
-
-              <Route
-                path="/Configuracion/General"
-                element={<ConfiguracionGeneralWrapper />}
-              />
-
-              <Route
-                path="/Configuracion/Usuarios"
-                element={<UsuariosWrapper />}
-              />
-
-              <Route
-                path="/Configuracion/Barrios"
-                element={<BarriosWrapper />}
-              />
-
-              <Route path="/Configuracion/Zonas" element={<ZonasWrapper />} />
-
-              <Route
-                path="/Configuracion/Productos"
-                element={<ProductosWrapper />}
-              />
-
-              <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
-
+              {/* Redirige cualquier ruta desconocida a Inicio */}
               <Route path="*" element={<Navigate to="/Inicio" />} />
             </Routes>
           </div>

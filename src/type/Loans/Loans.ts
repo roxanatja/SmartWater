@@ -2,7 +2,7 @@ export type LoansBody = {
   user: string;
   client: string;
   contract: {
-    link: string;
+    link: string | null;
     validUntil: string;
   };
   comment: string;
@@ -24,6 +24,7 @@ export type Loans = {
   detail: {
     item: string;
     quantity: number;
+    name?: string;
   }[];
   status: string;
   created: string;

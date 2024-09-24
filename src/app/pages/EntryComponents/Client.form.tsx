@@ -23,12 +23,13 @@ const ClientForm = ({
   const [date2, setDate2] = useState(false);
   const { selectedClient } = useContext(ClientesContext);
   const [uploading, setUploading] = useState(false);
+  const [mapinteration, setMapinteration] = useState(false);
   const d =
     selectedClient._id !== ""
       ? {
           defaultValues: {
             ...selectedClient,
-            hasLoan: Number(selectedClient.renewInDays) > 0,
+            dayrenew: Number(selectedClient.renewInDays) > 0,
           } as unknown as Client,
         }
       : {};
@@ -59,9 +60,8 @@ const ClientForm = ({
     try {
       values = {
         ...data,
-        whatsAppNumber: verifyPhoneNumber(data.whatsAppNumber),
+        phoneLandLine: verifyPhoneNumber(data.phoneLandLine),
       };
-      console.log(values);
       if (selectedClient._id !== "") {
         await api.updateClient(selectedClient._id, values);
         return toast.success("Cliente editado exitosamente");
@@ -84,6 +84,7 @@ const ClientForm = ({
       setValue("zone", d._id);
     } else {
       setValue("zone", selectedClient.zone);
+      setMapinteration(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue]);
@@ -102,15 +103,13 @@ const ClientForm = ({
     }
   };
 
-  const handleCheckboxChangeReno = (type: "hasLoan" | "hasOrder") => {
-    if (type === "hasLoan") {
-      setValue("hasLoan", true);
-      setValue("hasOrder", false);
+  const handleCheckboxChangeReno = (type: "dayrenew" | "hasOrder") => {
+    if (type === "dayrenew") {
+      setValue("dayrenew", true);
       setDate(true);
       setDate2(false);
     } else {
-      setValue("hasOrder", true);
-      setValue("hasLoan", false);
+      setValue("dayrenew", false);
       setDate(false);
       setDate2(true);
     }
@@ -120,7 +119,7 @@ const ClientForm = ({
     if (selectedClient._id === "") {
       setValue("isClient", true);
       setValue("isAgency", false);
-      setValue("hasLoan", true);
+      setValue("dayrenew", true);
       setValue("hasOrder", false);
       setValue("renewInDays", 0);
       setValue("renewInDaysNumber", "0");
@@ -238,16 +237,13 @@ const ClientForm = ({
           errors={errors.fullName}
           required
         />
-        {selectedClient._id === "" && (
-          <Input
-            label="Datos de Factura"
-            name="billingInfo.name"
-            register={register}
-            errors={errors.billingInfo?.name}
-            required
-          />
-        )}
-
+        <Input
+          label="Datos de Factura"
+          name="billingInfo.name"
+          register={register}
+          errors={errors.billingInfo?.name}
+          required
+        />
         <Input
           label="Numero de NIT"
           name="billingInfo.NIT"
@@ -255,28 +251,26 @@ const ClientForm = ({
           errors={errors.billingInfo?.NIT}
           required
         />
-        {selectedClient._id === "" && (
-          <Input
-            label="Numero de whatsapp"
-            name="whatsAppNumber"
-            register={register}
-            errors={errors.whatsAppNumber}
-            className="pl-24"
-            icon={
-              <div className="flex items-center gap-2 justify-center py-1">
-                <i className="fa-brands fa-square-whatsapp text-green-500"></i>
-                <p className="text-sm">(591)</p>
-              </div>
-            }
-            required
-          />
-        )}
         <Input
-          label="Numero de Telefono"
-          name="phoneNumber"
+          label="Numero de Telefono Fijo"
+          name="phoneLandLine"
           register={register}
           icon={<i className="fa-solid fa-phone"></i>}
+          errors={errors.phoneLandLine}
+          required
+        />
+        <Input
+          label="Numero de whatsapp"
+          name="phoneNumber"
+          register={register}
           errors={errors.phoneNumber}
+          className="pl-24"
+          icon={
+            <div className="flex items-center gap-2 justify-center py-1">
+              <i className="fa-brands fa-square-whatsapp text-green-500"></i>
+              <p className="text-sm">(591)</p>
+            </div>
+          }
           required
         />
         <Input
@@ -455,12 +449,13 @@ const ClientForm = ({
             errors={errors}
           />
         )}
-        <div className="w-full col-span-2 max-sm:col-span-1">
+        <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">
             Selecciona una ubicación en el mapa
           </h1>
           <GoogleMapWithSelection
             visible={isOpen}
+            disable={mapinteration}
             linkAddress={watch("linkAddress")}
             latitude={Number(watch("location.latitude"))}
             longitude={Number(watch("location.longitude"))}
@@ -469,6 +464,13 @@ const ClientForm = ({
               setValue("location.longitude", `${coordinates.lng}`);
             }}
           />
+          <button
+            type="button"
+            onClick={() => setMapinteration(!mapinteration)}
+            className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-50 right-14"
+          >
+            {mapinteration ? "Editar" : "Bloquear"}
+          </button>
         </div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -481,7 +483,7 @@ const ClientForm = ({
             <div className="flex gap-2 items-center justify-center font-semibold">
               <i
                 onClick={() => {
-                  handleCheckboxChangeReno("hasLoan");
+                  handleCheckboxChangeReno("dayrenew");
                 }}
                 className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${
                   watch("renewInDays") === 0
@@ -491,7 +493,7 @@ const ClientForm = ({
               ></i>
 
               <p
-                className={`${watch("hasOrder") ? "text-zinc-300" : ""} ${
+                className={`${!watch("dayrenew") ? "text-zinc-300" : ""} ${
                   date && "text-transparent"
                 }`}
               >
@@ -509,8 +511,8 @@ const ClientForm = ({
                 <input
                   id="switch-component"
                   type="checkbox"
-                  onClick={() => handleCheckboxChangeReno("hasLoan")}
-                  checked={watch("hasLoan")}
+                  onClick={() => handleCheckboxChangeReno("dayrenew")}
+                  checked={watch("dayrenew")}
                   className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
                 />
                 <label
@@ -521,17 +523,19 @@ const ClientForm = ({
             </div>
           </div>
           {date && (
-            <Input
-              type="number"
-              label="Periodo Renovacion"
-              register={register}
-              name="renewInDays"
-              numericalOnly
-              isVisibleLable
-              className="absolute -top-9 -translate-y-0.5 bg-white left-9 w-20"
-              errors={errors.renewInDays}
-              required={date}
-            />
+            <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
+              <Input
+                type="number"
+                label="Periodo Renovacion"
+                register={register}
+                name="renewInDays"
+                numericalOnly
+                isVisibleLable
+                className="w-full"
+                errors={errors.renewInDays}
+                required={date}
+              />
+            </div>
           )}
         </motion.div>
         <motion.div
@@ -539,7 +543,7 @@ const ClientForm = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-col justify-center items-center col-span-2 max-sm:col-span-1 pr-6 border-b border-black pb-4"
+          className="flex flex-col justify-center items-center col-span-2 max-sm:col-span-1 pr-6 border-b border-black pb-4 relative"
         >
           <div className="flex justify-between items-center gap-4 w-full">
             <div className="flex gap-2 items-center justify-center font-semibold">
@@ -548,12 +552,12 @@ const ClientForm = ({
                   handleCheckboxChangeReno("hasOrder");
                 }}
                 className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${
-                  watch("renewInDaysNumber") === ""
+                  watch("renewInDaysNumber") === "0"
                     ? `text-zinc-300 hover:text-blue-900`
                     : "text-blue-900"
                 }`}
               ></i>
-              <p className={`${watch("hasLoan") ? "text-zinc-300" : ""}`}>
+              <p className={`${watch("dayrenew") ? "text-zinc-300" : ""}`}>
                 Renovacion Promedio
               </p>
             </div>
@@ -569,7 +573,7 @@ const ClientForm = ({
                   id="switch-component-2"
                   type="checkbox"
                   onClick={() => handleCheckboxChangeReno("hasOrder")}
-                  checked={watch("hasOrder")}
+                  checked={!watch("dayrenew")}
                   className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
                 />
                 <label
@@ -580,16 +584,18 @@ const ClientForm = ({
             </div>
           </div>
           {date2 && (
-            <Input
-              type="number"
-              label="Renovacion Promedio"
-              register={register}
-              isVisibleLable
-              className="absolute w-44 -top-9 -translate-y-0.5 bg-white left-9"
-              name="renewInDaysNumber"
-              errors={errors.renewInDaysNumber}
-              required={date2}
-            />
+            <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
+              <Input
+                type="number"
+                label="Renovacion Promedio"
+                register={register}
+                isVisibleLable
+                className="w-full"
+                name="renewInDaysNumber"
+                errors={errors.renewInDaysNumber}
+                required={date2}
+              />
+            </div>
           )}
         </motion.div>
       </div>

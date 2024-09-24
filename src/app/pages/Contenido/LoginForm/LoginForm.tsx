@@ -1,5 +1,7 @@
 import React, { useState, FormEvent } from "react";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import AuthenticationService from "../../../../services/AuthenService";
 import "./LoginForm.css";
 
@@ -41,8 +43,8 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await AuthenticationService.login(phoneNumber, password);
-      console.log("Usuario autenticado:", response);
+      await AuthenticationService.login(phoneNumber, password);
+      toast.success("Usuario autenticado:");
       navigate("/Inicio");
     } catch (error: any) {
       setError("Error al iniciar sesión. Por favor revisa tus credenciales.");
@@ -51,42 +53,88 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-overlay">
-      <div className="login-content">
+    <motion.div
+      className="login-overlay"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="login-content"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 50 }}
+      >
         <div className="login-header">
           <h1 className="login-title">Iniciar Sesión</h1>
         </div>
         <div className="login-body">
           <form onSubmit={handleLogin}>
-            <input
+            <motion.input
               className={`login-input ${phoneNumberError && "error"}`}
               type="text"
               placeholder="Número de teléfono"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
             />
             {phoneNumberError && (
-              <p className="error-message">{phoneNumberError}</p>
+              <motion.p
+                className="error-message"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {phoneNumberError}
+              </motion.p>
             )}
 
-            <input
+            <motion.input
               className={`login-input ${passwordError && "error"}`}
               type="password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
             />
-            {passwordError && <p className="error-message">{passwordError}</p>}
+            {passwordError && (
+              <motion.p
+                className="error-message"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {passwordError}
+              </motion.p>
+            )}
 
-            {error && <p className="error-message">{error}</p>}
+            {error && (
+              <motion.p
+                className="error-message"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {error}
+              </motion.p>
+            )}
 
-            <button className="login-btn" type="submit">
+            <motion.button
+              className="login-btn"
+              type="submit"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Iniciar Sesión
-            </button>
+            </motion.button>
           </form>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

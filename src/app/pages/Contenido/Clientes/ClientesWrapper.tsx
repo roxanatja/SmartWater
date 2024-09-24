@@ -20,7 +20,7 @@ const ClientesWrapper: FC = () => {
             <Route path="/RegistrarPedido" element={<RegistrarPedido />} />
             <Route path="/RegistrarPrestamo" element={<RegistrarPrestamo />} />
             <Route
-              path="/RegistrarDevolucion"
+              path="/RegistrarDevolucion/:parcial"
               element={<RegistrarDevolucion />}
             />
             <Route path="/EditarCliente" element={<ClientEdit />} />

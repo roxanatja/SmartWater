@@ -1,7 +1,8 @@
-import { FC } from "react";
+import { FC, useContext } from "react";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import RegisterPedidoForm from "../../../EntryComponents/RegisterPedido";
+import { ClientesContext } from "../../Clientes/ClientesContext";
 
 const RegistrarPedido: FC = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const RegistrarPedido: FC = () => {
   const handleClick = () => {
     navigate("/MapaClientes");
   };
+  const { selectedClient } = useContext(ClientesContext);
 
   return (
     <>
@@ -25,7 +27,7 @@ const RegistrarPedido: FC = () => {
           </button>
           <span>Regresar</span>
         </div>
-        <RegisterPedidoForm isNoClient={true} />
+        <RegisterPedidoForm selectedClient={selectedClient} isNoClient={true} />
       </div>
     </>
   );

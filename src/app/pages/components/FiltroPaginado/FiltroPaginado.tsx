@@ -20,6 +20,7 @@ import { GetItems } from "../../../../services/ItemsService";
 import { loadOrders } from "../../../../services/OrdersService";
 import { useForm } from "react-hook-form";
 import Input from "../../EntryComponents/Inputs";
+import ApiMethodClient from "../../../../Class/api.client";
 
 type Componentes = {
   exportar?: boolean;
@@ -402,66 +403,57 @@ const FiltroPaginado: FC<Componentes> = ({
   };
 
   const getDataClients = async () => {
-    //Guarda todos los campos para exportar en el archivo excel
+    // Cargar datos
     const { data } = await loadClients();
     const userList = await GetUser();
-    const loans = await GetLoans().then((resp) => {
-      return resp.data;
-    });
-    const zones = await GetZone().then((resp) => {
-      return resp.data;
-    });
-    const districts = await GetDistricts().then((resp) => {
-      return resp.data;
-    });
-    const items = await GetItems().then((resp) => {
-      return resp.data;
-    });
-    const devolutions = await GetDevolutions().then((resp) => {
-      return resp.data;
-    });
+    const loans = await GetLoans().then((resp) => resp.data);
+    const zones = await GetZone().then((resp) => resp.data);
+    const districts = await GetDistricts().then((resp) => resp.data);
+    const items = await GetItems().then((resp) => resp.data);
+    const devolutions = await GetDevolutions().then((resp) => resp.data);
 
+    // Mapeo de datos
     const dataClientToExport = await Promise.all(
       data.map(async (client: Client) => {
+        // Filtrar préstamos asociados al cliente
         const filteredLoans = loans.filter(
           (loan: any) => loan.client === client._id
         );
 
         const typeDataToExport = {
-          NOMBRE: client.fullName,
+          NOMBRE: client.fullName || "Sin nombre",
           "TIPO DE CLIENTE": client.isClient
             ? "Cliente"
             : client.isAgency
             ? "Agencia"
-            : "Desconocido", // Añadido como tipo de cliente
-          WHATSAPP: client.phoneNumber ?? "S/Numero",
-          TELEFONO: client.phoneNumber ? client.phoneNumber : "S/Numero",
-          CODIGO: client.code ? client.code : "Sin codigo",
-          DIRECCION: client.address ? client.address : "Sin direccion",
-          REFERENCIA: client.comment,
-          USUARIO: await searchUser(client.user, userList),
-          ZONA: await searchZone(client.zone, zones),
-          BARRIO: await searchDistrict(client.district, districts),
-          "TIEMPO DE RENOVACION": client.renewInDays,
+            : "Desconocido", // Define el tipo de cliente
+          WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
+          TELEFONO: client.phoneNumber ? client.phoneNumber : "S/Numero", // Número de teléfono
+          CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
+          DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
+          REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
+          USUARIO: await searchUser(client.user, userList), // Buscar usuario asociado
+          ZONA: await searchZone(client.zone, zones), // Buscar la zona
+          BARRIO: await searchDistrict(client.district, districts), // Buscar barrio
+          "TIEMPO DE RENOVACION": client.renewInDays || "No especificado", // Tiempo de renovación
           "FECHA DE REGISTRO": formatDateTime(
             client.created,
             "numeric",
             "numeric",
             "2-digit"
-          ),
-          CONTRATOS: await setContract(client, loans),
-          PRESTAMOS: await setLoans(
-            client._id,
-            filteredLoans,
-            devolutions,
-            items
-          ),
-          DEVOLUCIONES: await setDevolutions(client._id, devolutions, items),
-          SALDOS: await setDetailClient(filteredLoans, items),
+          ), // Formatear la fecha de registro
+          CONTRATOS: (await setContract(client, loans)) || "SIN CONTRATOS", // Estado de contratos
+          PRESTAMOS:
+            (await setLoans(client._id, filteredLoans, devolutions, items)) ||
+            "SIN MOVIMIENTO", // Detalles de préstamos
+          DEVOLUCIONES:
+            (await setDevolutions(client._id, devolutions, items)) ||
+            "SIN MOVIMIENTO", // Detalles de devoluciones
+          SALDOS: (await setDetailClient(filteredLoans, items)) || "SIN SALDOS", // Detalles de saldos
           "FECHA DE ULTIMA VENTA": client.lastSale
             ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit")
-            : "Sin ventas",
-          "SALDOS POR COBRAR BS": client.credit,
+            : "Sin ventas", // Fecha de la última venta
+          "SALDOS POR COBRAR BS": client.credit || 0,
         };
 
         return typeDataToExport;
@@ -823,7 +815,7 @@ const FiltroPaginado: FC<Componentes> = ({
           </div>
         )}
         <div className="overflow-y-scroll max-h-[70vh]">{children}</div>
-        <div className="flex justify-between bg-transparent sticky bottom-0">
+        <div className="flex justify-between bg-transparent fixed right-5 w-10/12 bottom-0">
           {exportar && (
             <div className="flex flex-col justify-center items-center -translate-y-5">
               <button

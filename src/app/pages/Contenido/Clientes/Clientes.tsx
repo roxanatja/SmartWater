@@ -279,7 +279,12 @@ const Clientes: FC = () => {
           Opciones Cliente
         </h2>
         <div className="p-6">
-          <OpcionesClientes />
+          <OpcionesClientes
+            onClose={() => {
+              setSelectedClient(client);
+              setShowMiniModal(false);
+            }}
+          />
         </div>
       </Modal>
       {showFiltro && <FiltroClientes />}

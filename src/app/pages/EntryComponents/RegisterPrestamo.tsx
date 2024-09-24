@@ -10,10 +10,13 @@ import { useNavigate } from "react-router-dom";
 import { LoansBody } from "../../../type/Loans/Loans";
 import ApiMethodLoans from "../../../Class/api.loans";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import ImageUploadField from "./ImageUploadField";
+import { Client } from "../../../type/Cliente/Client";
+import { UserData } from "../../../type/UserData";
+import AuthenticationService from "../../../services/AuthenService";
 
-const RegisterPrestaForm = () => {
-  const { selectedClient } = useContext(ClientesContext);
+const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
@@ -27,13 +30,14 @@ const RegisterPrestaForm = () => {
     handleSubmit,
     watch,
     setValue,
+    reset,
     control,
     formState: { errors },
   } = useForm<LoansBody>({
     defaultValues: {
       detail: [{ item: "", quantity: "0" }],
       contract: {
-        link: undefined,
+        link: null,
         validUntil: "",
       },
     },
@@ -58,18 +62,21 @@ const RegisterPrestaForm = () => {
     }
     setActive(true);
     const api = new ApiMethodLoans();
+    const auth = AuthenticationService;
+    const userData: UserData = auth.getUser();
     const values: LoansBody = {
       ...data,
       detail: addedProducts.map((item) => ({
         item: products?.find((p) => p.description === item.product)?._id || "",
         quantity: item.quantity,
       })),
-      user: `${process.env.REACT_APP_USER_API}`,
+      user: userData.user._id,
       client: selectedClient._id,
     };
-    console.log(values);
     try {
       await api.saveLoans(values);
+      reset();
+      setAddedProducts([]);
       toast.success("Prestamo registrado");
     } catch (error) {
       toast.error("Upss error al registrar prestamo");
@@ -219,14 +226,23 @@ const RegisterPrestaForm = () => {
               className="opacity-0 w-2/12 cursor-pointer"
               onChange={(date: Date | null) => {
                 if (date) {
+                  const today = new Date().setHours(0, 0, 0, 0);
+                  const selectedDate = new Date(date).setHours(0, 0, 0, 0);
+
+                  if (selectedDate === today) {
+                    toast.error("No puedes seleccionar la fecha de hoy");
+                    setValue("contract.validUntil", "");
+                    return;
+                  }
+
                   const formattedDate = date
                     .toISOString()
                     .split("T")[0]
-                    .replace(/-/g, "/");
+                    .replace(/-/g, "-");
                   setValue("contract.validUntil", formattedDate as string);
                 }
               }}
-              dateFormat={"yyyy/MM/dd"}
+              dateFormat={"yyyy-MM-dd"}
               dropdownMode="select"
             />
           </div>
@@ -257,6 +273,7 @@ const RegisterPrestaForm = () => {
           register={register}
           setValue={setValue}
           errors={errors}
+          required={false}
         />
         <button
           type="submit"

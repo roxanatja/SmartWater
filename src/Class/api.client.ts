@@ -5,13 +5,27 @@ import { Client } from "./types.data";
 class ApiMethodClient extends GetApiMethod {
   public async getClientById(id: string): Promise<Client> {
     try {
-      const { data } = await this.axiosInstance.get(`/clients/extended/${id}`);
+      const { data } = await this.axiosInstance.get(`/clients/${id}`);
       return data as Client;
     } catch (e) {
       console.error(e);
       throw new Error(
         `Error al obtener la información extendida del cliente: ${e}`
       );
+    }
+  }
+  public async getReportClient() {
+    try {
+      const response = await this.axiosInstance.get(
+        "/clients/report/reportclients"
+      );
+      return response.data as Client;
+    } catch (error: any) {
+      console.error(error);
+      if (error?.response?.data?.msg) {
+        toast.error(error.response.data.msg);
+      }
+      throw new Error(`Error al registrar el cliente: ${error}`);
     }
   }
 

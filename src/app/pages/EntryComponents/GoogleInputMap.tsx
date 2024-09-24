@@ -6,6 +6,7 @@ type GoogleMapWithSelectionProps = {
   longitude?: number;
   visible: boolean;
   linkAddress?: string;
+  disable?: boolean;
 };
 
 const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
@@ -14,12 +15,17 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   longitude,
   visible,
   linkAddress,
+  disable,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const apiKey = `${process.env.REACT_APP_API_GOOGLE}`;
   const [mapInteractive, setMapInteractive] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMapInteractive(disable ? true : false);
+  }, [disable]);
 
   // Mover el callback fuera del efecto para evitar cambios infinitos
   const getCurrentLocation = useCallback(
@@ -265,8 +271,8 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-            zIndex: 1000,
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            zIndex: 40,
           }}
         />
       )}

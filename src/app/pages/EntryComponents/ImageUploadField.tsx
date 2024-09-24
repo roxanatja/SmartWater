@@ -8,6 +8,7 @@ interface ImageUploadFieldProps {
   register: any;
   setValue: any;
   errors: any;
+  required?: boolean;
 }
 
 const saveImage = async (file: File) => {
@@ -29,7 +30,7 @@ const saveImage = async (file: File) => {
 };
 
 const ImageUploadField = memo<ImageUploadFieldProps>(
-  ({ watchField, fieldName, label, register, setValue, errors }) => {
+  ({ watchField, fieldName, label, setValue, errors, required }) => {
     const [active, setActive] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -58,7 +59,7 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
         animate={{ opacity: 1, left: 0 }}
         exit={{ opacity: 0, left: 100 }}
         transition={{ delay: 0.3 }}
-        className="flex flex-col items-center justify-center w-full gap-4 relative col-span-2 max-sm:col-span-1"
+        className="flex flex-col items-center justify-center w-full gap-4 relative col-span-2 max-sm:col-span-1 z-0"
       >
         <button
           type="button"
@@ -83,7 +84,9 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
               type="file"
               accept="image/jpeg,image/jpg"
               onChange={handleFileChange}
-              required={!watchField(fieldName)}
+              required={
+                required !== undefined ? required : !watchField(fieldName)
+              }
             />
           </label>
         </button>

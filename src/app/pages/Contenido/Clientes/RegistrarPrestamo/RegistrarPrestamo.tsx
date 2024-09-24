@@ -12,6 +12,7 @@ const RegistrarPrestamo = () => {
     navigate("/Clientes");
     setSelectedClient(client);
   };
+  const { selectedClient } = useContext(ClientesContext);
 
   return (
     <>
@@ -28,7 +29,7 @@ const RegistrarPrestamo = () => {
           </button>
           <span>Regresar</span>
         </div>
-        <RegisterPrestaForm />
+        <RegisterPrestaForm selectedClient={selectedClient} />
       </div>
     </>
   );

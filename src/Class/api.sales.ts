@@ -42,6 +42,18 @@ class ApiMethodSales extends GetApiMethod {
       );
     }
   }
+
+  public async DeleteSale(id: string) {
+    try {
+      const { data } = await this.axiosInstance.get(`/sales/${id}/delete`);
+      return data.data as Product[];
+    } catch (e) {
+      console.error(e);
+      throw new Error(
+        `Error al obtener la información extendida de las Ventas: ${e}`
+      );
+    }
+  }
 }
 
 export default ApiMethodSales;

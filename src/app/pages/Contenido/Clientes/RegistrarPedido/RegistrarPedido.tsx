@@ -12,6 +12,7 @@ const RegistrarPedido = () => {
     navigate("/Clientes");
     setSelectedClient(client);
   };
+  const { selectedClient } = useContext(ClientesContext);
 
   return (
     <>
@@ -28,7 +29,7 @@ const RegistrarPedido = () => {
           </button>
           <span>Regresar</span>
         </div>
-        <RegisterPedidoForm />
+        <RegisterPedidoForm selectedClient={selectedClient} />
       </div>
     </>
   );

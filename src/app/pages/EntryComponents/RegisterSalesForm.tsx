@@ -8,9 +8,11 @@ import { SaleBody } from "../../../type/Sale/Sale";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Client } from "../../../type/Cliente/Client";
+import { UserData } from "../../../type/UserData";
+import AuthenticationService from "../../../services/AuthenService";
 
-const RegisterSalesForm = () => {
-  const { selectedClient } = useContext(ClientesContext);
+const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
@@ -47,6 +49,8 @@ const RegisterSalesForm = () => {
     }
     setActive(true);
     const api = new ApiMethodSales();
+    const auth = AuthenticationService;
+    const userData: UserData = auth.getUser();
     const values: SaleBody = {
       ...data,
       detail: addedProducts.map((item) => ({
@@ -55,7 +59,7 @@ const RegisterSalesForm = () => {
         quantity: item.quantity,
         price: `${parseInt(item.price)}`,
       })),
-      user: `${process.env.REACT_APP_USER_API}`,
+      user: userData.user._id,
       client: selectedClient._id,
     };
     console.log(values);

@@ -1,11 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { City, Zone } from "./types.data";
+import Product from "../type/Products/Products";
+import AuthenticationService from "../services/AuthenService";
 
 class GetApiMethod {
   public axiosInstance: AxiosInstance;
 
   constructor() {
-    const authToken = `${process.env.REACT_APP_API_TOKEN_HEROKU}`;
+    const auth = AuthenticationService;
+    const authToken =
+      auth.getToken() || `${process.env.REACT_APP_API_TOKEN_HEROKU}`;
     this.axiosInstance = axios.create({
       baseURL: process.env.REACT_APP_API_HEROKU,
       headers: {
@@ -32,6 +36,16 @@ class GetApiMethod {
     } catch (e) {
       console.error(e);
       throw new Error(`Error al obtener las ciudades: ${e}`);
+    }
+  }
+
+  public async getItems(): Promise<Product[]> {
+    try {
+      const response = await this.axiosInstance.get("/items?pageSize=3000");
+      return response.data.data as Product[];
+    } catch (e) {
+      console.error(e);
+      throw new Error(`Error al obtener los item: ${e}`);
     }
   }
 }

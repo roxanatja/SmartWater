@@ -1,11 +1,10 @@
-import { FC, useContext } from "react";
+import { useContext } from "react";
 import "./OpcionesClientes.css";
 import { Link } from "react-router-dom";
-import { ClientesContext, client } from "../ClientesContext";
+import { ClientesContext } from "../ClientesContext";
 
-const OpcionesClientes: FC = () => {
-  const { setShowMiniModal, setSelectedOption, setSelectedClient } =
-    useContext(ClientesContext);
+const OpcionesClientes = ({ onClose }: { onClose: () => void }) => {
+  const { setSelectedOption } = useContext(ClientesContext);
 
   return (
     <>
@@ -53,7 +52,7 @@ const OpcionesClientes: FC = () => {
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
-        to={"/Clientes/RegistrarDevolucion"}
+        to={"/Clientes/RegistrarDevolucion/parcial"}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -90,7 +89,7 @@ const OpcionesClientes: FC = () => {
         </button>
       </Link>
       <Link
-        to={"/Clientes/RegistrarDevolucion"}
+        to={"/Clientes/RegistrarDevolucion/total"}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -145,10 +144,7 @@ const OpcionesClientes: FC = () => {
         <button
           type="button"
           className="opcionesClientes-Btn"
-          onClick={() => {
-            setShowMiniModal(false);
-            setSelectedClient(client);
-          }}
+          onClick={onClose}
         >
           Cerrar
         </button>

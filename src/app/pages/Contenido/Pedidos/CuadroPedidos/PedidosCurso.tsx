@@ -64,7 +64,7 @@ const PedidosCurso: FC = () => {
         return (
           <div
             key={index}
-            className="PedidosCurso-container"
+            className="PedidosCurso-container w-full"
             style={{ gap: "14px" }}
           >
             {/* Datos del cliente */}

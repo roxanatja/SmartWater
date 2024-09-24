@@ -3,6 +3,7 @@ type Order = {
   client: string;
   comment: string;
   deliverDate: string;
+  distributorRedirectId: string;
   detail: Array<{
     product: string;
     quantity: string;
@@ -25,6 +26,7 @@ type OrdenBody = {
   client: string;
   comment: string;
   deliverDate: string;
+  distributorRedirectId: string;
   detail: {
     product: string;
     quantity: string;

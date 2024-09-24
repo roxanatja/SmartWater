@@ -39,9 +39,10 @@ export interface Client {
   renewInDays: number;
   credit: string;
   billingInfo: BillingInfo;
-  whatsAppNumber: string;
+  phoneLandLine: string;
   isAgency: boolean;
   linkAddress?: string;
+  dayrenew?: boolean;
 }
 
 export interface District {

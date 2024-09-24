@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import smartwaterApi from "../api/SmartWaterApi";
 
 const AuthenticationService = {
@@ -7,7 +8,9 @@ const AuthenticationService = {
         phoneNumber,
         password,
       });
-      localStorage.setItem("token", response.data.token);
+
+      Cookies.set("token", response.data.token, { expires: 7 });
+      Cookies.set("userData", JSON.stringify(response.data), { expires: 7 });
       return response.data;
     } catch (error) {
       throw new Error(
@@ -17,15 +20,19 @@ const AuthenticationService = {
   },
 
   logout: () => {
-    localStorage.removeItem("token");
+    Cookies.remove("token");
   },
 
   getToken: () => {
-    return localStorage.getItem("token");
+    return Cookies.get("token");
+  },
+
+  getUser: () => {
+    return JSON.parse(Cookies.get("userData") || '{}');
   },
 
   isLoggedIn: () => {
-    return !!localStorage.getItem("token");
+    return !!Cookies.get("token");
   },
 };
 

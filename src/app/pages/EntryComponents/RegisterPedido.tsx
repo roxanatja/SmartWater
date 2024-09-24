@@ -1,12 +1,12 @@
-import React, { useState, useContext, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import ApiMethodSales from "../../../Class/api.sales";
 import { OrdenBody } from "../../../type/Order/Order";
 import Product from "../../../type/Products/Products";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { motion } from "framer-motion";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-hot-toast";
 import ApiMethodOrder from "../../../Class/api.order";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +14,17 @@ import { District, Zone } from "../../../Class/types.data";
 import GetApiMethod from "../../../Class/api.class";
 import GoogleMapWithSelection from "./GoogleInputMap";
 import Input from "./Inputs";
+import { Client } from "../../../type/Cliente/Client";
+import { UserData } from "../../../type/UserData";
+import AuthenticationService from "../../../services/AuthenService";
 
-const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
-  const { selectedClient } = useContext(ClientesContext);
+const RegisterPedidoForm = ({
+  isNoClient,
+  selectedClient,
+}: {
+  isNoClient?: boolean;
+  selectedClient: Client;
+}) => {
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
@@ -121,6 +129,8 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
     }
     setActive(true);
     const api = new ApiMethodOrder();
+    const auth = AuthenticationService;
+    const userData: UserData = auth.getUser();
     if (isNoClient) {
       const values: OrdenBody = {
         ...data,
@@ -129,7 +139,7 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
             products?.find((p) => p.description === item.product)?._id || "",
           quantity: item.quantity,
         })),
-        user: `${process.env.REACT_APP_USER_API}`,
+        user: userData.user._id,
         deliverDate: data.deliverDate.replace(/\//g, "-"),
       };
       try {
@@ -138,7 +148,7 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
       } catch (error) {
         toast.error("Upss error al registrar pedido");
         console.error(error);
-      } 
+      }
       setActive(false);
       return;
     }
@@ -162,7 +172,6 @@ const RegisterPedidoForm = ({ isNoClient }: { isNoClient?: boolean }) => {
         zone: cl.zone,
       },
     };
-    console.log(values);
     try {
       await api.saveOrder(values);
       toast.success("Pedido registrado");
