@@ -70,7 +70,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
         item: products?.find((p) => p.description === item.product)?._id || "",
         quantity: item.quantity,
       })),
-      user: userData.user._id,
+      user: userData._id,
       client: selectedClient._id,
     };
     try {

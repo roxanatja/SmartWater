@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import ApiMethodSales from "../../../Class/api.sales";
 import { motion } from "framer-motion";
@@ -74,7 +73,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                     item: item.item,
                     quantity: `${item.quantity}`,
                   })),
-                  user: userData.user._id,
+                  user: userData._id,
                   client: selectedClient._id,
                   loan: loan?._id,
                 };
@@ -127,7 +126,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           item: products?.find((p) => p.name === item.item)?.item || "",
           quantity: item.quantity,
         })),
-        user: userData.user._id,
+        user: userData._id,
         client: selectedClient._id,
         loan: loan?._id,
       };

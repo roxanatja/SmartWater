@@ -7,7 +7,6 @@ import { Client } from "../../../../../type/Cliente/Client";
 import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
 import { formatDateTime } from "../../../../../utils/helpers";
-import ApiMethodClient from "../../../../../Class/api.client";
 import { toast } from "react-hot-toast";
 import ApiMethodSales from "../../../../../Class/api.sales";
 
@@ -19,23 +18,12 @@ const CuadroVentaCliente = (sale: Sale) => {
   const [date, setDate] = useState<string>();
 
   useEffect(() => {
-    getClient();
     getProducts();
-    console.log(sale);
+    var date = formatDateTime(sale.created, "numeric", "numeric", "numeric");
+    setClient(sale.client[0]);
+    setDate(date);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const getClient = async () => {
-    const api = new ApiMethodClient();
-    try {
-      const re = await api.getClientById(sale.client);
-      var date = formatDateTime(sale.created, "numeric", "numeric", "numeric");
-      setClient(re as unknown as Client);
-      setDate(date);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const getProducts = async () => {
     try {
@@ -151,7 +139,7 @@ const CuadroVentaCliente = (sale: Sale) => {
                   );
                   const defaultProduct = {
                     name: "Producto desconocido",
-                    icon: "./default-icon.svg",
+                    icon: "./Botella-icon.svg",
                   };
 
                   return (
@@ -236,7 +224,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, detail }) => {
   return (
     <div className="flex justify-between items-center w-full">
       <div className="flex items-center justify-start gap-2 w-7/12">
-        <img src={product.icon || "./Botella-icon.svg"} alt={product.name} />
+        <img src={product.icon || "./Botella-icon.svg"} alt={""} />
         <span className="CuadroVentaCliente-text truncate">{product.name}</span>
       </div>
 

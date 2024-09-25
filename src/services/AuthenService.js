@@ -9,8 +9,13 @@ const AuthenticationService = {
         password,
       });
 
+      if (!response.data.token) {
+        throw new Error("Token de autenticación no recibido.");
+      }
+
       Cookies.set("token", response.data.token, { expires: 7 });
-      Cookies.set("userData", JSON.stringify(response.data), { expires: 7 });
+      Cookies.set("userData", JSON.stringify(response.data.user), { expires: 7 });
+
       return response.data;
     } catch (error) {
       throw new Error(
@@ -20,7 +25,9 @@ const AuthenticationService = {
   },
 
   logout: () => {
+    // Eliminar cookies al cerrar sesión
     Cookies.remove("token");
+    Cookies.remove("userData");
   },
 
   getToken: () => {
@@ -28,7 +35,16 @@ const AuthenticationService = {
   },
 
   getUser: () => {
-    return JSON.parse(Cookies.get("userData") || '{}');
+    const userData = Cookies.get("userData");
+    if (userData) {
+      try {
+        return JSON.parse(userData);
+      } catch (error) {
+        console.error("Error al parsear los datos del usuario:", error);
+        return null;
+      }
+    }
+    return null;
   },
 
   isLoggedIn: () => {

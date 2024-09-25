@@ -9,7 +9,6 @@ import { GetZone } from "../../../../../services/ZonesService";
 
 const PedidosCurso: FC = () => {
   const { setShowMiniModal } = useContext(PedidosContext);
-  const [showOptions, setShowOptions] = useState<boolean>(false);
   const [clients, setClients] = useState<any[]>([]); // Estado para almacenar los clientes
   const [products, setProducts] = useState<any[]>([]); // Estado para almacenar los productos
   const [orders, setOrders] = useState<any[]>([]); // Estado para almacenar las órdenes
@@ -20,7 +19,7 @@ const PedidosCurso: FC = () => {
       try {
         const clientsData = await loadClients();
         const productsData = await GetProducts();
-        const ordersData = await loadOrders({ attended: false }); // Pasar parámetros si es necesario
+        const ordersData = await loadOrders({ attended: false });
         const zonesData = await GetZone();
 
         console.log("Original Orders Data:", ordersData);
@@ -33,10 +32,10 @@ const PedidosCurso: FC = () => {
           (order: any) => new Date(order.deliverDate) >= today
         );
 
-        console.log("Filtered Orders Data:", filteredOrders);
-        console.log("Clients Data:", clientsData);
-        console.log("Products Data:", productsData);
-        console.log("Zones Data:", zonesData);
+        // console.log("Filtered Orders Data:", filteredOrders);
+        // console.log("Clients Data:", clientsData);
+        // console.log("Products Data:", productsData);
+        // console.log("Zones Data:", zonesData);
 
         setClients(clientsData.data);
         setProducts(productsData.data);
@@ -57,8 +56,8 @@ const PedidosCurso: FC = () => {
         const zone = zones.find((zone) => zone._id === client?.zone);
 
         if (!client) {
-          console.warn(`No se encontró el cliente con el ID: ${order.user}`);
-          return null; // O maneja esto de otra manera, como mostrar un mensaje de error
+          console.log(`No se encontró el cliente con el ID: ${order.user}`);
+          return null;
         }
 
         return (

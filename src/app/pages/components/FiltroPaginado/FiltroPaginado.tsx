@@ -8,7 +8,6 @@ import {
   GetClientById,
   loadClients,
 } from "../../../../services/ClientsService";
-import { Client } from "../../../../type/Cliente/Client";
 import { GetUser } from "../../../../services/UserService";
 import { formatDateTime } from "../../../../utils/helpers";
 import { GetZone } from "../../../../services/ZonesService";
@@ -20,7 +19,7 @@ import { GetItems } from "../../../../services/ItemsService";
 import { loadOrders } from "../../../../services/OrdersService";
 import { useForm } from "react-hook-form";
 import Input from "../../EntryComponents/Inputs";
-import ApiMethodClient from "../../../../Class/api.client";
+import { Client } from "../../../../type/Cliente/Client";
 
 type Componentes = {
   exportar?: boolean;
@@ -127,7 +126,6 @@ const FiltroPaginado: FC<Componentes> = ({
             const product = products.find(
               (product: any) => product._id === detail.item
             );
-
             if (product === undefined) return;
 
             if (prod.includes(product.name)) {
@@ -360,7 +358,6 @@ const FiltroPaginado: FC<Componentes> = ({
   };
 
   const getDataWithClientNames = async () => {
-    //Guarda el nombre del cliente, del usuario y las fechas formateadas en la venta
     const { data } = await GetSales();
     const userList = await GetUser();
 
@@ -428,7 +425,7 @@ const FiltroPaginado: FC<Componentes> = ({
             ? "Agencia"
             : "Desconocido", // Define el tipo de cliente
           WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
-          TELEFONO: client.phoneNumber ? client.phoneNumber : "S/Numero", // Número de teléfono
+          TELEFONO: client.phoneLandLine ? client.phoneNumber : "S/Numero", // Número de teléfono
           CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
           DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
           REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
@@ -560,14 +557,7 @@ const FiltroPaginado: FC<Componentes> = ({
               </div>
             )}
             {resultadosPrestamo && (
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "end",
-                  gap: "50px",
-                }}
-              >
+              <div className="flex justify-end gap-4 py-2">
                 <div className="resultado-busqueda">
                   <span>Resultados:</span>
                   <span style={{ color: "#1A3D7D" }}> {total}</span>
@@ -814,7 +804,13 @@ const FiltroPaginado: FC<Componentes> = ({
             </div>
           </div>
         )}
-        <div className="overflow-y-scroll max-h-[70vh]">{children}</div>
+        <div
+          className={`${
+            !resultadosPrestamo && "overflow-y-scroll max-h-[70vh]"
+          }`}
+        >
+          {children}
+        </div>
         <div className="flex justify-between bg-transparent fixed right-5 w-10/12 bottom-0">
           {exportar && (
             <div className="flex flex-col justify-center items-center -translate-y-5">

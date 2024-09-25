@@ -8,6 +8,7 @@ export interface Client {
   address: string;
   comment: string;
   email: string;
+  phoneLandLine?: string;
   ciFrontImage: string;
   ciBackImage: string;
   zone: string;

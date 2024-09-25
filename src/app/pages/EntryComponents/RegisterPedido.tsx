@@ -139,8 +139,12 @@ const RegisterPedidoForm = ({
             products?.find((p) => p.description === item.product)?._id || "",
           quantity: item.quantity,
         })),
-        user: userData.user._id,
+        user: userData._id,
         deliverDate: data.deliverDate.replace(/\//g, "-"),
+        clientNotRegistered: {
+          ...data.clientNotRegistered,
+          cityId: userData.city.id,
+        },
       };
       try {
         await api.saveOrder(values);
@@ -170,6 +174,7 @@ const RegisterPedidoForm = ({
         location: cl.location,
         phoneNumber: cl.phoneNumber,
         zone: cl.zone,
+        cityId: userData.city.id,
       },
     };
     try {

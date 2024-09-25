@@ -1,3 +1,5 @@
+import { Client } from "../Cliente/Client";
+
 export type LoansBody = {
   user: string;
   client: string;
@@ -15,7 +17,7 @@ export type LoansBody = {
 export type Loans = {
   _id: string;
   user: string;
-  client: string;
+  client: Client[];
   contract: {
     link: string;
     validUntil: string;

@@ -37,6 +37,7 @@ type OrdenBody = {
     address: string;
     district: string;
     zone: string;
+    cityId: string;
     location: {
       latitude: string;
       longitude: string;

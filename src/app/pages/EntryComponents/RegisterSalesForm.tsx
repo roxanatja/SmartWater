@@ -59,7 +59,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         quantity: item.quantity,
         price: `${parseInt(item.price)}`,
       })),
-      user: userData.user._id,
+      user: userData._id,
       client: selectedClient._id,
     };
     console.log(values);
