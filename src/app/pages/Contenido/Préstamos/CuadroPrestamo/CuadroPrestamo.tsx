@@ -12,9 +12,15 @@ type Prestamo = {
   estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null;
   loan: Loans;
   productos: Array<Product>;
+  info?: boolean;
 };
 
-const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
+const CuadroPrestamo: FC<Prestamo> = ({
+  loan,
+  productos,
+  estadoContrato,
+  info,
+}) => {
   const { setShowMiniModal } = useContext(PrestamosContext);
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
@@ -31,8 +37,6 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
     const response = await DeleteLoan(loan._id);
 
     if (response === 200) {
-      console.log("Préstamo devuelto con éxito");
-      window.alert("Préstamo devuelto con éxito");
       window.location.reload();
     } else {
       console.error("ERROR: ", response.statusText);
@@ -51,7 +55,11 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
           >
             <div className="CuadroVentaCliente-header">
               <img
-                src={loan.client[0]?.storeImage || "./Cliente2.svg"}
+                src={
+                  loan.client[0]?.storeImage || info
+                    ? "../Cliente2.svg"
+                    : "./Cliente2.svg"
+                }
                 alt=""
                 className="w-8 h-8 rounded-full"
               />
@@ -63,7 +71,10 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
                 className="btn"
                 onClick={() => setShowMiniModal(true)}
               >
-                <img src="./Opciones-icon.svg" alt="" />
+                <img
+                  src={info ? "../Opciones-icon.svg" : "./Opciones-icon.svg"}
+                  alt=""
+                />
               </button>
             </div>
             <div className="infoClientes-ultimaventa">
@@ -96,7 +107,10 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
           </div>
           <div>
             <button type="button" className="btn" onClick={() => Opciones()}>
-              <img src="./opcion-icon.svg" alt="" />
+              <img
+                src={info ? "../opcion-icon.svg" : "./opcion-icon.svg"}
+                alt=""
+              />
             </button>
             <Option
               editAction={Edit}
@@ -125,7 +139,10 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
                     <React.Fragment key={index}>
                       <div className="flex items-center gap-2">
                         <img
-                          src="./Botella-icon.svg"
+                          src={
+                            product?.imageUrl ||
+                            "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
+                          }
                           alt=""
                           className="w-8 h-8"
                         />
@@ -149,7 +166,11 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
 
           {estadoContrato === "Con Contrato" ? (
             <div className="flex items-center gap-2 mt-4">
-              <img src="./ConContrato.svg" alt="" className="w-5 h-5" />
+              <img
+                src={info ? "../ConContrato.svg" : "./ConContrato.svg"}
+                alt=""
+                className="w-5 h-5"
+              />
               <span className="CuadroPrestamo-texto text-xs font-medium">
                 Contrato
               </span>
@@ -164,7 +185,7 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
                 fill="none"
               >
                 <image
-                  xlinkHref="./ConContrato.svg"
+                  xlinkHref={info ? "../ConContrato.svg" : "./ConContrato.svg"}
                   x="4"
                   y="5"
                   width="21"
@@ -185,7 +206,11 @@ const CuadroPrestamo: FC<Prestamo> = ({ loan, productos, estadoContrato }) => {
             </div>
           ) : estadoContrato === "Contrato Vencido" ? (
             <div className="flex items-center gap-2 mt-4">
-              <img src="./ContratoVencido.svg" alt="" className="w-5 h-5" />
+              <img
+                src={info ? "../ContratoVencido.svg" : "./ContratoVencido.svg"}
+                alt=""
+                className="w-5 h-5"
+              />
               <span className="CuadroPrestamo-texto text-xs font-medium">
                 Contrato Vencido
               </span>

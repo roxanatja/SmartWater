@@ -1,11 +1,14 @@
 import toast from "react-hot-toast";
 import GetApiMethod from "./api.class";
-import { DevolutionBody } from "../type/Devolution/devolution";
+import { Devolution, DevolutionBody } from "../type/Devolution/devolution";
 
 class ApiMethodDevolu extends GetApiMethod {
   public async DevolutionsRegister(devolution: DevolutionBody) {
     try {
-      const resp = this.axiosInstance.post("/devolutions/register", devolution);
+      const resp = await this.axiosInstance.post(
+        "/devolutions/register",
+        devolution
+      );
 
       return resp;
     } catch (e: any) {
@@ -17,12 +20,13 @@ class ApiMethodDevolu extends GetApiMethod {
     }
   }
 
-  public async GetDevolutions(): Promise<DevolutionBody[]> {
+  public async GetDevolutions(params?: any): Promise<Devolution[]> {
     try {
-      const response: any = this.axiosInstance.get<DevolutionBody[]>(
-        "/devolutions?pageSize=3000"
+      const response: any = await this.axiosInstance.get(
+        "/devolutions?pageSize=3000",
+        { params }
       );
-      return response.data;
+      return response.data.data;
     } catch (e: any) {
       console.error("Error in GetDevolutions:", e);
       if (e?.response?.data?.msg) {
@@ -31,25 +35,9 @@ class ApiMethodDevolu extends GetApiMethod {
       throw new Error(`Error al salvar el GetDevolutions: ${e}`);
     }
   }
-
-  public async GetDevolutionsByUser(userId: string): Promise<DevolutionBody> {
-    try {
-      const response: any = this.axiosInstance.get(
-        `/devolutions?client=${userId}`
-      );
-      return response.data as DevolutionBody;
-    } catch (e: any) {
-      console.error("Error in GetDevolutionsByUser:", e);
-      if (e?.response?.data?.msg) {
-        toast.error(e.response.data.msg);
-      }
-      throw new Error(`Error al salvar el GetDevolutionsByUser: ${e}`);
-    }
-  }
-
   public async registerDevolutions(devolution: DevolutionBody) {
     try {
-      const resp = this.axiosInstance
+      const resp = await this.axiosInstance
         .post("/devolutions/register", devolution)
         .then((respuesta) => {
           return respuesta.status;

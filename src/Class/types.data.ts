@@ -31,7 +31,7 @@ export interface Client {
   renewInDaysNumber: string;
   deactivated: string;
   reference: string;
-  lastSale: string;
+  lastSale?: string;
   hasLoan: boolean;
   hasOrder: boolean;
   hasContract: boolean;
