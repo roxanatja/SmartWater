@@ -10,10 +10,17 @@ import { FiltroVenta } from "./FiltroVenta/FiltroVenta";
 import { Sale } from "../../../../type/Sale/Sale";
 import { GetSales } from "../../../../services/SaleService";
 import { loadClients } from "../../../../services/ClientsService";
-import { CuadroClientes } from "../../components/CuadroClientes/CuadroClientes";
+import Modal from "../../EntryComponents/Modal";
+import { client } from "../Clientes/ClientesContext";
 
 const Ventas: FC = () => {
-  const { showModal, setShowFiltro, showFiltro } = useContext(VentasContext);
+  const {
+    showModal,
+    setShowModal,
+    setShowFiltro,
+    showFiltro,
+    setSelectedClient,
+  } = useContext(VentasContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sales, setSales] = useState<Array<Sale>>([]);
@@ -117,22 +124,33 @@ const Ventas: FC = () => {
           orderArray={orderArray}
           onFilter={Onfilter}
         >
-          <div
-            style={{
-              display: "flex",
-              gap: "20px",
-              justifyContent: "start",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="grid grid-cols-4 max-sm:grid-cols-1 gap-4 pb-2 pt-2">
             {sales.map((sale) => {
               return <CuadroVentaCliente {...sale} key={sale._id} />;
-              console.log(CuadroClientes);
             })}
           </div>
         </FiltroPaginado>
       </div>
-      {showModal && <OpcionesVentas />}
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          setSelectedClient(client);
+          setShowModal(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Opciones Cliente
+        </h2>
+        <div className="p-6">
+          <OpcionesVentas
+            onClose={() => {
+              setShowModal(false);
+              setSelectedClient(client);
+            }}
+          />
+        </div>
+      </Modal>
       {showFiltro && <FiltroVenta />}
     </>
   );

@@ -3,17 +3,27 @@ import moment from "moment";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
-import { AgregarCliente } from "./AgregarCliente/AgregarCliente";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
-import { ClientesContext } from "./ClientesContext";
+import { ClientesContext, client } from "./ClientesContext";
 import { FilterContext } from "../../components/FilterContexr/FilterContext";
 import { FiltroClientes } from "./FiltroClientes/FiltroClientes";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
+import Modal from "../../EntryComponents/Modal";
+import ClientForm from "../../EntryComponents/Client.form";
+import RegisterSalesForm from "../../EntryComponents/RegisterSalesForm";
 
 const Clientes: FC = () => {
-  const { showModal, setShowModal, showMiniModal, showFiltro, setShowFiltro } =
-    useContext(ClientesContext);
+  const {
+    showModal,
+    setShowModal,
+    showMiniModal,
+    showFiltro,
+    setShowFiltro,
+    selectedClient,
+    setShowMiniModal,
+    setSelectedClient,
+  } = useContext(ClientesContext);
   const {
     applicatedFilters,
     fromDate,
@@ -228,22 +238,55 @@ const Clientes: FC = () => {
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            justifyContent: "start",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
           {currentData.map((client: Client) => (
             <InfoCliente key={client._id} {...client} />
           ))}
         </div>
       </FiltroPaginado>
 
-      {showModal && <AgregarCliente />}
-      {showMiniModal && <OpcionesClientes />}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Registrar Cliente
+        </h2>
+        <ClientForm isOpen={showModal} onCancel={() => setShowModal(false)} />
+      </Modal>
+
+      <Modal
+        isOpen={selectedClient._id !== "" && !showMiniModal}
+        onClose={() => setSelectedClient(client)}
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Editar Cliente
+        </h2>
+        <ClientForm
+          isOpen={
+            selectedClient._id !== "" && showMiniModal === false ? true : false
+          }
+          onCancel={() => setSelectedClient(client)}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={selectedClient._id !== "" && showMiniModal ? true : false}
+        onClose={() => {
+          setSelectedClient(client);
+          setShowMiniModal(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+          Opciones Cliente
+        </h2>
+        <div className="p-6">
+          <OpcionesClientes
+            onClose={() => {
+              setSelectedClient(client);
+              setShowMiniModal(false);
+            }}
+          />
+        </div>
+      </Modal>
       {showFiltro && <FiltroClientes />}
     </>
   );

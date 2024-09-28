@@ -8,6 +8,7 @@ export interface Client {
   address: string;
   comment: string;
   email: string;
+  phoneLandLine?: string;
   ciFrontImage: string;
   ciBackImage: string;
   zone: string;
@@ -16,7 +17,6 @@ export interface Client {
     latitude: string;
     longitude: string;
   };
-
   hasOrder: boolean;
   hasLoan: boolean;
   hasContract: boolean;
@@ -26,7 +26,7 @@ export interface Client {
   isAgency: boolean;
   billingInfo: {
     NIT: string;
-    phoneNumber: string;
+    name: string;
   };
   averageRenewal: boolean;
   contracts: [];

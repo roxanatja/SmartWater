@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import smartwaterApi from "../api/SmartWaterApi";
 
 const AuthenticationService = {
@@ -7,7 +8,14 @@ const AuthenticationService = {
         phoneNumber,
         password,
       });
-      localStorage.setItem("token", response.data.token);
+
+      if (!response.data.token) {
+        throw new Error("Token de autenticación no recibido.");
+      }
+
+      Cookies.set("token", response.data.token, { expires: 7 });
+      Cookies.set("userData", JSON.stringify(response.data.user), { expires: 7 });
+
       return response.data;
     } catch (error) {
       throw new Error(
@@ -17,15 +25,30 @@ const AuthenticationService = {
   },
 
   logout: () => {
-    localStorage.removeItem("token");
+    // Eliminar cookies al cerrar sesión
+    Cookies.remove("token");
+    Cookies.remove("userData");
   },
 
   getToken: () => {
-    return localStorage.getItem("token");
+    return Cookies.get("token");
+  },
+
+  getUser: () => {
+    const userData = Cookies.get("userData");
+    if (userData) {
+      try {
+        return JSON.parse(userData);
+      } catch (error) {
+        console.error("Error al parsear los datos del usuario:", error);
+        return null;
+      }
+    }
+    return null;
   },
 
   isLoggedIn: () => {
-    return !!localStorage.getItem("token");
+    return !!Cookies.get("token");
   },
 };
 

@@ -34,11 +34,11 @@ const Pedidos: FC = () => {
           onFilter={Onfilter}
         >
           {selectedOption === false ? (
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
+            <div className="grid grid-cols-2 w-full gap-4">
               <PedidosCurso />
             </div>
           ) : (
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
+            <div className="grid grid-cols-2 w-full gap-4">
               <PedidosAtendidos />
             </div>
           )}

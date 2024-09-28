@@ -1,3 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -5,7 +8,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -13,4 +16,35 @@ code {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #000;
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+.custom-map-control-button {
+  background: none rgb(255, 255, 255);
+  border: 0px;
+  margin: 10px;
+  padding: 8px;
+  appearance: none;
+  position: absolute;
+  font-size: 1.3rem;
+  color: #5e5959;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 2px;
+  height: 40px;
+  width: 40px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+  overflow: hidden;
 }

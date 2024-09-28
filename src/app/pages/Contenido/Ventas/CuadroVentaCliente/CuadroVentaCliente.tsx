@@ -4,63 +4,30 @@ import { Option } from "../../../components/Option/Option";
 import { VentasContext } from "../VentasContext";
 import { Sale } from "../../../../../type/Sale/Sale";
 import { Client } from "../../../../../type/Cliente/Client";
-import { GetClientById } from "../../../../../services/ClientsService";
 import { GetProducts } from "../../../../../services/ProductsService";
 import Product from "../../../../../type/Products/Products";
 import { formatDateTime } from "../../../../../utils/helpers";
-import { GetSales } from "../../../../../services/SaleService";
+import { toast } from "react-hot-toast";
+import ApiMethodSales from "../../../../../Class/api.sales";
 
 const CuadroVentaCliente = (sale: Sale) => {
   const { setShowModal, setSelectedClient } = useContext(VentasContext);
 
-  const [showOptions, setShowOptions] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<Array<Product>>([]);
   const [client, setClient] = useState<Client>();
   const [date, setDate] = useState<string>();
-  const [sales, setSales] = useState<Sale[]>([]);
 
   useEffect(() => {
-    const fetchSales = async () => {
-      try {
-        const data = await GetSales();
-        console.log("Sales data:", data);
-        setSales(data.data); // Asume que la respuesta tiene una propiedad `data` con la lista de ventas
-        setLoading(false);
-      } catch (e) {
-        setLoading(false);
-      }
-    };
-
-    fetchSales();
-    getClient();
     getProducts();
+    var date = formatDateTime(sale.created, "numeric", "numeric", "numeric");
+    setClient(sale.client[0]);
+    setDate(date);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const getClient = async () => {
-    //Obtiene el cliente de la venta y convierte la fecha a un formato mas legible
-    try {
-      await GetClientById(sale.client).then((resp) => {
-        console.log("Client data:", resp);
-        setClient(resp);
-        var date = formatDateTime(
-          sale.created,
-          "numeric",
-          "numeric",
-          "numeric"
-        );
-        setDate(date);
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const getProducts = async () => {
     try {
       await GetProducts().then((resp) => {
-        console.log("Products data:", resp);
         setProducts(resp.data);
       });
     } catch (e) {
@@ -68,14 +35,15 @@ const CuadroVentaCliente = (sale: Sale) => {
     }
   };
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     setShowModal(true);
-    setSelectedClient(sale.client);
+    setSelectedClient(client as unknown as Client);
   };
 
+  const [showOptions, setShowOptions] = useState<boolean>(false);
   const Opciones = () => {
     setShowOptions(!showOptions);
-    setSelectedClient(sale.client);
+    setSelectedClient(client as unknown as Client);
   };
 
   const Edit = () => {
@@ -84,19 +52,40 @@ const CuadroVentaCliente = (sale: Sale) => {
 
   const Delete = () => {
     setShowOptions(false);
+    toast.error(
+      (t) => (
+        <span>
+          Se <b>eliminara</b> esta venta <br /> <b>pulsa</b> para continuar
+          <button
+            className="bg-red-500 px-2 py-1 rounded-lg ml-2"
+            onClick={async () => {
+              toast.dismiss(t.id);
+              const api = new ApiMethodSales();
+              try {
+                await api.DeleteSale(sale._id);
+                toast.success("Venta eliminada", {
+                  position: "top-center",
+                });
+                window.location.reload();
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+          >
+            <i className="fa-solid fa-xmark text-white"></i>
+          </button>
+        </span>
+      ),
+      {
+        position: "top-center",
+      }
+    );
   };
 
   return (
-    <div className="CuadroVentaCliente-container">
-      <div style={{ padding: "15px 20px 12px 10px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-            marginBottom: "10px",
-          }}
-        >
+    <div className="CuadroVentaCliente-container relative">
+      <div className="p-4">
+        <div className="flex flex-col gap-3 pb-4">
           <div
             style={{
               display: "flex",
@@ -105,26 +94,27 @@ const CuadroVentaCliente = (sale: Sale) => {
             }}
           >
             <div className="CuadroVentaCliente-header">
-              {client && client.storeImage && (
-                <>
-                  <img
-                    src={client.storeImage}
-                    alt=""
-                    className="PedidosCurso-profileImage"
-                  />
+              <img
+                src={
+                  client?.storeImage ||
+                  "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg"
+                }
+                alt=""
+                className="PedidosCurso-profileImage"
+              />
 
-                  {/* Muestra la imagen del cliente */}
-                  <span>{client.fullName}</span>
-                </>
-              )}
+              {/* Muestra la imagen del cliente */}
+              <span>{client?.fullName || "N/A"}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <button type="button" className="btn" onClick={handleOpen}>
-                <img src="./Opciones-icon.svg" alt="" />
-              </button>
-            </div>
-            <div className="infoClientes-ultimaventa">
-              <span>{date}</span>
+            <div className="flex gap-2">
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <button type="button" className="btn" onClick={handleOpen}>
+                  <img src="./Opciones-icon.svg" alt="" />
+                </button>
+              </div>
+              <div className="infoClientes-ultimaventa">
+                <span>{date}</span>
+              </div>
             </div>
           </div>
           <div className="CuadroVentaCliente-text">
@@ -135,112 +125,125 @@ const CuadroVentaCliente = (sale: Sale) => {
           </div>
         </div>
         <div className="CuadroVentaCliente-productos">
-          <div style={{ width: "100%" }}>
-            <table style={{ width: "100%" }}>
-              <thead style={{ textAlign: "left", marginBottom: "5px" }}>
-                <tr>
-                  <th>
-                    <span>Productos</span>
-                  </th>
-                  <th>
-                    <span>Cantidad</span>
-                  </th>
-                  <th>
-                    <span>Precio</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sale.detail.map((detail) => {
+          <div className="w-full min-h-24 max-h-28 overflow-y-scroll">
+            <div className="flex flex-row w-full gap-4 truncate">
+              <p className="w-6/12">Productos</p>
+              <p>Cantidad</p>
+              <p>Precio</p>
+            </div>
+            <div className="flex w-full gap-2 justify-center items-center">
+              <div className="flex flex-col justify-center items-start gap-4 w-full">
+                {sale.detail.map((detail, index) => {
                   let product = products.find(
                     (product) => product._id === detail.product
                   );
+                  const defaultProduct = {
+                    name: "Producto desconocido",
+                    icon: "./Botella-icon.svg",
+                  };
+
                   return (
-                    <tr key={detail._id}>
-                      <td>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "5px",
-                          }}
-                        >
-                          <img src="./Botella-icon.svg" alt="" />
-                          <span className="CuadroVentaCliente-text">
-                            {product?.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="CuadroVentaCliente-TextContainer">
-                          <span
-                            className="CuadroVentaCliente-text"
-                            style={{ fontWeight: "600" }}
-                          >
-                            {detail.quantity}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div>
-                          <span
-                            className="CuadroVentaCliente-text"
-                            style={{ fontWeight: "600" }}
-                          >
-                            {detail.price} Bs
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
+                    <ProductDetail
+                      key={index}
+                      product={product || defaultProduct}
+                      detail={detail}
+                      sale={client}
+                    />
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <button type="button" className="btn" onClick={() => Opciones()}>
-              <img src="./opcion-icon.svg" alt="" />
-            </button>
-            <Option
-              editAction={Edit}
-              visible={showOptions}
-              editar={true}
-              eliminar={true}
-              deleteAction={Delete}
-            />
+              </div>
+              <div>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => Opciones()}
+                >
+                  <img src="./opcion-icon.svg" alt="" />
+                </button>
+                <Option
+                  editAction={Edit}
+                  visible={showOptions}
+                  editar={true}
+                  eliminar={true}
+                  deleteAction={Delete}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div
-        style={{
-          width: "98%",
-          height: "1px",
-          background: "#52A5F5",
-          marginLeft: "3px",
-        }}
-      ></div>
-      <div
-        style={{
-          width: "100%",
-          textAlign: "right",
-          padding: "9px 43px 20px 0px",
-        }}
-      >
-        <span
-          className="CuadroVentaCliente-text"
-          style={{ fontWeight: "600", fontSize: "14px", marginRight: "17px" }}
+      <div className="relative bottom-0">
+        <div
+          style={{
+            width: "98%",
+            height: "1px",
+            background: "#52A5F5",
+            marginLeft: "3px",
+          }}
+        ></div>
+        <div
+          style={{
+            width: "100%",
+            textAlign: "right",
+            padding: "9px 43px 20px 0px",
+          }}
         >
-          Total:
-        </span>
-        <span
-          className="CuadroVentaCliente-text"
-          style={{ fontWeight: "600", fontSize: "18px", color: "#1A3D7D" }}
-        >
-          {sale.total}
-        </span>
+          <span
+            className="CuadroVentaCliente-text"
+            style={{ fontWeight: "600", fontSize: "14px", marginRight: "17px" }}
+          >
+            Total:
+          </span>
+          <span
+            className="CuadroVentaCliente-text"
+            style={{ fontWeight: "600", fontSize: "18px", color: "#1A3D7D" }}
+          >
+            {sale.total}
+          </span>
+        </div>
       </div>
     </div>
   );
 };
 
 export { CuadroVentaCliente };
+
+interface ProductDetailProps {
+  product: {
+    name: string;
+    icon?: string;
+  };
+  detail: {
+    quantity: number;
+    price: number;
+  };
+  sale: any;
+}
+
+const ProductDetail: React.FC<ProductDetailProps> = ({ product, detail }) => {
+  return (
+    <div className="flex justify-between items-center w-full">
+      <div className="flex items-center justify-start gap-2 w-7/12">
+        <img src={product.icon || "./Botella-icon.svg"} alt={""} />
+        <span className="CuadroVentaCliente-text truncate">{product.name}</span>
+      </div>
+
+      <div className="flex items-center justify-center -translate-x-2">
+        <span
+          className="CuadroVentaCliente-text outline outline-1 outline-blue-500 rounded-md py-0.5 px-3"
+          style={{ fontWeight: "600" }}
+        >
+          {detail.quantity}
+        </span>
+      </div>
+
+      <div>
+        <span className="CuadroVentaCliente-text" style={{ fontWeight: "600" }}>
+          {detail.price} Bs
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetail;

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes";
+import Modal from "../../EntryComponents/Modal";
 
 const CuadroClientes = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -47,7 +48,25 @@ const CuadroClientes = () => {
           </div>
           <div className="opciones-svg" onClick={handleOpcionesClick}>
             <img src="./Opciones-icon.svg" alt="" />
-            {showMiniModal && <OpcionesClientes />}
+
+            <Modal
+              isOpen={showMiniModal}
+              onClose={() => {
+                setShowMiniModal(false);
+              }}
+              className="w-3/12"
+            >
+              <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+                Opciones Cliente
+              </h2>
+              <div className="p-6">
+                <OpcionesClientes
+                  onClose={() => {
+                    setShowMiniModal(false);
+                  }}
+                />
+              </div>
+            </Modal>
           </div>
         </div>
         <div className="todos-clientes">

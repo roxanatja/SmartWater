@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import crearRegistroCaja from "../../../../services/CashRegisters";
 import "./CashRegister.css";
+import Modal from "../../EntryComponents/Modal";
+import { useForm } from "react-hook-form";
+import Input from "../../EntryComponents/Inputs";
 
 interface CobroMiniModalProps {
   client: Client;
@@ -48,17 +51,19 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
     onClose();
   };
 
+  const { register } = useForm();
+
   return (
     <div>
       {!showSecondModal ? (
-        <div className="cobro-mini-modal">
-          <div className="cobro-mini-modal-content">
-            <button className="cobro-mini-modal-close" onClick={onClose}>
-              X
-            </button>
-
-            <div className="modal-datos">
-              <div className="modalInfoClients">
+        <Modal
+          isOpen={!showSecondModal}
+          onClose={onClose}
+          className="p-6 w-2/12"
+        >
+          <div className="modal-datos">
+            <div className="flex justify-between gap-4 w-full">
+              <div className="flex justify gap-2 items-center">
                 {client.storeImage && client.storeImage.length > 1 ? (
                   <img
                     src={client.storeImage}
@@ -68,41 +73,41 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                 ) : (
                   <div className="cobro-mini-modal-image-placeholder"></div>
                 )}
-                <span className="modalInfoClients-name">{client.fullName}</span>
-                <div className="saldo">
-                  <div className="infoClientes-saldo">
-                    <span style={{ color: "#1A3D7D" }}>Saldo a cobrar:</span>
-                  </div>
-                  <div className="infoClientes-moneda">
-                    <img src="./Moneda-icon.svg" alt="" />
-                    <div>{client.credit} Bs.</div>
-                  </div>
+                <span className="text-sm">{client.fullName}</span>
+              </div>
+              <div className="flex justify-start items-center gap-2">
+                <div className="infoClientes-saldo">
+                  <span style={{ color: "#1A3D7D" }}>Saldo a cobrar:</span>
+                </div>
+                <div className="infoClientes-moneda">
+                  <img src="./Moneda-icon.svg" alt="" />
+                  <div>{client.credit} Bs.</div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="infoClientes-ventas">
-              <div className="input-container">
-                <span>Pago a cuenta</span>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={handleChange}
-                  placeholder="Monto a cobrar"
-                  min="0"
-                  step="0.01"
-                />
-                <span>Bs</span>
-              </div>
+          <div className="infoClientes-ventas">
+            <div className="input-container flex flex-col w-full">
+              <Input
+                label="Pago a cuenta"
+                register={register}
+                name="saldo"
+                type="number"
+                value={amount}
+                // className="text-center"
+                onChange={handleChange}
+                placeholder="Monto a cobrar"
+                min="0"
+                step="0.01"
+                icon={<span>Bs</span>}
+                onClick={handleSubmit}
+                button={"Registrar Cobro"}
+              />
               {error && <p className="error">{error}</p>}
             </div>
-            <div className="cobro-mini-modal-actions">
-              <button onClick={handleSubmit} className="btn-registrar-modal">
-                Registrar Cobro
-              </button>
-            </div>
           </div>
-        </div>
+        </Modal>
       ) : (
         <div className="cobro-mini-modal">
           <div className="cobro-mini-modal-content">

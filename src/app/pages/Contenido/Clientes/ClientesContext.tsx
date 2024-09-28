@@ -16,6 +16,47 @@ type ClientesContextType = {
   setFromDate: React.Dispatch<React.SetStateAction<Date | null>>; // Nueva función
   toDate: Date | null; // Nueva propiedad
   setToDate: React.Dispatch<React.SetStateAction<Date | null>>; // Nueva función
+  registerSale: boolean;
+  setRegisterSale: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const client: Client = {
+  // Tu objeto de cliente
+  _id: "",
+  code: "",
+  user: "",
+  storeImage: "",
+  fullName: "",
+  phoneNumber: "",
+  address: "",
+  comment: "",
+  email: "",
+  ciFrontImage: "",
+  ciBackImage: "",
+  zone: "",
+  district: "",
+  location: {
+    latitude: "",
+    longitude: "",
+  },
+  hasOrder: false,
+  hasLoan: true,
+  hasContract: false,
+  renewInDays: 1,
+  renewDate: "",
+  isClient: true,
+  isAgency: true,
+  billingInfo: {
+    NIT: "",
+    name: "",
+  },
+  averageRenewal: false,
+  contracts: [],
+  created: "",
+  updated: "",
+  lastSale: "",
+  hasExpiredContract: false,
+  credit: 1,
 };
 
 export const ClientesContext = createContext<ClientesContextType>(
@@ -26,48 +67,11 @@ export const ClientesProvider = ({ children }: any) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<boolean>(false);
+  const [registerSale, setRegisterSale] = useState<boolean>(false);
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
   const [fromDate, setFromDate] = useState<Date | null>(null); // Inicialización de estado
-  const [toDate, setToDate] = useState<Date | null>(null); // Inicialización de estado
+  const [toDate, setToDate] = useState<Date | null>(null);
 
-  const client: Client = {
-    // Tu objeto de cliente
-    _id: "",
-    code: "",
-    user: "",
-    storeImage: "",
-    fullName: "",
-    phoneNumber: "",
-    address: "",
-    comment: "",
-    email: "",
-    ciFrontImage: "",
-    ciBackImage: "",
-    zone: "",
-    district: "",
-    location: {
-      latitude: "",
-      longitude: "",
-    },
-    hasOrder: false,
-    hasLoan: true,
-    hasContract: false,
-    renewInDays: 1,
-    renewDate: "",
-    isClient: true,
-    isAgency: true,
-    billingInfo: {
-      NIT: "",
-      phoneNumber: "",
-    },
-    averageRenewal: false,
-    contracts: [],
-    created: "",
-    updated: "",
-    lastSale: "",
-    hasExpiredContract: false,
-    credit: 1,
-  };
   const [selectedClient, setSelectedClient] = useState<Client>(client);
 
   return (
@@ -87,6 +91,8 @@ export const ClientesProvider = ({ children }: any) => {
         setFromDate,
         toDate,
         setToDate,
+        registerSale,
+        setRegisterSale,
       }}
     >
       {children}
