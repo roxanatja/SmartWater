@@ -30,7 +30,11 @@ const RegisterPedidoForm = ({
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
   const [mapview, setMapview] = useState(false);
   const [active, setActive] = useState(false);
-  const [editar, setEditar] = useState<number | null>(null);
+  const [editar, setEditar] = useState<{
+    quantity: number;
+    item: number;
+    index: number;
+  } | null>(null);
   const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
@@ -99,9 +103,16 @@ const RegisterPedidoForm = ({
     const product = watch("detail")[0].product;
     const quantity = watch("detail")[0].quantity;
 
-    if (product && quantity) {
-      setAddedProducts([...addedProducts, { product, quantity }]);
-      append({ product: "", quantity: "1" });
+    if (editar !== null) {
+      const updatedProducts = [...addedProducts];
+      updatedProducts[editar.index] = { product, quantity };
+      setAddedProducts(updatedProducts);
+      setEditar(null);
+    } else {
+      if (product && quantity) {
+        setAddedProducts([...addedProducts, { product, quantity }]);
+        append({ product: "", quantity: "1" });
+      }
     }
   };
 
@@ -165,7 +176,7 @@ const RegisterPedidoForm = ({
           products?.find((p) => p.description === item.product)?._id || "",
         quantity: item.quantity,
       })),
-      user: `${process.env.REACT_APP_USER_API}`,
+      user: userData._id,
       client: selectedClient._id,
       deliverDate: data.deliverDate.replace(/\//g, "-"),
       clientNotRegistered: {
@@ -234,12 +245,14 @@ const RegisterPedidoForm = ({
               </div>
               <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
                 <OptionScrooll
+                  value={editar?.quantity}
                   options={Cantidad}
                   onOptionChange={(selectedOption) =>
                     handleOptionChange(selectedOption, "quantity")
                   }
                 />
                 <OptionScrooll
+                  value={editar?.item}
                   options={products.map((product) => product.name)}
                   onOptionChange={(selectedOption) =>
                     handleOptionChange(selectedOption, "product")
@@ -249,10 +262,16 @@ const RegisterPedidoForm = ({
 
               <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
                 <i
-                  className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
+                  className={`fa-solid  ${
+                    editar !== null
+                      ? "fa-pen py-3 hover:animate-pulse"
+                      : "fa-plus hover:rotate-90"
+                  } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
                   onClick={handleAddProduct}
                 ></i>
-                <p className="text-base font-semibold"> Agregar Producto</p>
+                <p className="text-base font-semibold">
+                  {editar !== null ? "Editar" : "Agregar"} Producto
+                </p>
               </div>
             </>
           )}
@@ -492,7 +511,9 @@ const RegisterPedidoForm = ({
               {addedProducts.map((product, index) => (
                 <motion.li
                   key={index}
-                  className="mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2"
+                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${
+                    index === editar?.index && "border-2 border-blue_custom"
+                  }`}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
@@ -511,7 +532,14 @@ const RegisterPedidoForm = ({
                       onClick={() => {
                         handleOptionChange(product.product, "product");
                         handleOptionChange(product.quantity, "quantity");
-                        setEditar(index);
+                        const indepro = products.findIndex(
+                          (x) => x.description === product.product
+                        );
+                        setEditar({
+                          quantity: Number(product.quantity) - 1,
+                          item: indepro,
+                          index,
+                        });
                       }}
                     >
                       <i className="fa-solid fa-pen"></i>

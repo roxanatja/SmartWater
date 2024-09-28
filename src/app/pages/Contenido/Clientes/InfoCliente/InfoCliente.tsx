@@ -148,7 +148,7 @@ const InfoCliente = (client: Client) => {
               <span>{client.phoneNumber}</span>
             </div>
           </div>
-          <div className="relative z-10">
+          <div className="absolute right-0 p-4 rounded-full z-10">
             <button type="button" className="btn" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>

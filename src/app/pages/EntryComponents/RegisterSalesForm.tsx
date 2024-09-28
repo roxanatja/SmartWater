@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import ApiMethodSales from "../../../Class/api.sales";
 import Product from "../../../type/Products/Products";
@@ -19,6 +18,11 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string; price: string }[]
   >([]);
+  const [editar, setEditar] = useState<{
+    quantity: number;
+    item: number;
+    index: number;
+  } | null>(null);
 
   const { register, handleSubmit, watch, setValue, control } =
     useForm<SaleBody>({
@@ -87,7 +91,12 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     const product = watch("detail")[0].product;
     const quantity = watch("detail")[0].quantity;
     const price = watch("detail")[0].price;
-    if (product && quantity && price) {
+    if (editar !== null) {
+      const updatedProducts = [...addedProducts];
+      updatedProducts[editar.index] = { product, quantity, price };
+      setAddedProducts(updatedProducts);
+      setEditar(null);
+    } else {
       setAddedProducts([...addedProducts, { product, quantity, price }]);
       append({ product: "", quantity: "1", price: "0" });
     }
@@ -187,7 +196,8 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         </div>
         <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-3 rounded-b-2xl w-full py-20 gap-10">
           <OptionScrooll
-            options={["1", "2", "3", "4", "5"]}
+            options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+            value={editar?.quantity}
             className="text-md"
             onOptionChange={(selectedOption) =>
               setValue(`detail.0.quantity`, selectedOption)
@@ -196,41 +206,47 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
           <OptionScrooll
             options={products ? products.map((product) => product.name) : []}
             className="text-md text-nowrap"
+            value={editar?.item}
             onOptionChange={(selectedOption) => {
               if (products) {
                 const selectedProduct = products.find(
                   (product) => product.name === selectedOption
                 );
                 setValue(`detail.0.product`, selectedProduct?.name || "");
+                if (selectedProduct) {
+                  setValue(`detail.0.price`, selectedProduct.price.toString());
+                }
               }
             }}
           />
           <OptionScrooll
-            options={["5000", "10000", "300", "4000", "20000"].map((price) => {
-              const number = parseFloat(price);
-              return new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(number);
-            })}
+            options={
+              products && watch(`detail.0.product`)
+                ? products
+                    .filter((x) => x.name === watch(`detail.0.product`))
+                    .map((product) => product.price.toString())
+                : []
+            }
             className="text-md"
             onOptionChange={(selectedOption) => {
-              setValue(
-                `detail.0.price`,
-                `${parseInt(selectedOption.replace(/[^0-9.-]/g, ""))}`
-              );
+              const priceValue = parseFloat(selectedOption);
+              setValue(`detail.0.price`, priceValue.toString());
             }}
           />
         </div>
 
         <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
           <i
-            className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
+            className={`fa-solid  ${
+              editar !== null
+                ? "fa-pen py-3 hover:animate-pulse"
+                : "fa-plus hover:rotate-90"
+            } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
             onClick={handleAddProduct}
           ></i>
-          <p className="text-base font-semibold"> Agregar Producto</p>
+          <p className="text-base font-semibold">
+            {editar !== null ? "Editar" : "Agregar"} Producto
+          </p>
         </div>
 
         <div className="relative w-full flex items-center">
@@ -249,7 +265,9 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
             {addedProducts.map((product, index) => (
               <motion.li
                 key={index}
-                className="mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2"
+                className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${
+                  index === editar?.index && "border-2 border-blue_custom"
+                }`}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -259,15 +277,41 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                   <p>
                     <strong>{product.product}</strong>
                   </p>
-                  <p className="text-sm">Cantidad:{product.quantity}</p>
+                  <div className="flex gap-4 items-center">
+                    <p className="text-sm">Cantidad: {product.quantity}</p>
+                    <p className="text-sm">Precio: {product.price}</p>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className="text-red-700 hover:text-red-500 -translate-y-6"
-                  onClick={() => handleDeleteProduct(index)}
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="text-blue_custom hover:text-blue-600 -translate-y-6"
+                    onClick={() => {
+                      setValue(`detail.0.product`, product.product);
+                      setValue(`detail.0.price`, product.price);
+                      setValue(`detail.0.quantity`, product.quantity);
+                      const indepro = products
+                        ? products.findIndex(
+                            (x) => x.description === product.product
+                          )
+                        : 0;
+                      setEditar({
+                        quantity: Number(product.quantity) - 1,
+                        item: indepro,
+                        index,
+                      });
+                    }}
+                  >
+                    <i className="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    className="text-red-700 hover:text-red-500 -translate-y-6"
+                    onClick={() => handleDeleteProduct(index)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </motion.li>
             ))}
           </ul>
