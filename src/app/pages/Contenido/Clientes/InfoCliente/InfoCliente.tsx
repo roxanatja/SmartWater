@@ -8,6 +8,7 @@ import { DeleteClient } from "../../../../../services/ClientsService";
 import { GetZone } from "../../../../../services/ZonesService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -17,11 +18,11 @@ const InfoCliente = (client: Client) => {
   const [date, setDate] = useState<string>();
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false); // Agregado el estado para el Pop-Up
   const location = client.location;
-  
+  const navigate = useNavigate();
+
   const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${
     location?.longitude || ""
   }`;
-
 
   useEffect(() => {
     const getZone = async () => {
@@ -106,6 +107,13 @@ const InfoCliente = (client: Client) => {
   return (
     <>
       <div className="infoClientes-container relative">
+        <div
+          onClick={() => {
+            setSelectedClient(client);
+            navigate("/Clientes/Informacion");
+          }}
+          className="bg-transparent w-full h-full absolute top-0 left-0 rounded-xl cursor-pointer"
+        ></div>
         <div className="infoClientes-header">
           <div className="flex justify-between w-8/12 max-sm:w-full">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
@@ -128,7 +136,7 @@ const InfoCliente = (client: Client) => {
               <img src="./CasaUbi-icon.svg" alt="" />
               <span>{client.code}</span>
             </div>
-            <div className="infoClientes-datos">
+            <div className="infoClientes-datos relative z-10">
               <a
                 href={`https://api.whatsapp.com/send?phone=${client?.phoneNumber}`}
                 className="btn-whatsapp"
@@ -140,7 +148,7 @@ const InfoCliente = (client: Client) => {
               <span>{client.phoneNumber}</span>
             </div>
           </div>
-          <div>
+          <div className="relative z-10">
             <button type="button" className="btn" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
@@ -154,7 +162,7 @@ const InfoCliente = (client: Client) => {
                 <span>{date}</span>
               </div>
             </div>
-            <div className="infoClientes-ventas">
+            <div className="infoClientes-ventas relative z-10">
               <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
               <div
                 className="infoClientes-moneda cursor-pointer"
@@ -168,7 +176,7 @@ const InfoCliente = (client: Client) => {
             </div>
           </div>
 
-          <div>
+          <div className="relative z-10">
             <button type="button" className="btn" onClick={() => Opciones()}>
               <img src="./opcion-icon.svg" alt="" />
             </button>
@@ -181,7 +189,7 @@ const InfoCliente = (client: Client) => {
             />
           </div>
         </div>
-        <div className="infoClientes-footer">
+        <div className="infoClientes-footer relative z-10">
           <img src="./Location-azul-icon.svg" alt="" />
           <a
             className="infoClientes-ubi"

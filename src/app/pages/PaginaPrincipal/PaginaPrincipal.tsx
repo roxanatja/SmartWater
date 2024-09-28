@@ -43,7 +43,6 @@ const PaginaPrincipal: FC = () => {
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
-
               {/* Protege todas las rutas que necesitan autenticación */}
               <Route element={<ProtectedRoute />}>
                 <Route path="" element={<Navigate to="/Inicio" />} />
@@ -119,9 +118,8 @@ const PaginaPrincipal: FC = () => {
                 />
                 <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
               </Route>
-
-              {/* Redirige cualquier ruta desconocida a Inicio */}
-              <Route path="*" element={<Navigate to="/Inicio" />} />
+              {/* Redirige cualquier ruta desconocida a Inicio
+              <Route path="*" element={<Navigate to="/Inicio" />} /> */}
             </Routes>
           </div>
         </div>

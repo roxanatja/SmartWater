@@ -30,6 +30,7 @@ const RegisterPedidoForm = ({
   const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
   const [mapview, setMapview] = useState(false);
   const [active, setActive] = useState(false);
+  const [editar, setEditar] = useState<number | null>(null);
   const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
     { product: string; quantity: string }[]
@@ -503,13 +504,26 @@ const RegisterPedidoForm = ({
                     </p>
                     <p className="text-sm">Cantidad:{product.quantity}</p>
                   </div>
-                  <button
-                    type="button"
-                    className="text-red-700 hover:text-red-500 -translate-y-6"
-                    onClick={() => handleDeleteProduct(index)}
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="text-blue_custom hover:text-blue-600 -translate-y-6"
+                      onClick={() => {
+                        handleOptionChange(product.product, "product");
+                        handleOptionChange(product.quantity, "quantity");
+                        setEditar(index);
+                      }}
+                    >
+                      <i className="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-700 hover:text-red-500 -translate-y-6"
+                      onClick={() => handleDeleteProduct(index)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
                 </motion.li>
               ))}
             </ul>

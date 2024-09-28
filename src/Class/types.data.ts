@@ -38,11 +38,15 @@ export interface Client {
   lastAttenderOrder: string;
   renewInDays: number;
   credit: string;
+  hasExpiredContract?: boolean;
   billingInfo: BillingInfo;
   phoneLandLine: string;
   isAgency: boolean;
   linkAddress?: string;
   dayrenew?: boolean;
+  code?: string;
+  created: string;
+  updated: string;
 }
 
 export interface District {
