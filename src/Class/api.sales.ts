@@ -3,10 +3,12 @@ import { Sale, SaleBody } from "../type/Sale/Sale";
 import GetApiMethod from "./api.class";
 
 class ApiMethodSales extends GetApiMethod {
-  public async GetSales(): Promise<Sale> {
+  public async GetSales(params?: { client: string }): Promise<Sale[]> {
     try {
-      const { data } = await this.axiosInstance.get("/sales?pageSize=3000");
-      return data as Sale;
+      const { data } = await this.axiosInstance.get("/sales?pageSize=3000", {
+        params,
+      });
+      return data.data as Sale[];
     } catch (e) {
       console.error(e);
       throw new Error(

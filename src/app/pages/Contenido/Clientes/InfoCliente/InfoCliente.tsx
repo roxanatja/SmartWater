@@ -9,6 +9,7 @@ import { GetZone } from "../../../../../services/ZonesService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Modal from "../../../EntryComponents/Modal";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -202,9 +203,13 @@ const InfoCliente = (client: Client) => {
         </div>
       </div>
 
-      {showCobroPopUp && (
+      <Modal
+        isOpen={showCobroPopUp}
+        onClose={() => setShowCobroPopUp(false)}
+        className="p-6 w-2/12"
+      >
         <CobroPopUp client={client} onClose={() => setShowCobroPopUp(false)} />
-      )}
+      </Modal>
     </>
   );
 };

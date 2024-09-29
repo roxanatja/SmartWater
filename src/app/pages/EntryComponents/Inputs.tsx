@@ -1,6 +1,5 @@
 import React, { memo } from "react";
 import { motion } from "framer-motion";
-import ReactNode from "react";
 
 interface InputProps {
   label?: string;
@@ -17,6 +16,7 @@ interface InputProps {
   button?: React.ReactNode;
   icon?: React.ReactNode;
   onClick?(): void;
+  validateAmount?(e: any): void;
   [key: string]: any;
 }
 
@@ -34,6 +34,7 @@ const Input = memo<InputProps>(
     icon,
     isVisibleLable,
     isText,
+    validateAmount,
     button,
     onClick,
     ...rest
@@ -107,11 +108,13 @@ const Input = memo<InputProps>(
                 required
                   ? {
                       required: `el ${label} es requerido`,
+                      validate: validateAmount,
                       onChange:
                         rest.type === "file" ? handleFileChange : handleChange,
                     }
                   : {
                       required: false,
+                      validate: validateAmount,
                       onChange:
                         rest.type === "file" ? handleFileChange : handleChange,
                     }
@@ -125,7 +128,8 @@ const Input = memo<InputProps>(
             />
             {button && (
               <button
-                className="absolute ps-4 py-1.5 bg-blue-500 text-white rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
+                className="absolute ps-4 py-1.5  text-black rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
+                type="button"
                 onClick={onClick}
               >
                 {button}

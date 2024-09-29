@@ -66,7 +66,6 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
       user: userData._id,
       client: selectedClient._id,
     };
-    console.log(values);
     try {
       await api.saveSale(values);
       toast.success("Venta registrada");
