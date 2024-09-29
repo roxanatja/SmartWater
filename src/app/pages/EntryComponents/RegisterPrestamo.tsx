@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import ApiMethodSales from "../../../Class/api.sales";
 import Product from "../../../type/Products/Products";
@@ -21,8 +20,13 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
   const [addedProducts, setAddedProducts] = useState<
-    { product: string; quantity: string }[]
+    { item: string; quantity: string }[]
   >([]);
+  const [editar, setEditar] = useState<{
+    quantity: number;
+    item: number;
+    index: number;
+  } | null>(null);
   const [views, setWiews] = useState(true);
 
   const {
@@ -67,7 +71,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
     const values: LoansBody = {
       ...data,
       detail: addedProducts.map((item) => ({
-        item: products?.find((p) => p.description === item.product)?._id || "",
+        item: products?.find((p) => p.description === item.item)?._id || "",
         quantity: item.quantity,
       })),
       user: userData._id,
@@ -96,10 +100,15 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   }, [getProduct]);
 
   const handleAddProduct = () => {
-    const product = watch("detail")[0].item;
+    const item = watch("detail")[0].item;
     const quantity = watch("detail")[0].quantity;
-    if (product && quantity) {
-      setAddedProducts([...addedProducts, { product, quantity }]);
+    if (editar !== null) {
+      const updatedProducts = [...addedProducts];
+      updatedProducts[editar.index] = { item, quantity };
+      setAddedProducts(updatedProducts);
+      setEditar(null);
+    } else {
+      setAddedProducts([...addedProducts, { item, quantity }]);
       append({ item: "", quantity: "1" });
     }
   };
@@ -158,7 +167,8 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             </div>
             <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
               <OptionScrooll
-                options={["1", "2", "3", "4", "5"]}
+                options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+                value={editar?.quantity}
                 onOptionChange={(selectedOption) =>
                   handleOptionChange(selectedOption, "quantity")
                 }
@@ -167,17 +177,25 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                 options={
                   products ? products.map((product) => product.name) : []
                 }
+                value={editar?.item}
                 onOptionChange={(selectedOption) =>
                   handleOptionChange(selectedOption, "item")
                 }
               />
             </div>
+
             <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
               <i
-                className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
+                className={`fa-solid  ${
+                  editar !== null
+                    ? "fa-pen py-3 hover:animate-pulse"
+                    : "fa-plus hover:rotate-90"
+                } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
                 onClick={handleAddProduct}
               ></i>
-              <p className="text-base font-semibold"> Agregar Producto</p>
+              <p className="text-base font-semibold">
+                {editar !== null ? "Editar" : "Agregar"} Producto
+              </p>
             </div>
 
             {/* Display Added Products */}
@@ -186,7 +204,9 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                 {addedProducts.map((product, index) => (
                   <motion.li
                     key={index}
-                    className="mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2"
+                    className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${
+                      index === editar?.index && "border-2 border-blue_custom"
+                    }`}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
@@ -194,17 +214,39 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                   >
                     <div className="flex flex-col gap-4 p-1">
                       <p>
-                        <strong>{product.product}</strong>
+                        <strong>{product.item}</strong>
                       </p>
                       <p className="text-sm">Cantidad:{product.quantity}</p>
                     </div>
-                    <button
-                      type="button"
-                      className="text-red-700 hover:text-red-500 -translate-y-6"
-                      onClick={() => handleDeleteProduct(index)}
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className="text-blue_custom hover:text-blue-600 -translate-y-6"
+                        onClick={() => {
+                          handleOptionChange(product.item, "item");
+                          handleOptionChange(product.quantity, "quantity");
+                          const indepro = products
+                            ? products.findIndex(
+                                (x) => x.description === product.item
+                              )
+                            : 0;
+                          setEditar({
+                            quantity: Number(product.quantity) - 1,
+                            item: indepro,
+                            index,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-pen"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-700 hover:text-red-500 -translate-y-6"
+                        onClick={() => handleDeleteProduct(index)}
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
                   </motion.li>
                 ))}
               </ul>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, memo } from "react";
 import { motion } from "framer-motion";
 import "./OptionScrooll.css";
 
@@ -6,13 +6,11 @@ interface CustomSelectProps {
   options: string[];
   onOptionChange: (selectedOption: string) => void;
   className?: string;
+  value?: number;
 }
 
-const OptionScrooll: React.FC<CustomSelectProps> = ({
-  options,
-  onOptionChange,
-  className,
-}) => {
+const OptionScrooll = memo<CustomSelectProps>((props) => {
+  const { options, onOptionChange, className, value } = props;
   const [selectedOption, setSelectedOption] = useState(0);
   const [active, setActive] = useState(true);
   const [active2, setActive2] = useState(true);
@@ -26,6 +24,10 @@ const OptionScrooll: React.FC<CustomSelectProps> = ({
     setSelectedOption((prev) => (prev < options.length - 1 ? prev + 1 : prev));
     setActive(true);
   };
+
+  useEffect(() => {
+    if (value !== undefined) setSelectedOption(value);
+  }, [value]);
 
   const handleOptionChange = useCallback(() => {
     if (active) {
@@ -96,6 +98,6 @@ const OptionScrooll: React.FC<CustomSelectProps> = ({
       </button>
     </div>
   );
-};
+});
 
 export { OptionScrooll };

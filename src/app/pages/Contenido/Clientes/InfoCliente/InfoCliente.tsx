@@ -9,6 +9,7 @@ import { GetZone } from "../../../../../services/ZonesService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Modal from "../../../EntryComponents/Modal";
 
 const InfoCliente = (client: Client) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -148,7 +149,7 @@ const InfoCliente = (client: Client) => {
               <span>{client.phoneNumber}</span>
             </div>
           </div>
-          <div className="relative z-10">
+          <div className="absolute right-0 p-4 rounded-full z-10">
             <button type="button" className="btn" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
@@ -202,9 +203,13 @@ const InfoCliente = (client: Client) => {
         </div>
       </div>
 
-      {showCobroPopUp && (
+      <Modal
+        isOpen={showCobroPopUp}
+        onClose={() => setShowCobroPopUp(false)}
+        className="p-6 w-2/12"
+      >
         <CobroPopUp client={client} onClose={() => setShowCobroPopUp(false)} />
-      )}
+      </Modal>
     </>
   );
 };

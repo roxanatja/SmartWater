@@ -30,10 +30,10 @@ class ApiMethodLoans extends GetApiMethod {
     }
   }
 
-  public async loadLoans(params: LoansBody): Promise<LoansBody> {
+  public async loadLoans(params?: any): Promise<Loans[]> {
     try {
       const response = await this.axiosInstance.get("/loans", { params });
-      return response.data;
+      return response.data.data;
     } catch (e: any) {
       console.error("Error in loadLoans:", e);
       if (e?.response?.data?.msg) {

@@ -11,7 +11,6 @@ import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
-import RegisterSalesForm from "../../EntryComponents/RegisterSalesForm";
 
 const Clientes: FC = () => {
   const {
