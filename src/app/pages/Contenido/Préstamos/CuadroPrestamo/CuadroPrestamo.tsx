@@ -56,7 +56,9 @@ const CuadroPrestamo: FC<Prestamo> = ({
             <div className="CuadroVentaCliente-header">
               <img
                 src={
-                  loan.client[0]?.storeImage || info
+                  loan.client[0]?.storeImage
+                    ? loan.client[0]?.storeImage
+                    : info
                     ? "../Cliente2.svg"
                     : "./Cliente2.svg"
                 }

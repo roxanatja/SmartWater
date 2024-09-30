@@ -40,9 +40,9 @@ const Clientes: FC = () => {
   const [clientsFiltered, setClientsFiltered] = useState<Client[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentData, setCurrentData] = useState<Client[]>([]);
   const itemsPerPage: number = 10;
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
 
   useEffect(() => {

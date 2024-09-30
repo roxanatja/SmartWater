@@ -611,17 +611,13 @@ const FiltroPaginado: FC<Componentes> = ({
                     <div>
                       <button
                         type="button"
-                        className="boton-paginado"
+                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
                         onClick={() =>
                           handlePageChange && handlePageChange(currentPage - 1)
                         }
                         disabled={currentPage === 1}
                       >
-                        <img
-                          style={{ transform: "rotate(90deg)" }}
-                          src="./Desplegable-icon.svg"
-                          alt=""
-                        />
+                        <i className="fa-solid fa-angle-left text-white"></i>
                       </button>
                     </div>
                     <div className="flex items-center">
@@ -630,17 +626,13 @@ const FiltroPaginado: FC<Componentes> = ({
                     <div>
                       <button
                         type="button"
-                        className="boton-paginado"
+                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
                         onClick={() =>
                           handlePageChange && handlePageChange(currentPage + 1)
                         }
                         disabled={currentPage === totalPage}
                       >
-                        <img
-                          style={{ transform: "rotate(-0.25turn)" }}
-                          src="./Desplegable-icon.svg"
-                          alt=""
-                        />
+                        <i className="fa-solid fa-angle-right text-white"></i>
                       </button>
                     </div>
                   </>
@@ -832,7 +824,7 @@ const FiltroPaginado: FC<Componentes> = ({
                 </button>
               </div>
             )}
-            {paginacion && totalPage && currentPage && (
+            {paginacion && totalPage && currentPage && !resultadosPrestamo && (
               <div
                 style={{
                   display: "flex",
@@ -846,17 +838,13 @@ const FiltroPaginado: FC<Componentes> = ({
                   <div>
                     <button
                       type="button"
-                      className="boton-paginado"
+                      className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
                       onClick={() =>
                         handlePageChange && handlePageChange(currentPage - 1)
                       }
                       disabled={currentPage === 1}
                     >
-                      <img
-                        style={{ transform: "rotate(90deg)" }}
-                        src="./Desplegable-icon.svg"
-                        alt=""
-                      />
+                      <i className="fa-solid fa-angle-left text-white"></i>
                     </button>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
@@ -865,17 +853,13 @@ const FiltroPaginado: FC<Componentes> = ({
                   <div>
                     <button
                       type="button"
-                      className="boton-paginado"
+                      className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
                       onClick={() =>
                         handlePageChange && handlePageChange(currentPage + 1)
                       }
                       disabled={currentPage === totalPage}
                     >
-                      <img
-                        style={{ transform: "rotate(-0.25turn)" }}
-                        src="./Desplegable-icon.svg"
-                        alt=""
-                      />
+                      <i className="fa-solid fa-angle-right text-white"></i>
                     </button>
                   </div>
                 </>
