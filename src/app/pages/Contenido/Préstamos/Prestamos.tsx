@@ -3,32 +3,33 @@ import { OpcionesPrestamo } from "./CuadroPrestamo/OpcionesPrestamo";
 import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import { PrestamosContext } from "./PrestamosContext";
 import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
 import { GetLoans } from "../../../../services/LoansService";
 import { GetProducts } from "../../../../services/ProductsService";
-import { loadClients } from "../../../../services/ClientsService";
 import Product from "../../../../type/Products/Products";
+import { Loans } from "../../../../type/Loans/Loans";
 
 const Prestamos: FC = () => {
   const { showMiniModal, showFiltro, setShowFiltro } =
     useContext(PrestamosContext);
-  const [loans, setLoans] = useState<Array<any>>([]);
+  const [loans, setLoans] = useState<Array<Loans>>([]);
   const [products, setProducts] = useState<Array<Product>>([]);
-  const [clients, setClients] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const itemsPerPage: number = 9;
+  const [currentData, setCurrentData] = useState<Loans[]>([]);
 
-  useEffect(() => {
-    getLoans();
-    getProducts();
-  }, []);
-
-  const getLoans = async () => {
+  const getLoans = useCallback(async () => {
     try {
       await GetLoans().then((resp) => {
         setLoans(resp.data);
+        setCurrentData(resp.data.slice(0, itemsPerPage));
+        setTotalPage(Math.ceil(resp.data.length / itemsPerPage));
+        setCurrentPage(1);
       });
 
       setLoading(false);
@@ -37,19 +38,9 @@ const Prestamos: FC = () => {
       setError(true);
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getClients = async () => {
-    try {
-      await loadClients().then((resp) => {
-        setClients(resp.data);
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const getProducts = async () => {
+  const getProducts = useCallback(async () => {
     try {
       await GetProducts().then((resp) => {
         setProducts(resp.data);
@@ -57,7 +48,12 @@ const Prestamos: FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    getLoans();
+    getProducts();
+  }, [getLoans, getProducts]);
 
   if (loading) {
     return <p>Cargando Prestamos...</p>;
@@ -80,25 +76,34 @@ const Prestamos: FC = () => {
     const value = e;
 
     if (value === "") {
-      getLoans();
-      getClients();
+      setCurrentData(loans.slice(0, itemsPerPage));
+      setTotalPage(Math.ceil(loans.length / itemsPerPage));
+      setCurrentPage(1);
       return;
     } else {
-      let clientFilter = clients.filter((client) =>
-        client.fullName?.toLowerCase().includes(value.toLowerCase())
+      let clientFilter = loans.filter(
+        (loan) =>
+          loan.client?.[0]?.fullName
+            ?.toLowerCase()
+            .includes(value.toLowerCase()) || null
       );
-      let loanfilter = clientFilter.flatMap((client) => {
-        return loans.filter((loan) => loan.client === client._id);
-      });
-      setLoans(loanfilter);
+      setCurrentData(clientFilter.slice(0, itemsPerPage));
+      setTotalPage(Math.ceil(clientFilter.length / itemsPerPage));
+      setCurrentPage(1);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    const startIndex: number = (page - 1) * itemsPerPage;
+    const endIndex: number = startIndex + itemsPerPage;
+    setCurrentData(loans.slice(startIndex, endIndex));
   };
 
   const getContractState = (
     hasContract: boolean,
     hasExpiredContract: boolean
   ) => {
-    // This function is used to determine the state of the contract
     if (hasExpiredContract) {
       return "Contrato Vencido";
     } else if (hasContract) {
@@ -116,11 +121,15 @@ const Prestamos: FC = () => {
           filtro
           search={searchLoans}
           resultadosPrestamo
+          paginacion={true}
+          totalPage={totalPage}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
           onFilter={Onfilter}
           total={loans.length}
         >
           <div className="grid grid-cols-3 gap-4 w-full pt-4 ">
-            {loans.map((loan, index) => {
+            {currentData.map((loan, index) => {
               const contratcEstate = getContractState(
                 loan.hasContract,
                 loan.hasExpiredContract
