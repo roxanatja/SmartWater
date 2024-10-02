@@ -62,7 +62,7 @@ const CuentasPorCobrar = () => {
           finanzas
         >
           <div
-            className={`grid grid-cols-4 gap-4 py-2 transition-all ${
+            className={`grid grid-cols-4 gap-4 py-2 transition-all md:grid-cols-3 ${
               !selectedOption ? "" : "scale-0 -z-10 fixed"
             }`}
           >
@@ -76,7 +76,7 @@ const CuentasPorCobrar = () => {
               ))}
           </div>
           <div
-            className={`grid grid-cols-4 gap-4 py-2 transition-all ${
+            className={`grid grid-cols-4 gap-4 py-2 transition-all md:grid-cols-3 ${
               selectedOption ? "" : "scale-0 -z-10 fixed"
             }`}
           >

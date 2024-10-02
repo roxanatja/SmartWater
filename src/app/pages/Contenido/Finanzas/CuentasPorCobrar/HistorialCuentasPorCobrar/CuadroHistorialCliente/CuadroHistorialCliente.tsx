@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import "./CuadroHistorialCliente.css";
 import { Option } from "../../../../../components/Option/Option";
 import { CuentasPorCobrarContext } from "../../CuentasPorCobrarContext";
@@ -75,105 +75,57 @@ const CuadroHistorialCliente = ({
               </button>
             </div>
           </div>
-          <div className="CuadroVentaCliente-productos">
-            <div style={{ width: "100%" }}>
-              <table style={{ width: "75%" }}>
-                <thead style={{ textAlign: "left", marginBottom: "5px" }}>
-                  <tr>
-                    <th style={{ width: "50%" }}>
-                      <span>Productos</span>
-                    </th>
-                    <th>
-                      <span>Cantidad</span>
-                    </th>
-                    <th>
-                      <span>Precio</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "26px",
-                          marginBottom: "6px 6px",
-                        }}
-                      >
-                        <img src="../../BotellaGrande.svg" alt="" />
-                        <span className="CuadroVentaCliente-text">
-                          Botellon 20 lts
+          <div className="flex w-full justify-between  items-center">
+            <div className="w-full">
+              <div className="flex justify-between text-left mb-1 text-xs font-medium text-blue_custom sticky top-0 w-10/12">
+                <div className="w-8/12">
+                  <span>Productos</span>
+                </div>
+                <div className="-translate-x-">
+                  <span>Cantidad</span>
+                </div>
+                <div className="translate-x-6">
+                  <span>Precio</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 max-h-36 overflow-y-auto w-11/12 min-h-28 pr-4">
+                {sale.detail.map((item, index) => {
+                  const product = products.find((p) => p._id === item.product);
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between gap-6"
+                    >
+                      {/* Producto */}
+                      <div className="flex items-center gap-4 w-7/12">
+                        <img
+                          src={product?.imageUrl || "../../default.svg"}
+                          alt={item._id}
+                          className="w-10 h-10 rounded-sm"
+                        />
+                        <span className="text-md">
+                          {product?.description || "Producto Desconocido"}
                         </span>
                       </div>
-                    </td>
-                    <td>
-                      <div
-                        className="CuadroVentaCliente-TextContainer"
-                        style={{ marginBottom: "6px" }}
-                      >
-                        <span
-                          className="CuadroVentaCliente-text"
-                          style={{ fontWeight: "600" }}
-                        >
-                          1
+
+                      {/* Cantidad */}
+                      <div className="text-center w-10 h-5 border-blue_custom rounded-sm border flex items-center justify-center">
+                        <span className="CuadroVentaCliente-text font-semibold text-center">
+                          {item.quantity || 0}
                         </span>
                       </div>
-                    </td>
-                    <td>
-                      <div style={{ marginBottom: "6px" }}>
-                        <span
-                          className="CuadroVentaCliente-text"
-                          style={{ fontWeight: "600" }}
-                        >
-                          15 Bs.
+
+                      {/* Precio */}
+                      <div>
+                        <span className="CuadroVentaCliente-text font-semibold text-xl">
+                          {item.price || "0"} Bs.
                         </span>
                       </div>
-                    </td>
-                  </tr>
-                  <tr style={{}}>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "26px",
-                          marginBottom: "6px",
-                        }}
-                      >
-                        <img src="../../dispensador.svg" alt="" />
-                        <span className="CuadroVentaCliente-text">
-                          Dispensador
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        className="CuadroVentaCliente-TextContainer"
-                        style={{ marginBottom: "6px" }}
-                      >
-                        <span
-                          className="CuadroVentaCliente-text"
-                          style={{ fontWeight: "600" }}
-                        >
-                          1
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ marginBottom: "6px" }}>
-                        <span
-                          className="CuadroVentaCliente-text"
-                          style={{ fontWeight: "600" }}
-                        >
-                          15 Bs.
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <button type="button" className="btn" onClick={() => Opciones()}>
@@ -197,34 +149,44 @@ const CuadroHistorialCliente = ({
               />
             </div>
           </div>
-        </div>
-        <div
-          style={{
-            width: "98%",
-            height: "1px",
-            background: "#52A5F5",
-            marginLeft: "3px",
-          }}
-        ></div>
-        <div
-          style={{
-            width: "100%",
-            textAlign: "right",
-            padding: "9px 43px 20px 0px",
-          }}
-        >
-          <span
-            className="CuadroVentaCliente-text"
-            style={{ fontWeight: "600", fontSize: "14px", marginRight: "17px" }}
+          <div
+            className="relative top-4"
+            style={{
+              width: "98%",
+              height: "1px",
+              background: "#52A5F5",
+              marginLeft: "3px",
+            }}
+          ></div>
+          <div
+            className="relative top-4"
+            style={{
+              width: "100%",
+              textAlign: "right",
+              padding: "9px 43px 20px 0px",
+            }}
           >
-            Total:
-          </span>
-          <span
-            className="CuadroVentaCliente-text"
-            style={{ fontWeight: "600", fontSize: "18px", color: "#1A3D7D" }}
-          >
-            60Bs
-          </span>
+            <span
+              className="CuadroVentaCliente-text"
+              style={{
+                fontWeight: "600",
+                fontSize: "14px",
+                marginRight: "17px",
+              }}
+            >
+              Total:
+            </span>
+            <span
+              className="CuadroVentaCliente-text"
+              style={{
+                fontWeight: "600",
+                fontSize: "18px",
+                color: "#1A3D7D",
+              }}
+            >
+              {sale.total.toLocaleString()} Bs.
+            </span>
+          </div>
         </div>
       </div>
     </>

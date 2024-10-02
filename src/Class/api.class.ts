@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { City, Zone } from "./types.data";
 import Product from "../type/Products/Products";
 import AuthenticationService from "../services/AuthenService";
+import { User } from "../type/User";
 
 class GetApiMethod {
   public axiosInstance: AxiosInstance;
@@ -46,6 +47,16 @@ class GetApiMethod {
     } catch (e) {
       console.error(e);
       throw new Error(`Error al obtener los item: ${e}`);
+    }
+  }
+
+  public async getUser(): Promise<User[]> {
+    try {
+      const response = await this.axiosInstance.get("/users");
+      return response.data.data as User[];
+    } catch (e) {
+      console.error(e);
+      throw new Error(`Error al obtener los usuario: ${e}`);
     }
   }
 }

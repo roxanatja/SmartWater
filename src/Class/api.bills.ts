@@ -33,7 +33,10 @@ class ApiMethodBills extends GetApiMethod {
     }
   }
 
-  public async GetBills(params?: { client: string }): Promise<Bills[]> {
+  public async GetBills(params?: {
+    client: string;
+    user?: string;
+  }): Promise<Bills[]> {
     try {
       const response: any = await this.axiosInstance.get(
         "/bills?pageSize=3000",
