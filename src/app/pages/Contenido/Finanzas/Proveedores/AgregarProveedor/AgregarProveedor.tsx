@@ -1,69 +1,102 @@
-import { FC, useContext } from "react";
+import { useContext } from "react";
 import "./AgregarProveedor.css";
 import { ProveedoresContext } from "../ProveedoresContext";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { ProvidersBody, Providers } from "../../../../../../type/providers";
+import Input from "../../../../EntryComponents/Inputs";
+import ApiMethodProvider from "../../../../../../Class/api.providers";
+import { toast } from "react-hot-toast";
 
-const AgregarProveedor: FC = () => {
+const AgregarProveedor = ({ onClose }: { onClose: () => void }) => {
+  const { provider } = useContext(ProveedoresContext);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProvidersBody>({ defaultValues: { ...provider } });
 
-    const { setShowModal } = useContext(ProveedoresContext);
+  const onSubmit: SubmitHandler<ProvidersBody> = async (data) => {
+    const api = new ApiMethodProvider();
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
+    if (provider) {
+      try {
+        await api.updateProvider({ ...data, _id: provider._id } as Providers);
+        toast.success("Provedor actualizado existoxamente");
+      } catch (error) {
+        toast.error("Upps error al actualizar proverdor");
+      }
+      return;
+    }
+    try {
+      await api.saveProvider(data);
+      toast.success("Provedor creado existoxamente");
+      reset();
+      onClose();
+    } catch (error) {
+      toast.error("Upps error al guardar proverdor");
+    }
+  };
 
-    return(
-        <>
-        <form onSubmit={(e) => e.preventDefault()}>
-            <div className="modal-overlay">
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header" style={{height: "auto"}}>
-                        <div className="Titulo-Modal">
-                            <div>
-                                <span>Registro de proveedor</span>
-                            </div>
-                            <div>
-                                <button type="button" className="btn" onClick={handleCloseModal}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="25" viewBox="0 0 21 25" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M16.4034 6.91L15.186 5.5L10.3599 11.09L5.53374 5.5L4.31641 6.91L9.14256 12.5L4.31641 18.09L5.53374 19.5L10.3599 13.91L15.186 19.5L16.4034 18.09L11.5772 12.5L16.4034 6.91Z" fill="black" fill-opacity="0.87"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-body">
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Nombre</label>
-                                <input type="text" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Correo</label>
-                                <input type="text" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Dirección</label>
-                                <input type="text" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Nit</label>
-                                <input type="text" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                        <button type="button" className="btn-registrar">Registrar</button>
-                    </div>
-                </div>
+  return (
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="p-6">
+          <div className="Titulo-Modal">
+            <div>
+              <span>Registro de proveedor</span>
             </div>
-        </form>
-        </>
-    )
-}
+          </div>
+        </div>
+        <div className="modal-body px-6">
+          <Input
+            register={register}
+            errors={errors.fullName}
+            name="fullName"
+            label="Nombre"
+            required
+          />
+          <Input
+            register={register}
+            errors={errors.email}
+            name="email"
+            label="Correo"
+            required
+          />
+          <Input
+            register={register}
+            errors={errors.phoneNumber}
+            icon={<i className="fa-solid fa-phone"></i>}
+            name="phoneNumber"
+            label="Telefono"
+            required
+          />
+          <Input
+            register={register}
+            errors={errors.address}
+            name="address"
+            label="Dirección"
+            required
+          />
+          <Input
+            register={register}
+            errors={errors.NIT}
+            name="NIT"
+            label="Nit"
+            required
+          />
+        </div>
+        <div className="flex justify-between w-full gap-2 px-6 py-4">
+          <button type="button" className="btn-cancelar" onClick={onClose}>
+            Cancelar
+          </button>
+          <button type="submit" className="btn-registrar">
+            {provider ? "Editar" : "Registrar"}
+          </button>
+        </div>
+      </form>
+    </>
+  );
+};
 
-export{AgregarProveedor}
+export { AgregarProveedor };

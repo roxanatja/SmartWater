@@ -1,58 +1,88 @@
-import { FC, useContext } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import "./HistorialCuentasPorCobrar.css";
 import { PageTitle } from "../../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
 import { SmartwaterContext } from "../../../../../SmartwaterContext";
 import { CuadroHistorialCliente } from "./CuadroHistorialCliente/CuadroHistorialCliente";
-import { CobrosClientes } from "../CuadroCuentasPorCobrar/CobrosClientes";
 import { useNavigate } from "react-router-dom";
 import { CuentasPorCobrarContext } from "../CuentasPorCobrarContext";
 import { FiltroHistorialCuentasPorCobrar } from "./FiltroHistorialCuentasPorCobrar/FiltroHistorialCuentasPorCobrar";
+import { Sale } from "../../../../../../type/Sale/Sale";
+import ApiMethodSales from "../../../../../../Class/api.sales";
+import Product from "../../../../../../type/Products/Products";
 
 const HistorialCuentasPorCobrar: FC = () => {
+  const { selectedOption } = useContext(SmartwaterContext);
+  const { setShowMiniModal, showFiltro, setShowFiltro } = useContext(
+    CuentasPorCobrarContext
+  );
+  const [data, setData] = useState<{
+    sales?: Sale[];
+    products?: Product[];
+  }>();
 
-    const {selectedOption} = useContext(SmartwaterContext);
-    const {setShowMiniModal, showFiltro, setShowFiltro} = useContext(CuentasPorCobrarContext);
-    const navigate = useNavigate();
+  const getData = useCallback(async () => {
+    const api = new ApiMethodSales();
+    const salesData = await api.GetSales();
+    return setData({
+      sales: salesData.filter((x) => x.creditSale === true),
+      products: await api.GetProducts(),
+    });
+  }, []);
 
-    const handleClick = () => {
-        navigate('/Finanzas/CuentasPorCobrarCobros');
-        setShowMiniModal(false);
-    };
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
-    const Onfilter = () => {
-        setShowFiltro(true)
-    }
+  const navigate = useNavigate();
 
-    return(
-        <>
+  const handleClick = () => {
+    navigate("/Finanzas/CuentasPorCobrarCobros");
+    setShowMiniModal(false);
+  };
+
+  const Onfilter = () => {
+    setShowFiltro(true);
+  };
+
+  return (
+    <>
+      <div>
         <div>
-            <div>
-                <button className="btn" onClick={handleClick}>
-                    <span className="material-symbols-outlined">
-                        arrow_back
-                    </span>
-                </button>
-            </div>
-            <PageTitle titulo="Historial" icon="../../Finanzas-icon.svg"/>
-            <FiltroPaginado filtro swith infoPedidos opcionesSwitch1="Ventas al crédito" opcionesSwitch2="Cobros" finanzas onFilter={Onfilter}>
-                {
-                    selectedOption === false ?
-                    <div style={{display:"flex", flexWrap: "wrap", gap: "24px"}}>
-                        <CuadroHistorialCliente/>
-                        <CuadroHistorialCliente/>
-                        <CuadroHistorialCliente/>
-                    </div>
-                    :
-                    <div style={{display:"flex", flexWrap: "wrap", gap: "23px"}}>
-                        <CobrosClientes/>
-                    </div>
-                }
-            </FiltroPaginado>
+          <button className="btn" onClick={handleClick}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
         </div>
-        {showFiltro && <FiltroHistorialCuentasPorCobrar/>}
-        </>
-    )
-}
+        <PageTitle titulo="Historial" icon="../../Finanzas-icon.svg" />
+        <FiltroPaginado
+          filtro
+          swith
+          infoPedidos
+          opcionesSwitch1="Ventas al crédito"
+          opcionesSwitch2="Cobros"
+          finanzas
+          onFilter={Onfilter}
+        >
+          <div
+            className={`grid grid-cols-2 max-sm:grid-cols-1 gap-4 py-2 transition-all ${
+              !selectedOption ? "" : "scale-0 -z-10 fixed"
+            }`}
+          >
+            {data?.sales &&
+              data.sales.map((row, index) => (
+                <CuadroHistorialCliente
+                  sale={row}
+                  products={data.products || []}
+                  key={index}
+                  onSendBill={() => getData()}
+                />
+              ))}
+          </div>
+        </FiltroPaginado>
+      </div>
+      {showFiltro && <FiltroHistorialCuentasPorCobrar />}
+    </>
+  );
+};
 
-export{ HistorialCuentasPorCobrar }
+export { HistorialCuentasPorCobrar };
