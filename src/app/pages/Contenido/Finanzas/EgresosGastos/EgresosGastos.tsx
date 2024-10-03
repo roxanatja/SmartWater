@@ -1,61 +1,99 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import "./EgresosGastos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
 import { SmartwaterContext } from "../../../../SmartwaterContext";
 import { CuentasContales } from "./CuentasContales/CuentasContales";
 import { RegistrosEyG } from "./RegistrosEyG/RegistrosEyG";
-import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
 import { EgresosGastosContext } from "./EgresosGastosContext";
 import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
+import Modal from "../../../EntryComponents/Modal";
+import RegisterAccount from "../../../EntryComponents/RegisterAccount";
+import { Account } from "../../../../../type/AccountEntry";
+import ApiMethodAccountEntry from "../../../../../Class/api.entryaco";
+import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
 
 const EgresosGastos: FC = () => {
+  const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+  const [data, setData] = useState<{ accounts?: Account[] }>();
 
-    const {selectedOption, setSelectedOption } = useContext(SmartwaterContext);
+  const getData = useCallback(async () => {
+    const api = new ApiMethodAccountEntry();
+    return setData({
+      accounts: await api.loadAccounts(),
+    });
+  }, []);
 
-    const {showModal, setShowModal, showFiltro, setShowFiltro} = useContext(EgresosGastosContext);
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
-    const handleModal = () => {
-        setShowModal(true)
-    }
+  const { showModal, setShowModal, showFiltro, setShowFiltro } =
+    useContext(EgresosGastosContext);
 
-    const Onfilter = () => {
-        setShowFiltro(true)
-    }
+  const handleModal = () => {
+    setShowModal(true);
+  };
 
-    useEffect(() => {
-        setSelectedOption(false)
-    }, [setSelectedOption])
+  const Onfilter = () => {
+    setShowFiltro(true);
+  };
 
-    return(
-        <>
-        <div>
-            <PageTitle titulo="Cuentas Egresos y gastos" icon="../../Finanzas-icon.svg"/>
-                {
-                    selectedOption === false ?
-                    <FiltroPaginado filtro swith finanzas 
-                            opcionesSwitch1="Cuentas contables" 
-                            opcionesSwitch2="Registros Egresos y Gastos">
-                    <div style={{display:"flex", flexWrap: "wrap", gap: "36px", paddingLeft: "5px"}}>
-                        <CuentasContales/>
-                    </div>
-                    </FiltroPaginado>
-                    :
-                    <FiltroPaginado filtro swith finanzas add onAdd={handleModal}
-                            opcionesSwitch1="Cuentas contables" 
-                            opcionesSwitch2="Registros Egresos y Gastos"
-                            onFilter={Onfilter}>
-                        <div style={{display:"flex", flexWrap: "wrap", gap: "23px", paddingLeft: "5px"}}>
-                            <RegistrosEyG/>
-                        </div>
-                    </FiltroPaginado>
-                }
-            
-        </div>
-        {showFiltro && <FiltroEgresosGastos/>}
-        {showModal && <AddEgresosGastos/>}
-        </>
-    )
-}
+  useEffect(() => {
+    setSelectedOption(false);
+  }, [setSelectedOption]);
 
-export{EgresosGastos}
+  return (
+    <>
+      <div>
+        <PageTitle
+          titulo="Cuentas Egresos y gastos"
+          icon="../../Finanzas-icon.svg"
+        />
+        {selectedOption === false ? (
+          <FiltroPaginado
+            filtro
+            swith
+            finanzas
+            opcionesSwitch1="Cuentas contables"
+            opcionesSwitch2="Registros Egresos y Gastos"
+          >
+            <div className="flex flex-wrap gap-4 pl-4">
+              <CuentasContales accounts={data?.accounts} />
+            </div>
+          </FiltroPaginado>
+        ) : (
+          <FiltroPaginado
+            filtro
+            swith
+            finanzas
+            add
+            onAdd={handleModal}
+            opcionesSwitch1="Cuentas contables"
+            opcionesSwitch2="Registros Egresos y Gastos"
+            onFilter={Onfilter}
+          >
+            <div className="flex flex-wrap gap-4 pl-4">
+              <RegistrosEyG />
+            </div>
+          </FiltroPaginado>
+        )}
+      </div>
+      {showFiltro && <FiltroEgresosGastos />}
+      <Modal
+        isOpen={showModal && !selectedOption}
+        onClose={() => setShowModal(false)}
+      >
+        <RegisterAccount handleOnsubmit={() => getData()} />
+      </Modal>
+      <Modal
+        isOpen={showModal && selectedOption}
+        onClose={() => setShowModal(false)}
+      >
+        <AddEgresosGastos />
+      </Modal>
+    </>
+  );
+};
+
+export { EgresosGastos };
