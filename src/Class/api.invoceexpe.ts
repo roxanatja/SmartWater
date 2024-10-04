@@ -1,5 +1,10 @@
 import toast from "react-hot-toast";
-import { InvoceExpense, InvoceExpenseBody } from "../type/InvoceExpense";
+import {
+  Expense,
+  ExpensesBody,
+  InvoceExpense,
+  InvoceExpenseBody,
+} from "../type/InvoceExpense";
 import GetApiMethod from "./api.class";
 
 class ApiMethodInvoceExpense extends GetApiMethod {
@@ -31,6 +36,37 @@ class ApiMethodInvoceExpense extends GetApiMethod {
         toast.error(e.response.data.msg);
       }
       throw new Error(`Error al borrar la Orden: ${e}`);
+    }
+  }
+
+  public async saveExpense(dataToSave: ExpensesBody) {
+    try {
+      const response = await this.axiosInstance.post(
+        "/expenses/create",
+        dataToSave
+      );
+      return response.status;
+    } catch (e: any) {
+      console.error("Error in saveExpense:", e);
+      if (e?.response?.data?.msg) {
+        toast.error(e.response.data.msg);
+      }
+      throw new Error(`Error al salvar la saveExpense: ${e}`);
+    }
+  }
+
+  public async loadExpense(params?: Expense): Promise<Expense[]> {
+    try {
+      const response = await this.axiosInstance.get("/expenses", {
+        params,
+      });
+      return response.data.data;
+    } catch (e: any) {
+      console.error("Error in loadExpense:", e);
+      if (e?.response?.data?.msg) {
+        toast.error(e.response.data.msg);
+      }
+      throw new Error(`Error al borrar la loadExpense: ${e}`);
     }
   }
 }

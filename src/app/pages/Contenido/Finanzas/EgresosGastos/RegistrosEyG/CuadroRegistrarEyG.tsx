@@ -1,37 +1,57 @@
-import { FC } from "react";
+import { Account } from "../../../../../../type/AccountEntry";
+import { Expense } from "../../../../../../type/InvoceExpense";
+import { User } from "../../../../../../type/User";
 import "./RegistrosEyG.css";
 
-const CuadroRegistrarEyG: FC = () => {
-    return(
-        <>
-        <div className="CuadroRegistrarEyG-container">
-            <div className="CuadroVentaCliente-header">
-                <img src="../../Cliente2.svg" alt="" />
-                <span>Daniela Ayala</span>
-            </div>
-            <div className="CuadroRegistrarEyG-container2">
-                <div className="RegistrosEyG-Cuadro1-text">
-                    <span>Tipo de gasto</span>
-                    <span>150 Bs.</span>
-                </div>
-                <div className="RegistrosEyG-Cuadro1-text">
-                    <span>Formas de pago</span>
-                    <span>Contado</span>
-                </div>
-                <div className="RegistrosEyG-Cuadro1-text">
-                    <span>Documento</span>
-                    <span>Rec.220</span>
-                </div>
-                <div className="RegistrosEyG-Cuadro1-text" style={{display: "flex", flexDirection: "column", gap: "24px"}}>
-                    <span>Comenatrios</span>
-                    <div className="CuadroRegistrarEyG-comentario">
-                        <span></span>
-                    </div>
-                </div>
-            </div>
+const CuadroRegistrarEyG = ({
+  expense,
+  users,
+  accounts,
+}: {
+  expense: Expense;
+  users?: User[];
+  accounts?: Account[];
+}) => {
+  const user = users?.find((x) => x._id === expense.user);
+  return (
+    <>
+      <div className="CuadroRegistrarEyG-container w-full">
+        <div className="CuadroVentaCliente-header">
+          <img src="../../Cliente2.svg" alt="" />
+          <span>{user?.fullName || "N/A"}</span>
         </div>
-        </>
-    )
-}
+        <div className="flex flex-col w-full gap-2">
+          <div className="RegistrosEyG-Cuadro1-text">
+            <span>Tipo de gasto</span>
+            <span>
+              {accounts?.find((x) => x._id === expense.accountEntry)?.name ||
+                "Cuenta no reconocida"}
+            </span>
+          </div>
+          <div className="RegistrosEyG-Cuadro1-text">
+            <span>Importe</span>
+            <span>{expense.amount.toString().toLocaleString()} Bs.</span>
+          </div>
+          <div className="RegistrosEyG-Cuadro1-text">
+            <span>Formas de pago</span>
+            <span>
+              {expense.paymentMethodCurrentAccount ? "Cta. Cte" : "Efectivo"}
+            </span>
+          </div>
+          <div className="RegistrosEyG-Cuadro1-text">
+            <span>Documento</span>
+            <span>{expense.documentNumber}</span>
+          </div>
+          <div className="RegistrosEyG-Cuadro1-text flex flex-col gap-4">
+            <span>Comenatrios</span>
+            <div className="CuadroRegistrarEyG-comentario">
+              <span>{expense.comment}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
-export{CuadroRegistrarEyG}
+export { CuadroRegistrarEyG };

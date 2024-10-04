@@ -1,131 +1,199 @@
-import { FC, useContext, useState } from "react";
+import { useContext } from "react";
 import "./AddEgresosGastos.css";
 import { EgresosGastosContext } from "../EgresosGastosContext";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { ExpensesBody } from "../../../../../../type/InvoceExpense";
+import Input from "../../../../EntryComponents/Inputs";
+import { Account } from "../../../../../../type/AccountEntry";
+import { Providers } from "../../../../../../type/providers";
+import { UserData } from "../../../../../../type/UserData";
+import AuthenticationService from "../../../../../../services/AuthenService";
+import { toast } from "react-hot-toast";
+import ApiMethodInvoceExpense from "../../../../../../Class/api.invoceexpe";
 
-const AddEgresosGastos: FC = () => {
-    const { setShowModal } = useContext(EgresosGastosContext);
+const AddEgresosGastos = ({
+  data,
+  handleOnsubmit,
+}: {
+  data?: {
+    accounts?: Account[];
+    providers?: Providers[];
+  };
+  handleOnsubmit: () => void;
+}) => {
+  const { setShowModal } = useContext(EgresosGastosContext);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = useForm<ExpensesBody>({
+    defaultValues: {
+      hasInVoice: true,
+      creditBuy: false,
+      paymentMethodCurrentAccount: false,
+    },
+  });
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
+  const onSubmit: SubmitHandler<ExpensesBody> = async (data) => {
+    const user: UserData = AuthenticationService.getUser();
+    const api = new ApiMethodInvoceExpense();
+    try {
+      await api.saveExpense({
+        ...data,
+        paymentMethodCurrentAccount: data.user === "1" ? false : true,
+        user: user._id,
+      });
+      toast.success("Registro registrado exitosamente");
+      reset();
+      handleOnsubmit();
+    } catch (error) {
+      console.log(error);
+      toast.error("Upps error al hacer el registro");
+    }
+  };
 
-    const [checkbox1, setCheckbox1] = useState<boolean>(false);
-    const [checkbox2, setCheckbox2] = useState<boolean>(false);
-    
-    const handleCheckbox1Change = () => {
-        setCheckbox1(!checkbox1);
-        if (checkbox2) {
-        setCheckbox2(false);
-        }
-    };
-
-    const handleCheckbox2Change = () => {
-        setCheckbox2(!checkbox2);
-        if (checkbox1) {
-        setCheckbox1(false);
-        }
-    };
-
-return (
+  return (
     <>
-        <form onSubmit={(e) => e.preventDefault()}>
-            <div className="modal-overlay">
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header" style={{height: "auto"}}>
-                        <div className="Titulo-Modal">
-                            <div>
-                                <span>Registro de egresos y gastos</span>
-                            </div>
-                            <div>
-                                <button type="button" className="btn" onClick={handleCloseModal}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="25" viewBox="0 0 21 25" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M16.4034 6.91L15.186 5.5L10.3599 11.09L5.53374 5.5L4.31641 6.91L9.14256 12.5L4.31641 18.09L5.53374 19.5L10.3599 13.91L15.186 19.5L16.4034 18.09L11.5772 12.5L16.4034 6.91Z" fill="black" fill-opacity="0.87"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-body">
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Fecha</label>
-                                <input type="date" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input" style={{gap: "16px"}}>
-                            <div className="input-grup">
-                                <label className="label-grup">Importe</label>
-                                <input type="number" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                            <div className="input-grup">
-                                <label className="label-grup">Medio de pago</label>
-                                <select name="Pago" className="input-select">
-                                    <option value="Efectivo">Efectivo</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="grupo-input" style={{gap: "20px"}}>
-                            <div className="input-grup">
-                                <label className="label-grup">Proveedor</label>
-                                <select name="Proveedor" className="input-select">
-                                    <option value="Julia Galicia">Julia Galicia</option>
-                                    <option value="Julia Galicia">Julia Galicia</option>
-                                </select>
-                            </div>
-                            <div className="input-grup">
-                                <label className="label-grup">Egreso o gasto </label>
-                                <select name="zona" className="input-select">
-                                    <option value="Egreso">Egreso</option>
-                                    <option value="Ingreso">Ingreso</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="label-grup" style={{width: "100%"}}>
-                            <span>Tipo de compra</span>
-                        </div>
-                        <div className="grupo-checbox">
-                            <div className="grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="text-check">Factura</label>
-                            </div>
-                            <div className="grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox2}
-                                onChange={handleCheckbox2Change}
-                                />
-                                <label className="text-check">Recibo</label>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">N° de documento</label>
-                                <input type="text" className="input-text" style={{textAlign: "left"}}/>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="input-grup">
-                                <label className="label-grup">Comentario</label>
-                                <textarea className="CrearCuente-Textarea" name="Comentario"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                        <button type="button" className="btn-registrar">Registrar</button>
-                    </div>
-                </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="p-6">
+          <h2 className="Titulo-Modal mb-4">Registro de egresos y gastos</h2>
+          <div className="flex flex-col gap-4 mb-10">
+            <Input
+              register={register}
+              name="date"
+              label="Fecha"
+              className="text-right"
+              value={new Date().toLocaleDateString()}
+              readOnly
+            />
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
+              <Input
+                register={register}
+                name="amount"
+                label="Importe"
+                type="number"
+                errors={errors.amount}
+                button={"Bs"}
+                required
+              />
+              <div className="input-grup w-full relative top-1">
+                <label className="label-grup mb-1.5">Medio de pago</label>
+                <select
+                  {...register("user", { required: true })}
+                  className="p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full text-sm "
+                >
+                  <option value="1">Efectivo</option>
+                  <option value="2">Cta. Cte</option>
+                </select>
+              </div>
             </div>
-        </form>
-    </>
-);
-}
+            <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
+              <div className="input-grup w-full relative top-1">
+                <label className="label-grup mb-1.5">Provedor</label>
+                <select
+                  {...register("provider", { required: true })}
+                  className="p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full text-sm "
+                >
+                  {data?.providers &&
+                    data.providers.map((provider, index) => (
+                      <option key={index} value={provider._id}>
+                        {provider.fullName}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="input-grup w-full relative top-1">
+                <label className="label-grup mb-1.5">Egreso o gasto </label>
+                <select
+                  {...register("accountEntry")}
+                  className="p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full text-sm "
+                >
+                  {data?.accounts &&
+                    data.accounts.map((account, index) => (
+                      <option key={index} value={account._id}>
+                        {account.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
 
-export{AddEgresosGastos}
+            <div className="label-grup" style={{ width: "100%" }}>
+              <span>Tipo de compra</span>
+            </div>
+            <div className="grupo-checbox">
+              <div className="grupo-check">
+                <input
+                  className="input-check cursor-pointer"
+                  type="checkbox"
+                  id="hasInVoice"
+                  checked={watch("hasInVoice")}
+                  onChange={() => {
+                    setValue("hasInVoice", true);
+                    setValue("creditBuy", false);
+                  }}
+                />
+                <label
+                  htmlFor="hasInVoice"
+                  className="text-check cursor-pointer"
+                >
+                  Factura
+                </label>
+              </div>
+              <div className="grupo-check">
+                <input
+                  className="input-check cursor-pointer"
+                  type="checkbox"
+                  id="creditBuy"
+                  checked={watch("creditBuy")}
+                  onChange={() => {
+                    setValue("creditBuy", true);
+                    setValue("hasInVoice", false);
+                  }}
+                />
+                <label
+                  htmlFor="creditBuy"
+                  className="text-check cursor-pointer"
+                >
+                  Credito
+                </label>
+              </div>
+            </div>
+            <Input
+              name="documentNumber"
+              label="N° de documento"
+              register={register}
+              errors={errors.documentNumber}
+              required
+            />
+            <Input
+              name="documentNumber"
+              label="Comentario"
+              register={register}
+              errors={errors.documentNumber}
+              required
+              textarea
+            />
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn-cancelar"
+              onClick={() => setShowModal(false)}
+            >
+              Cancelar
+            </button>
+            <button type="submit" className="btn-registrar">
+              Registrar
+            </button>
+          </div>
+        </div>
+      </form>
+    </>
+  );
+};
+
+export { AddEgresosGastos };
