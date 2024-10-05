@@ -92,8 +92,8 @@ const Input = memo<InputProps>(
             )}
             {...rest}
             className={`${
-              errors && "outline outline-black text-black"
-            } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-black text-black ${className}`}
+              errors && "outline outline-red-500 text-black"
+            } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-2 outline-black text-black ${className}`}
           />
         ) : (
           <div className="relative w-full flex items-center">
@@ -124,11 +124,11 @@ const Input = memo<InputProps>(
                 errors && errors && "outline outline-red-500 text-black"
               } ${className} ${icon ? "pl-16" : ""} ${
                 !isText && "text-sm"
-              }  p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
+              }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
             />
             {button && (
               <button
-                className="absolute ps-4 py-1.5  text-black rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
+                className="absolute ps-4 py-1.5 text-black rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
                 type="button"
                 onClick={onClick}
               >
@@ -138,7 +138,7 @@ const Input = memo<InputProps>(
           </div>
         )}
         {errors && (
-          <span className="text-red-500 font-normal text-sm font-pricedown">
+          <span className="text-red-500 font-normal text-sm">
             <i className="fa-solid fa-triangle-exclamation"></i>{" "}
             {errors.message}
           </span>

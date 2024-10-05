@@ -24,7 +24,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     index: number;
   } | null>(null);
 
-  const { register, handleSubmit, watch, setValue, control } =
+  const { register, handleSubmit, watch, setValue, control, reset } =
     useForm<SaleBody>({
       defaultValues: {
         detail: [{ product: "", quantity: "0", price: "0" }],
@@ -69,6 +69,8 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     try {
       await api.saveSale(values);
       toast.success("Venta registrada");
+      reset();
+      setAddedProducts([]);
     } catch (error) {
       toast.error("Upss error al registrar venta");
       console.error(error);

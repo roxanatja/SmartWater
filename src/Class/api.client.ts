@@ -57,6 +57,21 @@ class ApiMethodClient extends GetApiMethod {
       throw new Error(`Error al registrar el cliente: ${error}`);
     }
   }
+
+  public async loadClients(): Promise<Client[]> {
+    try {
+      const response: any = await this.axiosInstance.get(
+        `/clients?pageSize=3000`
+      );
+      return response.data.data as Client[];
+    } catch (error: any) {
+      console.error(error);
+      if (error?.response?.data?.msg) {
+        toast.error(error.response.data.msg);
+      }
+      throw new Error(`Error al obtener los clientes: ${error}`);
+    }
+  }
 }
 
 export default ApiMethodClient;
