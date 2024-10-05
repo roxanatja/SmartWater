@@ -5,11 +5,12 @@ import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
 import { FC, useCallback, useContext, useEffect, useState } from "react";
 import { PrestamosContext } from "./PrestamosContext";
-import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
+import FiltroPrestamos from "./FiltroPrestamos/FiltroPrestamos";
 import { GetLoans } from "../../../../services/LoansService";
 import { GetProducts } from "../../../../services/ProductsService";
 import Product from "../../../../type/Products/Products";
 import { Loans } from "../../../../type/Loans/Loans";
+import Modal from "../../EntryComponents/Modal";
 
 const Prestamos: FC = () => {
   const { showMiniModal, showFiltro, setShowFiltro } =
@@ -104,9 +105,9 @@ const Prestamos: FC = () => {
     hasContract: boolean,
     hasExpiredContract: boolean
   ) => {
-    if (hasExpiredContract) {
+    if (hasExpiredContract === true) {
       return "Contrato Vencido";
-    } else if (hasContract) {
+    } else if (hasContract === true) {
       return "Con Contrato";
     } else {
       return "Sin Contrato";
@@ -146,7 +147,13 @@ const Prestamos: FC = () => {
           </div>
         </FiltroPaginado>
       </div>
-      {showFiltro && <FiltroPrestamos />}
+      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
+        <FiltroPrestamos
+          loans={loans}
+          onChange={(val) => setCurrentData(val)}
+        />
+      </Modal>
+
       {showMiniModal && <OpcionesPrestamo />}
     </>
   );

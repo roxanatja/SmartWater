@@ -5,19 +5,19 @@ import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
 import { DeleteClient } from "../../../../../services/ClientsService";
-import { GetZone } from "../../../../../services/ZonesService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../EntryComponents/Modal";
+import { Zone } from "../../../../../Class/types.data";
 
-const InfoCliente = (client: Client) => {
+const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [zone, setZone] = useState<string>("");
   const [date, setDate] = useState<string>();
-  const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false); // Agregado el estado para el Pop-Up
+  const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false);
   const location = client.location;
   const navigate = useNavigate();
 
@@ -26,22 +26,10 @@ const InfoCliente = (client: Client) => {
   }`;
 
   useEffect(() => {
-    const getZone = async () => {
-      try {
-        const response = await GetZone();
+    setZone(zones.find((x) => x._id === client.zone)?.name || "");
+  }, [client.zone, zones]);
 
-        response.data.forEach((element: any) => {
-          if (element._id === client.zone) {
-            setZone(element.name);
-          }
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    getZone();
-
+  useEffect(() => {
     var date = formatDateTime(client.lastSale, "numeric", "numeric", "numeric");
     if (date === "Invalid Date") {
       date = "Sin ventas";
@@ -118,14 +106,19 @@ const InfoCliente = (client: Client) => {
         <div className="infoClientes-header">
           <div className="flex justify-between w-8/12 max-sm:w-full">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
-              {client.storeImage && client.storeImage.length > 1 ? (
+              {client.storeImage ? (
                 <img
                   src={client.storeImage}
                   alt=""
                   className="infoClientes-imgStore"
                 />
               ) : (
-                <img src="" alt="" />
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                  <div className="opacity-0">.</div>
+                  <p className="absolute font-extrabold ">
+                    {client.fullName[0]}
+                  </p>
+                </div>
               )}
               <span>{client.fullName}</span>
             </div>

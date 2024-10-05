@@ -6,10 +6,9 @@ import "./Ventas.css";
 import { FC, useContext, useEffect, useState } from "react";
 import moment from "moment";
 import { VentasContext } from "./VentasContext";
-import { FiltroVenta } from "./FiltroVenta/FiltroVenta";
+import FiltroVenta from "./FiltroVenta/FiltroVenta";
 import { Sale } from "../../../../type/Sale/Sale";
 import { GetSales } from "../../../../services/SaleService";
-import { loadClients } from "../../../../services/ClientsService";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
 
@@ -24,28 +23,18 @@ const Ventas: FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sales, setSales] = useState<Array<Sale>>([]);
-  const [clients, setClients] = useState<Array<any>>([]);
+  const [currenData, setCurrenData] = useState<Array<Sale>>([]);
 
   const getSales = async () => {
     try {
-      await GetSales().then((resp) => {
-        setSales(resp.data);
-        setLoading(false);
-      });
+      const resp = await GetSales();
+      setSales(resp.data);
+      setLoading(false);
+      setCurrenData(resp.data); // Almacenar datos originales
     } catch (e) {
       console.error(e);
       setLoading(false);
       setError(true);
-    }
-  };
-
-  const getClients = async () => {
-    try {
-      await loadClients().then((resp) => {
-        setClients(resp.data);
-      });
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -67,9 +56,12 @@ const Ventas: FC = () => {
     setSales(salesOrdenadas);
   };
 
+  const Onfilter = (filteredSales: Array<Sale>) => {
+    setSales(filteredSales);
+  };
+
   useEffect(() => {
     getSales();
-    getClients();
   }, []);
 
   if (loading) {
@@ -85,25 +77,19 @@ const Ventas: FC = () => {
     );
   }
 
-  const Onfilter = () => {
-    setShowFiltro(true);
-  };
-
   const serchSale = (e: string) => {
     const value = e;
 
     if (value === "") {
-      getSales();
-      getClients();
+      setSales(currenData);
       return;
     } else {
-      let clientFilter = clients.filter((client) =>
-        client.fullName?.toLowerCase().includes(value.toLowerCase())
+      const clientFilter = sales.filter((sale: Sale) =>
+        sale.client.some((client) =>
+          client.fullName?.toLowerCase().includes(value.toLowerCase())
+        )
       );
-      let saleFilter = clientFilter.flatMap((client) => {
-        return sales.filter((sale) => sale.client === client._id);
-      });
-      setSales(saleFilter);
+      setSales(clientFilter);
     }
   };
 
@@ -122,7 +108,7 @@ const Ventas: FC = () => {
           resultados={true}
           total={sales.length}
           orderArray={orderArray}
-          onFilter={Onfilter}
+          onFilter={() => setShowFiltro(true)}
         >
           <div className="grid grid-cols-4 max-sm:grid-cols-1 gap-4 pb-2 pt-2">
             {sales.map((sale) => {
@@ -151,7 +137,9 @@ const Ventas: FC = () => {
           />
         </div>
       </Modal>
-      {showFiltro && <FiltroVenta />}
+      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
+        <FiltroVenta sales={currenData} onChange={Onfilter} />
+      </Modal>
     </>
   );
 };
