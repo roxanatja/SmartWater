@@ -337,7 +337,7 @@ const FiltroClientes = ({
           type="button"
           onClick={() => {
             setClientes(false);
-            if (clients) onChange(clients, {});
+            if (clients) onChange(clients, "quit");
           }}
           className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
         >
