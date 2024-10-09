@@ -9,18 +9,29 @@ import { Client } from "../../../../../type/Cliente/Client";
 const FiltroClientes = ({
   clients,
   onChange,
+  initialFilters,
 }: {
   clients: Client[];
-  onChange: (value: Client[]) => void;
+  onChange: (value: Client[], filter: any) => void;
+  initialFilters: any;
 }) => {
   const { setShowFiltro } = useContext(ClientesContext);
   const [data, setData] = useState<{ zones: Zone[] }>();
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue } = useForm({
+    defaultValues: initialFilters || {},
+  });
+
+  const getData = useCallback(async () => {
+    const api = new GetApiMethod();
+    return setData({
+      zones: await api.getZone(),
+    });
+  }, []);
 
   const onSubmit = (data: any) => {
     setShowFiltro(false);
     const filtered = filterClients(clients, data);
-    onChange(filtered);
+    onChange(filtered, data);
   };
 
   const filterClients = (clients: Client[], filters: any) => {
@@ -44,10 +55,15 @@ const FiltroClientes = ({
       )
         return false;
 
-      // Check zones
-      if (filters.zones && filters.zones !== client.zone) return false;
-
-      // Additional date range checks if needed
+      // Check zones (multiple selected)
+      if (
+        filters.zones &&
+        !Object.values(filters.zones).some(
+          (checked) => checked && client.zone === checked
+        )
+      ) {
+        return false;
+      }
       if (
         filters.fromDate &&
         new Date(client.created) < new Date(filters.fromDate)
@@ -60,12 +76,12 @@ const FiltroClientes = ({
     });
   };
 
-  const getData = useCallback(async () => {
-    const api = new GetApiMethod();
-    return setData({
-      zones: await api.getZone(),
-    });
-  }, []);
+
+
+  const distribu = [
+    { _id: "1", name: "Distribuidor 1" },
+    { _id: "2", name: "Distribuidor 2" },
+  ];
 
   useEffect(() => {
     getData();
@@ -131,76 +147,203 @@ const FiltroClientes = ({
 
       <div className="FiltroClientes-Renovación">
         <div className="FiltroClientes-RenovaciónTitulo">
-          <span>Préstamo / Cuentas por cobrar</span>
+          <span>Préstamo</span>
         </div>
         <div className="lineagris"></div>
-        <div className="FiltroClientes-Cuentas grid grid-cols-2">
-          <div className="FiltroClientes-CuentasOptionInput">
-            <input
-              className="input-check"
-              type="checkbox"
-              {...register("withLoans")}
-            />
-            <img src="/presta.svg" alt="/presta.svg" />
-            <span className="text-blue_custom font-semibold">Con préstamo</span>
+        <div className="FiltroClientes-Cuentas flex flex-col">
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex justify-between w-full">
+              <div className="FiltroClientes-CuentasOptionInput">
+                <input
+                  className="input-check"
+                  type="checkbox"
+                  {...register("withLoans")}
+                />
+                <img src="/presta.svg" alt="/presta.svg" />
+                <span className="text-blue_custom font-semibold text-sm">
+                  Con préstamo
+                </span>
+              </div>
+              <div className="FiltroClientes-CuentasOptionInput">
+                <input
+                  className="input-check"
+                  type="checkbox"
+                  {...register("iscredicv")}
+                />
+                <span className="text-blue_custom font-semibold text-sm text-nowrap">
+                  Contratos vencido
+                </span>
+              </div>
+            </div>
+
+            <div className="FiltroClientes-CuentasOptionInput">
+              <input
+                className="input-check"
+                type="checkbox"
+                {...register("withoutLoans")}
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="11"
+                  stroke="#F40101"
+                  strokeWidth="2"
+                />
+                <image
+                  xlinkHref="../../Dispensador-iconsvg.svg"
+                  x="5"
+                  y="6"
+                  width="14"
+                  height="14"
+                />
+                <line
+                  x1="6"
+                  y1="6"
+                  x2="18"
+                  y2="18"
+                  stroke="#FF0000"
+                  strokeWidth="3"
+                />
+              </svg>
+              <span className="text-blue_custom font-semibold text-sm">
+                Sin préstamo
+              </span>
+            </div>
           </div>
-          <div className="FiltroClientes-CuentasOptionInput">
-            <input
-              className="input-check"
-              type="checkbox"
-              {...register("withoutLoans")}
-            />
-            <img src="/nopresta.svg" alt="/nopresta.svg" />
-            <span className="text-blue_custom font-semibold">Sin préstamo</span>
-          </div>
-          <div className="FiltroClientes-CuentasOptionInput">
-            <input
-              className="input-check"
-              type="checkbox"
-              {...register("withCredit")}
-            />
-            <img src="/saldo.svg" alt="/saldo.svg" />
-            <span className="text-blue_custom font-semibold">Con crédito</span>
-          </div>
-          <div className="FiltroClientes-CuentasOptionInput">
-            <input
-              className="input-check"
-              type="checkbox"
-              {...register("withoutCredit")}
-            />
-            <img src="/nopresta.svg" alt="/nopresta.svg" />
-            <span className="text-blue_custom font-semibold">Sin crédito</span>
+          <div className="flex flex-col gap-3">
+            <h4 className="text-sm text-black font-semibold">
+              Cuentas por cobrar
+            </h4>
+            <div className="FiltroClientes-CuentasOptionInput">
+              <input
+                className="input-check"
+                type="checkbox"
+                {...register("withCredit")}
+              />
+              <img src="/saldo.svg" alt="/saldo.svg" />
+              <span className="text-blue_custom font-semibold text-sm">
+                Con saldo
+              </span>
+            </div>
+            <div className="FiltroClientes-CuentasOptionInput">
+              <input
+                className="input-check"
+                type="checkbox"
+                {...register("withoutCredit")}
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="11"
+                  stroke="#F40101"
+                  strokeWidth="2"
+                />
+                <image
+                  xlinkHref="../../monedadenegada-icon.svg"
+                  x="5"
+                  y="6"
+                  width="14"
+                  height="14"
+                />
+                <line
+                  x1="6"
+                  y1="6"
+                  x2="18"
+                  y2="18"
+                  stroke="#FF0000"
+                  strokeWidth="3"
+                />
+              </svg>
+              <span className="text-blue_custom font-semibold text-sm">
+                Sin saldo
+              </span>
+            </div>
           </div>
         </div>
-        <div className="w-full flex justify-between items-center gap-2">
-          <label htmlFor="zones">Zonas</label>
-          <select
-            {...register("zones")}
-            className="border border-black rounded p-2 w-full text-right"
-          >
-            {data?.zones?.map((zone, index) => (
-              <option value={zone._id} key={index}>
-                {zone.name}
-              </option>
+        <div className="FiltroClientes-RenovaciónTitulo">
+          <span>Distribuidores</span>
+        </div>
+        <div className="lineagris"></div>
+        <div className="w-full flex flex-col gap-2">
+          <label className="font-medium text-blue_custom text-sm">
+            Distribuidores
+          </label>
+          <div className="flex flex-col gap-3">
+            {distribu?.map((zone, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 w-1/2 text-black"
+              >
+                <input
+                  type="checkbox"
+                  {...register(`dist.${zone._id}`)}
+                  value={zone._id}
+                  id={`dist-${zone._id}`}
+                />
+                <label
+                  htmlFor={`dist-${zone._id}`}
+                  className="font-medium text-sm"
+                >
+                  {zone.name}
+                </label>
+              </div>
             ))}
-          </select>
+          </div>
+        </div>
+        <div className="w-full flex flex-col gap-2">
+          <label className="font-bold">Zonas</label>
+          <div className="flex flex-col gap-3">
+            {data?.zones?.map((zone, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 w-1/2 text-blue_custom"
+              >
+                <input
+                  type="checkbox"
+                  {...register(`zones.${zone._id}`)}
+                  value={zone._id}
+                  id={`zone-${zone._id}`}
+                />
+                <label
+                  htmlFor={`zone-${zone._id}`}
+                  className="font-bold text-sm"
+                >
+                  {zone.name}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-between w-full items-center">
+      <div className="flex justify-between w-full items-center gap-3 px-4">
         <button
           type="button"
           onClick={() => {
             setShowFiltro(false);
-            onChange(clients);
+            onChange(clients, {});
           }}
-          className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2 text-blue_custom font-bold"
+          className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
         >
           Quitar Filtros
         </button>
         <button
           type="submit"
-          className="mt-4 bg-blue-500 text-white rounded-full px-4 py-2"
+          className="mt-4 bg-blue-500 border-2 border-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold"
         >
           Aplicar Filtros
         </button>

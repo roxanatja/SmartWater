@@ -30,6 +30,7 @@ const Clientes: FC = () => {
   const itemsPerPage: number = 10;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(10);
+  const [savedFilters, setSavedFilters] = useState({});
 
   const getClients = useCallback(async () => {
     const api = new ApiMethodClient();
@@ -90,10 +91,11 @@ const Clientes: FC = () => {
     setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
   };
 
-  const handleFilterChange = (filteredClients: Client[]) => {
+  const handleFilterChange = (filteredClients: Client[], filterdata: any) => {
     setCurrentData(filteredClients.slice(0, itemsPerPage));
     setCurrentPage(1);
     setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
+    setSavedFilters(filterdata);
   };
 
   return (
@@ -166,7 +168,11 @@ const Clientes: FC = () => {
       </Modal>
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-        <FiltroClientes clients={clients} onChange={handleFilterChange} />
+        <FiltroClientes
+          clients={clients}
+          onChange={handleFilterChange}
+          initialFilters={savedFilters}
+        />
       </Modal>
     </>
   );

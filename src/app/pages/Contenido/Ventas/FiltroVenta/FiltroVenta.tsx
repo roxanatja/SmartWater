@@ -1,17 +1,35 @@
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import GetApiMethod from "../../../../../Class/api.class";
+import { Zone } from "../../../../../Class/types.data";
 import { Sale } from "../../../../../type/Sale/Sale";
 import { VentasContext } from "../VentasContext";
 
 const FiltroVenta = ({
   sales,
   onChange,
+  initialFilters,
 }: {
   sales: Sale[];
-  onChange?: (val: Sale[]) => void;
+  onChange: (value: Sale[], filter: any) => void;
+  initialFilters: any;
 }) => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm({
+    defaultValues: initialFilters || {},
+  });
   const { setShowFiltro } = useContext(VentasContext);
+  const [data, setData] = useState<{ zones: Zone[] }>();
+
+  const getData = useCallback(async () => {
+    const api = new GetApiMethod();
+    return setData({
+      zones: await api.getZone(),
+    });
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   const onSubmit = (data: any) => {
     const filteredSales = sales?.filter((sale) => {
@@ -58,12 +76,25 @@ const FiltroVenta = ({
           ? !sale.client.some((client) => client.hasContract)
           : true);
 
-      return dateFilter && saleTypeFilter && invoiceFilter && clientFilter;
+      // Filtrar por zonas
+      const zonesFilter = data.zones
+        ? Object.keys(data.zones).some(
+            (zone) => data.zones[zone] && sale?.client?.[0]?.zone === zone
+          )
+        : true;
+
+      return (
+        dateFilter &&
+        saleTypeFilter &&
+        invoiceFilter &&
+        clientFilter &&
+        zonesFilter
+      );
     });
 
     // Llama a onChange si está definido para actualizar las ventas filtradas
     if (onChange) {
-      onChange(filteredSales);
+      onChange(filteredSales, data);
     }
     setShowFiltro(false);
   };
@@ -163,11 +194,36 @@ const FiltroVenta = ({
                     type="checkbox"
                     {...register("sinFactura")}
                   />
-                  <img
-                    src="/nofactura.svg"
-                    alt="/nofactura.svg"
-                    className="w-5 h-5"
-                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#F40101"
+                      strokeWidth="2"
+                    />
+                    <image
+                      xlinkHref="../../archivo-factura-dolar-mini.svg"
+                      x="6"
+                      y="5"
+                      width="14"
+                      height="14"
+                    />
+                    <line
+                      x1="6"
+                      y1="6"
+                      x2="18"
+                      y2="18"
+                      stroke="#FF0000"
+                      strokeWidth="3"
+                    />
+                  </svg>
                   <span>Sin Factura</span>
                 </div>
               </div>
@@ -198,11 +254,36 @@ const FiltroVenta = ({
                     type="checkbox"
                     {...register("sinPrestamo")}
                   />
-                  <img
-                    src="/nopresta.svg"
-                    alt="/presta.svg"
-                    className="w-5 h-5"
-                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="11"
+                      stroke="#F40101"
+                      strokeWidth="2"
+                    />
+                    <image
+                      xlinkHref="../../Dispensador-iconsvg.svg"
+                      x="5"
+                      y="6"
+                      width="14"
+                      height="14"
+                    />
+                    <line
+                      x1="6"
+                      y1="6"
+                      x2="18"
+                      y2="18"
+                      stroke="#FF0000"
+                      strokeWidth="3"
+                    />
+                  </svg>
                   <span>Sin Préstamo</span>
                 </div>
               </div>
@@ -228,11 +309,33 @@ const FiltroVenta = ({
                     type="checkbox"
                     {...register("sinContrato")}
                   />
-                  <img
-                    src="/nopresta.svg"
-                    alt="/nopresta.svg"
-                    className="w-5 h-5"
-                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="29"
+                    height="29"
+                    viewBox="0 0 29 29"
+                    fill="none"
+                  >
+                    <image
+                      xlinkHref="../../ConContrato.svg"
+                      x="4"
+                      y="5"
+                      width="21"
+                      height="21"
+                    />
+                    <circle
+                      cx="14.5"
+                      cy="14.5"
+                      r="13"
+                      stroke="#FF0000"
+                      strokeWidth="3"
+                    />
+                    <path
+                      d="M7.0 22.9L23.1 6"
+                      stroke="#FF0000"
+                      strokeWidth="3"
+                    />
+                  </svg>
                   <span>Sin contrato</span>
                 </div>
               </div>
@@ -263,20 +366,41 @@ const FiltroVenta = ({
               </div>
             </div>
 
-            <div className="flex justify-between w-full items-center">
+            <div className="w-full flex flex-col gap-4">
+              <label className="font-bold">Zonas</label>
+              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-3 w-full">
+                {data?.zones?.map((zone, index) => (
+                  <div key={index} className="flex items-center gap-2 w-full">
+                    <input
+                      type="checkbox"
+                      {...register(`zones.${zone._id}`)}
+                      value={zone._id}
+                      id={`zone-${zone._id}`}
+                    />
+                    <label
+                      htmlFor={`zone-${zone._id}`}
+                      className="font-medium text-sm"
+                    >
+                      {zone.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-between w-full items-center gap-3 px-4 translate-y-4">
               <button
                 type="button"
                 onClick={() => {
                   setShowFiltro(false);
-                  if (onChange) onChange(sales);
+                  if (onChange) onChange(sales, {});
                 }}
-                className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2 text-blue_custom font-bold"
+                className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
               >
                 Quitar Filtros
               </button>
               <button
                 type="submit"
-                className="mt-4 bg-blue-500 text-white rounded-full px-4 py-2"
+                className="mt-4 bg-blue-500 border-2 border-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold"
               >
                 Aplicar Filtros
               </button>
