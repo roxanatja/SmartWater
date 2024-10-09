@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Input from "./Inputs";
@@ -7,7 +7,7 @@ import ImageUploadField from "./ImageUploadField";
 import GoogleMapWithSelection from "./GoogleInputMap";
 import GetApiMethod from "../../../Class/api.class";
 import { Client, District, Zone } from "../../../Class/types.data";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
+import { client, ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import ApiMethodClient from "../../../Class/api.client";
 
 const ClientForm = ({
@@ -21,7 +21,7 @@ const ClientForm = ({
   const [disti, setDisti] = useState<District[]>([]);
   const [date, setDate] = useState(false);
   const [date2, setDate2] = useState(false);
-  const { selectedClient } = useContext(ClientesContext);
+  const { selectedClient, setSelectedClient } = useContext(ClientesContext);
   const [uploading, setUploading] = useState(false);
   const [mapinteration, setMapinteration] = useState(false);
   const d =
@@ -64,13 +64,15 @@ const ClientForm = ({
       };
       if (selectedClient._id !== "") {
         await api.updateClient(selectedClient._id, values);
-        return toast.success("Cliente editado exitosamente");
+        setSelectedClient(client);
+        return toast.success("Cliente editado", { position: "bottom-center" });
       }
       await api.registerClient(values);
-      toast.success("Cliente registrado exitosamente");
+      toast.success("Cliente registrado", { position: "bottom-center" });
+      setSelectedClient(client);
     } catch (error) {
       console.error(error);
-      toast.error("Upps error al crear cliente");
+      toast.error("Upps error al crear cliente", { position: "bottom-center" });
     }
   };
 
@@ -277,6 +279,7 @@ const ClientForm = ({
           label="Correo Electronico"
           name="email"
           register={register}
+          className="lowercase"
           icon={<i className="fa-solid fa-envelope"></i>}
         />
         <div
@@ -439,16 +442,14 @@ const ClientForm = ({
           setValue={setValue}
           errors={errors}
         />
-        {selectedClient._id === "" && (
-          <ImageUploadField
-            watchField={watch}
-            fieldName={"storeImage"}
-            label={"Porfavor, adjunta foto de la tienda"}
-            register={register}
-            setValue={setValue}
-            errors={errors}
-          />
-        )}
+        <ImageUploadField
+          watchField={watch}
+          fieldName={"storeImage"}
+          label={"Porfavor, adjunta foto de la tienda"}
+          register={register}
+          setValue={setValue}
+          errors={errors}
+        />
         <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">
             Selecciona una ubicación en el mapa
@@ -586,7 +587,7 @@ const ClientForm = ({
           {date2 && (
             <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
               <Input
-                type="number"
+                type="date"
                 label="Renovacion Promedio"
                 register={register}
                 isVisibleLable

@@ -7,8 +7,7 @@ import { MapaClientesContext } from "./MapaClientesContext";
 import GoogleMaps from "../../components/GoogleMaps/GoogleMaps";
 import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
-import { ClientesContext } from "../Clientes/ClientesContext";
-import { FiltroClientes } from "../Reportes/ReportesIngresos/FiltroClientes/FiltroClientes";
+import FiltroClientes from "../Reportes/ReportesIngresos/FiltroClientes/FiltroClientes";
 
 const MapaClientes: React.FC = () => {
   const { showMiniModal, setShowMiniModal, showFiltro, setShowFiltro } =
@@ -97,7 +96,7 @@ const MapaClientes: React.FC = () => {
         </FiltroPaginado>
       </div>
       {showMiniModal && <RegistrarNuevo />}
-      {showFiltro && <FiltroClientes />}
+      {/* {showFiltro && <FiltroClientes />} */}
     </>
   );
 };

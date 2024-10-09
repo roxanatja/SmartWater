@@ -9,7 +9,7 @@ const Contador: FC<typeContadorProduct> = ({
   onDecrementar,
   onIncrementar,
 }) => {
-  const [count, setCount] = useState(1);
+  const [count, setCount] = useState(0);
 
   const decrementar = () => {
     if (count > 0) {

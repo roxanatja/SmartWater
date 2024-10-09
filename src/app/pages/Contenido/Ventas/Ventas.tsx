@@ -24,6 +24,7 @@ const Ventas: FC = () => {
   const [error, setError] = useState(false);
   const [sales, setSales] = useState<Array<Sale>>([]);
   const [currenData, setCurrenData] = useState<Array<Sale>>([]);
+  const [savedFilters, setSavedFilters] = useState({});
 
   const getSales = async () => {
     try {
@@ -56,8 +57,9 @@ const Ventas: FC = () => {
     setSales(salesOrdenadas);
   };
 
-  const Onfilter = (filteredSales: Array<Sale>) => {
+  const Onfilter = (filteredSales: Array<Sale>, filter: any) => {
     setSales(filteredSales);
+    setSavedFilters(filter);
   };
 
   useEffect(() => {
@@ -138,7 +140,11 @@ const Ventas: FC = () => {
         </div>
       </Modal>
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-        <FiltroVenta sales={currenData} onChange={Onfilter} />
+        <FiltroVenta
+          sales={currenData}
+          onChange={Onfilter}
+          initialFilters={savedFilters}
+        />
       </Modal>
     </>
   );

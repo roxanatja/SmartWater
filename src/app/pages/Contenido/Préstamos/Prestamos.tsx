@@ -23,6 +23,7 @@ const Prestamos: FC = () => {
   const [totalPage, setTotalPage] = useState<number>(0);
   const itemsPerPage: number = 9;
   const [currentData, setCurrentData] = useState<Loans[]>([]);
+  const [savedFilters, setSavedFilters] = useState({});
 
   const getLoans = useCallback(async () => {
     try {
@@ -150,7 +151,17 @@ const Prestamos: FC = () => {
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroPrestamos
           loans={loans}
-          onChange={(val) => setCurrentData(val)}
+          onChange={(val, filter) => {
+            if (filter === "quit") {
+              setCurrentData(val.slice(0, itemsPerPage));
+              setTotalPage(Math.ceil(val.length / itemsPerPage));
+              setCurrentPage(1);
+            } else {
+              setCurrentData(val);
+            }
+            setSavedFilters(filter);
+          }}
+          initialFilters={savedFilters}
         />
       </Modal>
 
