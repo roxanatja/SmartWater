@@ -157,7 +157,9 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
+              {client.hasLoan && (
+                <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
+              )}
               <div
                 className="infoClientes-moneda cursor-pointer"
                 onClick={() => setShowCobroPopUp(true)}
