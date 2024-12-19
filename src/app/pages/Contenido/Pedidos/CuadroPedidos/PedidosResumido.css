@@ -21,7 +21,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .pedidosResumido-body {
@@ -61,7 +61,8 @@
   font-weight: 400;
   line-height: normal;
   font-family: "Poppins", sans-serif;
-  margin: 20px;
+  width: 100px;
+  /* margin: 20px; */
 }
 
 .pedidosResumido-moneda {
@@ -91,8 +92,8 @@
 
 .pedidosResumido-imgStore,
 .pedidosResumido-productImage {
-  width: 40px; /* Ancho del avatar */
-  height: 40px; /* Alto del avatar */
+  width: 35px; /* Ancho del avatar */
+  height: 35px; /* Alto del avatar */
   border-radius: 50%; /* Hacer la imagen circular */
 }
 

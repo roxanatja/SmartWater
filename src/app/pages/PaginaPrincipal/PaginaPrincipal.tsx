@@ -118,8 +118,8 @@ const PaginaPrincipal: FC = () => {
                 />
                 <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
               </Route>
-              {/* Redirige cualquier ruta desconocida a Inicio
-              <Route path="*" element={<Navigate to="/Inicio" />} /> */}
+              {/* Redirige cualquier ruta desconocida a Inicio */}
+              <Route path="*" element={<Navigate to="/Inicio" />} />
             </Routes>
           </div>
         </div>

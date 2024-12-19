@@ -40,7 +40,7 @@
   display: inline-flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 19px;
+  gap: 1.5rem !important;
   margin-top: 10px;
 }
 
@@ -48,8 +48,8 @@
   display: flex;
   flex-direction: row;
   gap: 19px;
-  margin-top: 15px;
-  margin-bottom: 10px;
+  /* margin-top: 15px;
+  margin-bottom: 10px; */
 }
 
 .perfil-cliente {
@@ -88,24 +88,27 @@
   display: flex;
   padding: 5px 15px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   border-radius: 10px;
   border: 1px solid var(--Azul-oscuro, #1a3d7d);
   background: var(--Azul-oscuro, #1a3d7d);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   color: #fff;
-  font-size: 14px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
   width: 130px;
-  height: 40px;
+  /* height: 40px; */
   gap: 19px;
 }
 
 .img-cliente {
-  width: 40px; /* Ancho del avatar */
-  height: 40px; /* Alto del avatar */
-  border-radius: 50%; /* Hacer la imagen circular */
+  width: 35px;
+  /* Ancho del avatar */
+  height: 35px;
+  /* Alto del avatar */
+  border-radius: 50%;
+  /* Hacer la imagen circular */
 }

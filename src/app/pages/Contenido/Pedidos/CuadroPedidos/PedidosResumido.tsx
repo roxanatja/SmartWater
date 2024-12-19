@@ -1,11 +1,9 @@
-import { FC, useContext, useState, useEffect } from "react";
+import { FC, useState, useEffect } from "react";
 import "./PedidosResumido.css";
-import { PedidosContext } from "../PedidosContext";
 import { loadOrders } from "../../../../../services/OrdersService";
 import { loadClients } from "../../../../../services/ClientsService";
 import { GetProducts } from "../../../../../services/ProductsService";
 import { GetZone } from "../../../../../services/ZonesService";
-import { OpcionesClientes } from "../../Clientes/OpcionesClientes/OpcionesClientes";
 import { OpcionesPedidos } from "./OpcionesPedidos/OpcionesPedidos";
 
 const PedidosResumido: FC = () => {
@@ -16,6 +14,7 @@ const PedidosResumido: FC = () => {
   const [zones, setZones] = useState<any[]>([]);
 
   useEffect(() => {
+    // TODO: Get just 4 clients from API, instead of slicing
     const fetchData = async () => {
       try {
         const clientsData = await loadClients();
@@ -51,10 +50,9 @@ const PedidosResumido: FC = () => {
         </div>
       </div>
 
-      <div className="todos-clientes">
+      <div className="todos-clientes w-full">
         {orders.slice(0, 4).map((order, index) => {
           const client = clients.find((client) => client.user === order.user);
-          const zone = zones.find((zone) => zone._id === client?.zone);
           const product = products.find(
             (product) => product._id === order.detail[0]?.product
           );
@@ -70,31 +68,33 @@ const PedidosResumido: FC = () => {
             order.detail[0]?.quantity === 1 ? "botella" : "botellas";
 
           return (
-            <div key={index} className="pedidosResumido-body">
-              {client.storeImage && (
-                <img
-                  src={client.storeImage}
-                  alt=""
-                  className="pedidosResumido-imgStore"
-                />
-              )}
-              <div className="pedidosResumido-body">
-                <span className="pedidosResumido-datos">{client.fullName}</span>
+            <div key={index} className="pedidosResumido-body w-full">
+              <div className="pedidosResumido-datos flex-1">
+                {client.storeImage && (
+                  <img
+                    src={client.storeImage || ''}
+                    alt="Pedido"
+                    className="pedidosResumido-imgStore"
+                  />
+                )}
+                <span>{client.fullName}</span>
+              </div>
+              <div className="flex items-center flex-1 gap-3">
                 <span className="pedidosResumido-ultimaventa">
                   {new Date(order.created).toLocaleDateString()}
                 </span>
-              </div>
-              {product.imageUrl && (
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="pedidosResumido-productImage"
-                />
-              )}
-              <div className="pedidosResumido-body">
-                <span>
-                  {order.detail[0]?.quantity} {quantityText}
-                </span>
+                <div className="flex items-center gap-2 text-sm">
+                  {product.imageUrl && (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="pedidosResumido-productImage"
+                    />
+                  )}
+                  <span className="whitespace-nowrap">
+                    {order.detail[0]?.quantity} {quantityText}
+                  </span>
+                </div>
               </div>
             </div>
           );

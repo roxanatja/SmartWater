@@ -10,6 +10,7 @@ const CuadroClientes = () => {
   const [showMiniModal, setShowMiniModal] = useState(false);
 
   useEffect(() => {
+    // TODO: Get just 4 clients from API, instead of slicing
     const fetchClients = async () => {
       try {
         const clientsData = await loadClients();
@@ -69,17 +70,17 @@ const CuadroClientes = () => {
             </Modal>
           </div>
         </div>
-        <div className="todos-clientes">
+        <div className="todos-clientes w-full">
           {clients.map((item) => {
             return (
-              <div className="cliente" key={item._id}>
-                <div className="perfil-cliente">
-                  <img src={item.storeImage} className="img-cliente" alt="" />
+              <div className="cliente w-full" key={item._id}>
+                <div className="perfil-cliente flex-1">
+                  <img src={item.storeImage || ''} className="img-cliente" alt="Cliente" />
                   <div>
                     <span>{item.fullName}</span>
                   </div>
                 </div>
-                <div className="fecha-pago">
+                <div className="fecha-pago flex-1">
                   <div className="fecha-cliente">
                     <span>{new Date(item.created).toLocaleDateString()}</span>
                   </div>

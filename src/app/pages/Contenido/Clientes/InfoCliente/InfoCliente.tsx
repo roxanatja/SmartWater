@@ -21,9 +21,8 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const location = client.location;
   const navigate = useNavigate();
 
-  const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${
-    location?.longitude || ""
-  }`;
+  const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${location?.longitude || ""
+    }`;
 
   useEffect(() => {
     setZone(zones.find((x) => x._id === client.zone)?.name || "");
@@ -116,7 +115,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
                 <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
                   <div className="opacity-0">.</div>
                   <p className="absolute font-extrabold ">
-                    {client.fullName[0]}
+                    {client.fullName?.[0]}
                   </p>
                 </div>
               )}

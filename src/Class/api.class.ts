@@ -9,8 +9,8 @@ class GetApiMethod {
 
   constructor() {
     const auth = AuthenticationService;
-    const authToken =
-      auth.getToken() || `${process.env.REACT_APP_API_TOKEN_HEROKU}`;
+    const authToken = auth.getToken() || `${process.env.REACT_APP_API_TOKEN_HEROKU}`;
+
     this.axiosInstance = axios.create({
       baseURL: process.env.REACT_APP_API_HEROKU,
       headers: {

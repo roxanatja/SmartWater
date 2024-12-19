@@ -56,7 +56,7 @@ const CuadroRealizarPedido = () => {
   // Filtrar clientes según el término de búsqueda
   const filteredClients = clientes.filter(
     (cliente) =>
-      cliente.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.fullName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       cliente.phoneNumber.includes(searchTerm)
   );
 

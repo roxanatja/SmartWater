@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { BarChart } from "../../components/Barchart/Barchart";
 import { CuadroClientes } from "../../components/CuadroClientes/CuadroClientes";
-import {
-  CuadroInformativo,
-  CuadroInformativo2,
-} from "../../components/CuadroInformativo/CuadroInformativo";
+import { CuadroInformativo } from "../../components/CuadroInformativo/CuadroInformativo";
 import { CuadroRealizarPedido } from "../../components/CuadroRealizarPedido/CuadroRealizarPedido";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { FC } from "react";
@@ -42,14 +39,15 @@ const Inicio: FC = () => {
       try {
         // Cargar clientes y calcular clientes del último mes (julio en este momento)
         const clientsData = await loadClients();
-        if (clientsData && clientsData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
 
+        const currentDate = new Date();
+        const firstDayOfMonth = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+
+        if (clientsData && clientsData.data) {
           const filteredClients = clientsData.data.filter((client: Client) => {
             const clientCreatedDate = new Date(client.created);
             return (
@@ -65,13 +63,6 @@ const Inicio: FC = () => {
         // Cargar préstamos activos y calcular préstamos del último mes (julio en este momento)
         const loansData = await GetLoans();
         if (loansData && loansData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
-
           const filteredLoans = loansData.data.filter((loan: any) => {
             const loanCreatedDate = new Date(loan.created);
             return (
@@ -87,13 +78,6 @@ const Inicio: FC = () => {
         // Cargar ventas activas y calcular ventas del último mes (julio en este momento)
         const salesData = await GetSales();
         if (salesData && salesData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
-
           const filteredSales = salesData.data.filter((sale: Sale) => {
             const saleCreatedDate = new Date(sale.created);
             return (
@@ -105,10 +89,7 @@ const Inicio: FC = () => {
           setActiveSalesCount(salesData.data.length); // Total de ventas activas
           setSalesLastMonthCount(filteredSales.length); // Ventas del último mes
 
-          const totalIncome = salesData.data.reduce(
-            (sum: number, sale: Sale) => sum + sale.total,
-            0
-          );
+          const totalIncome = salesData.data.reduce((sum: number, sale: Sale) => sum + sale.total, 0);
           setTotalIncome(totalIncome);
         }
       } catch (error) {
@@ -153,7 +134,7 @@ const Inicio: FC = () => {
             }
             porcentaje={
               activeLoansCount !== undefined &&
-              loansLastMonthCount !== undefined
+                loansLastMonthCount !== undefined
                 ? calculatePercentage(loansLastMonthCount, activeLoansCount)
                 : undefined
             }
@@ -168,13 +149,14 @@ const Inicio: FC = () => {
             }
             porcentaje={
               activeSalesCount !== undefined &&
-              salesLastMonthCount !== undefined
+                salesLastMonthCount !== undefined
                 ? calculatePercentage(salesLastMonthCount, activeSalesCount)
                 : undefined
             }
           />
 
-          <CuadroInformativo2
+          <CuadroInformativo
+            mostrar_ultimo_mes_text={false}
             titulo="Ingresos Totales"
             numero={totalIncome.toString()}
             letra="Bs"
@@ -189,6 +171,7 @@ const Inicio: FC = () => {
             <CuadroClientes />
           </div>
           <div>
+            {/* TODO: It's not in the design */}
             <CuadroRealizarPedido />
           </div>
           <div>

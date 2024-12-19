@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Barchat.css";
 import { Bar } from "react-chartjs-2";
 import {
@@ -14,7 +14,6 @@ import {
 } from "chart.js";
 import { GetSales } from "../../../../services/SaleService";
 import { GetExpenses } from "../../../../services/Expenses";
-import { Sale } from "../../../../type/Sale/Sale";
 
 // Registra los componentes necesarios de Chart.js para usar en el gráfico
 ChartJS.register(
@@ -32,7 +31,7 @@ const BarChart = () => {
   // Estados para almacenar los datos de beneficios, gastos y semanas
   const [beneficios, setBeneficios] = useState<number[]>([]);
   const [gastos, setGastos] = useState<number[]>([]);
-  const [semanas, setSemanas] = useState<string[]>([
+  const [semanas] = useState<string[]>([
     "Semana 1",
     "Semana 2",
     "Semana 3",
