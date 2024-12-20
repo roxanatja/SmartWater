@@ -37,3 +37,34 @@ export type Transaction = {
   created: string;
   updated: string;
 };
+
+export type CashReport = {
+  initialMount: number;
+  finalMount: number;
+  incomes: {
+    cash: {
+      cashSales: number;
+      creditBillSales: number;
+      total: number;
+    };
+    currentAccount: {
+      cash: number;
+      creditBillSales: number;
+      total: number;
+    };
+    billPending: number;
+  };
+  expenses: {
+    cash: {
+      cashExpense: number;
+      expensespayobligations: number;
+      total: number;
+    };
+    currentAccount: {
+      expenseCurrentAccount: number;
+      expensespayobligations: number;
+      total: number;
+    };
+    expensesToPayPending: number;
+  }
+};

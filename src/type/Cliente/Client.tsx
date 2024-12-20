@@ -36,3 +36,19 @@ export interface Client {
   hasExpiredContract: boolean;
   credit: number;
 }
+
+export interface ReportClient {
+  nombre: string;
+  telefono: string;
+  codigo: string;
+  direccion: string;
+  referencia: string;
+  zona: string;
+  barrio: string;
+  renovacion: number;
+  fecharegistro: string;
+  contratos: string;
+  devoluciones: any | null;
+  prestamos: any | null;
+  saldos: any | null;
+}

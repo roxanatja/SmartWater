@@ -7,7 +7,7 @@ export type Account = {
   _id: string;
   name: string;
   description: string;
-  desactivated: boolean;
+  desactivated: boolean | null;
   created: string;
   updated: string;
 };

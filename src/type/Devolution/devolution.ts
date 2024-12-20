@@ -1,14 +1,3 @@
-export type DevolutionBody = {
-  user: string;
-  loan: string;
-  client: string;
-  comment: string;
-  detail: {
-    item: string;
-    quantity: string;
-  }[];
-};
-
 export type Devolution = {
   _id: string;
   user: string;
@@ -23,3 +12,9 @@ export type Devolution = {
   created: string;
   updated: string;
 };
+
+export type DevolutionConsolidated = {
+  itemId: string;
+  itemName: string;
+  quantity: number;
+}

@@ -5,7 +5,7 @@ export type Bills = {
   client: string;
   user: string;
   cashPayment: boolean;
-  paymentMethodCurrentAccount: boolean;
+  paymentMethodCurrentAccount?: boolean;
   created: string;
   updated: string;
 };

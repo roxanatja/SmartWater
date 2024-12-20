@@ -18,18 +18,30 @@ type Sale = {
   updated: string;
 };
 
-type SaleBody = {
-  client: string;
-  user: string;
-  comment: string;
-  detail: {
-    product: string;
-    quantity: string;
-    price: string;
-  }[];
-  creditSale: boolean;
-  hasInvoice: boolean;
-  paymentMethodCurrentAccount: boolean;
-};
+type SaleProduct = {
+  id: string;
+  cant: number;
+  prod: string;
+  total: number;
+}
 
-export type { Sale, SaleBody };
+type SaleConsolidatedItem = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  total: number;
+}
+
+type SaleReport = {
+  fecharegistro: string;
+  nombre: string;
+  codigo: string;
+  detalles: {
+    precio: number;
+    cantidad: number;
+    subtotal: number;
+    producto: string;
+  }[]
+}
+
+export type { Sale, SaleProduct, SaleConsolidatedItem, SaleReport };

@@ -1,26 +1,12 @@
 import { Client } from "../Cliente/Client";
 
-export type LoansBody = {
-  user: string;
-  client: string;
-  contract: {
-    link: string | null;
-    validUntil: string;
-  };
-  comment: string;
-  detail: {
-    item: string;
-    quantity: string;
-  }[];
-};
-
 export type Loans = {
   _id: string;
   user: string;
   client: Client[];
   contract: {
     link: string;
-    validUntil: string;
+    validUntil: string | null;
   };
   comment: string;
   detail: {
@@ -35,3 +21,9 @@ export type Loans = {
   hasContract: boolean;
   hasExpiredContract: boolean;
 };
+
+export type LoanConsolidated = {
+  itemId: string;
+  itenName: string;
+  quantity: number;
+}
