@@ -1,7 +1,5 @@
 import toast from "react-hot-toast";
 import {
-  Expense,
-  ExpensesBody,
   InvoceExpense,
   InvoceExpenseBody,
 } from "../type/InvoceExpense";
@@ -39,7 +37,7 @@ class ApiMethodInvoceExpense extends GetApiMethod {
     }
   }
 
-  public async saveExpense(dataToSave: ExpensesBody) {
+  public async saveExpense(dataToSave: any) {
     try {
       const response = await this.axiosInstance.post(
         "/expenses/create",
@@ -55,7 +53,7 @@ class ApiMethodInvoceExpense extends GetApiMethod {
     }
   }
 
-  public async loadExpense(params?: Expense): Promise<Expense[]> {
+  public async loadExpense(params?: any): Promise<any[]> {
     try {
       const response = await this.axiosInstance.get("/expenses", {
         params,

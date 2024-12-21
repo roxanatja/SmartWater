@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import AuthenticationService from "../../../../services/AuthenService";
+import { AuthService } from "../../../../api/services/AuthService";
 import "./LoginForm.css";
 
 const LoginForm = () => {
@@ -43,7 +43,7 @@ const LoginForm = () => {
     }
 
     try {
-      await AuthenticationService.login(phoneNumber, password);
+      await AuthService.login(phoneNumber, password);
       toast.success("Usuario autenticado:");
       navigate("/Inicio");
     } catch (error: any) {

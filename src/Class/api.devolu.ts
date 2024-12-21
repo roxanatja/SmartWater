@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 import GetApiMethod from "./api.class";
-import { Devolution, DevolutionBody } from "../type/Devolution/devolution";
+import { Devolution } from "../type/Devolution/devolution";
 
 class ApiMethodDevolu extends GetApiMethod {
-  public async DevolutionsRegister(devolution: DevolutionBody) {
+  public async DevolutionsRegister(devolution: any) {
     try {
       const resp = await this.axiosInstance.post(
         "/devolutions/register",
@@ -35,7 +35,7 @@ class ApiMethodDevolu extends GetApiMethod {
       throw new Error(`Error al salvar el GetDevolutions: ${e}`);
     }
   }
-  public async registerDevolutions(devolution: DevolutionBody) {
+  public async registerDevolutions(devolution: any) {
     try {
       const resp = await this.axiosInstance
         .post("/devolutions/register", devolution)

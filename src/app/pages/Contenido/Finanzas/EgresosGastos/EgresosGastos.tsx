@@ -13,7 +13,6 @@ import ApiMethodAccountEntry from "../../../../../Class/api.entryaco";
 import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
 import { Providers } from "../../../../../type/providers";
 import ApiMethodProvider from "../../../../../Class/api.providers";
-import { Expense } from "../../../../../type/InvoceExpense";
 import ApiMethodInvoceExpense from "../../../../../Class/api.invoceexpe";
 import { User } from "../../../../../type/User";
 import { CuadroRegistrarEyG } from "./RegistrosEyG/CuadroRegistrarEyG";
@@ -23,12 +22,12 @@ const EgresosGastos: FC = () => {
   const [data, setData] = useState<{
     accounts?: Account[];
     providers?: Providers[];
-    expense?: Expense[];
+    expense?: any[];
     users?: User[];
-    expeGroup?: Expense[];
+    expeGroup?: any[];
   }>();
 
-  const groupExpensesById = (expenses: Expense[]) => {
+  const groupExpensesById = (expenses: any[]) => {
     const groupedExpenses = expenses.reduce((acc, expense) => {
       // Si ya existe el _id en el acumulador, suma el amount
       if (acc[expense.accountEntry]) {
@@ -38,7 +37,7 @@ const EgresosGastos: FC = () => {
         acc[expense.accountEntry] = { ...expense };
       }
       return acc;
-    }, {} as { [key: string]: Expense[][0] });
+    }, {} as { [key: string]: any[][0] });
 
     return Object.values(groupedExpenses);
   };

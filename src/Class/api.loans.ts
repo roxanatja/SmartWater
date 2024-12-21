@@ -1,10 +1,10 @@
 import toast from "react-hot-toast";
-import { Loans, LoansBody } from "../type/Loans/Loans";
+import { Loans } from "../type/Loans/Loans";
 
 import GetApiMethod from "./api.class";
 
 class ApiMethodLoans extends GetApiMethod {
-  public async saveLoans(dataToSave: LoansBody) {
+  public async saveLoans(dataToSave: any) {
     try {
       const response = await this.axiosInstance.post(
         "/loans/register",

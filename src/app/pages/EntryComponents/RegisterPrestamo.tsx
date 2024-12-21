@@ -6,7 +6,6 @@ import Product from "../../../type/Products/Products";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { LoansBody } from "../../../type/Loans/Loans";
 import ApiMethodLoans from "../../../Class/api.loans";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -37,7 +36,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
     reset,
     control,
     formState: { errors },
-  } = useForm<LoansBody>({
+  } = useForm<any>({
     defaultValues: {
       detail: [{ item: "", quantity: "0" }],
       contract: {
@@ -59,7 +58,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
     name: "detail",
   });
 
-  const onSubmit: SubmitHandler<LoansBody> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     if (addedProducts.length === 0) {
       toast.error("Por favor agrega un producto.");
       return;
@@ -68,7 +67,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
     const api = new ApiMethodLoans();
     const auth = AuthenticationService;
     const userData: UserData = auth.getUser();
-    const values: LoansBody = {
+    const values: any = {
       ...data,
       detail: addedProducts.map((item) => ({
         item: products?.find((p) => p.description === item.item)?._id || "",

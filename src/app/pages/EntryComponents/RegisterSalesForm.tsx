@@ -3,7 +3,6 @@ import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import ApiMethodSales from "../../../Class/api.sales";
 import Product from "../../../type/Products/Products";
-import { SaleBody } from "../../../type/Sale/Sale";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +24,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
   } | null>(null);
 
   const { register, handleSubmit, watch, setValue, control, reset } =
-    useForm<SaleBody>({
+    useForm<any>({
       defaultValues: {
         detail: [{ product: "", quantity: "0", price: "0" }],
         creditSale: false,
@@ -46,7 +45,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     name: "detail",
   });
 
-  const onSubmit: SubmitHandler<SaleBody> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     if (addedProducts.length === 0) {
       toast.error("Por favor agrega un producto.");
       return;
@@ -55,7 +54,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     const api = new ApiMethodSales();
     const auth = AuthenticationService;
     const userData: UserData = auth.getUser();
-    const values: SaleBody = {
+    const values: any = {
       ...data,
       detail: addedProducts.map((item) => ({
         product:

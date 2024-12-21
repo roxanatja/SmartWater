@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import ApiMethodSales from "../../../Class/api.sales";
-import { OrdenBody } from "../../../type/Order/Order";
 import Product from "../../../type/Products/Products";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
@@ -70,7 +69,7 @@ const RegisterPedidoForm = ({
     setValue,
     control,
     formState: { errors },
-  } = useForm<OrdenBody>({
+  } = useForm<any>({
     defaultValues: {
       detail: [{ product: "", quantity: "0" }],
       deliverDate: "",
@@ -134,7 +133,7 @@ const RegisterPedidoForm = ({
     [setValue, watch]
   );
 
-  const onSubmit: SubmitHandler<OrdenBody> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     if (addedProducts.length === 0) {
       toast.error("Por favor agrega un producto.");
       return;
@@ -144,7 +143,7 @@ const RegisterPedidoForm = ({
     const auth = AuthenticationService;
     const userData: UserData = auth.getUser();
     if (isNoClient) {
-      const values: OrdenBody = {
+      const values: any = {
         ...data,
         detail: addedProducts.map((item) => ({
           product:
@@ -169,7 +168,7 @@ const RegisterPedidoForm = ({
       return;
     }
     const cl = selectedClient;
-    const values: OrdenBody = {
+    const values: any = {
       ...data,
       detail: addedProducts.map((item) => ({
         product:
@@ -262,11 +261,10 @@ const RegisterPedidoForm = ({
 
               <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
                 <i
-                  className={`fa-solid  ${
-                    editar !== null
+                  className={`fa-solid  ${editar !== null
                       ? "fa-pen py-3 hover:animate-pulse"
                       : "fa-plus hover:rotate-90"
-                  } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
+                    } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
                   onClick={handleAddProduct}
                 ></i>
                 <p className="text-base font-semibold">
@@ -280,12 +278,12 @@ const RegisterPedidoForm = ({
             <>
               <div className="grid grid-cols-3 max-sm:grid-cols-1 w-full gap-2">
                 <div className="relative w-full flex items-center">
-                  <i
+                  {/* <i
                     className={`fa-solid fa-user text-2xl text-blue_custom absolute ${
                       errors?.clientNotRegistered?.fullName && "text-red-500"
                     }`}
-                  ></i>
-                  <input
+                  ></i> */}
+                  {/* <input
                     {...register("clientNotRegistered.fullName", {
                       required: true,
                     })}
@@ -295,11 +293,11 @@ const RegisterPedidoForm = ({
                       errors?.clientNotRegistered?.fullName &&
                       "placeholder:text-red-500 border-red-500"
                     }`}
-                  />
+                  /> */}
                 </div>
 
                 <div className="relative w-full flex items-center">
-                  <i
+                  {/* <i
                     className={`fa-solid fa-phone text-2xl text-blue_custom absolute ${
                       errors?.clientNotRegistered?.phoneNumber && "text-red-500"
                     }`}
@@ -314,11 +312,11 @@ const RegisterPedidoForm = ({
                       errors?.clientNotRegistered?.phoneNumber &&
                       "placeholder:text-red-500 border-red-500"
                     }`}
-                  />
+                  /> */}
                 </div>
 
                 <div className="relative w-full flex items-center">
-                  <i
+                  {/* <i
                     className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
                       errors?.clientNotRegistered?.address && "text-red-500"
                     }`}
@@ -333,7 +331,7 @@ const RegisterPedidoForm = ({
                       errors?.clientNotRegistered?.address &&
                       "placeholder:text-red-500 border-red-500"
                     }`}
-                  />
+                  /> */}
                 </div>
               </div>
             </>
@@ -374,11 +372,11 @@ const RegisterPedidoForm = ({
                 </div>
 
                 <div className="relative flex items-center">
-                  <i
+                  {/* <i
                     className={`fa-solid fa-location-dot text-2xl pl-2 text-blue_custom absolute ${
                       errors?.clientNotRegistered?.district && "text-red-500"
                     }`}
-                  ></i>
+                  ></i> */}
                   <select
                     {...register("clientNotRegistered.district")}
                     className="p-2 px-6 ps-10 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-blue_custom font-medium  text-blue_custom"
@@ -511,9 +509,8 @@ const RegisterPedidoForm = ({
               {addedProducts.map((product, index) => (
                 <motion.li
                   key={index}
-                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${
-                    index === editar?.index && "border-2 border-blue_custom"
-                  }`}
+                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                    }`}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}

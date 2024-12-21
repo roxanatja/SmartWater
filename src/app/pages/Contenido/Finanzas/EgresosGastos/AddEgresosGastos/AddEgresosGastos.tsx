@@ -2,7 +2,6 @@ import { useContext } from "react";
 import "./AddEgresosGastos.css";
 import { EgresosGastosContext } from "../EgresosGastosContext";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { ExpensesBody } from "../../../../../../type/InvoceExpense";
 import Input from "../../../../EntryComponents/Inputs";
 import { Account } from "../../../../../../type/AccountEntry";
 import { Providers } from "../../../../../../type/providers";
@@ -29,7 +28,7 @@ const AddEgresosGastos = ({
     setValue,
     watch,
     reset,
-  } = useForm<ExpensesBody>({
+  } = useForm<any>({
     defaultValues: {
       hasInVoice: true,
       creditBuy: false,
@@ -37,7 +36,7 @@ const AddEgresosGastos = ({
     },
   });
 
-  const onSubmit: SubmitHandler<ExpensesBody> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     const user: UserData = AuthenticationService.getUser();
     const api = new ApiMethodInvoceExpense();
     try {

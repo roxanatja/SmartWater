@@ -5,7 +5,6 @@ import ApiMethodSales from "../../../Class/api.sales";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import { DevolutionBody } from "../../../type/Devolution/devolution";
 import ApiMethodDevolu from "../../../Class/api.devolu";
 import { Loans } from "../../../type/Loans/Loans";
 import ApiMethodLoans from "../../../Class/api.loans";
@@ -29,7 +28,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [views, setWiews] = useState(true);
 
   const { register, handleSubmit, watch, setValue, control, reset } =
-    useForm<DevolutionBody>({
+    useForm<any>({
       defaultValues: {
         detail: [{ item: "", quantity: "0" }],
       },
@@ -53,7 +52,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     name: "detail",
   });
 
-  const onSubmit: SubmitHandler<DevolutionBody> = async (data) => {
+  const onSubmit: SubmitHandler<any> = async (data) => {
     const api = new ApiMethodDevolu();
     const auth = AuthenticationService;
     const userData: UserData = auth.getUser();
@@ -67,7 +66,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
               className="bg-green-500 px-2 py-1 rounded-lg ml-2 hoverbg-green-600"
               onClick={async () => {
                 toast.dismiss(t.id);
-                const values: DevolutionBody = {
+                const values: any = {
                   ...data,
                   detail: loan.detail.map((item) => ({
                     item: item.item,
@@ -120,7 +119,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           );
         }
       }
-      const values: DevolutionBody = {
+      const values: any = {
         ...data,
         detail: addedProducts.map((item) => ({
           item: products?.find((p) => p.name === item.item)?.item || "",

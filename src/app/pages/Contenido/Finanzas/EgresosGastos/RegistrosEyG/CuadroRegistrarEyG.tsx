@@ -1,5 +1,4 @@
 import { Account } from "../../../../../../type/AccountEntry";
-import { Expense } from "../../../../../../type/InvoceExpense";
 import { User } from "../../../../../../type/User";
 import "./RegistrosEyG.css";
 
@@ -8,7 +7,7 @@ const CuadroRegistrarEyG = ({
   users,
   accounts,
 }: {
-  expense: Expense;
+  expense: any;
   users?: User[];
   accounts?: Account[];
 }) => {
