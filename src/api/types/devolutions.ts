@@ -4,8 +4,8 @@ export interface IDevolutionGetParams extends Search {
     filters?: {
         client?: string;
         loan?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

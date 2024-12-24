@@ -11,9 +11,10 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ChartData,
 } from "chart.js";
-import { GetSales } from "../../../../services/SaleService";
-import { GetExpenses } from "../../../../services/Expenses";
+import { ExpensesApiConector, SalesApiConector } from "../../../../api/classes";
+import moment from "moment";
 
 // Registra los componentes necesarios de Chart.js para usar en el gráfico
 ChartJS.register(
@@ -43,7 +44,9 @@ const BarChart = () => {
     // Función asincrónica para obtener los datos de ventas
     const fetchSalesData = async () => {
       try {
-        const salesResponse = await GetSales(); // Llama al servicio para obtener datos de ventas
+        const salesResponse = await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }); // Llama al servicio para obtener datos de ventas
+        console.log(salesResponse)
+
         if (salesResponse && salesResponse.data) {
           // Calcula las ventas de las últimas 4 semanas
           const today = new Date();
@@ -81,7 +84,7 @@ const BarChart = () => {
     // Función asincrónica para obtener los datos de gastos
     const fetchExpensesData = async () => {
       try {
-        const expensesResponse = await GetExpenses(); // Llama al servicio para obtener datos de gastos
+        const expensesResponse = await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }); // Llama al servicio para obtener datos de ventas
         if (expensesResponse && expensesResponse.data) {
           // Calcula los gastos de las últimas 4 semanas
           const today = new Date();
@@ -124,38 +127,8 @@ const BarChart = () => {
     fetchExpensesData();
   }, []);
 
-  // Opciones de configuración para el gráfico
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        ticks: {
-          stepSize: 500, // Establece el espaciado entre las etiquetas
-          callback: function (value: string | number) {
-            // Muestra solo ciertos valores
-            if (value === 500 || value === 1000 || value === 1500) {
-              return value.toString();
-            }
-            return "";
-          },
-        },
-      },
-      x: {
-        ticks: {
-          color: "#000",
-        },
-      },
-    },
-    maintainAspectRatio: false, // Esto evita que el gráfico mantenga el aspect ratio
-  };
-
   // Datos del gráfico
-  const data = {
+  const data: ChartData<"bar", number[], string> = {
     labels: semanas,
     datasets: [
       {
@@ -183,7 +156,27 @@ const BarChart = () => {
           paddingRight: "8px",
         }}
       >
-        <Bar data={data} options={options} />
+        <Bar data={data} options={{
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            y: {
+              ticks: {
+                stepSize: 500, // Establece el espaciado entre las etiquetas
+              },
+            },
+            x: {
+              ticks: {
+                color: "#000",
+              },
+            },
+          },
+          maintainAspectRatio: false, // Esto evita que el gráfico mantenga el aspect ratio
+        }} />
       </div>
     </div>
   );

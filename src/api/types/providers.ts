@@ -5,8 +5,8 @@ export interface IProvidersGetParams extends Search {
         fullName?: string;
         email?: string;
         NIT?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

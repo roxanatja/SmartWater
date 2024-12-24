@@ -1,22 +1,20 @@
 import "./CuadroClientes.css";
 import { useEffect, useState } from "react";
-import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes";
 import Modal from "../../EntryComponents/Modal";
+import { ClientsApiConector } from "../../../../api/classes";
 
 const CuadroClientes = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [showMiniModal, setShowMiniModal] = useState(false);
 
   useEffect(() => {
-    // TODO: Get just 4 clients from API, instead of slicing
     const fetchClients = async () => {
       try {
-        const clientsData = await loadClients();
+        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 4 } });
+
         if (clientsData && clientsData.data) {
           const validClients = clientsData.data
-            .slice(0, 4) // Mostrar solo los primeros 4 clientes
             .map((client: Client) => ({
               ...client,
               credit:
@@ -34,10 +32,6 @@ const CuadroClientes = () => {
     fetchClients();
   }, []);
 
-  const handleOpcionesClick = () => {
-    setShowMiniModal(!showMiniModal);
-  };
-
   return (
     <>
       <div className="cuadroClientes">
@@ -47,37 +41,26 @@ const CuadroClientes = () => {
               Clientes <span className="Cliente-title2">vista rapida</span>{" "}
             </span>
           </div>
-          <div className="opciones-svg" onClick={handleOpcionesClick}>
-            <img src="./Opciones-icon.svg" alt="" />
-
-            <Modal
-              isOpen={showMiniModal}
-              onClose={() => {
-                setShowMiniModal(false);
-              }}
-              className="w-3/12"
-            >
-              <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
-                Opciones Cliente
-              </h2>
-              <div className="p-6">
-                <OpcionesClientes
-                  onClose={() => {
-                    setShowMiniModal(false);
-                  }}
-                />
-              </div>
-            </Modal>
-          </div>
         </div>
         <div className="todos-clientes w-full">
           {clients.map((item) => {
             return (
               <div className="cliente w-full" key={item._id}>
                 <div className="perfil-cliente flex-1">
-                  <img src={item.storeImage || ''} className="img-cliente" alt="Cliente" />
+                  {
+                    item.storeImage ?
+                      <img src={item.storeImage || 'clientes-icon-blue.svg'} className="img-cliente" alt="Cliente" /> :
+                      (
+                        <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                          <div className="opacity-0">.</div>
+                          <p className="absolute font-extrabold ">
+                            {item.fullName?.[0]}
+                          </p>
+                        </div>
+                      )
+                  }
                   <div>
-                    <span>{item.fullName}</span>
+                    <span>{(!item.fullName || item.fullName.trim() === "") ? "Sin nombre" : item.fullName}</span>
                   </div>
                 </div>
                 <div className="fecha-pago flex-1">

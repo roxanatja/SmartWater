@@ -13,21 +13,21 @@ export interface IOrdersGetParams extends Search {
         deliverDateEnd?: string;
         initialDate?: string;
         finalDate?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 
 export interface IOrderBody {
     data: {
-        user: string;
+        user?: string;
         client: string;
-        distributorRedirectId: string;
+        distributorRedirectId?: string;
         comment: string;
-        deliverDate: string;
+        deliverDate?: string;
         detail: {
             product: string;
-            quantity: string;
+            quantity: number;
         }[];
         clientNotRegistered: {
             fullName: string;
@@ -35,7 +35,7 @@ export interface IOrderBody {
             address: string;
             district: string;
             zone: string;
-            cityId: string;
+            cityId?: string;
             location: {
                 latitude: string;
                 longitude: string;
@@ -50,7 +50,7 @@ export interface IUpdateOrderBody {
         deliverDate?: string;
         detail?: {
             product: string;
-            quantity: string;
+            quantity: number;
         }[];
         clientNotRegistered?: {
             fullName: string;

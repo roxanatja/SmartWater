@@ -1,31 +1,31 @@
 import { FC, useState, useEffect } from "react";
 import "./PedidosResumido.css";
-import { loadOrders } from "../../../../../services/OrdersService";
-import { loadClients } from "../../../../../services/ClientsService";
 import { GetProducts } from "../../../../../services/ProductsService";
-import { GetZone } from "../../../../../services/ZonesService";
-import { OpcionesPedidos } from "./OpcionesPedidos/OpcionesPedidos";
+import { ClientsApiConector, OrdersApiConector } from "../../../../../api/classes";
+import { Order } from "../../../../../type/Order/Order";
+import Modal from "../../../EntryComponents/Modal";
+import { CuadroRealizarPedido } from "../../../components/CuadroRealizarPedido/CuadroRealizarPedido";
 
-const PedidosResumido: FC = () => {
+const PedidosResumido = () => {
   const [showMiniModal, setShowMiniModal] = useState(false);
-  const [clients, setClients] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [zones, setZones] = useState<any[]>([]);
+  const [orders, setOrders] = useState<(Order)[]>([]);
 
   useEffect(() => {
-    // TODO: Get just 4 clients from API, instead of slicing
     const fetchData = async () => {
       try {
-        const clientsData = await loadClients();
         const productsData = await GetProducts();
-        const ordersData = await loadOrders();
-        const zonesData = await GetZone();
+        const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 4 } });
 
-        setClients(clientsData.data);
+        const ordersPopulated: Order[] = []
+
+        for (const order of ordersData?.data || []) {
+          const client = await ClientsApiConector.getClient({ clientId: order.client })
+          ordersPopulated.push({ ...order, client })
+        }
+
         setProducts(productsData.data);
-        setOrders(ordersData.data.slice(-4));
-        setZones(zonesData.data);
+        setOrders(ordersPopulated);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -44,20 +44,32 @@ const PedidosResumido: FC = () => {
         <span className="Pedidos-title">
           Pedidos <span className="Pedidos-title2">vista rapida</span>{" "}
         </span>
-        <div className="opciones-svg" onClick={handleOpcionesClick}>
-          <img src="./Opciones-icon.svg" alt="" />
-          {showMiniModal && <OpcionesPedidos />}
+        <div className="opciones-svg">
+          <img src="./Opciones-icon.svg" alt="" onClick={handleOpcionesClick} />
+          <Modal
+            isOpen={showMiniModal}
+            onClose={() => {
+              setShowMiniModal(false);
+            }}
+            className="w-3/12"
+          >
+            <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+              Realizar Pedido
+            </h2>
+            <div className="p-6">
+              <CuadroRealizarPedido onClose={() => setShowMiniModal(false)} />
+            </div>
+          </Modal>
         </div>
       </div>
 
       <div className="todos-clientes w-full">
         {orders.slice(0, 4).map((order, index) => {
-          const client = clients.find((client) => client.user === order.user);
           const product = products.find(
             (product) => product._id === order.detail[0]?.product
           );
 
-          if (!client || !product) {
+          if ((!order.client && !order.clientNotRegistered) || !product) {
             console.warn(
               `Cliente o producto no encontrado para el pedido con ID: ${order._id}`
             );
@@ -70,14 +82,36 @@ const PedidosResumido: FC = () => {
           return (
             <div key={index} className="pedidosResumido-body w-full">
               <div className="pedidosResumido-datos flex-1">
-                {client.storeImage && (
-                  <img
-                    src={client.storeImage || ''}
-                    alt="Pedido"
-                    className="pedidosResumido-imgStore"
-                  />
-                )}
-                <span>{client.fullName}</span>
+                {
+                  !!order.client &&
+                  <>
+                    {
+                      order.client.storeImage ?
+                        <img src={order.client.storeImage || 'clientes-icon-blue.svg'} className="img-cliente" alt="Cliente" /> :
+                        (
+                          <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                            <div className="opacity-0">.</div>
+                            <p className="absolute font-extrabold ">
+                              {order.client.fullName?.[0]}
+                            </p>
+                          </div>
+                        )
+                    }
+                    <span>{order.client.fullName || "Sin nombre"}</span>
+                  </>
+                }
+                {
+                  (!order.client && !!order.clientNotRegistered) &&
+                  <>
+                    <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                      <div className="opacity-0">.</div>
+                      <p className="absolute font-extrabold ">
+                        {order.clientNotRegistered.fullName?.[0]}
+                      </p>
+                    </div>
+                    <span>{order.clientNotRegistered.fullName}</span>
+                  </>
+                }
               </div>
               <div className="flex items-center flex-1 gap-3">
                 <span className="pedidosResumido-ultimaventa">
@@ -100,7 +134,7 @@ const PedidosResumido: FC = () => {
           );
         })}
       </div>
-    </div>
+    </div >
   );
 };
 

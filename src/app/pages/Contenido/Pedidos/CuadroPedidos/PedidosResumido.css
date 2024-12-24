@@ -92,9 +92,12 @@
 
 .pedidosResumido-imgStore,
 .pedidosResumido-productImage {
-  width: 35px; /* Ancho del avatar */
-  height: 35px; /* Alto del avatar */
-  border-radius: 50%; /* Hacer la imagen circular */
+  width: 30px;
+  /* Ancho del avatar */
+  height: 30px;
+  /* Alto del avatar */
+  border-radius: 50%;
+  /* Hacer la imagen circular */
 }
 
 .titulo-pedidos {

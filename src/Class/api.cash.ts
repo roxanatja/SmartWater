@@ -35,8 +35,8 @@ class ApiMethodCash extends GetApiMethod {
   public async getCashRegister(params?: {
     open?: boolean;
     user?: string;
-    year?: string;
-    month?: string;
+    year?: number;
+    month?: number;
     hour?: string;
   }): Promise<Transaction[]> {
     try {

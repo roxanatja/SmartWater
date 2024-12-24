@@ -2,8 +2,8 @@ import { FilteredSearch, Search } from "./common";
 
 export interface IDistricsGetParams extends Search {
     filters?: {
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

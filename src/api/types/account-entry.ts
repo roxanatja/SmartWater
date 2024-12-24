@@ -2,8 +2,8 @@ import { Search } from "./common";
 
 export interface IAccountsGetParams extends Search {
     filters?: {
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

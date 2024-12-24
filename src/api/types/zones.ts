@@ -2,8 +2,8 @@ import { Search } from "./common";
 
 export interface IZonesGetParams extends Search {
     filters?: {
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

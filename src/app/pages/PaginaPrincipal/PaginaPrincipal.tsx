@@ -39,16 +39,16 @@ const PaginaPrincipal: FC = () => {
       <Router>
         <div className="flex">
           <Sidebar />
-          <div className="Contenedor max-sm:w-full">
+          <div className="Contenedor max-md:w-full relative">
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
               {/* Protege todas las rutas que necesitan autenticación */}
               <Route element={<ProtectedRoute />}>
                 <Route path="" element={<Navigate to="/Inicio" />} />
-                {/* <Route path="/Inicio" element={<InicioWrapper />} />
+                <Route path="/Inicio" element={<InicioWrapper />} />
                 <Route path="/Clientes/*" element={<ClientesWrapper />} />
-                <Route
+                {/* <Route
                   path="/MapaClientes/*"
                   element={<MapaClientesWrapper />}
                 />

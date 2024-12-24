@@ -4,8 +4,8 @@ export type FilteredSearch = {
 
 export type PaginatedSearch = {
     pagination?: {
-        pageSize: string
-        page: string
+        pageSize: number
+        page: number
     }
 }
 

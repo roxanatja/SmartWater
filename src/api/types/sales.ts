@@ -12,8 +12,8 @@ export interface ISalesGetParams extends Search {
         hasClientLoan?: boolean;
         hasClientContract?: boolean;
         hasClientExpiredContracts?: boolean;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

@@ -3,15 +3,15 @@ import { Search } from "./common";
 export interface IUsersGetParams extends Search {
     filters?: {
         role?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 
 export interface IPermissionsGetParams extends Search {
     filters?: {
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

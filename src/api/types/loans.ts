@@ -9,8 +9,8 @@ export interface ILoansGetParams extends Search {
         hasExpiredContract?: boolean;
         renewedAgo?: number;
         renewedIn?: number;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

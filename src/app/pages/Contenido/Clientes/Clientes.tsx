@@ -8,9 +8,11 @@ import { ClientesContext, client } from "./ClientesContext";
 import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
 import FiltroClientes from "./FiltroClientes/FiltroClientes";
+import { ClientsApiConector, ZonesApiConector } from "../../../../api/classes";
 import { Client } from "../../../../type/Cliente/Client";
-import ApiMethodClient from "../../../../Class/api.client";
-import { Zone } from "../../../../Class/types.data";
+import { Zone } from "../../../../type/City";
+import { useSearchParams } from "react-router-dom";
+import { useGlobalContext } from "../../../SmartwaterContext";
 
 const Clientes: FC = () => {
   const {
@@ -24,26 +26,41 @@ const Clientes: FC = () => {
     setSelectedClient,
   } = useContext(ClientesContext);
 
+  const { setLoading } = useGlobalContext()
+
   const [clients, setClients] = useState<Client[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
   const [currentData, setCurrentData] = useState<Client[]>([]);
   const itemsPerPage: number = 10;
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(10);
+  const [totalPage, setTotalPage] = useState<number>(0);
   const [savedFilters, setSavedFilters] = useState({});
 
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (!searchParams.has('page')) {
+      setCurrentPage(1)
+    } else {
+      setCurrentPage(Number(searchParams.get('page')))
+    }
+  }, [searchParams])
+
   const getClients = useCallback(async () => {
-    const api = new ApiMethodClient();
-    const datClien = await api.loadClients();
-    setZones(await api.getZone());
-    const sortedClients = datClien.sort(
-      (a: any, b: any) =>
-        moment(b.lastSale).valueOf() - moment(a.lastSale).valueOf()
-    );
-    setClients(sortedClients as unknown as Client[]);
-    setCurrentData(sortedClients.slice(0, itemsPerPage) as unknown as Client[]); // Set initial currentData
-    setTotalPage(Math.ceil(sortedClients.length / itemsPerPage)); // Update total pages
-  }, []);
+    setLoading(true)
+    const datClients = await ClientsApiConector.getClients({ pagination: { page: currentPage, pageSize: itemsPerPage } });
+    setZones((await ZonesApiConector.get({}))?.data || []);
+
+    // const sortedClients = datClien.sort(
+    //   (a: any, b: any) =>
+    //     moment(b.lastSale).valueOf() - moment(a.lastSale).valueOf()
+    // );
+
+    setClients(datClients?.data || []);
+    setCurrentData(datClients?.data || []);
+    setTotalPage(Math.ceil((datClients?.metadata.totalCount || 0) / itemsPerPage)); // Update total pages
+    setLoading(false)
+  }, [currentPage, setLoading]);
 
   useEffect(() => {
     getClients();
@@ -51,9 +68,7 @@ const Clientes: FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    const startIndex: number = (page - 1) * itemsPerPage;
-    const endIndex: number = startIndex + itemsPerPage;
-    setCurrentData(clients.slice(startIndex, endIndex)); // Update based on current clients
+    setSearchParams((prev) => ({ ...prev, page }))
   };
 
   const orderClients = (orden: string) => {
@@ -81,10 +96,10 @@ const Clientes: FC = () => {
       value === ""
         ? clients
         : clients.filter(
-            (client: Client) =>
-              client.fullName?.toLowerCase().includes(value) ||
-              client.phoneNumber.includes(value)
-          );
+          (client: Client) =>
+            client.fullName?.toLowerCase().includes(value) ||
+            client.phoneNumber.includes(value)
+        );
 
     setCurrentData(filteredClients.slice(0, itemsPerPage));
     setCurrentPage(1);
@@ -99,7 +114,7 @@ const Clientes: FC = () => {
   };
 
   return (
-    <>
+    <div className="px-10">
       <PageTitle titulo="Clientes" icon="./clientes-icon.svg" />
       <FiltroPaginado
         add={true}
@@ -174,7 +189,7 @@ const Clientes: FC = () => {
           initialFilters={savedFilters}
         />
       </Modal>
-    </>
+    </div>
   );
 };
 

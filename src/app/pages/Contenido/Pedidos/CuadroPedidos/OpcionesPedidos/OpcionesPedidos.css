@@ -9,8 +9,14 @@
 
 .OpcionesPedidos-Item{
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    color: #1a3d7d;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    align-items: center;
 }
 
 .OpcionesPedidos-text{

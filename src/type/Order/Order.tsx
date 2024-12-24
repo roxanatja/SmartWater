@@ -1,7 +1,7 @@
 type Order = {
   _id: string;
   user: string;
-  client: string;
+  client: string | any;
   comment: string;
   deliverDate: string;
   distributorRedirectId?: string;
@@ -9,7 +9,7 @@ type Order = {
   district: string;
   detail: Array<{
     product: string;
-    quantity: string;
+    quantity: number;
   }>;
   clientNotRegistered?: {
     fullName?: string;
@@ -24,6 +24,8 @@ type Order = {
     hasOrder: boolean;
     isClient: boolean;
   };
+  created: string;
+  updated: string;
 };
 
 export type { Order };

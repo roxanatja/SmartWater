@@ -2,8 +2,8 @@ import { AsideItem } from "../AsideMenu/AsideItem";
 import { AsideSubMenu } from "../AsideSubMenu/AsideSubMenu";
 import "./Sidebar.css";
 import { FC, useEffect, useRef, useState } from "react"; // Importar useState
-import AuthenticationService from "../../../../services/AuthenService";
 import { useNavigate } from "react-router-dom";
+import { AuthService } from "../../../../api/services/AuthService";
 
 const Sidebar: FC = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const Sidebar: FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    AuthenticationService.logout();
+    AuthService.logout();
     navigate("users/login");
   };
 
@@ -48,9 +48,8 @@ const Sidebar: FC = () => {
       {/* Menú lateral */}
       <div
         ref={menuRef}
-        className={`Sidebar scrool bg-blue_custom text-white fixed z-50 inset-y-0 left-0 w-64 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:static md:translate-x-0`}
+        className={`Sidebar scrool bg-blue_custom text-white fixed z-50 inset-y-0 left-0 w-64 transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out md:static md:translate-x-0`}
       >
         <div className="Logo">
           <span className="smart">Smart</span>

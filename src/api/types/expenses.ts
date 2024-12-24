@@ -10,8 +10,8 @@ export interface IExpensesGetParams extends Search {
         amount?: number;
         paymentMethodCurrentAccount?: boolean;
         hasInVoice?: boolean;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 

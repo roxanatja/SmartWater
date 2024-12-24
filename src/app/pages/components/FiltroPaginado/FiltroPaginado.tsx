@@ -422,8 +422,8 @@ const FiltroPaginado: FC<Componentes> = ({
           "TIPO DE CLIENTE": client.isClient
             ? "Cliente"
             : client.isAgency
-            ? "Agencia"
-            : "Desconocido", // Define el tipo de cliente
+              ? "Agencia"
+              : "Desconocido", // Define el tipo de cliente
           WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
           TELEFONO: client.phoneLandLine ? client.phoneNumber : "S/Numero", // Número de teléfono
           CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
@@ -797,15 +797,14 @@ const FiltroPaginado: FC<Componentes> = ({
           </div>
         )}
         <div
-          className={`${
-            !resultadosPrestamo && "overflow-y-scroll max-h-[70vh]"
-          }`}
+          className={`${!resultadosPrestamo && "overflow-y-scroll max-h-[70vh] pb-[80px]"
+            }`}
         >
           {children}
         </div>
-        <div className="flex justify-between bg-transparent fixed right-5 w-10/12 bottom-0">
+        <div className="flex justify-between bg-transparent absolute right-0 bottom-0 px-5 w-full h-[130px] bg-white z-[40] ">
           {exportar && (
-            <div className="flex flex-col justify-center items-center -translate-y-5">
+            <div className="flex flex-col justify-center items-center">
               <button
                 type="button"
                 className="flex justify-center items-center bg-blue_custom hover:bg-blue-800 p-4 rounded-full"
@@ -832,7 +831,7 @@ const FiltroPaginado: FC<Componentes> = ({
                   width: "145px",
                   minWidth: "145px",
                 }}
-                className="translate-x-1"
+                className="py-2"
               >
                 <>
                   <div>

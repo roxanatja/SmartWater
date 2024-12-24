@@ -11,8 +11,8 @@ export interface IClientGetParams extends Search {
         zone?: string;
         initialDate?: string;
         finalDate?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
         renewedAgo?: number;
         hasCredit?: boolean;
     }

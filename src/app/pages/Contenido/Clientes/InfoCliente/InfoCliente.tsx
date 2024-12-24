@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import "./InfoCliente.css";
 import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";
@@ -9,7 +9,8 @@ import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../EntryComponents/Modal";
-import { Zone } from "../../../../../Class/types.data";
+import { Zone } from "../../../../../type/City";
+import { formatIncompletePhoneNumber } from "libphonenumber-js";
 
 const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -18,6 +19,9 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const [zone, setZone] = useState<string>("");
   const [date, setDate] = useState<string>();
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false);
+
+  const optionsRef = useRef<HTMLDivElement>(null);
+
   const location = client.location;
   const navigate = useNavigate();
 
@@ -92,9 +96,26 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
     setSelectedClient(client);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
       <div className="infoClientes-container relative">
+        {/* FIXME: Use clientId in url instead of state */}
         <div
           onClick={() => {
             setSelectedClient(client);
@@ -103,7 +124,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
           className="bg-transparent w-full h-full absolute top-0 left-0 rounded-xl cursor-pointer"
         ></div>
         <div className="infoClientes-header">
-          <div className="flex justify-between w-8/12 max-sm:w-full">
+          <div className="flex justify-start gap-4 w-[calc(100%_-_30px)] flex-wrap">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
               {client.storeImage ? (
                 <img
@@ -114,51 +135,62 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               ) : (
                 <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
                   <div className="opacity-0">.</div>
-                  <p className="absolute font-extrabold ">
-                    {client.fullName?.[0]}
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {client.fullName?.[0] || "S"}
                   </p>
                 </div>
               )}
-              <span>{client.fullName}</span>
+              <span>{client.fullName || "Sin nombre"}</span>
             </div>
             <div className="infoClientes-datos">
               <img src="./Location-icon.svg" alt="" />
-              <span>{zone}</span>
+              <span className="whitespace-nowrap">{zone}</span>
             </div>
             <div className="infoClientes-datos">
               <img src="./CasaUbi-icon.svg" alt="" />
-              <span>{client.code}</span>
+              <span className="whitespace-nowrap">{client.code}</span>
             </div>
             <div className="infoClientes-datos relative z-10">
               <a
-                href={`https://api.whatsapp.com/send?phone=${client?.phoneNumber}`}
-                className="btn-whatsapp"
+                href={`https://wa.me/${client?.phoneNumber}`}
+                className="btn-whatsapp flex items-center gap-1"
                 target="_blank"
                 rel="noreferrer"
               >
                 <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
+                <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client.phoneNumber, "BO")}</span>
               </a>
-              <span>{client.phoneNumber}</span>
             </div>
           </div>
-          <div className="absolute right-0 p-4 rounded-full z-10">
+          <div className="absolute right-0 p-4 rounded-full z-10 top-0 flex flex-col gap-6">
             <button type="button" className="btn" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
+
+            <div className="relative z-10" ref={optionsRef}>
+              <button type="button" className="btn" onClick={() => Opciones()}>
+                <img src="./opcion-icon.svg" alt="" />
+              </button>
+              <Option
+                editAction={Edit}
+                visible={showOptions}
+                editar={true}
+                eliminar={true}
+                deleteAction={Delete}
+              />
+            </div>
           </div>
         </div>
-        <div className="infoClientes-body">
+        <div className="infoClientes-body w-[calc(100%_-_30px)]">
           <div className="infoClientes-ventasContainer">
             <div className="infoClientes-ventas">
-              <span>última venta</span>
+              <span>Última venta</span>
               <div className="infoClientes-ultimaventa">
                 <span>{date}</span>
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              {client.hasLoan && (
-                <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
-              )}
+              <span style={{ color: "#1A3D7D" }}>Préstamos activos</span>
               <div
                 className="infoClientes-moneda cursor-pointer"
                 onClick={() => setShowCobroPopUp(true)}
@@ -169,19 +201,6 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="relative z-10">
-            <button type="button" className="btn" onClick={() => Opciones()}>
-              <img src="./opcion-icon.svg" alt="" />
-            </button>
-            <Option
-              editAction={Edit}
-              visible={showOptions}
-              editar={true}
-              eliminar={true}
-              deleteAction={Delete}
-            />
           </div>
         </div>
         <div className="infoClientes-footer relative z-10">

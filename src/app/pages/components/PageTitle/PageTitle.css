@@ -1,7 +1,8 @@
 .Pages {
     display: flex;
     justify-content: space-between;
-    height: 50px;
+    height: auto;
+    background-color: white;
 }
 
 .Title-Pages {

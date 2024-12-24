@@ -3,8 +3,8 @@ import { FilteredSearch } from "./common";
 export interface IRegistersGetParams extends FilteredSearch {
     filters?: {
         user?: string;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
         hour?: string;
         open?: boolean;
     }

@@ -11,8 +11,8 @@ export interface IBillsGetParams extends Search {
         cashPayment?: boolean;
         renewedAgo?: number;
         renewedIn?: number;
-        year?: string;
-        month?: string;
+        year?: number;
+        month?: number;
     }
 }
 
