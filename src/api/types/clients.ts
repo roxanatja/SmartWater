@@ -5,7 +5,7 @@ export interface IClientGetParams extends Search {
     filters?: {
         user?: string;
         hasOrder?: boolean;
-        hasLoad?: boolean;
+        hasLoan?: boolean;
         hasExpiredContracts?: boolean;
         hasContract?: boolean;
         zone?: string;
@@ -14,6 +14,7 @@ export interface IClientGetParams extends Search {
         year?: number;
         month?: number;
         renewedAgo?: number;
+        renewedIn?: number;
         hasCredit?: boolean;
     }
 }

@@ -1,6 +1,6 @@
 import { Switch } from "../Switch/Switch";
 import "./FiltroPaginado.css";
-import { FC, ReactNode } from "react";
+import { forwardRef, ReactNode, useImperativeHandle, useRef } from "react";
 import * as XLSX from "xlsx";
 import { Sale } from "../../../../type/Sale/Sale";
 import { GetSales } from "../../../../services/SaleService";
@@ -46,9 +46,14 @@ type Componentes = {
   orderArray?: (order: string) => void;
   search?: (e: string) => void;
   suggestions?: string[];
+  hasFilter?: boolean
 };
 
-const FiltroPaginado: FC<Componentes> = ({
+export interface IFiltroPaginadoReference {
+  clearSearch: () => void
+}
+
+const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   exportar,
   typeDataToExport,
   add,
@@ -73,7 +78,14 @@ const FiltroPaginado: FC<Componentes> = ({
   onFilter,
   search,
   suggestions,
-}) => {
+  hasFilter
+}, ref) => {
+  useImperativeHandle(ref, () => ({
+    clearSearch() {
+      setValue("search", "")
+    }
+  }));
+
   const searchUser = async (id: string, userList: any) => {
     //Busca el nombre del usuario
     const user = userList.find((user: any) => user._id === id);
@@ -495,7 +507,7 @@ const FiltroPaginado: FC<Componentes> = ({
     }
   };
 
-  const { register } = useForm();
+  const { register, setValue } = useForm();
 
   return (
     <>
@@ -579,9 +591,13 @@ const FiltroPaginado: FC<Componentes> = ({
                 <div className="w-full">
                   <button
                     type="button"
-                    className="boton-filtro"
+                    className="boton-filtro relative"
                     onClick={onFilter}
                   >
+                    {
+                      hasFilter &&
+                      <div className="bg-red-500 rounded-full p-[5px] absolute -top-1 -right-1" />
+                    }
                     <span style={{ marginRight: "5px" }}>Filtrar</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -869,6 +885,8 @@ const FiltroPaginado: FC<Componentes> = ({
       </div>
     </>
   );
-};
+});
+
+FiltroPaginado.displayName = "FiltroPaginado"
 
 export { FiltroPaginado };

@@ -25,10 +25,10 @@ const Contador: FC<typeContadorProduct> = ({
 
   return (
     <>
-      <div className="FiltroClientes-Botones">
+      <div className="FiltroClientes-Botones flex items-center gap-3">
         <button
           type="button"
-          className="FiltroClientes-Botonesbtn"
+          className="FiltroClientes-Botonesbtn flex items-center"
           onClick={decrementar}
         >
           <span className="material-symbols-outlined">do_not_disturb_on</span>
@@ -36,7 +36,7 @@ const Contador: FC<typeContadorProduct> = ({
         <span className="FiltroClientes-BotonesNumero">{count}</span>
         <button
           type="button"
-          className="FiltroClientes-Botonesbtn"
+          className="FiltroClientes-Botonesbtn flex items-center"
           onClick={incrementar}
         >
           <span className="material-symbols-outlined">add_circle</span>

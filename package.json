@@ -5,6 +5,7 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.6",
     "@googlemaps/markerclusterer": "^2.5.3",
+    "@hookform/resolvers": "github:react-hook-form/resolvers",
     "@react-google-maps/api": "^2.19.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^16.0.1",
@@ -13,6 +14,7 @@
     "@types/node": "^16.18.68",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "@types/yup": "^0.29.14",
     "axios": "^1.6.7",
     "chart.js": "^4.4.0",
     "firebase": "^10.13.1",
@@ -31,7 +33,8 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yup": "^1.6.1"
   },
   "scripts": {
     "start": "react-scripts start",

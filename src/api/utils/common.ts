@@ -6,6 +6,10 @@ export const generateQueryString = (params: Search): string | null => {
     if (params.pagination) {
         query += `page=${params.pagination.page}`
         query += `&pageSize=${params.pagination.pageSize}`
+
+        if (params.pagination.sort) {
+            query += `&sort=${params.pagination.sort}`
+        }
     }
 
     if (params.filters && Object.keys(params.filters).length > 0) {

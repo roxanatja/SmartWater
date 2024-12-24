@@ -197,7 +197,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               >
                 <img src="./Moneda-icon.svg" alt="" />
                 <div>
-                  <span>{client.credit.toString()} Bs.</span>
+                  <span>{client.credit?.toString()} Bs.</span>
                 </div>
               </div>
             </div>

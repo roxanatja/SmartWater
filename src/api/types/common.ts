@@ -6,6 +6,7 @@ export type PaginatedSearch = {
     pagination?: {
         pageSize: number
         page: number
+        sort?: 'asc' | 'desc'
     }
 }
 

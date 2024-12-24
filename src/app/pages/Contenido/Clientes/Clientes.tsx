@@ -1,6 +1,6 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import moment from "moment";
-import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
@@ -11,8 +11,9 @@ import FiltroClientes from "./FiltroClientes/FiltroClientes";
 import { ClientsApiConector, ZonesApiConector } from "../../../../api/classes";
 import { Client } from "../../../../type/Cliente/Client";
 import { Zone } from "../../../../type/City";
-import { useSearchParams } from "react-router-dom";
 import { useGlobalContext } from "../../../SmartwaterContext";
+import { IClientGetParams } from "../../../../api/types/clients";
+import { QueryMetadata } from "../../../../api/types/common";
 
 const Clientes: FC = () => {
   const {
@@ -28,39 +29,44 @@ const Clientes: FC = () => {
 
   const { setLoading } = useGlobalContext()
 
-  const [clients, setClients] = useState<Client[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
   const [currentData, setCurrentData] = useState<Client[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+
   const itemsPerPage: number = 10;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [savedFilters, setSavedFilters] = useState({});
+  const [total, setTotal] = useState<number>(0);
 
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParamDebounced, setSearchParamDebounced] = useState<string>('');
+  const [searchParam, setSearchParam] = useState<string>('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
+  const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters']>({});
+
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
 
   useEffect(() => {
-    if (!searchParams.has('page')) {
-      setCurrentPage(1)
-    } else {
-      setCurrentPage(Number(searchParams.get('page')))
+    const fetchZones = async () => {
+      setZones((await ZonesApiConector.get({}))?.data || []);
     }
-  }, [searchParams])
+    fetchZones()
+  }, [])
 
   const getClients = useCallback(async () => {
     setLoading(true)
-    const datClients = await ClientsApiConector.getClients({ pagination: { page: currentPage, pageSize: itemsPerPage } });
-    setZones((await ZonesApiConector.get({}))?.data || []);
 
-    // const sortedClients = datClien.sort(
-    //   (a: any, b: any) =>
-    //     moment(b.lastSale).valueOf() - moment(a.lastSale).valueOf()
-    // );
+    let datClients: { data: Client[] } & QueryMetadata | null
+    if (searchParamDebounced && searchParamDebounced !== "") {
+      if (savedFilters && Object.keys(savedFilters).length > 0) { setSavedFilters({}) }
+      datClients = await ClientsApiConector.searchClients({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { text: searchParamDebounced } });
+    } else {
+      datClients = await ClientsApiConector.getClients({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: savedFilters });
+    }
 
-    setClients(datClients?.data || []);
     setCurrentData(datClients?.data || []);
     setTotalPage(Math.ceil((datClients?.metadata.totalCount || 0) / itemsPerPage)); // Update total pages
+    setTotal(datClients?.metadata.totalCount || 0)
     setLoading(false)
-  }, [currentPage, setLoading]);
+  }, [currentPage, setLoading, savedFilters, sort, searchParamDebounced]);
 
   useEffect(() => {
     getClients();
@@ -68,55 +74,40 @@ const Clientes: FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    setSearchParams((prev) => ({ ...prev, page }))
   };
 
   const orderClients = (orden: string) => {
-    let clientesOrdenados: Client[] = [...currentData];
-
     if (orden === "new") {
-      clientesOrdenados.sort(
-        (a: Client, b: Client) =>
-          moment(b.created).valueOf() - moment(a.created).valueOf()
-      );
+      setSort('desc')
     } else if (orden === "older") {
-      clientesOrdenados.sort(
-        (a: Client, b: Client) =>
-          moment(a.created).valueOf() - moment(b.created).valueOf()
-      );
+      setSort('asc')
     }
-
-    setCurrentPage(1);
-    setCurrentData(clientesOrdenados.slice(0, itemsPerPage));
   };
 
-  const handleSearchUser = (searchValue: string) => {
-    const value: string = searchValue.trim().toLowerCase();
-    const filteredClients: Client[] =
-      value === ""
-        ? clients
-        : clients.filter(
-          (client: Client) =>
-            client.fullName?.toLowerCase().includes(value) ||
-            client.phoneNumber.includes(value)
-        );
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      setSearchParamDebounced(searchParam);
+      setCurrentPage(1);
+    }, 800);
+    return () => clearTimeout(getData)
+  }, [searchParam])
 
-    setCurrentData(filteredClients.slice(0, itemsPerPage));
+  const handleFilterChange = (filters: IClientGetParams['filters']) => {
     setCurrentPage(1);
-    setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
-  };
-
-  const handleFilterChange = (filteredClients: Client[], filterdata: any) => {
-    setCurrentData(filteredClients.slice(0, itemsPerPage));
-    setCurrentPage(1);
-    setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
-    setSavedFilters(filterdata);
+    if (searchParamDebounced !== "") {
+      setSearchParamDebounced("")
+      setSearchParam("")
+      console.log('calling clear search in Clientes')
+      if (filterRef?.current) { filterRef.current.clearSearch() }
+    }
+    setSavedFilters(filters);
   };
 
   return (
     <div className="px-10">
       <PageTitle titulo="Clientes" icon="./clientes-icon.svg" />
       <FiltroPaginado
+        ref={filterRef}
         add={true}
         exportar={true}
         typeDataToExport="clients"
@@ -127,16 +118,26 @@ const Clientes: FC = () => {
         onAdd={() => setShowModal(true)}
         resultados={true}
         filtro
-        total={clients.length}
-        search={handleSearchUser}
+        total={total}
+        search={setSearchParam}
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
+        hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
       >
-        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-          {currentData.map((client: Client) => (
-            <InfoCliente key={client._id} client={client} zones={zones} />
-          ))}
-        </div>
+        {
+          currentData.length > 0 &&
+          <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+            {currentData.map((client: Client) => (
+              <InfoCliente key={client._id} client={client} zones={zones} />
+            ))}
+          </div>
+        }
+        {
+          currentData.length === 0 &&
+          <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+            Sin resultados
+          </div>
+        }
       </FiltroPaginado>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
@@ -182,9 +183,9 @@ const Clientes: FC = () => {
         </div>
       </Modal>
 
-      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
+      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)} className="lg:!w-1/2 md:!w-3/4 !w-full">
         <FiltroClientes
-          clients={clients}
+          zones={zones}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
