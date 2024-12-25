@@ -1,14 +1,17 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import Input from "./Inputs";
 import { motion } from "framer-motion";
 import ImageUploadField from "./ImageUploadField";
 import GoogleMapWithSelection from "./GoogleInputMap";
-import GetApiMethod from "../../../Class/api.class";
-import { Client, District, Zone } from "../../../Class/types.data";
-import { client, ClientesContext } from "../Contenido/Clientes/ClientesContext";
-import ApiMethodClient from "../../../Class/api.client";
+import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
+import * as Yup from 'yup'
+import { ZonesApiConector, ClientsApiConector } from "../../../api/classes";
+import { District, Zone } from "../../../type/City";
+import { IClientForm } from "../../../api/types/clients";
+import { formatNumber, isValidPhoneNumber } from "libphonenumber-js";
+import { AuthService } from "../../../api/services/AuthService";
+import toast from "react-hot-toast";
 
 const ClientForm = ({
   isOpen,
@@ -19,20 +22,24 @@ const ClientForm = ({
 }) => {
   const [city, setCity] = useState<Zone[]>([]);
   const [disti, setDisti] = useState<District[]>([]);
-  const [date, setDate] = useState(false);
-  const [date2, setDate2] = useState(false);
-  const { selectedClient, setSelectedClient } = useContext(ClientesContext);
+
+  const [date, setDate] = useState(true);
+
+  const { selectedClient } = useContext(ClientesContext);
+
   const [uploading, setUploading] = useState(false);
   const [mapinteration, setMapinteration] = useState(false);
+
   const d =
     selectedClient._id !== ""
       ? {
-          defaultValues: {
-            ...selectedClient,
-            dayrenew: Number(selectedClient.renewInDays) > 0,
-          } as unknown as Client,
-        }
+        defaultValues: {
+          ...selectedClient,
+          dayrenew: Number(selectedClient.renewInDays) > 0,
+        } as unknown as IClientForm,
+      }
       : {};
+
   const {
     register,
     handleSubmit,
@@ -40,56 +47,98 @@ const ClientForm = ({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<Client>(d);
+  } = useForm<IClientForm>({
+    defaultValues: d.defaultValues,
+    mode: 'all'
+  });
 
-  const verifyPhoneNumber = (value: string | undefined) => {
-    if (!value) {
-      return "";
+
+  const onSubmit: SubmitHandler<IClientForm> = async (data) => {
+    let res = null
+
+    if (selectedClient._id !== "") {
+      // TODO: Update
+    } else {
+      res = await ClientsApiConector.registerClient({
+        data: {
+          address: data.address,
+          billingInfo: data.billingInfo,
+          ciBackImage: data.ciBackImage,
+          ciFrontImage: data.ciFrontImage,
+          clientImage: data.clientImage,
+          comment: "",
+          reference: data.reference,
+          credit: 0,
+          district: data.district,
+          fullName: data.fullName,
+          hasContract: data.hasContract,
+          hasLoan: data.hasLoan,
+          hasOrder: data.hasOrder,
+          isAgency: data.isAgency,
+          isClient: data.isClient,
+          location: data.location,
+          phoneNumber: formatNumber(data.phoneNumber, "BO", "E.164"),
+          renewInDays: data.dayrenew ? data.renewInDays : undefined,
+          storeImage: data.storeImage,
+          user: AuthService.getUser()?._id || '',
+          zone: data.zone,
+          email: data.email,
+          averageRenewal: !data.dayrenew,
+          phoneLandLine: data.phoneLandLine ? formatNumber(data.phoneLandLine, "BO", "E.164") : undefined
+        }
+      })
     }
 
-    if (!value.startsWith("+")) {
-      return "+" + value;
-    }
-
-    return value;
-  };
-
-  const onSubmit: SubmitHandler<Client> = async (data) => {
-    let values = data;
-    const api = new ApiMethodClient();
-    try {
-      values = {
-        ...data,
-        phoneLandLine: verifyPhoneNumber(data.phoneLandLine),
-      };
-      if (selectedClient._id !== "") {
-        await api.updateClient(selectedClient._id, values);
-        setSelectedClient(client);
-        return toast.success("Cliente editado", { position: "bottom-center" });
-      }
-      await api.registerClient(values);
+    if (res) {
       toast.success("Cliente registrado", { position: "bottom-center" });
-      setSelectedClient(client);
-    } catch (error) {
-      console.error(error);
+      window.location.reload();
+    } else {
       toast.error("Upps error al crear cliente", { position: "bottom-center" });
     }
+    // const api = new ApiMethodClient();
+    // try {
+    //   values = {
+    //     ...data,
+    //     phoneLandLine: verifyPhoneNumber(data.phoneLandLine),
+    //   };
+    //   if (selectedClient._id !== "") {
+    //     await api.updateClient(selectedClient._id, values);
+    //     setSelectedClient(client);
+    //     return toast.success("Cliente editado", { position: "bottom-center" });
+    //   }
+    //   await api.registerClient(values);
+    //   toast.success("Cliente registrado", { position: "bottom-center" });
+    //   setSelectedClient(client);
+    // } catch (error) {
+    //   console.error(error);
+    //   toast.error("Upps error al crear cliente", { position: "bottom-center" });
+    // }
   };
 
   const getCitys = useCallback(async () => {
-    const api = new GetApiMethod();
-    const data = await api.getZone();
-    setCity(data);
-    let d = data[0];
-    setDisti(d.districts);
+    const data = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } });
+    const zones = data?.data || []
+    setCity(zones);
+
     if (selectedClient._id === "") {
-      setValue("zone", d._id);
+      if (zones.length > 0) {
+        setValue("zone", zones[0]._id);
+      }
     } else {
       setValue("zone", selectedClient.zone);
       setMapinteration(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setValue]);
+  }, [setValue, selectedClient]);
+
+  const selectedZone = watch('zone')
+  useEffect(() => {
+    if (selectedZone) {
+      const zon = city.find(z => z._id === selectedZone)
+      const dists = zon?.districts || []
+      setDisti(dists)
+      if (dists.length > 0) setValue('district', dists[0]._id)
+    }
+  }, [selectedZone, city, setValue])
 
   useEffect(() => {
     getCitys();
@@ -97,41 +146,47 @@ const ClientForm = ({
 
   const handleCheckboxChange = (type: "isClient" | "isAgency") => {
     if (type === "isClient") {
-      setValue("isClient", true);
-      setValue("isAgency", false);
+      setValue("isClient", true, { shouldValidate: true });
+      setValue("isAgency", false, { shouldValidate: true });
     } else {
-      setValue("isAgency", true);
-      setValue("isClient", false);
+      setValue("isAgency", true, { shouldValidate: true });
+      setValue("isClient", false, { shouldValidate: true });
     }
   };
 
   const handleCheckboxChangeReno = (type: "dayrenew" | "hasOrder") => {
     if (type === "dayrenew") {
-      setValue("dayrenew", true);
+      setValue("dayrenew", true, { shouldValidate: true });
       setDate(true);
-      setDate2(false);
     } else {
-      setValue("dayrenew", false);
+      setValue("dayrenew", false, { shouldValidate: true });
       setDate(false);
-      setDate2(true);
     }
   };
 
   useEffect(() => {
     if (selectedClient._id === "") {
-      setValue("isClient", true);
-      setValue("isAgency", false);
-      setValue("dayrenew", true);
-      setValue("hasOrder", false);
-      setValue("renewInDays", 0);
-      setValue("renewInDaysNumber", "0");
-      setValue("address", "");
+      setValue("isClient", true, { shouldValidate: true });
+      setValue("isAgency", false, { shouldValidate: true });
+      setValue("dayrenew", true, { shouldValidate: true });
+      setValue("hasOrder", false, { shouldValidate: true });
+      setValue("renewInDays", 0, { shouldValidate: true });
+      setValue("renewInDaysNumber", "0", { shouldValidate: true });
     }
   }, [reset, selectedClient, selectedClient._id, setValue]);
 
-  const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(
-    watch("address")
-  )}`;
+  const [googleMapsUrl, setGoogleMapsUrl] = useState<string>(`https://www.google.com/maps?q=`)
+  const address = watch("address")
+  useEffect(() => {
+    if (address) {
+      const newAddress = `https://www.google.com/maps?q=${encodeURIComponent(address)}`
+      setGoogleMapsUrl(newAddress)
+      setValue('linkAddress', newAddress)
+    } else {
+      setGoogleMapsUrl("https://www.google.com/maps?q")
+      setValue('linkAddress', "")
+    }
+  }, [address, setValue])
 
   const saveImage = async (file: File) => {
     const formData = new FormData();
@@ -173,7 +228,7 @@ const ClientForm = ({
               selectedClient._id
                 ? watch("storeImage")
                 : watch("clientImage") ||
-                  "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
+                "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
             }
             alt="logo.png"
             className="max-sm:w-56 max-sm:h-56 w-32 h-32 rounded-full shadow-md"
@@ -222,13 +277,13 @@ const ClientForm = ({
         {(selectedClient._id !== ""
           ? errors.storeImage
           : errors.clientImage) && (
-          <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
-            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-            {selectedClient._id !== ""
-              ? errors?.storeImage?.message
-              : errors?.clientImage?.message}
-          </div>
-        )}
+            <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
+              <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+              {selectedClient._id !== ""
+                ? errors?.storeImage?.message
+                : errors?.clientImage?.message}
+            </div>
+          )}
       </motion.div>
 
       <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 gap-4 w-full px-6">
@@ -259,6 +314,7 @@ const ClientForm = ({
           register={register}
           icon={<i className="fa-solid fa-phone"></i>}
           errors={errors.phoneLandLine}
+          validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
           required
         />
         <Input
@@ -273,27 +329,53 @@ const ClientForm = ({
               <p className="text-sm">(591)</p>
             </div>
           }
+          validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
           required
         />
         <Input
-          label="Correo Electronico"
+          label="Correo Electrónico"
           name="email"
           register={register}
           className="lowercase"
           icon={<i className="fa-solid fa-envelope"></i>}
+          errors={errors.email}
+          validateAmount={(value: string) => {
+            try {
+              Yup.string().email("Dirección de correo incorrecta").validateSync(value)
+              return true
+            } catch (error: any) {
+              console.log(error.message)
+              return error.message as string
+            }
+          }}
         />
-        <div
-          className={` ${
-            selectedClient._id !== "" && "col-span-2 max-sm:col-span-1"
-          } `}
-        >
+
+        <div className={` ${selectedClient._id !== "" && "col-span-2 max-sm:col-span-1"} `}        >
           <Input
-            label="Dirreccion"
+            label="Dirección"
             name="address"
             register={register}
             errors={errors.address}
             required
           />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-2 col-span-2 max-sm:col-span-1 flex gap-2 items-center"
+          >
+            <i className="fa-solid fa-location-dot text-sm"></i>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              className="text-xs underline"
+              rel="noreferrer"
+              tabIndex={-1}
+            >
+              Ver ubicacion en Google Maps
+            </a>
+          </motion.div>
         </div>
         {selectedClient._id === "" && (
           <Input
@@ -304,7 +386,7 @@ const ClientForm = ({
             required
           />
         )}
-        {selectedClient._id === "" && (
+        {/* {selectedClient._id === "" && (
           <div className="col-span-2 max-sm:col-span-1">
             <Input
               label="Enlace de ubicación"
@@ -314,24 +396,7 @@ const ClientForm = ({
               icon={<i className="fa-solid fa-location-dot"></i>}
             />
           </div>
-        )}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ delay: 0.3 }}
-          className="col-span-2 max-sm:col-span-1 flex gap-1 items-center"
-        >
-          <i className="fa-solid fa-location-dot"></i>
-          <a
-            href={googleMapsUrl}
-            target="_blank"
-            className="text-sm underline"
-            rel="noreferrer"
-          >
-            Ver ubicacion en Google Maps
-          </a>
-        </motion.div>
+        )} */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -343,15 +408,6 @@ const ClientForm = ({
           <select
             {...register("zone", {
               required: "se requiere una zona",
-              onChange: (e) => {
-                const da = city.find((x) => x._id === e.target.value);
-                if (da && da.districts.length > 0) {
-                  setDisti(da.districts);
-                  setValue("district", da.districts?.[0]?._id || "");
-                } else {
-                  setDisti([]);
-                }
-              },
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black"
           >
@@ -410,7 +466,7 @@ const ClientForm = ({
             {...register("isClient", {
               onChange: (e) => handleCheckboxChange("isClient"),
             })}
-            className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded focus:ring-blue-900 focus:ring-2"
+            className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded accent-blue-700"
             id="isClient"
           />
           <label htmlFor="isClient" className="mr-4">
@@ -421,7 +477,7 @@ const ClientForm = ({
             {...register("isAgency", {
               onChange: (e) => handleCheckboxChange("isAgency"),
             })}
-            className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded focus:ring-blue-900 focus:ring-2"
+            className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded accent-blue-700"
             id="isAgency"
           />
           <label htmlFor="isAgency">Agencia</label>
@@ -429,7 +485,7 @@ const ClientForm = ({
         <ImageUploadField
           watchField={watch}
           fieldName={"ciBackImage"}
-          label={"Porfavor, adjunta foto del carnet (trasero)"}
+          label={"Por favor, adjunta foto del carnet (trasero)"}
           register={register}
           setValue={setValue}
           errors={errors}
@@ -437,7 +493,7 @@ const ClientForm = ({
         <ImageUploadField
           watchField={watch}
           fieldName={"ciFrontImage"}
-          label={"Porfavor, adjunta foto del carnet (delantero)"}
+          label={"Por favor, adjunta foto del carnet (delantero)"}
           register={register}
           setValue={setValue}
           errors={errors}
@@ -445,7 +501,7 @@ const ClientForm = ({
         <ImageUploadField
           watchField={watch}
           fieldName={"storeImage"}
-          label={"Porfavor, adjunta foto de la tienda"}
+          label={"Por favor, adjunta foto de la tienda"}
           register={register}
           setValue={setValue}
           errors={errors}
@@ -468,7 +524,7 @@ const ClientForm = ({
           <button
             type="button"
             onClick={() => setMapinteration(!mapinteration)}
-            className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-50 right-14"
+            className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-[10] right-14"
           >
             {mapinteration ? "Editar" : "Bloquear"}
           </button>
@@ -481,25 +537,41 @@ const ClientForm = ({
           className="flex flex-col justify-center items-center col-span-2 max-sm:col-span-1 pr-6 border-b border-black pb-4 relative"
         >
           <div className="flex justify-between items-center gap-4 w-full">
-            <div className="flex gap-2 items-center justify-center font-semibold">
+            <div className={`flex gap-4 font-semibold w-full ${date ? "items-start" : "items-center"}`}>
               <i
                 onClick={() => {
                   handleCheckboxChangeReno("dayrenew");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${
-                  watch("renewInDays") === 0
-                    ? `text-zinc-300 hover:text-blue-900`
-                    : "text-blue-900"
-                }`}
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${watch("renewInDays") === 0
+                  ? `text-zinc-300 hover:text-blue-900`
+                  : "text-blue-900"
+                  }`}
               ></i>
 
-              <p
-                className={`${!watch("dayrenew") ? "text-zinc-300" : ""} ${
-                  date && "text-transparent"
-                }`}
+              {date ? (
+                <div className="bg-white z-10 relative w-full">
+                  <p className={`transition-all absolute top-0 left-1 w-fit -translate-y-1/2 h-fit text-sm bg-white z-[20] px-2`}>
+                    Periodo de Renovacion
+                  </p>
+                  <Input
+                    placeholder="Periodo de Renovacion"
+                    type="number"
+                    label="Periodo Renovacion"
+                    register={register}
+                    name="renewInDays"
+                    numericalOnly
+                    isVisibleLable
+                    className="w-full"
+                    errors={errors.renewInDays}
+                    required={date}
+                  />
+                </div>
+              ) : <p
+                className={`${!watch("dayrenew") ? "text-zinc-300" : ""} ${date && "text-transparent"
+                  }`}
               >
                 Periodo de Renovacion
-              </p>
+              </p>}
             </div>
             <div className="flex items-center gap-2">
               <label
@@ -523,21 +595,6 @@ const ClientForm = ({
               </div>
             </div>
           </div>
-          {date && (
-            <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
-              <Input
-                type="number"
-                label="Periodo Renovacion"
-                register={register}
-                name="renewInDays"
-                numericalOnly
-                isVisibleLable
-                className="w-full"
-                errors={errors.renewInDays}
-                required={date}
-              />
-            </div>
-          )}
         </motion.div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -547,16 +604,15 @@ const ClientForm = ({
           className="flex flex-col justify-center items-center col-span-2 max-sm:col-span-1 pr-6 border-b border-black pb-4 relative"
         >
           <div className="flex justify-between items-center gap-4 w-full">
-            <div className="flex gap-2 items-center justify-center font-semibold">
+            <div className="flex gap-4 items-center justify-center font-semibold">
               <i
                 onClick={() => {
                   handleCheckboxChangeReno("hasOrder");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${
-                  watch("renewInDaysNumber") === "0"
-                    ? `text-zinc-300 hover:text-blue-900`
-                    : "text-blue-900"
-                }`}
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("renewInDaysNumber") === "0"
+                  ? `text-zinc-300 hover:text-blue-900`
+                  : "text-blue-900"
+                  }`}
               ></i>
               <p className={`${watch("dayrenew") ? "text-zinc-300" : ""}`}>
                 Renovacion Promedio
@@ -584,7 +640,7 @@ const ClientForm = ({
               </div>
             </div>
           </div>
-          {date2 && (
+          {/* {date2 && (
             <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
               <Input
                 type="date"
@@ -597,7 +653,7 @@ const ClientForm = ({
                 required={date2}
               />
             </div>
-          )}
+          )} */}
         </motion.div>
       </div>
       <div className="w-full  sticky bottom-0 bg-white h-full z-50">

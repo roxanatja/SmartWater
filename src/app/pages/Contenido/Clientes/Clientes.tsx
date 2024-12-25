@@ -1,5 +1,4 @@
 import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
-import moment from "moment";
 import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";

@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { UsersApiConector } from "../classes/users";
 import { ApiConnector } from "../classes/api-conector";
+import { UserData } from "../../type/UserData";
 
 const AuthService = {
     login: async (phoneNumber: string, password: string) => {
@@ -28,11 +29,11 @@ const AuthService = {
     getToken: () => {
         return Cookies.get("token");
     },
-    getUser: () => {
+    getUser: (): UserData | null => {
         const userData = Cookies.get("userData");
         if (userData) {
             try {
-                return JSON.parse(userData);
+                return JSON.parse(userData) as UserData;
             } catch (error) {
                 console.error("Error al parsear los datos del usuario:", error);
                 return null;

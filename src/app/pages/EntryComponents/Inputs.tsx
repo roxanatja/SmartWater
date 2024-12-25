@@ -16,7 +16,7 @@ interface InputProps {
   button?: React.ReactNode;
   icon?: React.ReactNode;
   onClick?(): void;
-  validateAmount?(e: any): void;
+  validateAmount?(e: any): string | boolean;
   [key: string]: any;
 }
 
@@ -91,9 +91,8 @@ const Input = memo<InputProps>(
               }
             )}
             {...rest}
-            className={`${
-              errors && "outline outline-red-500 text-black"
-            } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-2 outline-black text-black ${className}`}
+            className={`${errors && "outline outline-red-500 text-black"
+              } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-2 outline-black text-black ${className}`}
           />
         ) : (
           <div className="relative w-full flex items-center">
@@ -107,24 +106,22 @@ const Input = memo<InputProps>(
                 name,
                 required
                   ? {
-                      required: `el ${label} es requerido`,
-                      validate: validateAmount,
-                      onChange:
-                        rest.type === "file" ? handleFileChange : handleChange,
-                    }
+                    required: `${label} es requerido`,
+                    validate: validateAmount,
+                    onChange:
+                      rest.type === "file" ? handleFileChange : handleChange,
+                  }
                   : {
-                      required: false,
-                      validate: validateAmount,
-                      onChange:
-                        rest.type === "file" ? handleFileChange : handleChange,
-                    }
+                    required: false,
+                    validate: validateAmount,
+                    onChange:
+                      rest.type === "file" ? handleFileChange : handleChange,
+                  }
               )}
               {...rest}
-              className={`${
-                errors && errors && "outline outline-red-500 text-black"
-              } ${className} ${icon ? "pl-16" : ""} ${
-                !isText && "text-sm"
-              }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
+              className={`${errors && "outline outline-red-500 text-black"
+                } ${className} ${icon ? "pl-16" : ""} ${!isText && "text-sm"
+                }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
             />
             {button && (
               <button

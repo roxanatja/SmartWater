@@ -49,7 +49,7 @@ export abstract class ClientsApiConector {
         }
     }
 
-    static async registerClient(params: IClientRegisterParams): Promise<Client | null> {
+    static async registerClient(params: IClientRegisterParams): Promise<{ code: string; _id: string } | null> {
         try {
             const res = await ApiConnector.getInstance().post(`${this.root_path}/register`, params.data)
             return res.data
@@ -85,7 +85,7 @@ export abstract class ClientsApiConector {
         }
     }
 
-    static async deleteClient(params: IClientGetOneParams): Promise<any | null> {
+    static async deleteClient(params: IClientGetOneParams): Promise<{ mensaje: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.clientId}`)
             return res.data

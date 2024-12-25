@@ -1,8 +1,9 @@
 export interface Client {
   _id: string;
-  code: string;
   user: string;
+  isClient: boolean;
   storeImage: string;
+  code: string;
   fullName: string;
   phoneNumber: string;
   address: string;
@@ -22,7 +23,6 @@ export interface Client {
   hasContract: boolean;
   renewInDays: Number;
   renewDate: string;
-  isClient: boolean;
   isAgency: boolean;
   billingInfo: {
     NIT: string;

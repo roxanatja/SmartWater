@@ -4,13 +4,13 @@ import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
-import { DeleteClient } from "../../../../../services/ClientsService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../EntryComponents/Modal";
 import { Zone } from "../../../../../type/City";
 import { formatIncompletePhoneNumber } from "libphonenumber-js";
+import { ClientsApiConector } from "../../../../../api/classes";
 
 const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -21,7 +21,6 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false);
 
   const optionsRef = useRef<HTMLDivElement>(null);
-
   const location = client.location;
   const navigate = useNavigate();
 
@@ -53,16 +52,24 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const Delete = async () => {
     toast.error(
       (t) => (
-        <span>
-          Se <b>eliminara</b> este cliente <br /> <b>pulsa</b> para continuar
-          <button
-            className="bg-red-500 px-2 py-1 rounded-lg ml-2"
-            onClick={async () => {
-              toast.dismiss(t.id);
-              try {
-                const response = await DeleteClient(client._id);
-                if (response.status === 200) {
-                  toast.success("Cliente eliminado", {
+        <div>
+          <p className="mb-4 text-center">
+            Se <b>eliminará</b> este cliente <br /> pulsa <b>Proceder</b> para continuar
+          </p>
+          <div className="flex justify-center">
+            <button
+              className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+              onClick={() => { toast.dismiss(t.id); }}
+            >
+              Cancelar
+            </button>
+            <button
+              className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+              onClick={async () => {
+                toast.dismiss(t.id);
+                const response = await ClientsApiConector.deleteClient({ clientId: client?._id || '' });
+                if (!!response) {
+                  toast.success(response.mensaje, {
                     position: "top-center",
                   });
                   window.location.reload();
@@ -70,22 +77,18 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
                   toast.error("Error al eliminar cliente", {
                     position: "top-center",
                   });
-                  toast.error(response.data.error, {
-                    position: "top-center",
-                  });
-                  console.log("Error al eliminar cliente", response.data);
                 }
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-          >
-            <i className="fa-solid fa-xmark text-white"></i>
-          </button>
-        </span>
+              }}
+            >
+              Proceder
+            </button>
+          </div>
+        </div>
       ),
       {
-        position: "top-center",
+        className: "shadow-2xl border-2 border-slate-100",
+        icon: null,
+        position: "top-center"
       }
     );
     setShowOptions(false);
@@ -162,12 +165,12 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               </a>
             </div>
           </div>
-          <div className="absolute right-0 p-4 rounded-full z-10 top-0 flex flex-col gap-6">
+          <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
             <button type="button" className="btn" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
 
-            <div className="relative z-10" ref={optionsRef}>
+            <div className="relative" ref={optionsRef}>
               <button type="button" className="btn" onClick={() => Opciones()}>
                 <img src="./opcion-icon.svg" alt="" />
               </button>
