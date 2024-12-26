@@ -70,7 +70,7 @@ export interface IClientRegisterParams {
             longitude: string;
         };
         averageRenewal: boolean;
-        clientImage: string;
+        // clientImage: string;
         renewInDays?: number;
         reference: string;
         hasLoan: boolean;
@@ -97,11 +97,15 @@ export interface IClientUpdateParams {
     clientId: string;
     data: {
         storeImage: string;
+        billingInfo: {
+            NIT: string;
+            name: string;
+        };
         fullName: string;
         phoneNumber: string;
+        email: string;
         address: string;
         comment: string;
-        email: string;
         zone: string;
         district: string;
         ciFrontImage: string;
@@ -110,8 +114,9 @@ export interface IClientUpdateParams {
             latitude: string;
             longitude: string;
         };
-        renewInDays: string;
+        renewInDays: number | null;
         averageRenewal: boolean;
+        phoneLandLine?: string | null;
     };
 }
 
@@ -133,27 +138,18 @@ export interface IClientForm {
         latitude: string;
         longitude: string;
     };
-    clientImage: string;
-    deliverDate: string;
-    lastPostponedInDays: string;
-    lastPostponed: string;
+    // clientImage: string;
     renewDate: string;
-    renewInDaysNumber: string;
-    deactivated: string;
-    reference: string;
-    lastSale?: string;
+    reference?: string;
     hasLoan: boolean;
     hasOrder: boolean;
     hasContract: boolean;
-    lastAttenderOrder: string;
     renewInDays: number;
-    credit: string;
-    hasExpiredContract?: boolean;
     billingInfo: {
         NIT: string;
         name: string;
     };
-    phoneLandLine: string;
+    phoneLandLine?: string;
     isAgency: boolean;
     linkAddress?: string;
     dayrenew: boolean;

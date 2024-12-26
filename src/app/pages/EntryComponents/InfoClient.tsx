@@ -1,14 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import GetApiMethod from "../../../Class/api.class";
-import { Client } from "../../../Class/types.data";
-import ApiMethodLoans from "../../../Class/api.loans";
 import { Loans } from "../../../type/Loans/Loans";
 import { CuadroPrestamo } from "../Contenido/Préstamos/CuadroPrestamo/CuadroPrestamo";
-import ApiMethodSales from "../../../Class/api.sales";
 import Product from "../../../type/Products/Products";
 import { Devolution } from "../../../type/Devolution/devolution";
-import ApiMethodDevolu from "../../../Class/api.devolu";
+import { Client } from "../../../type/Cliente/Client";
+import { formatDateTime } from "../../../utils/helpers";
+import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, ZonesApiConector } from "../../../api/classes";
+import { Zone } from "../../../type/City";
 
 const InfoClient = ({ client }: { client: Client }) => {
   const [city, setCity] = useState<{
@@ -22,31 +21,31 @@ const InfoClient = ({ client }: { client: Client }) => {
     zone: "",
     district: "",
   });
+
   const [activeinfo, setActiveinfo] = useState<boolean>(true);
-  const [activepresta, setActivepresta] = useState<boolean>(true);
+  const [activepresta, setActivepresta] = useState<boolean>(false);
+  const [activecarnet, setActivecarnet] = useState<boolean>(true);
+  const [activeContracts, setActiveContracts] = useState<boolean>(false);
+  const [activeDevol, setActiveDevol] = useState<boolean>(false);
+
   const getZone = useCallback(
     async (zone: string, disc: string, client?: string) => {
-      let resload, devo;
-      const api = new GetApiMethod();
-      const apiloa = new ApiMethodLoans();
-      const apiProduc = new ApiMethodSales();
-      const apidevu = new ApiMethodDevolu();
-      const res = await api.getZone();
-      if (client) {
-        resload = await apiloa.loadLoans({
-          client: client,
-        });
+      let resload: Loans[] = []; let devo: Devolution[] = [];
+      const zones: Zone[] = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
 
-        devo = await apidevu.GetDevolutions({ client });
+      if (client) {
+        resload = (await LoansApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+        devo = (await DevolutionsApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
       }
-      const zoneData = res.find((x) => x._id === zone);
+
+      const zoneData = zones.find((x) => x._id === zone);
       return setCity({
         zone: zoneData?.name,
         district: zoneData?.districts.find((x) => x._id === disc)?.name,
         loans: resload,
-        product: await apiProduc.GetProducts(),
+        product: (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
         devolu: devo,
-        item: await apiProduc.getItems(),
+        item: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
       });
     },
     []
@@ -70,7 +69,7 @@ const InfoClient = ({ client }: { client: Client }) => {
     if (client.district) getZone(client.zone, client.district, client._id);
   }, [client._id, client.district, client.zone, getZone]);
   return (
-    <div>
+    <div className="pb-10">
       <div className="flex flex-col w-full justify-center items-start gap-4">
         <div className="flex gap-2 items-center">
           <img
@@ -87,9 +86,8 @@ const InfoClient = ({ client }: { client: Client }) => {
         >
           <h4 className="text-sm font-semibold">Informacion general</h4>
           <i
-            className={`fa-solid fa-angle-down transition-all ${
-              activeinfo && "rotate-180"
-            }`}
+            className={`fa-solid fa-angle-down transition-all ${activeinfo && "rotate-180"
+              }`}
           ></i>
         </div>
 
@@ -139,11 +137,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <p>{client.address}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Refencia:</p>
-                  <p>{client.reference || "N/A"}</p>
-                </li>
-                <li className="flex gap-2 text-base">
-                  <p className="font-medium">Refencia:</p>
+                  <p className="font-medium">Referencia:</p>
                   <p>{client.reference || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
@@ -156,13 +150,13 @@ const InfoClient = ({ client }: { client: Client }) => {
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Fecha de Registro:</p>
-                  <p>{new Date(client.created).toLocaleString() || "N/A"}</p>
+                  <p>{client.created ? formatDateTime(client.created, 'numeric', '2-digit', '2-digit', true) : "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Ultima venta:</p>
                   <p>
                     {client.lastSale
-                      ? new Date(client.lastSale).toLocaleString()
+                      ? formatDateTime(client.lastSale, 'numeric', '2-digit', '2-digit', true)
                       : "Sin venta"}
                   </p>
                 </li>
@@ -175,31 +169,32 @@ const InfoClient = ({ client }: { client: Client }) => {
           </>
         )}
 
-        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer">
-          <h4 className="text-sm font-semibold">Carnet frontal</h4>
-          <i className={`fa-solid fa-angle-up transition-all`}></i>
+        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActivecarnet(!activecarnet)}>
+          <h4 className="text-sm font-semibold">Carnet</h4>
+          <i className={`fa-solid fa-angle-down transition-all ${activecarnet && "rotate-180"}`}></i>
         </div>
 
-        <div>
-          <img
-            src={client.ciFrontImage}
-            className="w-80 h-44 rounded-md"
-            alt={client.ciFrontImage}
-          />
-        </div>
-
-        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer">
-          <h4 className="text-sm font-semibold">Carnet reverso</h4>
-          <i className={`fa-solid fa-angle-up transition-all`}></i>
-        </div>
-
-        <div>
-          <img
-            src={client.ciBackImage}
-            className="w-80 h-44 rounded-md"
-            alt={client.ciBackImage}
-          />
-        </div>
+        {
+          activecarnet &&
+          <div className="flex gap-4 justify-between">
+            <div className="flex flex-col gap-2 items-center">
+              <img
+                src={client.ciFrontImage || ''}
+                className="w-80 h-44 rounded-md flex-1"
+                alt={client.ciFrontImage}
+              />
+              <small className="text-gray-500 w-fit">Frontal</small>
+            </div>
+            <div className="flex flex-col gap-2 items-center">
+              <img
+                src={client.ciBackImage || ''}
+                className="w-80 h-44 rounded-md flex-1"
+                alt={client.ciBackImage}
+              />
+              <small className="text-gray-500 w-fit">Reverso</small>
+            </div>
+          </div>
+        }
 
         <div
           className="w-full border-b-2 pb-4 flex justify-between cursor-pointer"
@@ -207,9 +202,7 @@ const InfoClient = ({ client }: { client: Client }) => {
         >
           <h4 className="text-sm font-semibold">Prestamo</h4>
           <i
-            className={`fa-solid fa-angle-down transition-all ${
-              activepresta && "rotate-180"
-            }`}
+            className={`fa-solid fa-angle-down transition-all ${activepresta && "rotate-180"}`}
           ></i>
         </div>
 
@@ -220,7 +213,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                 <b>Actual: </b> Sin prestamos actuales
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-4 w-full pt-4 ">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 w-full pt-4 ">
                 {city.loans &&
                   city.loans.map((loan, index) => {
                     const contratcEstate = getContractState(
@@ -241,67 +234,98 @@ const InfoClient = ({ client }: { client: Client }) => {
             )}
           </>
         )}
-        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer">
+
+        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActiveContracts(!activeContracts)}>
           <h4 className="text-sm font-semibold">Contratos</h4>
-          <i className={`fa-solid fa-angle-up transition-all`}></i>
+          <i className={`fa-solid fa-angle-down transition-all ${activeContracts && "rotate-180"}`}></i>
         </div>
-        {!client.hasContract && (
-          <div className="text-md">
-            <b>Actual: </b> Sin contratos
-          </div>
-        )}
-        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer">
+        {
+          activeContracts && <>
+            {
+              !client.hasContract && (
+                <div className="text-md">
+                  <b>Actual: </b> Sin contratos
+                </div>
+              )
+            }
+            {
+              (client.hasContract) && (
+                <div className="text-base">
+                  <b>Actual: </b> Con contratos
+                </div>
+              )
+            }
+          </>
+        }
+
+        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActiveDevol(!activeDevol)}>
           <h4 className="text-sm font-semibold">Devoluciones</h4>
-          <i className={`fa-solid fa-angle-up transition-all`}></i>
+          <i className={`fa-solid fa-angle-down transition-all ${activeDevol && "rotate-180"}`}></i>
         </div>
 
-        {city.devolu && city.devolu.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 w-full pt-4">
-            {city.devolu.map((devolution, index) => (
-              <div
-                key={devolution._id}
-                className="border p-4 rounded-md shadow-sm flex flex-col gap-2"
-              >
-                <p className="font-semibold">Devolución #{index + 1}</p>
-                <p>
-                  <b>ID de Préstamo:</b> {devolution.loan}
-                </p>
-                <p>
-                  <b>Fecha de creación:</b>{" "}
-                  {new Date(devolution.created).toLocaleDateString()}
-                </p>
-                <p className="font-semibold">Detalles:</p>
-                <ul className="list-none pl-4">
-                  {devolution.detail.map((itemDetail, idx) => {
-                    const product =
-                      city.product &&
-                      city.product.find(
-                        (product: any) => product._id === itemDetail.item
-                      );
-                    return (
-                      <li
-                        key={idx}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={product?.imageUrl}
-                            alt=""
-                            className="w-8 h-8"
-                          />
-                          {product?.name}
-                        </div>
-                        <p> Cantidad: {itemDetail.quantity}</p>
-                      </li>
-                    );
-                  })}
-                </ul>
+        {
+          activeDevol &&
+          <>
+            {city.devolu && city.devolu.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 w-full pt-4 ">
+                {city.devolu.map((devolution, index) => (
+                  <div
+                    key={devolution._id}
+                    className="flex-shrink-0 rounded-[20px] border border-[#f0f4fd] bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-[15px] flex flex-col gap-2"
+                  >
+                    <p className="font-semibold">Devolución #{index + 1}</p>
+                    <p>
+                      <b>ID de Préstamo:</b> {devolution.loan}
+                    </p>
+                    <p>
+                      <b>Fecha de creación:</b>{" "}
+                      {new Date(devolution.created).toLocaleDateString()}
+                    </p>
+                    <p className="font-semibold">Detalles:</p>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="font-bold text-left sticky top-0 bg-white col-span-2">
+                        <span>Productos</span>
+                      </div>
+                      <div className="font-bold sticky top-0 bg-white text-center">
+                        <span>Cantidad</span>
+                      </div>
+                      {devolution.detail.map((detail: any, index: number) => {
+                        let product = city.product?.find(
+                          (product) => product._id === detail.item
+                        );
+
+                        return (
+                          <React.Fragment key={index}>
+                            <div className="flex items-center gap-2 col-span-2">
+                              <img
+                                src={
+                                  product?.imageUrl ||
+                                  "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
+                                }
+                                alt=""
+                                className="w-7 h-7 rounded-full"
+                              />
+                              <span className="CuadroVentaCliente-text">
+                                {product ? product.name : "Producto no encontrado"}
+                              </span>
+                            </div>
+                            <div className="CuadroVentaCliente-TextContainer font-semibold text-center">
+                              <span className="CuadroVentaCliente-text">
+                                {detail.quantity}
+                              </span>
+                            </div>
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p>No hay devoluciones registradas.</p>
-        )}
+            ) : (
+              <p>No hay devoluciones registradas.</p>
+            )}
+          </>
+        }
       </div>
     </div>
   );

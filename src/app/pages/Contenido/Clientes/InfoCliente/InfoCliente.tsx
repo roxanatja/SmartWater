@@ -118,7 +118,6 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   return (
     <>
       <div className="infoClientes-container relative">
-        {/* FIXME: Use clientId in url instead of state */}
         <div
           onClick={() => {
             setSelectedClient(client);
@@ -206,17 +205,15 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
             </div>
           </div>
         </div>
-        <div className="infoClientes-footer relative z-10">
+        <a className="infoClientes-footer relative z-10" rel="noreferrer"
+          target="_blank"
+          href={url}>
           <img src="./Location-azul-icon.svg" alt="" />
-          <a
-            className="infoClientes-ubi"
-            rel="noreferrer"
-            target="_blank"
-            href={url}
+          <span className="infoClientes-ubi"
           >
             Ver ubicación en el mapa
-          </a>
-        </div>
+          </span>
+        </a>
       </div>
 
       <Modal

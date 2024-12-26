@@ -30,22 +30,23 @@ const ClientForm = ({
   const [uploading, setUploading] = useState(false);
   const [mapinteration, setMapinteration] = useState(false);
 
-  const d =
-    selectedClient._id !== ""
-      ? {
-        defaultValues: {
-          ...selectedClient,
-          dayrenew: Number(selectedClient.renewInDays) > 0,
-        } as unknown as IClientForm,
-      }
-      : {};
+  const d: { defaultValues?: IClientForm } = selectedClient._id !== "" ?
+    {
+      defaultValues: {
+        ...selectedClient,
+        phoneLandLine: selectedClient.phoneLandLine ? formatNumber(selectedClient.phoneLandLine, "BO", "NATIONAL").replaceAll(" ", "") : undefined,
+        phoneNumber: formatNumber(selectedClient.phoneNumber, "BO", "NATIONAL").replaceAll(" ", ""),
+        address: selectedClient.address,
+        dayrenew: Number(selectedClient.renewInDays) > 0,
+      },
+    } :
+    {};
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    reset,
     formState: { errors },
   } = useForm<IClientForm>({
     defaultValues: d.defaultValues,
@@ -57,7 +58,26 @@ const ClientForm = ({
     let res = null
 
     if (selectedClient._id !== "") {
-      // TODO: Update
+      res = await ClientsApiConector.updateClient({
+        clientId: selectedClient._id,
+        data: {
+          address: data.address,
+          billingInfo: data.billingInfo,
+          ciBackImage: data.ciBackImage,
+          ciFrontImage: data.ciFrontImage,
+          comment: "",
+          district: data.district,
+          fullName: data.fullName,
+          location: data.location,
+          phoneNumber: formatNumber(data.phoneNumber, "BO", "E.164"),
+          renewInDays: data.dayrenew ? data.renewInDays : null,
+          storeImage: data.storeImage,
+          zone: data.zone,
+          email: data.email,
+          averageRenewal: !data.dayrenew,
+          phoneLandLine: data.phoneLandLine ? formatNumber(data.phoneLandLine, "BO", "E.164") : null
+        }
+      })
     } else {
       res = await ClientsApiConector.registerClient({
         data: {
@@ -65,9 +85,8 @@ const ClientForm = ({
           billingInfo: data.billingInfo,
           ciBackImage: data.ciBackImage,
           ciFrontImage: data.ciFrontImage,
-          clientImage: data.clientImage,
           comment: "",
-          reference: data.reference,
+          reference: data.reference || "",
           credit: 0,
           district: data.district,
           fullName: data.fullName,
@@ -90,29 +109,11 @@ const ClientForm = ({
     }
 
     if (res) {
-      toast.success("Cliente registrado", { position: "bottom-center" });
+      toast.success(`Cliente ${selectedClient._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
       window.location.reload();
     } else {
       toast.error("Upps error al crear cliente", { position: "bottom-center" });
     }
-    // const api = new ApiMethodClient();
-    // try {
-    //   values = {
-    //     ...data,
-    //     phoneLandLine: verifyPhoneNumber(data.phoneLandLine),
-    //   };
-    //   if (selectedClient._id !== "") {
-    //     await api.updateClient(selectedClient._id, values);
-    //     setSelectedClient(client);
-    //     return toast.success("Cliente editado", { position: "bottom-center" });
-    //   }
-    //   await api.registerClient(values);
-    //   toast.success("Cliente registrado", { position: "bottom-center" });
-    //   setSelectedClient(client);
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error("Upps error al crear cliente", { position: "bottom-center" });
-    // }
   };
 
   const getCitys = useCallback(async () => {
@@ -171,9 +172,11 @@ const ClientForm = ({
       setValue("dayrenew", true, { shouldValidate: true });
       setValue("hasOrder", false, { shouldValidate: true });
       setValue("renewInDays", 0, { shouldValidate: true });
-      setValue("renewInDaysNumber", "0", { shouldValidate: true });
+      setDate(true)
+    } else {
+      setDate(Number(selectedClient.renewInDays) > 0)
     }
-  }, [reset, selectedClient, selectedClient._id, setValue]);
+  }, [selectedClient, setValue]);
 
   const [googleMapsUrl, setGoogleMapsUrl] = useState<string>(`https://www.google.com/maps?q=`)
   const address = watch("address")
@@ -225,10 +228,8 @@ const ClientForm = ({
         >
           <img
             src={
-              selectedClient._id
-                ? watch("storeImage")
-                : watch("clientImage") ||
-                "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
+              watch("storeImage") ||
+              "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
             }
             alt="logo.png"
             className="max-sm:w-56 max-sm:h-56 w-32 h-32 rounded-full shadow-md"
@@ -248,11 +249,7 @@ const ClientForm = ({
                   try {
                     const uploadResponse = await saveImage(file);
                     const downloadURL = uploadResponse.secure_url;
-                    if (selectedClient._id !== "") {
-                      setValue("storeImage", downloadURL);
-                    } else {
-                      setValue("clientImage", downloadURL);
-                    }
+                    setValue("storeImage", downloadURL);
                   } catch (error) {
                     console.error("Error uploading to Cloudinary:", error);
                   } finally {
@@ -260,11 +257,7 @@ const ClientForm = ({
                   }
                 }
               }}
-              required={
-                selectedClient._id !== ""
-                  ? !watch("storeImage")
-                  : !watch("clientImage")
-              }
+              required={!watch("storeImage")}
             />
           </label>
         </button>
@@ -274,16 +267,12 @@ const ClientForm = ({
           </div>
         )}
 
-        {(selectedClient._id !== ""
-          ? errors.storeImage
-          : errors.clientImage) && (
-            <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
-              <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-              {selectedClient._id !== ""
-                ? errors?.storeImage?.message
-                : errors?.clientImage?.message}
-            </div>
-          )}
+        {errors.storeImage && (
+          <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
+            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+            {errors?.storeImage?.message}
+          </div>
+        )}
       </motion.div>
 
       <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 gap-4 w-full px-6">
@@ -463,6 +452,7 @@ const ClientForm = ({
         >
           <input
             type="checkbox"
+            disabled={selectedClient._id !== ""}
             {...register("isClient", {
               onChange: (e) => handleCheckboxChange("isClient"),
             })}
@@ -474,6 +464,7 @@ const ClientForm = ({
           </label>
           <input
             type="checkbox"
+            disabled={selectedClient._id !== ""}
             {...register("isAgency", {
               onChange: (e) => handleCheckboxChange("isAgency"),
             })}
@@ -498,14 +489,14 @@ const ClientForm = ({
           setValue={setValue}
           errors={errors}
         />
-        <ImageUploadField
+        {/* <ImageUploadField
           watchField={watch}
           fieldName={"storeImage"}
           label={"Por favor, adjunta foto de la tienda"}
           register={register}
           setValue={setValue}
           errors={errors}
-        />
+        />` */}
         <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">
             Selecciona una ubicación en el mapa
@@ -609,7 +600,7 @@ const ClientForm = ({
                 onClick={() => {
                   handleCheckboxChangeReno("hasOrder");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("renewInDaysNumber") === "0"
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("renewInDays") === 0
                   ? `text-zinc-300 hover:text-blue-900`
                   : "text-blue-900"
                   }`}

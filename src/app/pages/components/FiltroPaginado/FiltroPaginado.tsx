@@ -1,25 +1,13 @@
 import { Switch } from "../Switch/Switch";
 import "./FiltroPaginado.css";
-import { forwardRef, ReactNode, useImperativeHandle, useRef } from "react";
+import { forwardRef, ReactNode, useImperativeHandle } from "react";
 import * as XLSX from "xlsx";
-import { Sale } from "../../../../type/Sale/Sale";
-import { GetSales } from "../../../../services/SaleService";
-import {
-  GetClientById,
-  loadClients,
-} from "../../../../services/ClientsService";
-import { GetUser } from "../../../../services/UserService";
 import { formatDateTime } from "../../../../utils/helpers";
-import { GetZone } from "../../../../services/ZonesService";
-import { GetProducts } from "../../../../services/ProductsService";
-import { GetDistricts } from "../../../../services/DistrictsService";
-import { GetLoans } from "../../../../services/LoansService";
-import { GetDevolutions } from "../../../../services/DevolutionsService";
-import { GetItems } from "../../../../services/ItemsService";
-import { loadOrders } from "../../../../services/OrdersService";
 import { useForm } from "react-hook-form";
 import Input from "../../EntryComponents/Inputs";
 import { Client } from "../../../../type/Cliente/Client";
+import { ClientsApiConector, DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, SalesApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
+import { District, Zone } from "../../../../type/City";
 
 type Componentes = {
   exportar?: boolean;
@@ -86,7 +74,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   }));
 
-  const searchUser = async (id: string, userList: any) => {
+  const searchUser = (id: string, userList: any) => {
     //Busca el nombre del usuario
     const user = userList.find((user: any) => user._id === id);
     if (user) {
@@ -96,71 +84,61 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
-  const searchZone = async (id: string, zones: any) => {
+  const searchZone = (id: string, zones: Zone[]): Zone | undefined => {
     //Busca la zona del cliente
     const zone = zones.find((zone: any) => zone._id === id);
-    return zone?.name;
+    return zone;
   };
 
-  const searchDistrict = async (id: string, districts: any) => {
+  const searchDistrict = (id: string, districts: District[]): District | undefined => {
     //Busca el distrito del cliente
     const district = districts.find((district: any) => district._id === id);
-    return district?.name;
+    return district;
   };
 
-  const setDetailSale = async (details: Array<any>, products: any) => {
+  const setDetailSale = (details: Array<any>, products: any) => {
     //Guarda los detalles de la venta
     var detailsProduct: string = "";
-    await Promise.all(
-      details.map(async (detail: any) => {
-        const product = products.find(
-          (product: any) => product._id === detail.product
-        );
-
-        detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity} `;
-        return {
-          detailsProduct,
-        };
-      })
-    );
+    details.forEach((detail: any) => {
+      const product = products.find((product: any) => product._id === detail.product);
+      detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity}\n`;
+    })
     return detailsProduct;
   };
 
-  const setDetailClient = async (loans: Array<any>, products: Array<any>) => {
+  const setDetailClient = (loans: Array<any>, products: Array<any>) => {
     //Guarda los detalles del cliente
     if (loans.length > 0) {
       const prod: Array<string> = [];
       const dataToSend: Array<{ itemName: string; quantity: number }> = [];
       var detailsProduct: string = "";
-      loans.map(async (loan: any) => {
-        await Promise.all(
-          loan.detail.map((detail: any) => {
-            const product = products.find(
-              (product: any) => product._id === detail.item
-            );
-            if (product === undefined) return;
+      loans.forEach((loan: any) => {
+        loan.detail.forEach((detail: any) => {
+          const product = products.find(
+            (product: any) => product._id === detail.item
+          );
+          if (product === undefined) return;
 
-            if (prod.includes(product.name)) {
-              const existingProduct = dataToSend.find(
-                (item) => item.itemName === product.name
-              );
-              if (existingProduct) {
-                existingProduct.quantity += detail.quantity;
-              } else {
-                dataToSend.push({
-                  itemName: product.name,
-                  quantity: detail.quantity,
-                });
-              }
+          if (prod.includes(product.name)) {
+            const existingProduct = dataToSend.find(
+              (item) => item.itemName === product.name
+            );
+            if (existingProduct) {
+              existingProduct.quantity += detail.quantity;
             } else {
-              prod.push(product.name);
               dataToSend.push({
                 itemName: product.name,
                 quantity: detail.quantity,
               });
             }
-          })
-        );
+          } else {
+            prod.push(product.name);
+            dataToSend.push({
+              itemName: product.name,
+              quantity: detail.quantity,
+            });
+          }
+        })
       });
 
       detailsProduct = dataToSend
@@ -172,13 +150,13 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
-  const setContract = async (client: Client, loans: Array<any>) => {
+  const setContract = (client: Client) => {
     //Guarda los detalles del contrato
     if (client.hasContract) {
       if (client.hasExpiredContract) {
         return "CONTRATO VENCIDO";
       } else {
-        if (loans.some((loan: any) => loan.client === client._id)) {
+        if (client.hasLoan) {
           return "PRESTAMO CON CONTRATO";
         } else {
           return "CONTRATO VIGENTE";
@@ -189,7 +167,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
-  const setDevolutions = async (
+  const setDevolutions = (
     id: string,
     devolutions: Array<any>,
     products: Array<any>
@@ -204,36 +182,34 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       const dataToSend: Array<{ itemName: string; quantity: number }> = [];
       var devolutionDetails: string = "";
 
-      await Promise.all(
-        devolution.map(async (devolution: any) => {
-          devolution.detail.map((detail: any) => {
-            const product = products.find(
-              (product: any) => product._id === detail.item
-            );
-            if (product === undefined) return;
+      devolution.forEach(async (devolution: any) => {
+        devolution.detail.forEach((detail: any) => {
+          const product = products.find(
+            (product: any) => product._id === detail.item
+          );
+          if (product === undefined) return;
 
-            if (prod.includes(product.name)) {
-              const existingProduct = dataToSend.find(
-                (item) => item.itemName === product.name
-              );
-              if (existingProduct) {
-                existingProduct.quantity += detail.quantity;
-              } else {
-                dataToSend.push({
-                  itemName: product.name,
-                  quantity: detail.quantity,
-                });
-              }
+          if (prod.includes(product.name)) {
+            const existingProduct = dataToSend.find(
+              (item) => item.itemName === product.name
+            );
+            if (existingProduct) {
+              existingProduct.quantity += detail.quantity;
             } else {
-              prod.push(product.name);
               dataToSend.push({
                 itemName: product.name,
                 quantity: detail.quantity,
               });
             }
-          });
-        })
-      );
+          } else {
+            prod.push(product.name);
+            dataToSend.push({
+              itemName: product.name,
+              quantity: detail.quantity,
+            });
+          }
+        });
+      })
 
       devolutionDetails = dataToSend
         .map((item) => `${item.quantity} ${item.itemName}`)
@@ -244,7 +220,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
-  const setLoans = async (
+  const setLoans = (
     id: string,
     loans: Array<any>,
     devolutions: Array<any>,
@@ -370,104 +346,93 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   };
 
   const getDataWithClientNames = async () => {
-    const { data } = await GetSales();
-    const userList = await GetUser();
+    const data = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
 
-    const products = await GetProducts().then((resp) => {
-      return resp.data;
-    });
-    const zones = await GetZone().then((resp) => {
-      return resp.data;
-    });
-    const dataWithClientNames = await Promise.all(
-      data.map(async (sale: Sale) => {
-        const client: Client = await GetClientById(sale.client);
-        // Verifica que `client` no sea `null` o `undefined`
-        if (!client || !client.fullName) {
-          throw new Error(`Cliente no encontrado para la venta ${sale._id}`);
-        }
+    const dataWithClientNames: any[] = []
 
-        const typeDataToExport = {
-          cliente: client.fullName,
-          usuario: await searchUser(sale.user, userList),
-          comentario: sale.comment ? sale.comment : "Sin comentario",
-          detalle: await setDetailSale(sale.detail, products),
-          Total: sale.total,
-          zona: await searchZone(sale.zone, zones),
-          Pago: sale.creditSale ? "Credito" : "Al contado",
-          creado: formatDateTime(sale.created, "numeric", "long", "2-digit"),
-          actualizado: formatDateTime(
-            sale.updated,
-            "numeric",
-            "long",
-            "2-digit"
-          ),
-        };
+    for (const sale of data) {
+      const client: Client | null = await ClientsApiConector.getClient({ clientId: sale.client?.[0]._id || '' });
 
-        return typeDataToExport;
-      })
-    );
+      if (!client || !client.fullName) {
+        throw new Error(`Cliente no encontrado para la venta ${sale._id}`);
+      }
+
+      const typeDataToExport = {
+        cliente: client.fullName,
+        usuario: searchUser(sale.user, userList),
+        comentario: sale.comment ? sale.comment : "Sin comentario",
+        detalle: setDetailSale(sale.detail, products),
+        Total: sale.total,
+        zona: searchZone(sale.zone, zones),
+        Pago: sale.creditSale ? "Credito" : "Al contado",
+        creado: formatDateTime(sale.created, "numeric", "long", "2-digit"),
+        actualizado: formatDateTime(
+          sale.updated,
+          "numeric",
+          "long",
+          "2-digit"
+        ),
+      };
+
+      dataWithClientNames.push(typeDataToExport);
+    }
 
     return dataWithClientNames;
   };
 
   const getDataClients = async () => {
     // Cargar datos
-    const { data } = await loadClients();
-    const userList = await GetUser();
-    const loans = await GetLoans().then((resp) => resp.data);
-    const zones = await GetZone().then((resp) => resp.data);
-    const districts = await GetDistricts().then((resp) => resp.data);
-    const items = await GetItems().then((resp) => resp.data);
-    const devolutions = await GetDevolutions().then((resp) => resp.data);
+    const data = (await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
+    const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
 
     // Mapeo de datos
-    const dataClientToExport = await Promise.all(
-      data.map(async (client: Client) => {
-        // Filtrar préstamos asociados al cliente
-        const filteredLoans = loans.filter(
-          (loan: any) => loan.client === client._id
-        );
+    const dataClientToExport: any[] = [];
 
-        const typeDataToExport = {
-          NOMBRE: client.fullName || "Sin nombre",
-          "TIPO DE CLIENTE": client.isClient
-            ? "Cliente"
-            : client.isAgency
-              ? "Agencia"
-              : "Desconocido", // Define el tipo de cliente
-          WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
-          TELEFONO: client.phoneLandLine ? client.phoneNumber : "S/Numero", // Número de teléfono
-          CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
-          DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
-          REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
-          USUARIO: await searchUser(client.user, userList), // Buscar usuario asociado
-          ZONA: await searchZone(client.zone, zones), // Buscar la zona
-          BARRIO: await searchDistrict(client.district, districts), // Buscar barrio
-          "TIEMPO DE RENOVACION": client.renewInDays || "No especificado", // Tiempo de renovación
-          "FECHA DE REGISTRO": formatDateTime(
-            client.created,
-            "numeric",
-            "numeric",
-            "2-digit"
-          ), // Formatear la fecha de registro
-          CONTRATOS: (await setContract(client, loans)) || "SIN CONTRATOS", // Estado de contratos
-          PRESTAMOS:
-            (await setLoans(client._id, filteredLoans, devolutions, items)) ||
-            "SIN MOVIMIENTO", // Detalles de préstamos
-          DEVOLUCIONES:
-            (await setDevolutions(client._id, devolutions, items)) ||
-            "SIN MOVIMIENTO", // Detalles de devoluciones
-          SALDOS: (await setDetailClient(filteredLoans, items)) || "SIN SALDOS", // Detalles de saldos
-          "FECHA DE ULTIMA VENTA": client.lastSale
-            ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit")
-            : "Sin ventas", // Fecha de la última venta
-          "SALDOS POR COBRAR BS": client.credit || 0,
-        };
+    for (const client of data) {
+      const filteredLoans = loans.filter(l => l.client.some(c => c._id === client._id))
+      const zone = await searchZone(client.zone, zones)
 
-        return typeDataToExport;
-      })
-    );
+      const typeDataToExport = {
+        NOMBRE: client.fullName || "Sin nombre",
+        "TIPO DE CLIENTE": client.isClient
+          ? "Cliente"
+          : client.isAgency
+            ? "Agencia"
+            : "Desconocido", // Define el tipo de cliente
+        WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
+        TELEFONO: client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
+        CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
+        DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
+        REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
+        USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
+        ZONA: zone?.name || "Sin zona", // Buscar la zona
+        BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+        "TIEMPO DE RENOVACION": client.renewInDays || "No especificado", // Tiempo de renovación
+        "FECHA DE REGISTRO": formatDateTime(
+          client.created,
+          "numeric",
+          "numeric",
+          "2-digit"
+        ), // Formatear la fecha de registro
+        CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
+        PRESTAMOS: setLoans(client._id, filteredLoans, devolutions, items) || "SIN MOVIMIENTO", // Detalles de préstamos
+        DEVOLUCIONES: setDevolutions(client._id, devolutions, items) || "SIN MOVIMIENTO", // Detalles de devoluciones
+        SALDOS: setDetailClient(filteredLoans, items) || "SIN SALDOS", // Detalles de saldos
+        "FECHA DE ULTIMA VENTA": client.lastSale
+          ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit")
+          : "Sin ventas", // Fecha de la última venta
+        "SALDOS POR COBRAR BS": client.credit || 0,
+      };
+
+      dataClientToExport.push(typeDataToExport)
+    }
 
     return dataClientToExport;
   };
@@ -489,21 +454,6 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       const fileName = "ReporteClientes.xlsx";
       const data = await getDataClients();
       exportData(fileName, data);
-    }
-  };
-
-  const getDataWithOrdersTotal = async () => {
-    try {
-      const orders = await loadOrders();
-      const totalOrders = orders.length; // O puedes calcular el total según los datos recibidos
-
-      // Aquí puedes hacer algo con el total de órdenes
-      console.log(`Total de órdenes: ${totalOrders}`);
-
-      return totalOrders;
-    } catch (error) {
-      console.error("Error al obtener el total de órdenes:", error);
-      return 0;
     }
   };
 

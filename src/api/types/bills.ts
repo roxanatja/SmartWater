@@ -21,8 +21,8 @@ export interface IBillsBody {
         zone: string;
         user: string;
         sale: string;
-        amount: string;
         client: string;
+        amount: number
         cashPayment: boolean;
         paymentMethodCurrentAccount: boolean;
     }

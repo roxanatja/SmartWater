@@ -2,14 +2,15 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import "./CashRegister.css";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BillBody, Bills } from "../../../../type/Bills";
-import ApiMethodBills from "../../../../Class/api.bills";
+import { Bills } from "../../../../type/Bills";
 import Input from "../../EntryComponents/Inputs";
 import { toast } from "react-hot-toast";
-import AuthenticationService from "../../../../services/AuthenService";
 import { UserData } from "../../../../type/UserData";
-import ApiMethodSales from "../../../../Class/api.sales";
 import { Sale } from "../../../../type/Sale/Sale";
+import { BillsApiConector, ProductsApiConector, SalesApiConector } from "../../../../api/classes";
+import { IBillsBody } from "../../../../api/types/bills";
+import { AuthService } from "../../../../api/services/AuthService";
+import { formatDateTime } from "../../../../utils/helpers";
 
 interface CobroMiniModalProps {
   client: Client;
@@ -17,32 +18,31 @@ interface CobroMiniModalProps {
 }
 
 const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
-  const [data, setData] = useState<{ bills: Bills[]; sales: Sale[] } | null>(
-    null
-  );
+  const [data, setData] = useState<{ bills: Bills[]; sales: Sale[] } | null>(null);
   const [credict, setCredict] = useState<number | null>(null);
   const [active, setActive] = useState(true);
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors },
-  } = useForm<BillBody>({
+    formState: { errors, isValid },
+  } = useForm<IBillsBody['data']>({
     defaultValues: {
-      amount: "0",
+      amount: 0,
       cashPayment: true,
       paymentMethodCurrentAccount: false,
     },
+    mode: 'all'
   });
 
   const getBillsInformation = useCallback(async () => {
-    const apibill = new ApiMethodBills();
-    const apisale = new ApiMethodSales();
-    const billsData = await apibill.GetBills({ client: client._id });
-    const salesData = await apisale.GetSales({ client: client._id });
-    const products = await apisale.GetProducts();
+    const billsData = (await BillsApiConector.get({ filters: { client: client._id }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const salesData = (await SalesApiConector.get({ filters: { client: client._id }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+
     const loansWithProductNames = salesData.map((loan) => {
       return {
         ...loan,
@@ -67,38 +67,42 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
     getBillsInformation();
   }, [getBillsInformation]);
 
-  const onSubmit: SubmitHandler<BillBody> = async (data) => {
-    const api = new ApiMethodBills();
-    const auth = AuthenticationService;
-    const userData: UserData = auth.getUser();
-    try {
-      await api.registerBill({
+  const onSubmit: SubmitHandler<IBillsBody['data']> = async (data) => {
+    const userData: UserData | null = AuthService.getUser();
+
+    const response = await BillsApiConector.create({
+      data: {
         ...data,
-        user: userData._id,
+        client: client._id,
+        user: userData?._id || "",
         zone: client.zone,
-      });
+      }
+    });
+
+    if (response) {
       toast.success("Cobro registrado");
       reset();
       onClose();
       window.location.reload();
       getBillsInformation();
-    } catch (error) {
-      console.error(error);
+    } else {
       toast.error("Uppss error al registrar el Cobro");
     }
   };
-  const credi = credict ? client.credit : client.credit;
-  const validateAmount = (value: number) => {
-    if (value <= 0) {
-      return "El monto no puede ser menor que 0";
-    }
-    if (value > credi) {
-      return `El monto no puede exceder el saldo de ${credi} Bs.`;
-    }
 
+  const validateAmount = (value: number) => {
+    const credit = credict ? credict : client.credit
     if (!watch("sale")) {
       return "Tiene que selecionar una venta";
     }
+
+    if (value <= 0) {
+      return "El monto no puede ser menor que 0";
+    }
+    if (value > credit) {
+      return `El monto no puede exceder el saldo de ${credit} Bs.`;
+    }
+
     return true;
   };
 
@@ -144,13 +148,12 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
               {data?.sales.map((bill) => (
                 <div
                   key={bill._id}
-                  className={`p-4 border rounded shadow hover:shadow-lg transition cursor-pointer ${
-                    watch("sale") === bill._id && "border-2 border-blue_custom"
-                  } ${
-                    errors.amount && !watch("sale") && "border-2 border-red-500"
-                  }`}
+                  className={`p-4 border rounded shadow hover:shadow-lg transition cursor-pointer ${watch("sale") === bill._id && "border-2 border-blue_custom"
+                    } ${errors.amount && !watch("sale") && "border-2 border-red-500"
+                    }`}
                   onClick={() => {
-                    setValue("sale", bill._id);
+                    setValue("sale", bill._id, { shouldValidate: true });
+                    setValue("amount", bill.total, { shouldValidate: true });
                     setCredict(bill.total);
                   }}
                 >
@@ -164,11 +167,11 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                     Bs.
                   </p>
                   <p>
-                    <strong>Credito:</strong> {bill.creditSale ? "Yes" : "No"}
+                    <strong>Credito:</strong> {bill.creditSale ? "Sí" : "No"}
                   </p>
                   <p>
                     <strong>Registrada:</strong>{" "}
-                    {new Date(bill.created).toLocaleString()}
+                    {formatDateTime(bill.created, "numeric", "2-digit", "2-digit")}
                   </p>
                 </div>
               ))}
@@ -183,13 +186,14 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
             <div className="RegistrarVenta-grupo-checbox">
               <div className="RegistrarVenta-grupo-check">
                 <input
-                  className="input-check cursor-pointer"
+                  className="input-check cursor-pointer accent-blue-600"
                   type="checkbox"
                   id="checkbox1"
                   checked={watch("cashPayment")}
                   onChange={() => {
-                    setValue("cashPayment", !watch("cashPayment"));
-                    setValue("paymentMethodCurrentAccount", false);
+                    const val = watch("cashPayment")
+                    setValue("cashPayment", !val);
+                    setValue("paymentMethodCurrentAccount", val);
                   }}
                 />
                 <label
@@ -201,16 +205,14 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
               </div>
               <div className="RegistrarVenta-grupo-check">
                 <input
-                  className="input-check cursor-pointer"
+                  className="input-check cursor-pointer accent-blue-600"
                   type="checkbox"
                   id="checkbox2"
                   checked={watch("paymentMethodCurrentAccount")}
                   onChange={() => {
-                    setValue(
-                      "paymentMethodCurrentAccount",
-                      !watch("paymentMethodCurrentAccount")
-                    );
-                    setValue("cashPayment", false);
+                    const val = watch("paymentMethodCurrentAccount")
+                    setValue("cashPayment", val);
+                    setValue("paymentMethodCurrentAccount", !val);
                   }}
                 />
                 <label
@@ -255,14 +257,19 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
               >
                 <h3 className="font-bold truncate">Bill ID: {bill._id}</h3>
                 <p>
-                  <strong>Monto:</strong> {bill.amount} Bs.
+                  <strong>Monto: </strong>
+                  {new Intl.NumberFormat("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2,
+                  }).format(bill.amount)}{" "}
+                  Bs.
                 </p>
                 <p>
-                  <strong>Efectivo:</strong> {bill.cashPayment ? "Yes" : "No"}
+                  <strong>Efectivo:</strong> {bill.cashPayment ? "Sí" : "No"}
                 </p>
                 <p>
                   <strong>Registrada:</strong>{" "}
-                  {new Date(bill.created).toLocaleString()}
+                  {formatDateTime(bill.created, "numeric", "2-digit", "2-digit", true)}
                 </p>
               </div>
             ))}
@@ -273,7 +280,8 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-white">
         <button
           type="submit"
-          className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-6 rounded-full text-base"
+          disabled={client.credit <= 0 || !isValid}
+          className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-6 rounded-full text-base disabled:bg-gray-400"
         >
           Registrar cobro
         </button>

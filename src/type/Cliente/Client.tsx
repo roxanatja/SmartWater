@@ -8,6 +8,7 @@ export interface Client {
   phoneNumber: string;
   address: string;
   comment: string;
+  reference?: string;
   email: string;
   phoneLandLine?: string;
   ciFrontImage: string;
@@ -21,7 +22,7 @@ export interface Client {
   hasOrder: boolean;
   hasLoan: boolean;
   hasContract: boolean;
-  renewInDays: Number;
+  renewInDays: number;
   renewDate: string;
   isAgency: boolean;
   billingInfo: {
