@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { BarChart } from "../../components/Barchart/Barchart";
 import { CuadroClientes } from "../../components/CuadroClientes/CuadroClientes";
 import { CuadroInformativo } from "../../components/CuadroInformativo/CuadroInformativo";
-import { CuadroRealizarPedido } from "../../components/CuadroRealizarPedido/CuadroRealizarPedido";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { FC } from "react";
 import { Sale } from "../../../../type/Sale/Sale";

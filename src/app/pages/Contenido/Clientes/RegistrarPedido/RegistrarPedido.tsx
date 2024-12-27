@@ -2,7 +2,7 @@ import "./RegistrarPedido.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import RegisterPedidoForm from "../../../EntryComponents/RegisterPedido";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ClientesContext, client } from "../ClientesContext";
 
 const RegistrarPedido = () => {
@@ -14,9 +14,15 @@ const RegistrarPedido = () => {
   };
   const { selectedClient } = useContext(ClientesContext);
 
+  useEffect(() => {
+    if (selectedClient._id === "") {
+      navigate("/Clientes")
+    }
+  }, [selectedClient, navigate])
+
   return (
     <>
-      <div>
+      <div className="px-10">
         <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"

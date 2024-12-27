@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./PedidosResumido.css";
 import { GetProducts } from "../../../../../services/ProductsService";
 import { ClientsApiConector, OrdersApiConector } from "../../../../../api/classes";
@@ -44,8 +44,12 @@ const PedidosResumido = () => {
         <span className="Pedidos-title">
           Pedidos <span className="Pedidos-title2">vista rapida</span>{" "}
         </span>
-        <div className="opciones-svg">
-          <img src="./Opciones-icon.svg" alt="" onClick={handleOpcionesClick} />
+        <div className="opciones-svg cursor-pointer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleOpcionesClick} >
+            <g id="&#240;&#159;&#147;&#141;Icon">
+              <path id=" &#226;&#134;&#179;Color" fill-rule="evenodd" clip-rule="evenodd" d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="black" fill-opacity="0.87" />
+            </g>
+          </svg>
           <Modal
             isOpen={showMiniModal}
             onClose={() => {
@@ -54,7 +58,7 @@ const PedidosResumido = () => {
             className="w-3/12"
           >
             <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
-              Realizar Pedido
+              Realizar Pedido Rápido
             </h2>
             <div className="p-6">
               <CuadroRealizarPedido onClose={() => setShowMiniModal(false)} />

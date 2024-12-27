@@ -4,6 +4,7 @@ import { Client } from "../../../../type/Cliente/Client";
 import Product from "../../../../type/Products/Products";
 import { ClientsApiConector, OrdersApiConector, ProductsApiConector } from "../../../../api/classes";
 import toast from "react-hot-toast";
+import { AuthService } from "../../../../api/services/AuthService";
 
 /**
  * Componente `CuadroRealizarPedido` para realizar pedidos.
@@ -73,26 +74,17 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
       return;
     }
 
-    // FIXME: Create order endpoint data request inconsistent
     const res = await OrdersApiConector.create({
       data: {
+        deliverDate: "",
+        user: AuthService.getUser()?._id || "",
         client: selectedClient._id,
-        clientNotRegistered: {
-          address: selectedClient.address,
-          district: selectedClient.district,
-          fullName: selectedClient.fullName,
-          location: selectedClient.location,
-          phoneNumber: selectedClient.phoneNumber,
-          zone: selectedClient.zone
-        },
         comment: "",
         detail: [{
           product, quantity: Number(quantity)
         }]
       }
     })
-
-    console.log(res)
 
     if (res) {
       toast.success("Pedido realizado con exito")
@@ -101,6 +93,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
     }
 
     resetForm()
+    window.location.reload()
     if (onClose) onClose()
   };
 
@@ -280,7 +273,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
               justifyContent: "end",
             }}
           >
-            <button className="boton-realizar-pedido" type="submit">
+            <button className="boton-realizar-pedido !outline-none !border-0 disabled:bg-gray-400" type="submit" disabled={!selectedProduct || !selectedClient || cantidad === 0}>
               Realizar Pedido
             </button>
           </div>

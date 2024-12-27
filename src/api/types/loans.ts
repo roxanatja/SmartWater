@@ -35,23 +35,7 @@ export interface ILoanBody {
         comment: string;
         detail: {
             item: string;
-            quantity: string;
-        }[];
-    };
-}
-
-export interface IUpdateLoanBody {
-    data: {
-        user?: string;
-        client?: string;
-        contract?: {
-            link: string | null;
-            validUntil: string;
-        };
-        comment?: string;
-        detail?: {
-            item: string;
-            quantity: string;
+            quantity: number;
         }[];
         totalItems?: number;
     };

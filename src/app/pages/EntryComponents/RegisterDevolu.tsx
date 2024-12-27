@@ -17,17 +17,16 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     { item: string; quantity: string; name: string }[] | null
   >(null);
   const [active, setActive] = useState(false);
-  const navigate = useNavigate();
+
   const [loans, setLoans] = useState<Array<Loans>>([]);
   const [loan, setLoan] = useState<Loans | null>(null);
-  const [addedProducts, setAddedProducts] = useState<
-    { item: string; quantity: string }[]
-  >([]);
+
+  const [addedProducts, setAddedProducts] = useState<{ item: string; quantity: string }[]>([]);
   const { parcial } = useParams();
   const [option, setOption] = useState(false);
   const [views, setWiews] = useState(true);
 
-  const { register, handleSubmit, watch, setValue, control, reset } =
+  const { register, handleSubmit, watch, setValue, reset } =
     useForm<any>({
       defaultValues: {
         detail: [{ item: "", quantity: "0" }],
@@ -39,18 +38,6 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
       setOption(true);
     }
   }, [parcial]);
-
-  useEffect(() => {
-    if (selectedClient._id === "") {
-      navigate("/Clientes");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClient]);
-
-  const { append } = useFieldArray({
-    control,
-    name: "detail",
-  });
 
   const onSubmit: SubmitHandler<any> = async (data) => {
     const api = new ApiMethodDevolu();
@@ -163,8 +150,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
               name: product
                 ? product.name
                 : item
-                ? item.name
-                : "Unknown product",
+                  ? item.name
+                  : "Unknown product",
             };
           }),
         };
@@ -183,7 +170,6 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     const quantity = watch("detail")[0].quantity;
     if (item && quantity) {
       setAddedProducts([...addedProducts, { item, quantity }]);
-      append({ item: "", quantity: "1" });
     }
   };
 
@@ -223,9 +209,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           <button
             type="button"
             onClick={() => setOption(!option)}
-            className={`${
-              !option && "bg-blue-500 font-medium text-white outline-0"
-            } p-2 rounded-l-full transition-all`}
+            className={`${!option && "bg-blue-500 font-medium text-white outline-0"
+              } p-2 rounded-l-full transition-all`}
           >
             Parcial
           </button>
@@ -234,9 +219,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
             onClick={() => {
               setOption(!option);
             }}
-            className={`${
-              option && "bg-blue-500 font-medium text-white"
-            } p-2 rounded-r-full transition-all`}
+            className={`${option && "bg-blue-500 font-medium text-white"
+              } p-2 rounded-r-full transition-all`}
           >
             Total
           </button>
@@ -249,9 +233,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         )}
 
         <div
-          className={`flex flex-col w-full gap-2  ${
-            !option && "max-h-80 overflow-y-scroll pb-2"
-          } `}
+          className={`flex flex-col w-full gap-2  ${!option && "max-h-80 overflow-y-scroll pb-2"
+            } `}
         >
           {loans.map((row: any, index: number) => (
             <div
@@ -287,11 +270,10 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                   className={`cursor-pointer border-2 p-0.5 border-blue-500 rounded-full`}
                 >
                   <div
-                    className={`p-2.5 rounded-full  ${
-                      loan && loan._id === row._id
-                        ? "bg-blue-500"
-                        : "group-hover:bg-zinc-300"
-                    }`}
+                    className={`p-2.5 rounded-full  ${loan && loan._id === row._id
+                      ? "bg-blue-500"
+                      : "group-hover:bg-zinc-300"
+                      }`}
                   />
                 </div>
               </div>
@@ -307,9 +289,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
             >
               <p className="text-md font-semibold">Agregar Productos</p>
               <i
-                className={`fa-solid fa-chevron-up ${
-                  !views && "rotate-180"
-                } transition-all`}
+                className={`fa-solid fa-chevron-up ${!views && "rotate-180"
+                  } transition-all`}
               ></i>
             </div>
 

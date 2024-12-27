@@ -1,6 +1,6 @@
 import { LoanConsolidated, Loans } from "../../type/Loans/Loans";
 import { QueryMetadata } from "../types/common";
-import { ILoanBody, ILoanFilter, ILoansGetParams, IUpdateLoanBody } from "../types/loans";
+import { ILoanBody, ILoanFilter, ILoansGetParams } from "../types/loans";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
 
@@ -38,7 +38,7 @@ export abstract class LoansApiConector {
         }
     }
 
-    static async update(params: IUpdateLoanBody & ILoanFilter): Promise<{ mensaje: string } | null> {
+    static async update(params: ILoanBody & ILoanFilter): Promise<{ mensaje: string } | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.loanId}/update`, params.data)
             return res.data

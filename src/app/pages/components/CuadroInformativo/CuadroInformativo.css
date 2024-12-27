@@ -1,5 +1,5 @@
 .cuadroGeneral {
-    width: 214px;
+    min-width: 214px;
     height: 143px;
     flex-shrink: 0;
     border-radius: 30px;
@@ -8,7 +8,7 @@
     padding-left: 20px;
     padding-top: 15px;
     padding-bottom: 15px;
-    margin-right: 20px;
+    padding-right: 20px;
     margin-bottom: 20px;
 }
 

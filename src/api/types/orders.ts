@@ -20,8 +20,8 @@ export interface IOrdersGetParams extends Search {
 
 export interface IOrderBody {
     data: {
-        user?: string;
-        client: string;
+        user: string;
+        client?: string;
         distributorRedirectId?: string;
         comment: string;
         deliverDate?: string;
@@ -29,7 +29,8 @@ export interface IOrderBody {
             product: string;
             quantity: number;
         }[];
-        clientNotRegistered: {
+        linkAddress?: string;
+        clientNotRegistered?: {
             fullName: string;
             phoneNumber: string;
             address: string;

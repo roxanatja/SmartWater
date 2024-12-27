@@ -46,7 +46,7 @@ export interface ISaleBody {
         zone: string;
         detail: {
             product: string;
-            quantity: string;
+            quantity: number;
             price: string;
         }[];
         creditSale: boolean;
