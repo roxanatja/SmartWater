@@ -67,15 +67,24 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
               onClick={async () => {
                 toast.dismiss(t.id);
-                const response = await ClientsApiConector.deleteClient({ clientId: client?._id || '' });
+                const response = await ClientsApiConector.deleteClient({ clientId: client?._id || '' }) as any;
                 if (!!response) {
-                  toast.success(response.mensaje, {
-                    position: "top-center",
-                  });
-                  window.location.reload();
+                  if (response.mensaje) {
+                    toast.success(response.mensaje, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                    window.location.reload();
+                  } else if (response.error) {
+                    toast.error(response.error, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                  }
                 } else {
                   toast.error("Error al eliminar cliente", {
                     position: "top-center",
+                    duration: 2000
                   });
                 }
               }}

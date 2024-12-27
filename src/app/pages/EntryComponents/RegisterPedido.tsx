@@ -179,11 +179,20 @@ const RegisterPedidoForm = ({
         {!isNoClient && (
           <div className="RegistrarPedido-NombreCliente">
             <div className="RegistrarPedido-Nombre">
-              <img
-                src={selectedClient.storeImage || ""}
-                alt=""
-                className="imagen-pequena"
-              />
+              {
+                selectedClient.storeImage ?
+                  <img
+                    src={selectedClient?.storeImage || ""}
+                    className="w-8 h-8 rounded-full"
+                    alt="storeImage"
+                  /> :
+                  <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                    <div className="opacity-0">.</div>
+                    <p className="absolute font-extrabold whitespace-nowrap">
+                      {selectedClient.fullName?.[0] || "S"}
+                    </p>
+                  </div>
+              }
               <span>{selectedClient.fullName}</span>
             </div>
             <div
@@ -236,6 +245,61 @@ const RegisterPedidoForm = ({
               </p>
             </div>
 
+            <div className={`w-full`}>
+              <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {addedProducts.map((product, index) => (
+                  <motion.div
+                    key={index}
+                    className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                      }`}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex flex-col gap-4 p-1">
+                      <p>
+                        <strong>{product.product}</strong>
+                      </p>
+                      <div className="flex gap-4 items-center">
+                        <p className="text-sm">Cantidad: {product.quantity}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 items-center flex-col pr-4">
+                      <button
+                        type="button"
+                        className="text-blue_custom hover:text-blue-600"
+                        onClick={() => {
+                          setValue(`detail.0.product`, product.product);
+                          setValue(`detail.0.quantity`, product.quantity);
+                          const indepro = products
+                            ? products.findIndex(
+                              (x) => x.name === product.product
+                            )
+                            : 0;
+
+                          console.log(indepro)
+                          setEditar({
+                            quantity: Number(product.quantity) - 1,
+                            item: indepro,
+                            index,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-pen"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-700 hover:text-red-500"
+                        onClick={() => handleDeleteProduct(index)}
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
             {isNoClient && (
               <>
@@ -480,63 +544,6 @@ const RegisterPedidoForm = ({
             </div>
           </div>
 
-
-          <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
-            <p className="text-blue_custom font-semibold mb-4">Productos seleccionados</p>
-            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {addedProducts.map((product, index) => (
-                <motion.div
-                  key={index}
-                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
-                    }`}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex flex-col gap-4 p-1">
-                    <p>
-                      <strong>{product.product}</strong>
-                    </p>
-                    <div className="flex gap-4 items-center">
-                      <p className="text-sm">Cantidad: {product.quantity}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 items-center flex-col pr-4">
-                    <button
-                      type="button"
-                      className="text-blue_custom hover:text-blue-600"
-                      onClick={() => {
-                        setValue(`detail.0.product`, product.product);
-                        setValue(`detail.0.quantity`, product.quantity);
-                        const indepro = products
-                          ? products.findIndex(
-                            (x) => x.name === product.product
-                          )
-                          : 0;
-
-                        console.log(indepro)
-                        setEditar({
-                          quantity: Number(product.quantity) - 1,
-                          item: indepro,
-                          index,
-                        });
-                      }}
-                    >
-                      <i className="fa-solid fa-pen"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="text-red-700 hover:text-red-500"
-                      onClick={() => handleDeleteProduct(index)}
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
           <button
             type="submit"
             disabled={!watch('deliverDate') || addedProducts.length === 0}

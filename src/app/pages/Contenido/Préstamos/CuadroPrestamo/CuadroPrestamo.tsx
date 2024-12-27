@@ -125,7 +125,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
               <div className="infoClientes-ultimaventa">
                 <span>
                   {formatDateTime(
-                    loan.client[0]?.lastSale,
+                    loan.created,
                     "numeric",
                     "numeric",
                     "numeric"

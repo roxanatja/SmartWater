@@ -27,7 +27,7 @@ export interface IDevolutionBody {
         comment: string;
         detail: {
             item: string;
-            quantity: string;
+            quantity: number;
         }[];
     }
 }

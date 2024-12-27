@@ -12,7 +12,7 @@ export type Loans = {
   detail: {
     item: string;
     quantity: number;
-    name?: string;
+    name: string;
   }[];
   status: string;
   created: string;

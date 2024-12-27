@@ -111,15 +111,20 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       <div className="modal-datos">
         <div className="flex justify-between gap-4 w-full">
           <div className="flex justify gap-2 items-center">
-            {client.storeImage && client.storeImage.length > 1 ? (
-              <img
-                src={client.storeImage}
-                alt=""
-                className="modalInfoClients-imgStore h-8 rounded-full w-8"
-              />
-            ) : (
-              <div className="cobro-mini-modal-image-placeholder"></div>
-            )}
+            {
+              client.storeImage ?
+                <img
+                  src={client?.storeImage || ""}
+                  className="w-8 h-8 rounded-full"
+                  alt="storeImage"
+                /> :
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                  <div className="opacity-0">.</div>
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {client.fullName?.[0] || "S"}
+                  </p>
+                </div>
+            }
             <span className="text-sm">{client.fullName}</span>
           </div>
           <div className="flex justify-start items-center gap-2">
@@ -193,7 +198,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                   onChange={() => {
                     const val = watch("cashPayment")
                     setValue("cashPayment", !val);
-                    setValue("paymentMethodCurrentAccount", val);
+                    setValue("paymentMethodCurrentAccount", false);
                   }}
                 />
                 <label
@@ -211,7 +216,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                   checked={watch("paymentMethodCurrentAccount")}
                   onChange={() => {
                     const val = watch("paymentMethodCurrentAccount")
-                    setValue("cashPayment", val);
+                    setValue("cashPayment", false);
                     setValue("paymentMethodCurrentAccount", !val);
                   }}
                 />

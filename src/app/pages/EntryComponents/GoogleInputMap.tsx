@@ -95,8 +95,9 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
           center: initialPosition,
           zoom: 14,
           mapTypeId: google.maps.MapTypeId.HYBRID,
-          clickableIcons: true,
           fullscreenControl: false,
+          disableDefaultUI: true,
+          
         });
 
         setMap(mapInstance);

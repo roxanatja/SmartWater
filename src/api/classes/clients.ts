@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { ReportClient, Client } from "../../type/Cliente/Client";
 import { IClientGetParams, ISearchGetParams, IClientGetOneParams, IClientUpdateParams, IReportClientsParams, IClientRegisterParams, IClientMatchParams, IPosponeRenovation } from "../types/clients";
 import { QueryMetadata } from "../types/common";
@@ -85,12 +86,22 @@ export abstract class ClientsApiConector {
         }
     }
 
-    static async deleteClient(params: IClientGetOneParams): Promise<{ mensaje: string } | null> {
+    static async deleteClient(params: IClientGetOneParams): Promise<{ mensaje: string } | { error: string } | null> {
+        console.log("deleting")
         try {
+            console.log("deleting inner")
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.clientId}`)
+            console.log(res)
             return res.data
         } catch (error) {
-            return null
+            const err = error as AxiosError
+            const data = err.response?.data as any
+
+            if (data && data.error) {
+                return data as { error: string }
+            } else {
+                return null
+            }
         }
     }
 }

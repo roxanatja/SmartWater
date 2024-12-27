@@ -103,11 +103,20 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
       <div className="flex flex-col gap-6 justify-center items-center w-full px-6 pb-0">
         {/* Client Information */}
         <div className="flex justify-start items-center w-full gap-2 pt-2">
-          <img
-            src={selectedClient?.storeImage || ""}
-            className="w-8 h-8 rounded-full"
-            alt="storeImage"
-          />
+          {
+            selectedClient.storeImage ?
+              <img
+                src={selectedClient?.storeImage || ""}
+                className="w-8 h-8 rounded-full"
+                alt="storeImage"
+              /> :
+              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                <div className="opacity-0">.</div>
+                <p className="absolute font-extrabold whitespace-nowrap">
+                  {selectedClient.fullName?.[0] || "S"}
+                </p>
+              </div>
+          }
           <p className="text-sm">{selectedClient?.fullName || "N/A"}</p>
         </div>
         <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4">
@@ -144,7 +153,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                 onChange={() => {
                   const credit = watch("creditSale")
                   setValue("creditSale", !credit);
-                  setValue("paymentMethodCurrentAccount", credit);
+                  setValue("paymentMethodCurrentAccount", false);
                 }}
               />
               <label
@@ -163,7 +172,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                 onChange={() => {
                   const val = watch("paymentMethodCurrentAccount")
                   setValue("paymentMethodCurrentAccount", !val);
-                  setValue("creditSale", val);
+                  setValue("creditSale", false);
                 }}
               />
               <label
@@ -237,6 +246,65 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
             </p>
           </div>
 
+          {/* Display Added Products */}
+          <div className={`w-full`}>
+            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {addedProducts.map((product, index) => (
+                <motion.div
+                  key={index}
+                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                    }`}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="flex flex-col gap-4 p-1">
+                    <p>
+                      <strong>{product.product}</strong>
+                    </p>
+                    <div className="flex gap-4 items-center">
+                      <p className="text-sm">Cantidad: {product.quantity}</p>
+                      <p className="text-sm">Precio: {product.price}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center flex-col pr-4">
+                    <button
+                      type="button"
+                      className="text-blue_custom hover:text-blue-600"
+                      onClick={() => {
+                        setValue(`detail.0.product`, product.product);
+                        setValue(`detail.0.price`, product.price);
+                        setValue(`detail.0.quantity`, product.quantity);
+                        const indepro = products
+                          ? products.findIndex(
+                            (x) => x.name === product.product
+                          )
+                          : 0;
+
+                        console.log(indepro)
+                        setEditar({
+                          quantity: Number(product.quantity) - 1,
+                          item: indepro,
+                          index,
+                        });
+                      }}
+                    >
+                      <i className="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-700 hover:text-red-500"
+                      onClick={() => handleDeleteProduct(index)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
           <div className="relative w-full flex items-start">
             <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
             <textarea
@@ -249,67 +317,6 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
           </div>
         </div>
 
-
-
-        {/* Display Added Products */}
-        <div className={`${addedProducts.length > 0 && "mt-4"} w-full`}>
-          <p className="text-blue_custom font-semibold mb-4">Productos seleccionados</p>
-          <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {addedProducts.map((product, index) => (
-              <motion.div
-                key={index}
-                className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
-                  }`}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex flex-col gap-4 p-1">
-                  <p>
-                    <strong>{product.product}</strong>
-                  </p>
-                  <div className="flex gap-4 items-center">
-                    <p className="text-sm">Cantidad: {product.quantity}</p>
-                    <p className="text-sm">Precio: {product.price}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 items-center flex-col pr-4">
-                  <button
-                    type="button"
-                    className="text-blue_custom hover:text-blue-600"
-                    onClick={() => {
-                      setValue(`detail.0.product`, product.product);
-                      setValue(`detail.0.price`, product.price);
-                      setValue(`detail.0.quantity`, product.quantity);
-                      const indepro = products
-                        ? products.findIndex(
-                          (x) => x.name === product.product
-                        )
-                        : 0;
-
-                      console.log(indepro)
-                      setEditar({
-                        quantity: Number(product.quantity) - 1,
-                        item: indepro,
-                        index,
-                      });
-                    }}
-                  >
-                    <i className="fa-solid fa-pen"></i>
-                  </button>
-                  <button
-                    type="button"
-                    className="text-red-700 hover:text-red-500"
-                    onClick={() => handleDeleteProduct(index)}
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
         <button
           disabled={(!watch('creditSale') && !watch('paymentMethodCurrentAccount')) || addedProducts.length === 0}
           type="submit"
