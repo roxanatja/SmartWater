@@ -39,7 +39,7 @@ const PedidosResumido = () => {
   };
 
   return (
-    <div className="cuadroClientes">
+    <div className="cuadroClientes bg-blocks dark:border-blocks">
       <div className="titulo-pedidos">
         <span className="Pedidos-title">
           Pedidos <span className="Pedidos-title2">vista rapida</span>{" "}
@@ -47,7 +47,7 @@ const PedidosResumido = () => {
         <div className="opciones-svg cursor-pointer">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={handleOpcionesClick} >
             <g id="&#240;&#159;&#147;&#141;Icon">
-              <path id=" &#226;&#134;&#179;Color" fill-rule="evenodd" clip-rule="evenodd" d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="black" fill-opacity="0.87" />
+              <path id=" &#226;&#134;&#179;Color" fill-rule="evenodd" clip-rule="evenodd" d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor" fill-opacity="0.87" />
             </g>
           </svg>
           <Modal
@@ -57,7 +57,7 @@ const PedidosResumido = () => {
             }}
             className="w-3/12"
           >
-            <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+            <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
               Realizar Pedido Rápido
             </h2>
             <div className="p-6">
@@ -118,7 +118,7 @@ const PedidosResumido = () => {
                 }
               </div>
               <div className="flex items-center flex-1 gap-3">
-                <span className="pedidosResumido-ultimaventa">
+                <span className="pedidosResumido-ultimaventa border-blue_custom text-blue_custom">
                   {new Date(order.created).toLocaleDateString()}
                 </span>
                 <div className="flex items-center gap-2 text-sm">

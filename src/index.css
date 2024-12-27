@@ -1,10 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --bg-sidebar: 26 61 125;
+  --bg-main: 255 255 255;
+  --blue-custom: 26 61 125;
+
+  --bg-blocks: 255 255 255;
+  --font-color: 27 27 27;
+
+  color: rgb(27, 27, 27);
+}
+
+body.dark {
+  --bg-sidebar: 17 17 17;
+  --bg-main: 34 34 34;
+  --blue-custom: 54 125 253;
+
+  --bg-blocks: 51 51 51;
+  --font-color: 254 254 254;
+
+  color: rgb(254, 254, 254);
 }
 
 code {
@@ -47,4 +67,25 @@ code {
   width: 40px;
   box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
   overflow: hidden;
+}
+
+.react-datepicker__triangle::before {
+  @apply dark:!border-0;
+}
+
+.react-datepicker__triangle::after {
+  @apply  !border-t-blocks;
+}
+
+.react-datepicker__header {
+  @apply bg-blocks dark:border-b-black;
+}
+
+.react-datepicker__header .react-datepicker__current-month,
+.react-datepicker__header .react-datepicker__day-name {
+  @apply text-font-color;
+}
+
+.react-datepicker__day {
+  @apply invert-0 dark:invert-[0.75];
 }

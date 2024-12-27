@@ -26,11 +26,11 @@ const ClientInfo: FC = () => {
       <div className="px-10">
         <PageTitle titulo="Información Cliente" icon="../clientes-icon.svg" />
         <div
-          className="RegistrarVenta-titulo flex items-start cursor-pointer"
+          className="RegistrarVenta-titulo flex items-start cursor-pointer text-blue_custom"
           onClick={handleClick}
         >
           <button className="RegistrarVenta-btn">
-            <span className="material-symbols-outlined translate-y-0.5">
+            <span className="material-symbols-outlined translate-y-0.5 text-blue_custom">
               arrow_back
             </span>
           </button>

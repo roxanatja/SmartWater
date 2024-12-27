@@ -154,7 +154,7 @@ const FiltroClientes = ({
                 max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
                 type="date"
                 {...register("fromDate")}
-                className="border-0 rounded outline-none font-semibold w-full"
+                className="border-0 rounded outline-none font-semibold w-full bg-transparent"
               />
             </div>
             <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border">
@@ -164,7 +164,7 @@ const FiltroClientes = ({
                 max={new Date().toISOString().split("T")[0]}
                 type="date"
                 {...register("toDate")}
-                className="border-0  rounded outline-none font-semibold w-full"
+                className="border-0  rounded outline-none font-semibold w-full bg-transparent"
               />
             </div>
           </div>
@@ -217,23 +217,25 @@ const FiltroClientes = ({
               <div className="flex flex-col w-full gap-2">
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check1"
                     {...register("withLoans")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check1" className="text-sm" >
                     Con préstamo
-                  </span>
+                  </label>
                 </div>
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check2"
                     {...register("withoutLoans")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check2" className="text-sm" >
                     Sin préstamo
-                  </span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -250,23 +252,25 @@ const FiltroClientes = ({
               <div className="flex flex-col w-full gap-2">
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check3"
                     {...register("withCredit")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check3" className="text-sm" >
                     Con crédito
-                  </span>
+                  </label>
                 </div>
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check4"
                     {...register("withoutCredit")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check4" className="text-sm" >
                     Sin crédito
-                  </span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -283,23 +287,25 @@ const FiltroClientes = ({
               <div className="flex flex-col w-full gap-2">
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check5"
                     {...register("withOrder")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check5" className="text-sm" >
                     Con órdenes
-                  </span>
+                  </label>
                 </div>
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check6"
                     {...register("withoutOrder")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check6" className="text-sm" >
                     Sin órdenes
-                  </span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -316,23 +322,25 @@ const FiltroClientes = ({
               <div className="flex flex-col w-full gap-2">
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check7"
                     {...register("withContract")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check7" className="text-sm" >
                     Con contratos
-                  </span>
+                  </label>
                 </div>
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check8"
                     {...register("withoutContract")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check8" className="text-sm" >
                     Sin contratos
-                  </span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -349,23 +357,25 @@ const FiltroClientes = ({
               <div className="flex flex-col w-full gap-2">
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check9"
                     {...register("withExpiredContract")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check9" className="text-sm" >
                     Con contratos expirados
-                  </span>
+                  </label>
                 </div>
                 <div className="flex gap-3 items-center">
                   <input
-                    className="input-check"
+                    className="input-check accent-blue_custom"
                     type="checkbox"
+                    id="check10"
                     {...register("withoutExpiredContract")}
                   />
-                  <span className="text-sm">
+                  <label htmlFor="check10" className="text-sm" >
                     Sin contratos expirados
-                  </span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -383,7 +393,7 @@ const FiltroClientes = ({
               className="flex items-center gap-3"
             >
               <input
-                className="input-check"
+                className="input-check accent-blue_custom"
                 type="checkbox"
                 {...register(`zones.${zone._id}`)}
                 value={zone._id}

@@ -170,12 +170,12 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             />
           </div>
 
-          <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
+          <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 pr-2.5 shadow-md border p-2 shadow-zinc-300/30">
             <i
               className={`fa-solid  ${editar !== null
                 ? "fa-pen py-3 hover:animate-pulse"
                 : "fa-plus hover:rotate-90"
-                } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
+                } rounded-full shadow-md shadow-zinc-400/25 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
               onClick={handleAddProduct}
             ></i>
             <p className="text-base font-semibold">
@@ -190,7 +190,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
               {addedProducts.map((product, index) => (
                 <motion.div
                   key={index}
-                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                  className={`mb-2 flex justify-between items-center bg-blocks shadow-md border dark:border-blocks shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
                     }`}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -258,6 +258,8 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                     : new Date()
                 }
                 className="opacity-0 w-2/12 cursor-pointer"
+                calendarClassName="bg-blocks dark:border-blocks"
+                popperClassName="bg-block"
                 onChange={(date: Date | null) => {
                   if (date) {
                     const today = new Date().setHours(0, 0, 0, 0);
@@ -291,7 +293,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
               type={"text"}
               placeholder="Valido hasta"
               readOnly
-              className="placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+              className="placeholder:text-blue_custom bg-transparent text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
             />
           </div>
 
@@ -302,7 +304,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
               rows={3}
               name="comment"
               placeholder="Agregar Comentario"
-              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
             />
           </div>
 
@@ -320,7 +322,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
         <button
           type="submit"
           disabled={addedProducts.length === 0 || !watch('contract.validUntil') || !watch('contract.link')}
-          className="disabled:bg-gray-400 outline outline-2 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
+          className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {
             active ? (

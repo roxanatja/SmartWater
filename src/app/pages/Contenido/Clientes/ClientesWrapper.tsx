@@ -7,7 +7,6 @@ import { RegistrarVenta } from "./RegistrarVenta/RegistrarVenta";
 import { RegistrarPedido } from "./RegistrarPedido/RegistrarPedido";
 import { RegistrarPrestamo } from "./RegistrarPrestamo/RegistrarPrestamo";
 import { RegistrarDevolucion } from "./RegistrarDevolucion/RegistrarDevolucion";
-import { ClientEdit } from "./EditClient/EditClient";
 import ClientInfo from "./ClientInfo/ClientInfo";
 
 const ClientesWrapper: FC = () => {
@@ -24,7 +23,7 @@ const ClientesWrapper: FC = () => {
               path="/RegistrarDevolucion/:parcial"
               element={<RegistrarDevolucion />}
             />
-            <Route path="/EditarCliente" element={<ClientEdit />} />
+            {/* <Route path="/EditarCliente" element={<ClientEdit />} /> */}
             <Route path="/Informacion" element={<ClientInfo />} />
           </Routes>
         </FilterProvider>

@@ -26,7 +26,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     useForm<ISaleBody['data']>({
       defaultValues: {
         detail: [],
-        creditSale: true,
+        creditSale: false,
         hasInvoice: false,
         paymentMethodCurrentAccount: false,
       },
@@ -125,9 +125,9 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         </div>
         {/* Credit/Invoice Options */}
         <div className="RegistrarVenta-opciones flex justify-center items-start w-full flex-col">
-          <p className="text-md">Seleccione una opción</p>
+          <p className="text-md text-font-color">Seleccione una opción</p>
           <div className="RegistrarVenta-grupo-checbox">
-            <div className="RegistrarVenta-grupo-check">
+            <div className="RegistrarVenta-grupo-check text-font-color">
               <input
                 className="input-check cursor-pointer accent-blue-600"
                 type="checkbox"
@@ -139,12 +139,12 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
               />
               <label
                 htmlFor="checkbox1"
-                className="text-check cursor-pointer text-md"
+                className="text-check text-inherit cursor-pointer text-md"
               >
                 Factura
               </label>
             </div>
-            <div className="RegistrarVenta-grupo-check">
+            <div className="RegistrarVenta-grupo-check text-font-color">
               <input
                 className="input-check cursor-pointer accent-blue-600"
                 type="checkbox"
@@ -158,12 +158,12 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
               />
               <label
                 htmlFor="checkbox2"
-                className="text-check cursor-pointer text-md"
+                className="text-check text-inherit cursor-pointer text-md"
               >
                 Credito
               </label>
             </div>
-            <div className="RegistrarVenta-grupo-check">
+            <div className="RegistrarVenta-grupo-check text-font-color">
               <input
                 className="input-check cursor-pointer accent-blue-600"
                 type="checkbox"
@@ -177,7 +177,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
               />
               <label
                 htmlFor="checkbox3"
-                className="text-check cursor-pointer text-md"
+                className="text-check text-inherit cursor-pointer text-md"
               >
                 Cta. Cte
               </label>
@@ -233,7 +233,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
             />
           </div>
 
-          <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
+          <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
             <i
               className={`fa-solid  ${editar !== null
                 ? "fa-pen py-3 hover:animate-pulse"
@@ -241,7 +241,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                 } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
               onClick={handleAddProduct}
             ></i>
-            <p className="text-base font-semibold">
+            <p className="text-base font-semibold text-font-color">
               {editar !== null ? "Editar" : "Agregar"} Producto
             </p>
           </div>
@@ -252,7 +252,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
               {addedProducts.map((product, index) => (
                 <motion.div
                   key={index}
-                  className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                  className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
                     }`}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -312,7 +312,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
               {...register("comment")}
               name="comment"
               placeholder="Agregar Comentario"
-              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
             />
           </div>
         </div>
@@ -320,7 +320,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         <button
           disabled={(!watch('creditSale') && !watch('paymentMethodCurrentAccount')) || addedProducts.length === 0}
           type="submit"
-          className="disabled:bg-gray-400 outline outline-2 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
+          className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {active ? (
             <i className="fa-solid fa-spinner animate-spin"></i>

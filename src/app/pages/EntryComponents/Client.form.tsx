@@ -220,7 +220,7 @@ const ClientForm = ({
         animate={{ opacity: 1, left: 0 }}
         exit={{ opacity: 0, left: 100 }}
         transition={{ delay: 0.3 }}
-        className="flex flex-col items-center justify-center w-full gap-4 p-6 sticky top-10 z-20 bg-white"
+        className="flex flex-col items-center justify-center w-full gap-4 p-6 top-10 z-20 bg-main-background"
       >
         <button
           type="button"
@@ -339,7 +339,7 @@ const ClientForm = ({
           }}
         />
 
-        <div className={` ${selectedClient._id !== "" && "col-span-2 max-sm:col-span-1"} `}        >
+        <div>
           <Input
             label="Dirección"
             name="address"
@@ -366,15 +366,13 @@ const ClientForm = ({
             </a>
           </motion.div>
         </div>
-        {selectedClient._id === "" && (
-          <Input
-            label="Referencia"
-            name="reference"
-            register={register}
-            errors={errors.reference}
-            required
-          />
-        )}
+        <Input
+          label="Referencia"
+          name="reference"
+          register={register}
+          errors={errors.reference}
+          required
+        />
         {/* {selectedClient._id === "" && (
           <div className="col-span-2 max-sm:col-span-1">
             <Input
@@ -398,7 +396,7 @@ const ClientForm = ({
             {...register("zone", {
               required: "se requiere una zona",
             })}
-            className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black"
+            className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
             {city.length > 0 &&
               city.map((city, index) => (
@@ -424,7 +422,7 @@ const ClientForm = ({
           <label>Barrio</label>
           <select
             {...register("district")}
-            className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-black text-black"
+            className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
             {disti && disti.length > 0 ? (
               disti.map((row, index) => (
@@ -540,8 +538,8 @@ const ClientForm = ({
               ></i>
 
               {date ? (
-                <div className="bg-white z-10 relative w-full">
-                  <p className={`transition-all absolute top-0 left-1 w-fit -translate-y-1/2 h-fit text-sm bg-white z-[20] px-2`}>
+                <div className="bg-main-background z-10 relative w-full">
+                  <p className={`transition-all absolute top-0 left-1 w-fit -translate-y-1/2 h-fit text-sm bg-main-background z-[20] px-2`}>
                     Periodo de Renovacion
                   </p>
                   <Input
@@ -647,7 +645,7 @@ const ClientForm = ({
           )} */}
         </motion.div>
       </div>
-      <div className="w-full  sticky bottom-0 bg-white h-full z-50">
+      <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
         <div className="py-4 flex flex-row gap-4 items-center justify-center px-6">
           <button
             onClick={onCancel}

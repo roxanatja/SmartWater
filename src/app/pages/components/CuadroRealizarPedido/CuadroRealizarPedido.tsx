@@ -142,7 +142,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
     <>
       <form onSubmit={handleSubmit} ref={formRef}>
         <div>
-          <div className="buscador-cliente-container">
+          <div className="buscador-cliente-container relative">
             <input
               type="text"
               placeholder="Buscar cliente por nombre o teléfono"
@@ -151,7 +151,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                 setSearchTerm(e.target.value);
                 setShowOptions(true);
               }}
-              className="buscador-cliente"
+              className="buscador-cliente bg-blocks "
               style={{
                 display: "block",
                 width: "100%",
@@ -163,12 +163,12 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
               }}
             />
             {showOptions && filteredClients.length > 0 && (
-              <div ref={optionsRef} className="options-list">
+              <div ref={optionsRef} className="absolute w-full top-[50px] left-0 bg-blocks rounded-xl max-h-[200px] overflow-auto">
                 {filteredClients.map((cliente) => (
                   <div
                     key={cliente._id}
                     onClick={() => handleOptionClick(cliente)}
-                    className="option-item"
+                    className="option-item bg-blocks"
                   >
                     {cliente.fullName} / {cliente.phoneNumber}
                   </div>
@@ -180,7 +180,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
           <select
             name="cliente"
             id="cliente"
-            className="selec-pedido"
+            className="selec-pedido bg-blocks"
             required
             value={selectedClient?._id || ""}
             onChange={(e) => {
@@ -200,7 +200,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
           <select
             name="producto"
             id="producto"
-            className="selec-pedido"
+            className="selec-pedido bg-blocks"
             required
             value={selectedProduct?._id || ""}
             onChange={(e) => {
@@ -218,7 +218,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
             ))}
           </select>
           <div style={{ marginTop: "11px", gap: "15px", display: "flex" }}>
-            <div className="cantidad-pedido">
+            <div className="cantidad-pedido bg-blocks text-inherit">
               <span style={{ marginLeft: "10px" }}>Cantidad</span>
               <div className="numero-pedido">
                 <button type="button" className="boton" onClick={() => handleQuantityIcons('dec')}>
@@ -231,7 +231,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                     min="1"
                     value={cantidad}
                     onChange={e => setCantidad(parseInt(e.target.value))}
-                    className="numero-solicitado"
+                    className="numero-solicitado bg-blocks text-inherit"
                     required
                   />
                 </div>
@@ -246,12 +246,12 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                 type="number"
                 min="0"
                 value={(Number(selectedProduct?.price) || 0) * cantidad}
-                className="numero-input"
+                className="numero-input bg-blocks text-inherit"
                 required
                 readOnly
               />
               <div
-                className="letras-Bs"
+                className="letras-Bs bg-blocks text-inherit"
                 style={{
                   display: "flex",
                   justifyContent: "center",
@@ -266,8 +266,6 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
           </div>
           <div
             style={{
-              minWidth: "96%",
-              width: "96%",
               marginTop: "11px",
               display: "flex",
               justifyContent: "end",

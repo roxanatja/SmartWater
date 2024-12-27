@@ -7,7 +7,6 @@
   padding-right: 24px;
   padding-bottom: 20px;
   border: 1px solid #d6d5d5;
-  background: #fff;
   font-family: "Poppins", sans-serif;
 }
 
@@ -21,7 +20,6 @@
 }
 
 .Cliente-title {
-  color: #000;
   font-size: 16px;
   font-style: normal;
   font-weight: 600;
@@ -56,7 +54,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #000;
   font-size: 12px;
   font-style: normal;
   font-weight: 500;

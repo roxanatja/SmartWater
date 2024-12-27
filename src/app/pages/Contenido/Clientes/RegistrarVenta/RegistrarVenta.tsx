@@ -30,11 +30,11 @@ const RegistrarVenta: FC = () => {
           onClick={handleClick}
         >
           <button className="RegistrarVenta-btn">
-            <span className="material-symbols-outlined translate-y-0.5">
+            <span className="material-symbols-outlined translate-y-0.5 text-blue_custom">
               arrow_back
             </span>
           </button>
-          <span>Regresar</span>
+          <span className="text-blue_custom">Regresar</span>
         </div>
         <RegisterSalesForm selectedClient={selectedClient} />
       </div>

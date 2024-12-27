@@ -32,7 +32,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
   } = useForm<IBillsBody['data']>({
     defaultValues: {
       amount: 0,
-      cashPayment: true,
+      cashPayment: false,
       paymentMethodCurrentAccount: false,
     },
     mode: 'all'
@@ -129,9 +129,9 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
           </div>
           <div className="flex justify-start items-center gap-2">
             <div className="infoClientes-saldo">
-              <span style={{ color: "#1A3D7D" }}>Saldo a cobrar:</span>
+              <span className="text-blue_custom">Saldo a cobrar:</span>
             </div>
-            <div className="infoClientes-moneda">
+            <div className="infoClientes-moneda bg-blue_custom">
               <img src="./Moneda-icon.svg" alt="" />
               <div>{client.credit} Bs.</div>
             </div>
@@ -187,7 +187,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       <div className="infoClientes-ventas">
         <div className="input-container flex flex-col w-full">
           <div className="RegistrarVenta-opciones flex justify-center items-start w-full flex-col">
-            <p className="text-md">Seleccione una opción</p>
+            <p className="text-md text-font-color">Seleccione una opción</p>
             <div className="RegistrarVenta-grupo-checbox">
               <div className="RegistrarVenta-grupo-check">
                 <input
@@ -203,7 +203,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                 />
                 <label
                   htmlFor="checkbox1"
-                  className="text-check cursor-pointer text-md"
+                  className="text-check cursor-pointer text-md text-font-color"
                 >
                   Efectivo
                 </label>
@@ -222,7 +222,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
                 />
                 <label
                   htmlFor="checkbox2"
-                  className="text-check cursor-pointer text-md"
+                  className="text-check cursor-pointer text-md text-font-color"
                 >
                   Cta. Cte
                 </label>
@@ -282,7 +282,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
         </div>
       )}
 
-      <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-white">
+      <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-main-background">
         <button
           type="submit"
           disabled={client.credit <= 0 || !isValid}

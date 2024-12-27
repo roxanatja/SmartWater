@@ -39,7 +39,7 @@ const PaginaPrincipal: FC = () => {
       <Router>
         <div className="flex">
           <Sidebar />
-          <div className="Contenedor max-md:w-full relative">
+          <div className="Contenedor max-md:w-full relative bg-main-background">
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
@@ -98,7 +98,7 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Reportes/Resultados/*"
                   element={<ReportesResultadosWrapper />}
-                />
+                /> */}
                 <Route
                   path="/Configuracion/General"
                   element={<ConfiguracionGeneralWrapper />}
@@ -116,7 +116,7 @@ const PaginaPrincipal: FC = () => {
                   path="/Configuracion/Productos"
                   element={<ProductosWrapper />}
                 />
-                <Route path="/Configuracion/Items" element={<ItemsWrapper />} /> */}
+                <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
               </Route>
               {/* Redirige cualquier ruta desconocida a Inicio */}
               <Route path="*" element={<Navigate to="/Inicio" />} />

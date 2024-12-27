@@ -14,6 +14,7 @@ import { OrdersApiConector, ProductsApiConector, ZonesApiConector } from "../../
 import { District, Zone } from "../../../type/City";
 import { IOrderBody } from "../../../api/types/orders";
 import { AuthService } from "../../../api/services/AuthService";
+import { formatIncompletePhoneNumber } from "libphonenumber-js";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -193,14 +194,14 @@ const RegisterPedidoForm = ({
                     </p>
                   </div>
               }
-              <span>{selectedClient.fullName}</span>
+              <span className="text-font-color">{selectedClient.fullName}</span>
             </div>
             <div
               className="RegistrarPedido-Nombre"
               style={{ gap: "10px", fontWeight: "400" }}
             >
               <i className="fa-brands fa-whatsapp text-xl text-green-500"></i>
-              <span>{selectedClient.phoneNumber}</span>
+              <span className="text-font-color">{formatIncompletePhoneNumber(selectedClient.phoneNumber, "BO")}</span>
             </div>
           </div>
         )}
@@ -232,15 +233,15 @@ const RegisterPedidoForm = ({
               />
             </div>
 
-            <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
+            <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
               <i
                 className={`fa-solid  ${editar !== null
                   ? "fa-pen py-3 hover:animate-pulse"
                   : "fa-plus hover:rotate-90"
-                  } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
+                  } rounded-full shadow-md shadow-zinc-400/25 px-3 py-2.5 bg-blue_custom text-white transition-all cursor-pointer`}
                 onClick={handleAddProduct}
               ></i>
-              <p className="text-base font-semibold">
+              <p className="text-base font-semibold text-font-color">
                 {editar !== null ? "Editar" : "Agregar"} Producto
               </p>
             </div>
@@ -250,7 +251,7 @@ const RegisterPedidoForm = ({
                 {addedProducts.map((product, index) => (
                   <motion.div
                     key={index}
-                    className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                    className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
                       }`}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -493,7 +494,7 @@ const RegisterPedidoForm = ({
                 {...register("comment")}
                 name="comment"
                 placeholder="Agregar Comentario"
-                className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+                className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
               />
             </div>
 
@@ -524,6 +525,7 @@ const RegisterPedidoForm = ({
                       setValue("deliverDate", formattedDate as string);
                     }
                   }}
+                  calendarClassName="bg-blocks dark:border-blocks"
                   dateFormat={"yyyy/MM/dd"}
                   dropdownMode="select"
                 />
@@ -539,7 +541,7 @@ const RegisterPedidoForm = ({
                 type={"text"}
                 placeholder="Fecha de entrega"
                 readOnly
-                className="placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+                className="bg-transparent placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
               />
             </div>
           </div>

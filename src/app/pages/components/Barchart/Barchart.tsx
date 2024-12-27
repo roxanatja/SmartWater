@@ -14,7 +14,6 @@ import {
   ChartData,
 } from "chart.js";
 import { ExpensesApiConector, SalesApiConector } from "../../../../api/classes";
-import moment from "moment";
 
 // Registra los componentes necesarios de Chart.js para usar en el gráfico
 ChartJS.register(
@@ -146,7 +145,7 @@ const BarChart = () => {
 
   // Componente que muestra el gráfico de barras
   return (
-    <div className="BarContainer">
+    <div className="BarContainer bg-blocks dark:border-blocks">
       <div
         style={{
           width: "76vw",
@@ -166,12 +165,13 @@ const BarChart = () => {
           scales: {
             y: {
               ticks: {
+                color: "#888",
                 stepSize: 500, // Establece el espaciado entre las etiquetas
               },
             },
             x: {
               ticks: {
-                color: "#000",
+                color: "#888",
               },
             },
           },

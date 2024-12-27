@@ -39,7 +39,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
     toast.error(
       (t) => (
         <div>
-          <p className="mb-4 text-center">
+          <p className="mb-4 text-center text-[#888]">
             Se <b>eliminará</b> este prestamo <br /> pulsa <b>Proceder</b> para continuar
           </p>
           <div className="flex justify-center">
@@ -72,7 +72,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
         </div>
       ),
       {
-        className: "shadow-2xl border-2 border-slate-100",
+        className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
         icon: null,
         position: "top-center"
       }
@@ -98,7 +98,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
 
   return (
     <>
-      <div className="CuadroPrestamo-container relative w-full">
+      <div className="CuadroPrestamo-container relative w-full bg-blocks dark:border-blocks shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] dark:shadow-slate-200/25">
         <div className="flex flex-col gap-4">
           <div
             style={{
@@ -122,7 +122,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
                 />
                 <span>{loan.client[0]?.fullName}</span>
               </div>
-              <div className="infoClientes-ultimaventa">
+              <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
                 <span>
                   {formatDateTime(
                     loan.created,
@@ -137,12 +137,12 @@ const CuadroPrestamo: FC<Prestamo> = ({
               !info &&
               <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
                 <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
-                  <img src={info ? "../Opciones-icon.svg" : "./Opciones-icon.svg"} alt="" />
+                  <img src={info ? "../Opciones-icon.svg" : "./Opciones-icon.svg"} alt="" className="invert-0 dark:invert" />
                 </button>
 
                 <div className="relative" ref={optionsRef}>
                   <button type="button" className="btn" onClick={() => Opciones()}>
-                    <img src="../opcion-icon.svg" alt="" />
+                    <img src="../opcion-icon.svg" alt="" className="invert-0 dark:invert" />
                   </button>
                   <Option
                     editAction={Edit}
@@ -155,32 +155,21 @@ const CuadroPrestamo: FC<Prestamo> = ({
               </div>
             }
           </div>
-          <div className="CuadroVentaCliente-text">
+          <div className="CuadroVentaCliente-text mb-4">
             <span>
               No. Cliente:{" "}
-              <span style={{ color: "#1A3D7D" }}>{loan.client[0]?.code}</span>
+              <span className="text-blue_custom">{loan.client[0]?.code}</span>
             </span>
-          </div>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "end",
-          }}
-        >
-          <div>
-            <span className="CuadroPrestamo-texto">ítems</span>
           </div>
         </div>
         <div className="flex flex-wrap CuadroVentaCliente-productos items-end justify-end">
           <div className="w-full min-h-28 max-h-28 overflow-y-auto">
             {loan.detail.length > 0 ? (
               <div className="grid grid-cols-3 gap-4">
-                <div className="font-bold text-left sticky top-0 bg-white col-span-2">
+                <div className="font-bold text-left sticky top-0 col-span-2">
                   <span>Productos</span>
                 </div>
-                <div className="font-bold sticky top-0 bg-white text-center">
+                <div className="font-bold sticky top-0 text-center">
                   <span>Cantidad</span>
                 </div>
                 {loan.detail.map((detail: any, index: number) => {

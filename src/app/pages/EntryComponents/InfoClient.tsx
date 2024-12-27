@@ -269,10 +269,7 @@ const InfoClient = ({ client }: { client: Client }) => {
             {city.devolu && city.devolu.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 w-full pt-4 ">
                 {city.devolu.map((devolution, index) => (
-                  <div
-                    key={devolution._id}
-                    className="flex-shrink-0 rounded-[20px] border border-[#f0f4fd] bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] p-[15px] flex flex-col gap-2"
-                  >
+                  <div key={devolution._id} className="flex-shrink-0 rounded-[20px] border border-[#f0f4fd] dark:border-blocks bg-blocks shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] dark:shadow-slate-200/25 p-[15px] flex flex-col gap-2">
                     <p className="font-semibold">Devolución #{index + 1}</p>
                     <p>
                       <b>ID de Préstamo:</b> {devolution.loan}
@@ -281,12 +278,12 @@ const InfoClient = ({ client }: { client: Client }) => {
                       <b>Fecha de creación:</b>{" "}
                       {new Date(devolution.created).toLocaleDateString()}
                     </p>
-                    <p className="font-semibold">Detalles:</p>
+                    {/* <p className="font-semibold">Detalles:</p> */}
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="font-bold text-left sticky top-0 bg-white col-span-2">
+                      <div className="font-bold text-left sticky top-0 col-span-2">
                         <span>Productos</span>
                       </div>
-                      <div className="font-bold sticky top-0 bg-white text-center">
+                      <div className="font-bold sticky top-0 text-center">
                         <span>Cantidad</span>
                       </div>
                       {devolution.detail.map((detail: any, index: number) => {

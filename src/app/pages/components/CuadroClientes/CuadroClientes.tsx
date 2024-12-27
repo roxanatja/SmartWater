@@ -1,8 +1,6 @@
 import "./CuadroClientes.css";
 import { useEffect, useState } from "react";
 import { Client } from "../../../../type/Cliente/Client";
-import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes";
-import Modal from "../../EntryComponents/Modal";
 import { ClientsApiConector } from "../../../../api/classes";
 
 const CuadroClientes = () => {
@@ -34,7 +32,7 @@ const CuadroClientes = () => {
 
   return (
     <>
-      <div className="cuadroClientes">
+      <div className="cuadroClientes !bg-blocks dark:!border-blocks">
         <div className="titulo-cliente">
           <div>
             <span className="Cliente-title">
@@ -64,10 +62,10 @@ const CuadroClientes = () => {
                   </div>
                 </div>
                 <div className="fecha-pago flex-1">
-                  <div className="fecha-cliente">
+                  <div className="fecha-cliente border-blue_custom text-blue_custom">
                     <span>{new Date(item.created).toLocaleDateString()}</span>
                   </div>
-                  <div className="moneda-cliente">
+                  <div className="moneda-cliente bg-blue_custom">
                     <img src="./Moneda-icon.svg" alt="" />
                     <div>
                       <span>{item.credit.toPrecision()} Bs.</span>

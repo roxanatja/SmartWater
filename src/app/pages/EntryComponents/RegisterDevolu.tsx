@@ -44,7 +44,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
       toast(
         (t) => (
           <div>
-            <p className="mb-4 text-center">
+            <p className="mb-4 text-center text-[#888]">
               Se <b>devolverá</b> todo <br /> pulsa <b>Proceder</b> para continuar
             </p>
             <div className="flex justify-center">
@@ -89,7 +89,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           </div>
         ),
         {
-          className: "shadow-2xl border-2 border-slate-100",
+          className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
           icon: null,
           position: "top-center",
         }
@@ -237,7 +237,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 justify-center items-center w-full pb-24"
+      className="flex flex-col gap-4 justify-center items-center w-full pb-32"
     >
       <div className="flex flex-col gap-6 justify-center items-center w-full px-6 pb-0 ">
         <div className="flex justify-start items-center w-full gap-2 pt-2">
@@ -257,7 +257,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           }
           <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
         </div>
-        <div className="text-md rounded-full w-full grid grid-cols-2 gap-2 text-black shadow-md border shadow-zinc-300">
+        <div className="text-md rounded-full w-full grid grid-cols-2 gap-2 text-black shadow-md border shadow-zinc-300/25">
           <button
             type="button"
             onClick={() => setOption(!option)}
@@ -279,15 +279,15 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         </div>
 
         {loans.length === 0 && (
-          <div className="flex justify-between items-center w-full text-black pr-2.5 shadow-md border p-4 shadow-zinc-300 rounded-2xl cursor-pointer group transition-all">
+          <div className="flex justify-between items-center w-full pr-2.5 shadow-md border p-4 shadow-zinc-300 rounded-2xl cursor-pointer group transition-all">
             No tienes Préstamos activos
           </div>
         )}
 
-        <div className={`w-full max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6`}>
+        <div className={`w-full max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 px-1 py-2`}>
           {loans.map((row: Loans, index: number) => (
             <div
-              className="flex gap-2 justify-between items-center w-full text-black pr-2.5 shadow-md border p-4 shadow-zinc-300 rounded-2xl cursor-pointer group transition-all"
+              className="flex gap-2 justify-between items-center w-full pr-2.5 shadow-md border p-4 shadow-zinc-300/25 rounded-2xl cursor-pointer group transition-all"
               key={index}
               onClick={() => {
                 setLoan(row);
@@ -358,9 +358,9 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                   }
                 />
               </div>
-              <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300">
+              <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
                 <i
-                  className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
+                  className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400/25 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
                   onClick={handleAddProduct}
                 ></i>
                 <p className="text-base font-semibold"> Agregar Producto</p>
@@ -372,7 +372,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                   {addedProducts.map((product, index) => (
                     <motion.div
                       key={index}
-                      className={`mb-2 flex justify-between items-center bg-white shadow-md border shadow-zinc-300 rounded-2xl p-2`}
+                      className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2`}
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 20 }}
@@ -411,7 +411,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
               {...register("comment")}
               name="comment"
               placeholder="Agregar Comentario"
-              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
+              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
             />
           </div>
         </div>
@@ -419,7 +419,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         <button
           type="submit"
           disabled={!option ? (addedProducts.length <= 0) : !loan}
-          className="disabled:bg-gray-400 outline outline-2 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
+          className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {active ? (
             <i className="fa-solid fa-spinner animate-spin"></i>

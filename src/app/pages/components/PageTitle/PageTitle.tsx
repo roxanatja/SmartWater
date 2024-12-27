@@ -11,7 +11,7 @@ const PageTitle: FC<TituloPages> = ({ titulo, icon }) => {
     <>
       <div className="Pages sticky top-0 z-10 py-5">
         <div className="Title-Pages">
-          <img src={icon} alt="" />
+          <img src={icon} alt="" className="invert dark:invert-0"/>
           <div>
             <span>{titulo}</span>
           </div>

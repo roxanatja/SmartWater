@@ -53,7 +53,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
     toast.error(
       (t) => (
         <div>
-          <p className="mb-4 text-center">
+          <p className="mb-4 text-center text-[#888]">
             Se <b>eliminará</b> este cliente <br /> pulsa <b>Proceder</b> para continuar
           </p>
           <div className="flex justify-center">
@@ -95,7 +95,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
         </div>
       ),
       {
-        className: "shadow-2xl border-2 border-slate-100",
+        className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
         icon: null,
         position: "top-center"
       }
@@ -126,7 +126,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
 
   return (
     <>
-      <div className="infoClientes-container relative">
+      <div className="infoClientes-container relative bg-blocks dark:border-blocks">
         <div
           onClick={() => {
             setSelectedClient(client);
@@ -154,11 +154,11 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               <span>{client.fullName || "Sin nombre"}</span>
             </div>
             <div className="infoClientes-datos">
-              <img src="./Location-icon.svg" alt="" />
+              <img src="./Location-icon.svg" alt="" className="invert-0 dark:invert" />
               <span className="whitespace-nowrap">{zone}</span>
             </div>
             <div className="infoClientes-datos">
-              <img src="./CasaUbi-icon.svg" alt="" />
+              <img src="./CasaUbi-icon.svg" alt="" className="invert-0 dark:invert" />
               <span className="whitespace-nowrap">{client.code}</span>
             </div>
             <div className="infoClientes-datos relative z-10">
@@ -174,12 +174,12 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
             </div>
           </div>
           <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
-            <button type="button" className="btn" onClick={showMiniModal}>
+            <button type="button" className="invert-0 dark:invert" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
 
             <div className="relative" ref={optionsRef}>
-              <button type="button" className="btn" onClick={() => Opciones()}>
+              <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
                 <img src="./opcion-icon.svg" alt="" />
               </button>
               <Option
@@ -196,14 +196,14 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
           <div className="infoClientes-ventasContainer">
             <div className="infoClientes-ventas">
               <span>Última venta</span>
-              <div className="infoClientes-ultimaventa">
+              <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
                 <span>{date}</span>
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              <span style={{ color: "#1A3D7D" }}>Préstamos activos</span>
+              <span className="text-blue_custom">Préstamos activos</span>
               <div
-                className="infoClientes-moneda cursor-pointer"
+                className="infoClientes-moneda cursor-pointer bg-blue_custom"
                 onClick={() => setShowCobroPopUp(true)}
               >
                 <img src="./Moneda-icon.svg" alt="" />
@@ -218,7 +218,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
           target="_blank"
           href={url}>
           <img src="./Location-azul-icon.svg" alt="" />
-          <span className="infoClientes-ubi"
+          <span className="infoClientes-ubi text-blue_custom"
           >
             Ver ubicación en el mapa
           </span>

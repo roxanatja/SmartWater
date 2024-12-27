@@ -41,7 +41,7 @@ const CuadroInformativo: React.FC<CuadroInformativoProps> = ({
   };
 
   return (
-    <div className="cuadroGeneral">
+    <div className="cuadroGeneral bg-blocks dark:border-blocks">
       <div className="titulo-cuadro">
         <span>{titulo}</span>
       </div>
@@ -49,12 +49,12 @@ const CuadroInformativo: React.FC<CuadroInformativoProps> = ({
       {/* Condición para mostrar el número y letra si están definidos */}
       {numero !== "" && numero !== undefined ? (
         letra !== undefined ? (
-          <div className="numero-letra">
+          <div className="numero-letra text-blue_custom">
             <span>{numero}</span>
             <span style={{ fontSize: "24px", marginLeft: "4px" }}>{letra}</span>
           </div>
         ) : (
-          <div className="numero-cuadro">
+          <div className="numero-cuadro text-blue_custom">
             <span>{numero}</span>
           </div>
         )

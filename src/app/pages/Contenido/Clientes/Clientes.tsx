@@ -140,7 +140,7 @@ const Clientes: FC = () => {
       </FiltroPaginado>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Registrar Cliente
         </h2>
         <ClientForm isOpen={showModal} onCancel={() => setShowModal(false)} />
@@ -150,7 +150,7 @@ const Clientes: FC = () => {
         isOpen={selectedClient._id !== "" && !showMiniModal}
         onClose={() => setSelectedClient(client)}
       >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Editar Cliente
         </h2>
         <ClientForm
@@ -169,7 +169,7 @@ const Clientes: FC = () => {
         }}
         className="w-3/12"
       >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
           Opciones Cliente
         </h2>
         <div className="p-6">
