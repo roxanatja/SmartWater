@@ -86,7 +86,7 @@ const Input = memo<InputProps>(
             {...register(
               name,
               required && {
-                required: `el ${label} es requerido`,
+                required: `${label} es requerido`,
                 onChange: handleChange,
               }
             )}

@@ -37,3 +37,42 @@
     gap: 24px;
     margin-top: 55px;
 }
+
+.CuentasContables-btn{
+    color: var(--Azul-oscuro, #1A3D7D);
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 28px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 30px;
+    border: 1px solid var(--Azul, #367DFD);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    background: #FFF;
+    width: 150.105px;
+    cursor: pointer;
+}
+
+.CuentasContables-btn:hover{
+    background: #ececec;
+}
+
+.CuentasContables-btn-crear{
+    color:#FFF;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 28px;
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 30px;
+    border: 1px solid #367DFD;
+    background: #367DFD;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    width: 150.105px;
+    cursor: pointer;
+}
+
+.CuentasContables-btn-crear:hover{
+    background: #234fa0;
+    border: 1px solid #234fa0;
+}

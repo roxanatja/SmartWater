@@ -10,6 +10,8 @@ import { ClientsApiConector, DevolutionsApiConector, ItemsApiConector, LoansApiC
 import { District, Zone } from "../../../../type/City";
 
 type Componentes = {
+  order?: boolean;
+  hasSearch?: boolean;
   exportar?: boolean;
   typeDataToExport?: string;
   add?: boolean;
@@ -34,7 +36,8 @@ type Componentes = {
   orderArray?: (order: string) => void;
   search?: (e: string) => void;
   suggestions?: string[];
-  hasFilter?: boolean
+  hasFilter?: boolean;
+  filterInject?: ReactNode;
 };
 
 export interface IFiltroPaginadoReference {
@@ -42,6 +45,8 @@ export interface IFiltroPaginadoReference {
 }
 
 const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
+  order = true,
+  hasSearch = true,
   exportar,
   typeDataToExport,
   add,
@@ -66,7 +71,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   onFilter,
   search,
   suggestions,
-  hasFilter
+  hasFilter,
+  filterInject
 }, ref) => {
   useImperativeHandle(ref, () => ({
     clearSearch() {
@@ -467,55 +473,61 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           className="max-sm:flex-col"
         >
           <div className="w-full">
-            <form className="" onSubmit={(e) => e.preventDefault()}>
-              <div className="relative w-full">
-                <Input
-                  className="rounded-xl py-3 outline-1 outline-zinc-300"
-                  type="text"
-                  name="search"
-                  register={register}
-                  placeholder="Buscar clientes por nombre o teléfono"
-                  required
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                    search && search(event.target.value)
-                  }
-                />
+            {
+              hasSearch &&
+              <form className="" onSubmit={(e) => e.preventDefault()}>
+                <div className="relative w-full">
+                  <Input
+                    className="rounded-xl py-3 outline-1 outline-zinc-300"
+                    type="text"
+                    name="search"
+                    register={register}
+                    placeholder="Buscar clientes por nombre o teléfono"
+                    required
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      search && search(event.target.value)
+                    }
+                  />
 
-                <button type="submit" className="absolute right-3 top-2.5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M19.5 9.75C19.5 11.9016 18.8016 13.8891 17.625 15.5016L23.5594 21.4406C24.1453 22.0266 24.1453 22.9781 23.5594 23.5641C22.9734 24.15 22.0219 24.15 21.4359 23.5641L15.5016 17.625C13.8891 18.8062 11.9016 19.5 9.75 19.5C4.36406 19.5 0 15.1359 0 9.75C0 4.36406 4.36406 0 9.75 0C15.1359 0 19.5 4.36406 19.5 9.75ZM9.75 16.5C10.6364 16.5 11.5142 16.3254 12.3331 15.9862C13.1521 15.647 13.8962 15.1498 14.523 14.523C15.1498 13.8962 15.647 13.1521 15.9862 12.3331C16.3254 11.5142 16.5 10.6364 16.5 9.75C16.5 8.86358 16.3254 7.98583 15.9862 7.16689C15.647 6.34794 15.1498 5.60382 14.523 4.97703C13.8962 4.35023 13.1521 3.85303 12.3331 3.51381C11.5142 3.17459 10.6364 3 9.75 3C8.86358 3 7.98583 3.17459 7.16689 3.51381C6.34794 3.85303 5.60382 4.35023 4.97703 4.97703C4.35023 5.60382 3.85303 6.34794 3.51381 7.16689C3.17459 7.98583 3 8.86358 3 9.75C3 10.6364 3.17459 11.5142 3.51381 12.3331C3.85303 13.1521 4.35023 13.8962 4.97703 14.523C5.60382 15.1498 6.34794 15.647 7.16689 15.9862C7.98583 16.3254 8.86358 16.5 9.75 16.5Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </form>
+                  <button type="submit" className="absolute right-3 top-2.5">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M19.5 9.75C19.5 11.9016 18.8016 13.8891 17.625 15.5016L23.5594 21.4406C24.1453 22.0266 24.1453 22.9781 23.5594 23.5641C22.9734 24.15 22.0219 24.15 21.4359 23.5641L15.5016 17.625C13.8891 18.8062 11.9016 19.5 9.75 19.5C4.36406 19.5 0 15.1359 0 9.75C0 4.36406 4.36406 0 9.75 0C15.1359 0 19.5 4.36406 19.5 9.75ZM9.75 16.5C10.6364 16.5 11.5142 16.3254 12.3331 15.9862C13.1521 15.647 13.8962 15.1498 14.523 14.523C15.1498 13.8962 15.647 13.1521 15.9862 12.3331C16.3254 11.5142 16.5 10.6364 16.5 9.75C16.5 8.86358 16.3254 7.98583 15.9862 7.16689C15.647 6.34794 15.1498 5.60382 14.523 4.97703C13.8962 4.35023 13.1521 3.85303 12.3331 3.51381C11.5142 3.17459 10.6364 3 9.75 3C8.86358 3 7.98583 3.17459 7.16689 3.51381C6.34794 3.85303 5.60382 4.35023 4.97703 4.97703C4.35023 5.60382 3.85303 6.34794 3.51381 7.16689C3.17459 7.98583 3 8.86358 3 9.75C3 10.6364 3.17459 11.5142 3.51381 12.3331C3.85303 13.1521 4.35023 13.8962 4.97703 14.523C5.60382 15.1498 6.34794 15.647 7.16689 15.9862C7.98583 16.3254 8.86358 16.5 9.75 16.5Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            }
             {resultados && (
               <div className="flex justify-end items-center gap-4 py-3 pb-6 max-sm:flex-col max-sm:items-start">
                 <div className="resultado-busqueda">
                   <span>Resultados:</span>
                   <span className="text-blue_custom"> {total}</span>
                 </div>
-                <div className="resultado-busqueda">
-                  <span>Ordenar por: </span>
-                  <select
-                    className="select-filtro text-blue_custom bg-main-background"
-                    name="filter"
-                    onChange={(event) =>
-                      orderArray && orderArray(event.target.value)
-                    }
-                  >
-                    <option value="new">Más reciente</option>
-                    <option value="older">Más antiguos</option>
-                  </select>
-                </div>
+                {
+                  order &&
+                  < div className="resultado-busqueda">
+                    <span>Ordenar por: </span>
+                    <select
+                      className="select-filtro text-blue_custom bg-main-background"
+                      name="filter"
+                      onChange={(event) =>
+                        orderArray && orderArray(event.target.value)
+                      }
+                    >
+                      <option value="new">Más reciente</option>
+                      <option value="older">Más antiguos</option>
+                    </select>
+                  </div>
+                }
               </div>
             )}
             {resultadosPrestamo && (
@@ -538,7 +550,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           <div className="flex w-4/12 items-center pt-2 justify-center h-full max-sm:flex-col max-sm:pb-4 max-sm:w-full">
             <div className="flex justify-between items-center w-full pl-4">
               {filtro && (
-                <div className="w-full">
+                <div className="w-full relative" >
+                  {!!filterInject && filterInject}
                   <button
                     type="button"
                     className="boton-filtro relative"
@@ -769,7 +782,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           {children}
         </div>
         <div className="flex justify-between absolute right-0 bottom-0 px-5 w-full h-[130px] bg-main-background z-[40]">
-          {exportar && (
+          {exportar ? (
             <div className="flex flex-col justify-center items-center">
               <button
                 type="button"
@@ -780,11 +793,11 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
               </button>
               <span className="text-center text-sm">Exportar</span>
             </div>
-          )}
-          <div className="flex flex-col-reverse gap-4 justify-center items-center">
+          ) : <div></div>}
+          <div className="flex flex-col-reverse gap-4 justify-center items-end">
             {add && onAdd && (
               <div style={{ marginBottom: "1em" }}>
-                <button type="button" className="btn-agregar bg-blue_custom" onClick={onAdd}>
+                <button type="button" className="btn-agregar bg-blue_custom -translate-x-3" onClick={onAdd}>
                   <span className="material-symbols-outlined">add</span>
                 </button>
               </div>
@@ -832,7 +845,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             )}
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 });

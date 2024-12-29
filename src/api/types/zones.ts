@@ -27,7 +27,7 @@ export interface IZoneAssignDistrictBody {
     data: {
         district: string;
         zoneId: string;
-        cityId: string[]
+        cityId: string
     }
 }
 

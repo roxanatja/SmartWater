@@ -16,5 +16,6 @@ export interface District {
 export interface Zone {
     _id: string;
     name: string;
+    description?: string;
     districts: District[];
 }
