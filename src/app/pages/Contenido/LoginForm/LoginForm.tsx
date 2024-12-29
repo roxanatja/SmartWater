@@ -44,7 +44,7 @@ const LoginForm = () => {
 
     try {
       await AuthService.login(phoneNumber, password);
-      toast.success("Usuario autenticado:");
+      toast.success("Usuario autenticado");
       navigate("/Inicio");
     } catch (error: any) {
       setError("Error al iniciar sesión. Por favor revisa tus credenciales.");
@@ -60,19 +60,19 @@ const LoginForm = () => {
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="login-content"
+        className="login-content bg-main-background"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 50 }}
       >
         <div className="login-header">
-          <h1 className="login-title">Iniciar Sesión</h1>
+          <h1 className="login-title text-blue_custom">Iniciar Sesión</h1>
         </div>
         <div className="login-body">
           <form onSubmit={handleLogin}>
             <motion.input
-              className={`login-input ${phoneNumberError && "error"}`}
-              type="text"
+              className={`login-input bg-transparent text-font-color border-font-color ${phoneNumberError && "error"}`}
+              type="tel"
               placeholder="Número de teléfono"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -92,7 +92,7 @@ const LoginForm = () => {
             )}
 
             <motion.input
-              className={`login-input ${passwordError && "error"}`}
+              className={`login-input bg-transparent text-font-color border-font-color ${passwordError && "error"}`}
               type="password"
               placeholder="Contraseña"
               value={password}
@@ -124,7 +124,7 @@ const LoginForm = () => {
             )}
 
             <motion.button
-              className="login-btn"
+              className="login-btn bg-blue_custom mt-6"
               type="submit"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
