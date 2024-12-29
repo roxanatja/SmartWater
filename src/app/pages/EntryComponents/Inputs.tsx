@@ -15,6 +15,7 @@ interface InputProps {
   isText?: boolean;
   button?: React.ReactNode;
   icon?: React.ReactNode;
+  sufix?: React.ReactNode;
   onClick?(): void;
   validateAmount?(e: any): string | boolean;
   [key: string]: any;
@@ -32,6 +33,7 @@ const Input = memo<InputProps>(
     onChange,
     numericalOnly,
     icon,
+    sufix,
     isVisibleLable,
     isText,
     validateAmount,
@@ -120,7 +122,7 @@ const Input = memo<InputProps>(
               )}
               {...rest}
               className={`${errors && "outline outline-red-500"
-                } ${className} ${icon ? "pl-16" : ""} ${!isText && "text-sm"
+                } ${className} ${icon ? "pl-16" : ""} ${sufix ? "pr-16" : ""} ${!isText && "text-sm"
                 }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black w-full`}
             />
             {button && (
@@ -131,6 +133,11 @@ const Input = memo<InputProps>(
               >
                 {button}
               </button>
+            )}
+            {sufix && (
+              <div className="absolute ps-4 py-1.5 text-xl border-l h-full border-black pr-4 right-0">
+                {sufix}
+              </div>
             )}
           </div>
         )}

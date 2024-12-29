@@ -113,7 +113,7 @@ const Barrios: FC = () => {
                                                     checked={checkedZones.includes(z._id)}
                                                     onChange={() => handleCheckbox1Change(z._id)}
                                                 />
-                                                <label className="AsignarPermisos-text-check">{z.name}</label>
+                                                <label className="AsignarPermisos-text-check text-font-color">{z.name}</label>
                                             </div>
                                         ))
                                     }
@@ -122,11 +122,20 @@ const Barrios: FC = () => {
                         }
                     </>}>
                     <div className="w-full">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {
-                                districtsToShow.map(d => <BarriosItem key={d._id} district={{ ...d, zones: zones.filter(z => z.districts.some(di => di._id === d._id)) }} />)
-                            }
-                        </div>
+                        {
+                            districtsToShow.length > 0 &&
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {
+                                    districtsToShow.map(d => <BarriosItem key={d._id} district={{ ...d, zones: zones.filter(z => z.districts.some(di => di._id === d._id)) }} />)
+                                }
+                            </div>
+                        }
+                        {
+                            districtsToShow.length === 0 &&
+                            <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+                                Sin resultados
+                            </div>
+                        }
                     </div>
 
                 </FiltroPaginado >

@@ -584,7 +584,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                   </button>
                 </div>
               )}
-              {paginacion && totalPage && currentPage && (
+              {(paginacion && totalPage && currentPage) ? (
                 <div className="flex gap-2 w-full justify-end">
                   <>
                     <div>
@@ -616,7 +616,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                     </div>
                   </>
                 </div>
-              )}
+              ) : <></>}
             </div>
           </div>
           {infoPedidos && (
@@ -776,7 +776,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           </div>
         )}
         <div
-          className={`${!resultadosPrestamo && "overflow-y-scroll max-h-[70vh] pb-[80px]"
+          className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[80px]"
             }`}
         >
           {children}
@@ -802,7 +802,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 </button>
               </div>
             )}
-            {paginacion && totalPage && currentPage && !resultadosPrestamo && (
+            {(paginacion && totalPage && currentPage && !resultadosPrestamo) ? (
               <div
                 style={{
                   display: "flex",
@@ -842,7 +842,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                   </div>
                 </>
               </div>
-            )}
+            ) : <div></div>}
           </div>
         </div>
       </div >

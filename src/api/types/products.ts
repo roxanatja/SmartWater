@@ -11,20 +11,10 @@ export interface IProductBody {
     data: {
         name: string;
         description: string;
-        price: string;
+        price: number;
         imageUrl: string;
         category: string;
-        priceBusiness: string;
-    }
-}
-
-export interface IProductBodyNoCategory {
-    data: {
-        name: string;
-        description: string;
-        price: string;
-        imageUrl: string;
-        priceBusiness: string;
+        priceBusiness: number;
     }
 }
 

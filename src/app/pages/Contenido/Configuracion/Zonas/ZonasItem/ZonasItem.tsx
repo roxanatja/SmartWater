@@ -110,7 +110,7 @@ const ZonasItem: FC<Props> = ({ zone }) => {
                         <strong>{zone.name}</strong>
                     </p>
                     <div className="flex gap-4 items-center">
-                        <p className="text-sm">Distritos: {zone.districts.length}</p>
+                        <p className="text-sm">Barrios: {zone.districts.length}</p>
                     </div>
                 </div>
                 <div className="flex gap-2 items-start flex-col pt-2 relative" ref={optionsRef}>

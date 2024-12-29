@@ -1,6 +1,6 @@
 import Product from "../../type/Products/Products";
 import { QueryMetadata } from "../types/common";
-import { IProductBody, IProductBodyNoCategory, IProductFilter, IProductsGetParams } from "../types/products";
+import { IProductBody, IProductFilter, IProductsGetParams } from "../types/products";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
 
@@ -27,7 +27,7 @@ export abstract class ProductsApiConector {
         }
     }
 
-    static async update(params: IProductBodyNoCategory & IProductFilter): Promise<{ mensaje: string } | null> {
+    static async update(params: IProductBody & IProductFilter): Promise<{ mensaje: string } | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.productId}/update`, params.data)
             return res.data

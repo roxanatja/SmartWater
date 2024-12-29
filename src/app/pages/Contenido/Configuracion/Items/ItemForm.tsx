@@ -1,50 +1,44 @@
 import { useContext, useState } from "react";
-import { ZonasContext } from "./ZonasContext";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IZoneBody } from "../../../../../api/types/zones";
-import { ZonesApiConector } from "../../../../../api/classes";
+import { ItemsApiConector } from "../../../../../api/classes";
 import toast from "react-hot-toast";
 import Input from "../../../EntryComponents/Inputs";
+import { ItemsContext } from "./ItemsContext";
+import { IItemBody } from "../../../../../api/types/items";
 
 interface Props {
     isOpen: boolean;
     onCancel?: () => void
 }
 
-const ZonasForm = ({ isOpen, onCancel }: Props) => {
-    const { selectedZone } = useContext(ZonasContext);
+const ItemForm = ({ isOpen, onCancel }: Props) => {
+    const { selectedItem } = useContext(ItemsContext);
     const [active, setActive] = useState(false);
 
     const {
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<IZoneBody['data']>({
-        defaultValues: selectedZone._id === "" ? {} : { description: selectedZone.description, districts: [], name: selectedZone.name },
+    } = useForm<IItemBody['data']>({
+        defaultValues: selectedItem._id === "" ? {} : { description: selectedItem.description, name: selectedItem.name },
         mode: 'all'
     });
 
-    const onSubmit: SubmitHandler<IZoneBody['data']> = async (data) => {
+    const onSubmit: SubmitHandler<IItemBody['data']> = async (data) => {
         let res = null
         setActive(true)
 
-        if (selectedZone._id !== "") {
-            res = await ZonesApiConector.update({
-                zoneId: selectedZone._id,
-                data: {
-                    ...data,
-                    districts: selectedZone.districts.map(d => d._id)
-                }
-            })
+        if (selectedItem._id !== "") {
+            res = await ItemsApiConector.update({ productId: selectedItem._id, data })
         } else {
-            res = await ZonesApiConector.create({ data })
+            res = await ItemsApiConector.create({ data })
         }
 
         if (res) {
-            toast.success(`Zona ${selectedZone._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
+            toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
             window.location.reload();
         } else {
-            toast.error("Upps error al crear la zona", { position: "bottom-center" });
+            toast.error("Upps error al crear el item", { position: "bottom-center" });
             setActive(false)
         }
     };
@@ -67,6 +61,7 @@ const ZonasForm = ({ isOpen, onCancel }: Props) => {
                 name="description"
                 register={register}
                 errors={errors.description}
+                required
             />
 
             <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
@@ -86,7 +81,7 @@ const ZonasForm = ({ isOpen, onCancel }: Props) => {
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
                             <>
-                                {selectedZone._id !== "" ? "Editar" : "Registrar"}
+                                {selectedItem._id !== "" ? "Editar" : "Registrar"}
                             </>
                         )}
                     </button>
@@ -96,4 +91,4 @@ const ZonasForm = ({ isOpen, onCancel }: Props) => {
     )
 }
 
-export default ZonasForm
+export default ItemForm

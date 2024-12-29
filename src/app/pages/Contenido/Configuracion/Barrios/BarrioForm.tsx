@@ -159,7 +159,7 @@ const BarrioForm = ({ isOpen, onCancel, zonas }: Props) => {
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
                             <>
-                                {selectedDistrict._id !== "" ? "Editar" : "Registrar"} zona
+                                {selectedDistrict._id !== "" ? "Editar" : "Registrar"}
                             </>
                         )}
                     </button>
