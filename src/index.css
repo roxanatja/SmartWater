@@ -74,7 +74,7 @@ code {
 }
 
 .react-datepicker__triangle::after {
-  @apply  !border-t-blocks;
+  @apply !border-t-blocks;
 }
 
 .react-datepicker__header {
@@ -88,4 +88,39 @@ code {
 
 .react-datepicker__day {
   @apply invert-0 dark:invert-[0.75];
+}
+
+.switch-contenido {
+  display: flex;
+  min-width: 321px;
+  max-width: 413px;
+  height: 40px;
+  border-radius: 30px;
+  background: rgb(var(--bg-main));
+  @apply shadow-md dark:shadow-slate-100/25;
+}
+
+.switch-option {
+  flex: 1;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgb(var(--font-color));
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.switch-option.selected {
+  border-radius: 30px;
+  background: rgb(var(--blue-custom));
+  box-shadow: 1px 0px 4px 0px rgba(0, 0, 0, 0.25);
+  color: #FFF;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  height: calc(100% - 1.5px);
 }

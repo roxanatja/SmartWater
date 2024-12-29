@@ -1,19 +1,19 @@
 import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./ItemsItem.css";
-import { Option } from "../../../../components/Option/Option";
-import { Item } from "../../../../../../type/Item";
+import { Option } from "../../../../../components/Option/Option";
+import { Item } from "../../../../../../../type/Item";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { ItemsContext } from "../ItemsContext";
-import { ItemsApiConector } from "../../../../../../api/classes";
+import { CategoriesContext } from "../CategoriesContext";
+import { ItemsApiConector } from "../../../../../../../api/classes";
 
 interface Props {
     item: Item
 }
 
-const ItemsItem: FC<Props> = ({ item }) => {
+const CategoryItems: FC<Props> = ({ item }) => {
     const [showOptions, setShowOptions] = useState<boolean>(false);
-    const { setSelectedItem } = useContext(ItemsContext);
+    const { setSelectedItem } = useContext(CategoriesContext);
 
     const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -130,4 +130,4 @@ const ItemsItem: FC<Props> = ({ item }) => {
     )
 }
 
-export { ItemsItem }
+export { CategoryItems as ItemsItem }

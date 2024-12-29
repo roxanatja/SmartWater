@@ -1,21 +1,24 @@
 import { FC, useCallback, useContext, useEffect, useState } from "react";
 import "./Items.css";
-import { PageTitle } from "../../../components/PageTitle/PageTitle";
-import { useGlobalContext } from "../../../../SmartwaterContext";
-import { item, ItemsContext } from "./ItemsContext";
-import { Item } from "../../../../../type/Item";
-import { ItemsApiConector } from "../../../../../api/classes";
-import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
-import Modal from "../../../EntryComponents/Modal";
-import ItemForm from "./ItemForm";
-import { ItemsItem } from "./Categoriastem/ItemsItem";
+import { PageTitle } from "../../../../components/PageTitle/PageTitle";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
+import { category, UnidadesContext } from "./UnidadesContext";
+import { Item } from "../../../../../../type/Item";
+import { ItemsApiConector } from "../../../../../../api/classes";
+import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
+import Modal from "../../../../EntryComponents/Modal";
+import UnidadesForm from "./UnidadesForm";
+import { UnidadeItems } from "./UnidadesItem/UnidadeItems";
+import { useNavigate, useParams } from "react-router-dom";
 
-const Items: FC = () => {
+const Unidades: FC = () => {
 
     const { setLoading } = useGlobalContext()
-    const { setShowModal, showModal, setSelectedItem, selectedItem } = useContext(ItemsContext)
+    const { setShowModal, showModal, setSelectedItem, selectedItem } = useContext(UnidadesContext)
 
     const [searchParam, setSearchParam] = useState<string>('');
+    const navigate = useNavigate()
+    const params = useParams()
 
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -58,16 +61,33 @@ const Items: FC = () => {
     return (
         <>
             <div className="px-10">
-                <PageTitle titulo="Configuración / Items" icon="../../../Configuracion-icon.svg" />
+                <PageTitle titulo="Configuración / Unidades" icon="../../../Configuracion-icon.svg" />
+
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={items.length} search={setSearchParam}>
+                    <div className="w-full sm:w-1/2 mb-10">
+                        <div className="switch-contenido">
+                            <div
+                                className={`switch-option ${params.section === "Categorias" ? "selected" : ""}`}
+                                onClick={() => navigate("/Configuracion/CategoriasUnidades/Categorias")}
+                            >
+                                Categorías
+                            </div>
+                            <div
+                                className={`switch-option ${params.section === "Unidades" ? "selected" : ""}`}
+                                onClick={() => navigate("/Configuracion/CategoriasUnidades/Unidades")}
+                            >
+                                Unidades
+                            </div>
+                        </div>
+                    </div>
                     <div className="w-full">
                         {
 
                             itemsToShow.length > 0 &&
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {
-                                    itemsToShow.map(p => <ItemsItem key={p._id} item={p} />)
+                                    itemsToShow.map(p => <UnidadeItems key={p._id} item={p} />)
                                 }
                             </div>
                         }
@@ -85,24 +105,24 @@ const Items: FC = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro de item
                 </h2>
-                <ItemForm isOpen={showModal} onCancel={() => setShowModal(false)} />
+                <UnidadesForm isOpen={showModal} onCancel={() => setShowModal(false)} />
             </Modal>
 
             <Modal
                 isOpen={selectedItem._id !== ""}
-                onClose={() => { setSelectedItem(item); setShowModal(false) }}
+                onClose={() => { setSelectedItem(category); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar item
                 </h2>
-                <ItemForm
+                <UnidadesForm
                     isOpen={
                         selectedItem._id !== "" ? true : false
                     }
-                    onCancel={() => { setSelectedItem(item); setShowModal(false) }} />
+                    onCancel={() => { setSelectedItem(category); setShowModal(false) }} />
             </Modal>
         </>
     )
 }
 
-export { Items }
+export { Unidades }

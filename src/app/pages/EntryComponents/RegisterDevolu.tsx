@@ -257,7 +257,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           }
           <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
         </div>
-        <div className="text-md rounded-full w-full grid grid-cols-2 gap-2 text-black shadow-md border shadow-zinc-300/25">
+        <div className="text-md rounded-full w-full grid grid-cols-2 gap-2 shadow-md border shadow-zinc-300/25">
           <button
             type="button"
             onClick={() => setOption(!option)}

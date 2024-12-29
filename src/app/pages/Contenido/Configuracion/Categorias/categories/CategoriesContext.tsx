@@ -1,31 +1,31 @@
 import { createContext, useState } from "react";
-import { Item } from "../../../../../type/Item";
+import { CategoryProduct } from "../../../../../../type/Products/Category";
 
-type ItemsContextType = {
+type CategoriesContextType = {
     showModal: boolean;
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     showMiniModal: boolean;
     setShowMiniModal: React.Dispatch<React.SetStateAction<boolean>>;
     selectedOption: boolean;
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedItem: Item;
-    setSelectedItem: React.Dispatch<React.SetStateAction<Item>>;
+    selectedItem: CategoryProduct;
+    setSelectedItem: React.Dispatch<React.SetStateAction<CategoryProduct>>;
 }
 
-export const ItemsContext = createContext<ItemsContextType>(
-    {} as ItemsContextType
+export const CategoriesContext = createContext<CategoriesContextType>(
+    {} as CategoriesContextType
 );
 
-export const item: Item = { name: "", _id: "", description: "" }
+export const category: CategoryProduct = { _id: "", description: "", name: "", desactivated: false, hiddenClient: false }
 
-export const ItemsProvider = ({ children }: any) => {
+export const CategoriesProvider = ({ children }: any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
-    const [selectedItem, setSelectedItem] = useState<Item>(item);
+    const [selectedItem, setSelectedItem] = useState<CategoryProduct>(category);
 
     return (
-        <ItemsContext.Provider value={{
+        <CategoriesContext.Provider value={{
             showModal,
             setShowModal,
             showMiniModal,
@@ -36,6 +36,6 @@ export const ItemsProvider = ({ children }: any) => {
             setSelectedItem,
         }}>
             {children}
-        </ItemsContext.Provider>
+        </CategoriesContext.Provider>
     );
 }

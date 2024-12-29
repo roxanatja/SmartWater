@@ -154,7 +154,7 @@ const Sidebar: FC = () => {
                 { titulo: "Horarios de trabajo", to: "/Configuracion/Horarios", id: 3 },
                 { titulo: "Barrios", to: "/Configuracion/Barrios", id: 4 },
                 { titulo: "Zonas", to: "/Configuracion/Zonas", id: 5 },
-                { titulo: "Categorías de productos", to: "/Configuracion/Categorias", id: 6 },
+                { titulo: "Categorías de productos", to: "/Configuracion/CategoriasUnidades", id: 6 },
                 { titulo: "Productos", to: "/Configuracion/Productos", id: 7 },
                 { titulo: "Items", to: "/Configuracion/Items", id: 8 },
                 { titulo: "Promociones", to: "/Configuracion/Promociones", id: 9 },
