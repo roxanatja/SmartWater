@@ -14,6 +14,7 @@ type Componentes = {
   hasSearch?: boolean;
   exportar?: boolean;
   typeDataToExport?: string;
+  searchPlaceholder?: string;
   add?: boolean;
   paginacion?: boolean;
   totalPage?: number;
@@ -47,6 +48,7 @@ export interface IFiltroPaginadoReference {
 const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   order = true,
   hasSearch = true,
+  searchPlaceholder = "Buscar",
   exportar,
   typeDataToExport,
   add,
@@ -482,7 +484,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                     type="text"
                     name="search"
                     register={register}
-                    placeholder="Buscar clientes por nombre o teléfono"
+                    placeholder={searchPlaceholder}
                     required
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       search && search(event.target.value)

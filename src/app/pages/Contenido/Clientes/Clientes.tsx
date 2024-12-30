@@ -122,6 +122,7 @@ const Clientes: FC = () => {
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
         hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
+        searchPlaceholder="Buscar clientes por nombre o teléfono"
       >
         {
           currentData.length > 0 &&

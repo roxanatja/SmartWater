@@ -3,7 +3,6 @@
     height: 40px;
     flex-shrink: 0;
     border-radius: 20px;
-    background: var(--Azul-oscuro, #1A3D7D);
     padding: 10px 35px 10px 35px;
     display: flex;
     justify-content: space-between;
@@ -34,8 +33,11 @@
 .AsignarPermisos-grupo-check{
     width: 150px;
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 16px;
+}
+.AsignarPermisos-grupo-check .input-check{
+    margin-top: 2.5px;
 }
 
 .AsignarPermisos-text-check{

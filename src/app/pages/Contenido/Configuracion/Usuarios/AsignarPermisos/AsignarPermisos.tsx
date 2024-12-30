@@ -1,211 +1,96 @@
-import { FC, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import "./AsignarPermisos.css";
 import { UsuariosContext } from "../UsuariosContext";
+import { Permission } from "../../../../../../type/User";
+import { Zone } from "../../../../../../type/City";
 
-const AsignarPermisos: FC = () =>{
+interface Props {
+    onCancel?: () => void;
+    permisos: Permission[];
+    zonas: Zone[];
+}
 
-    const { setShowMiniModal } = useContext(UsuariosContext);
-
-    const handleCloseModal = () => {
-        setShowMiniModal(false);
-    };
+const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
+    const { selectedUser } = useContext(UsuariosContext);
 
     const [checkbox1, setCheckbox1] = useState<boolean>(false);
-    
+
     const handleCheckbox1Change = () => {
         setCheckbox1(!checkbox1);
     };
 
-return (
-    <>
-        <form onSubmit={(e) => e.preventDefault()}>
-            <div className="modal-overlay">
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header" style={{height: "auto"}}>
-                        <div className="Titulo-Modal">
-                            <div>
-                                <span>Registro de usuario</span>
-                            </div>
-                            <div>
-                                <button type="button" className="btn" onClick={handleCloseModal}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="25" viewBox="0 0 21 25" fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M16.4034 6.91L15.186 5.5L10.3599 11.09L5.53374 5.5L4.31641 6.91L9.14256 12.5L4.31641 18.09L5.53374 19.5L10.3599 13.91L15.186 19.5L16.4034 18.09L11.5772 12.5L16.4034 6.91Z" fill="black" fill-opacity="0.87"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-body">
-                        <div className="grupo-input">
-                            <div className="AsignarPermisos-tituloinput">
-                                <span>Zonas</span>
-                                <button className="AsignarPermisos-tituloinput-btn"> 
-                                    <span className="material-symbols-outlined">
-                                        expand_less
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
+    return (
+        <>
+            <form onSubmit={(e) => e.preventDefault()}
+                className="flex flex-col gap-6 justify-center items-center w-full">
+                <div className="AsignarPermisos-tituloinput bg-blue_custom">
+                    <span>Zonas</span>
+                    <button className="AsignarPermisos-tituloinput-btn">
+                        <span className="material-symbols-outlined">
+                            expand_less
+                        </span>
+                    </button>
+                </div>
+                <div className="grid grid-cols-2 w-full px-4 gap-2">
+                    {
+                        zonas.map(z =>
+                            <div key={z._id} className="AsignarPermisos-grupo-check">
                                 <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
+                                    className="input-check accent-blue_custom"
+                                    type="checkbox"
+                                    id={z._id}
+                                    checked={checkbox1}
+                                    onChange={handleCheckbox1Change}
                                 />
-                                <label className="AsignarPermisos-text-check">Zona 1</label>
+                                <label htmlFor={z._id} className="AsignarPermisos-text-check text-font-color">{z.name}</label>
                             </div>
-                            <div className="AsignarPermisos-grupo-check">
+                        )
+                    }
+                </div>
+                <div className="AsignarPermisos-tituloinput bg-blue_custom">
+                    <span>Permisos</span>
+                    <button className="AsignarPermisos-tituloinput-btn">
+                        <span className="material-symbols-outlined">
+                            expand_less
+                        </span>
+                    </button>
+                </div>
+                <div className="grid grid-cols-2 w-full px-4 gap-2">
+                    {
+                        permisos.map(perm =>
+                            <div key={perm._id} className="AsignarPermisos-grupo-check">
                                 <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
+                                    id={perm._id}
+                                    className="input-check accent-blue_custom"
+                                    type="checkbox"
+                                    checked={checkbox1}
+                                    onChange={handleCheckbox1Change}
                                 />
-                                <label className="AsignarPermisos-text-check">Zona 2</label>
+                                <label htmlFor={perm._id} className="AsignarPermisos-text-check text-font-color">{perm.name}</label>
                             </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Zona 3</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Zona 4</label>
-                            </div>
-                        </div>
-                        <div className="grupo-input">
-                            <div className="AsignarPermisos-tituloinput">
-                                <span>Permisos</span>
-                                <button className="AsignarPermisos-tituloinput-btn"> 
-                                    <span className="material-symbols-outlined">
-                                        expand_less
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Registrar clientes</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Eliminar clientes</label>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Editar clientes</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Registrar ventas</label>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Editar ventas</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Eliminar ventas</label>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Editar préstamos</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Registrar pedidos</label>
-                            </div>
-                        </div>
-                        <div className="AsignarPermisos-grupo-input">
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Cancelar pedidos</label>
-                            </div>
-                            <div className="AsignarPermisos-grupo-check">
-                                <input
-                                className="input-check"
-                                type="checkbox"
-                                checked={checkbox1}
-                                onChange={handleCheckbox1Change}
-                                />
-                                <label className="AsignarPermisos-text-check">Eliminar pedidos</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
-                        <button type="button" className="btn-registrar">Registrar</button>
+                        )
+                    }
+                </div>
+
+                <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
+                    <div className="py-4 flex flex-row gap-4 items-center justify-center px-6">
+                        <button
+                            onClick={onCancel}
+                            className="w-full outline outline-2 outline-blue-500 py-2 rounded-full text-blue-600 font-black shadow-xl"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
+                        >
+                            Actualizar
+                        </button>
                     </div>
                 </div>
-            </div>
-        </form>
-    </>
-)
+            </form >
+        </>
+    )
 }
 
-export{AsignarPermisos}
+export { AsignarPermisos }

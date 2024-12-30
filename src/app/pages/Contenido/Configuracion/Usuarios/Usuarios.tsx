@@ -1,80 +1,138 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
 import "./Usuarios.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
-import { UsuariosContext } from "./UsuariosContext";
+import { user, UsuariosContext } from "./UsuariosContext";
 import { AddUsuario } from "./AddUsuario/AddUsuario";
 import { CuadroUsuarios } from "./CuadroUsuarios/CuadroUsuarios";
 import { AsignarPermisos } from "./AsignarPermisos/AsignarPermisos";
-import { GetUser } from "../../../../../services/UserService";
-import { User } from "../../../../../type/User/User";
+import { Permission, User } from "../../../../../type/User";
+import { UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
+import Modal from "../../../EntryComponents/Modal";
+import { Zone } from "../../../../../type/City";
+import { useGlobalContext } from "../../../../SmartwaterContext";
 
 const Usuarios: FC = () => {
+    const { setLoading } = useGlobalContext()
+    const { showModal, setShowModal, showMiniModal, selectedUser, setSelectedUser, setShowMiniModal } = useContext(UsuariosContext)
 
-    const {showModal, setShowModal, showMiniModal} = useContext(UsuariosContext)
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-    const [users, setUsers] = useState<Array<User>>([]);
+    const [searchParam, setSearchParam] = useState<string>('');
 
-    const getUsers = async () => {
-        try{
-            await GetUser()
-                .then((resp) => {
-                    setUsers(resp);
-                    setLoading(false);
-                });
-        }catch(e){
-            console.error(e);
-            setLoading(false);
-            setError(true);
-        };
-    };
+    const [page, setPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const ITEMS_PER_PAGE = 15
+
+    const [usersToShow, setUsersToShow] = useState<User[]>([])
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+    const [users, setUsers] = useState<User[]>([])
+
+    const [zonas, setZonas] = useState<Zone[]>([])
+    const [permisos, setPermisos] = useState<Permission[]>([])
+
+    const fetchData = useCallback(async () => {
+        setLoading(true)
+
+        const res = await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user' } })
+        const prods = res?.data || []
+        setUsers(prods)
+        setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
+
+        const resZ = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        setZonas(resZ?.data || [])
+        const resP = await UsersApiConector.getPermissions({ pagination: { page: 1, pageSize: 3000 } })
+        setPermisos(resP?.data || [])
+
+        setLoading(false)
+    }, [setLoading])
 
     useEffect(() => {
-        getUsers();
-    }, []);
+        fetchData()
+    }, [fetchData])
 
-    if (loading) {
-        return <p>Cargando Usuarios</p>
-    };
+    useEffect(() => {
+        if (users) {
+            const itms = users.filter(d => d.fullName.toLowerCase().includes(searchParam.toLowerCase()) || d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase()))
+            setFilteredUsers(itms);
+            setTotalPages(Math.ceil(itms.length / ITEMS_PER_PAGE))
+            setPage(1);
+        }
+    }, [users, searchParam])
 
-    if (error) {
-        return <p>Ocurrio un error en la carga de datos, intentelo de nuevo en unos minutos</p>
-    };
+    useEffect(() => {
+        if (filteredUsers) {
+            setUsersToShow(filteredUsers.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
+        }
+    }, [filteredUsers, page])
 
     const AgregarUsuario = () => {
         setShowModal(true)
     };
 
-    const searchUser = (e: string) => {
-        const value = e;
-        
-        if(value === ""){
-            getUsers();
-            return;
-        } else {
-            let resultado = users.filter(user => user.fullName.toLowerCase().includes(value.toLowerCase()));
-
-            setUsers(resultado); 
-        }
-    };
-
-    return(
+    return (
         <>
-        <div>
-            <PageTitle titulo="Configuración / Usuarios" icon="../../../Configuracion-icon.svg"/> 
-            <FiltroPaginado filtro ={false} onAdd={AgregarUsuario} add search={searchUser}>
-                <div style={{display: "flex", flexWrap: "wrap", flexDirection: "row", gap: "24px"}}>
-                    {users.map((user, index) => {
-                        return <CuadroUsuarios key={index} user={user}/>
-                    })}
+            <div className="px-10">
+                <PageTitle titulo="Configuración / Usuarios" icon="../../../Configuracion-icon.svg" />
+                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                    onAdd={() => setShowModal(true)} resultados order={false} total={filteredUsers.length} search={setSearchParam}
+                    searchPlaceholder="Buscar usuarios por nombre o teléfono">
+                    {
+
+                        usersToShow.length > 0 &&
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {
+                                usersToShow.map(p => <CuadroUsuarios key={user._id} user={p} />)
+                            }
+                        </div>
+                    }
+                    {
+                        usersToShow.length === 0 &&
+                        <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+                            Sin resultados
+                        </div>
+                    }
+                </FiltroPaginado>
+            </div>
+
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Registrar usuario
+                </h2>
+                <AddUsuario />
+            </Modal>
+
+            <Modal
+                isOpen={selectedUser._id !== "" && !showMiniModal}
+                onClose={() => setSelectedUser(user)}
+            >
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 top-0 z-30 bg-main-background">
+                    Editar Cliente
+                </h2>
+                <AddUsuario />
+            </Modal>
+
+            <Modal
+                isOpen={selectedUser._id !== "" && showMiniModal ? true : false}
+                onClose={() => {
+                    setSelectedUser(user)
+                    setShowMiniModal(false);
+                }}
+                className="w-3/12"
+            >
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 top-0 z-30">
+                    Asignar permisos y zonas
+                </h2>
+                <div className="p-6">
+                    <AsignarPermisos
+                        permisos={permisos}
+                        zonas={zonas}
+                        onCancel={() => {
+                            setSelectedUser(user);
+                            setShowMiniModal(false);
+                        }} />
                 </div>
-            </FiltroPaginado>
-        </div>
-        {showModal && <AddUsuario/>}
-        {showMiniModal && <AsignarPermisos/>}
+            </Modal>
         </>
     )
 }
 
-export{Usuarios}
+export { Usuarios }
