@@ -7,6 +7,7 @@ import { ProductosContext } from "../ProductosContext";
 import toast from "react-hot-toast";
 import { ProductsApiConector } from "../../../../../../api/classes";
 import { CategoryProduct } from "../../../../../../type/Products/Category";
+import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
 
 interface Props {
     product: Product;
@@ -33,7 +34,7 @@ const ProductosItem: FC<Props> = ({ product }) => {
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> este barrio, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminará</b> este producto, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
@@ -120,6 +121,9 @@ const ProductosItem: FC<Props> = ({ product }) => {
                     </div>
                     <div className="flex justify-between w-full gap-3">
                         <strong>Categoría:</strong><span>{(product.category as CategoryProduct).name}</span>
+                    </div>
+                    <div className="flex justify-between w-full gap-3">
+                        <strong>Unidad de medida:</strong><span>{(product.unitMeasure as UnitMeasure).name}</span>
                     </div>
                     <div className="flex flex-col w-full gap-3">
                         <strong>Imagen:</strong>

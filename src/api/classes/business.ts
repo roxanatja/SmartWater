@@ -7,7 +7,15 @@ export interface IBusinessGetOneParams {
 
 export interface IBusinessUpdateParams {
     businessId: string;
-    data: Business;
+    data: {
+        phoneNumber: string;
+        email: string;
+        address: string;
+        imageUrl: string;
+        companyName: string;
+        city?: string;
+        nit?: string;
+    };
 }
 
 export abstract class BussinessApiConector {

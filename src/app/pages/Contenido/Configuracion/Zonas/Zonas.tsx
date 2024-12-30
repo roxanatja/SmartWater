@@ -62,7 +62,7 @@ const Zonas: FC = () => {
                 {/* TODO: What filters */}
 
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados order={false} total={zonas.length} search={setSearchParam}>
+                    onAdd={() => setShowModal(true)} resultados order={false} total={filteredZonas.length} search={setSearchParam}>
                     <div className="w-full">
                         {
 

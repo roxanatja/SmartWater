@@ -8,15 +8,17 @@ import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import Input from '../../../EntryComponents/Inputs';
 import ImageUploadField from '../../../EntryComponents/ImageUploadField';
+import { UnitMeasure } from '../../../../../type/Products/UnitMeasure';
 
 interface Props {
     isOpen: boolean;
     onCancel?: () => void;
     categories: CategoryProduct[];
+    units: UnitMeasure[];
 }
 
 
-const ProductForm = ({ categories, isOpen, onCancel }: Props) => {
+const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
     const { selectedProduct } = useContext(ProductosContext);
     const [active, setActive] = useState(false);
 
@@ -27,7 +29,10 @@ const ProductForm = ({ categories, isOpen, onCancel }: Props) => {
         handleSubmit,
         formState: { errors, isValid },
     } = useForm<IProductBody['data']>({
-        defaultValues: selectedProduct._id === "" ? {} : { name: selectedProduct.name, description: selectedProduct.description, category: (selectedProduct.category as CategoryProduct)._id, imageUrl: selectedProduct.imageUrl, price: selectedProduct.price, priceBusiness: selectedProduct.priceBusiness },
+        defaultValues: selectedProduct._id === "" ? {} : {
+            name: selectedProduct.name, description: selectedProduct.description, category: (selectedProduct.category as CategoryProduct)._id,
+            unitMeasure: (selectedProduct.unitMeasure as UnitMeasure)._id, imageUrl: selectedProduct.imageUrl, price: selectedProduct.price, priceBusiness: selectedProduct.priceBusiness
+        },
         mode: 'all'
     });
 
@@ -67,37 +72,7 @@ const ProductForm = ({ categories, isOpen, onCancel }: Props) => {
                 required
             />
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.3 }}
-                className="w-full flex flex-col gap-2"
-            >
-                <label>Categoría</label>
-                <select
-                    {...register("category", {
-                        required: "Debes seleccionar una categoría"
-                    })}
-                    className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
-                >
-                    {
-                        categories.map((row, index) => (
-                            <option value={row._id} key={index}>
-                                {row.name}
-                            </option>
-                        ))
-                    }
-                </select>
-                {errors.category && (
-                    <span className="text-red-500 font-normal text-sm font-pricedown">
-                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                        {errors.category.message}
-                    </span>
-                )}
-            </motion.div>
-
-            <div className="flex gap-6 items-center w-full">
+            <div className="flex gap-6 items-center w-full flex-col sm:flex-row">
                 <Input
                     sufix={<>Bs.</>}
                     numericalOnly
@@ -116,6 +91,68 @@ const ProductForm = ({ categories, isOpen, onCancel }: Props) => {
                     errors={errors.price}
                     required
                 />
+            </div>
+
+            <div className="flex gap-6 items-center w-full flex-col sm:flex-row">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full sm:w-1/2 flex flex-col gap-2"
+                >
+                    <label>Categoría</label>
+                    <select
+                        disabled={selectedProduct._id !== ""}
+                        {...register("category", {
+                            required: "Debes seleccionar una categoría"
+                        })}
+                        className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
+                    >
+                        {
+                            categories.map((row, index) => (
+                                <option value={row._id} key={index}>
+                                    {row.name}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {errors.category && (
+                        <span className="text-red-500 font-normal text-sm font-pricedown">
+                            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                            {errors.category.message}
+                        </span>
+                    )}
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full sm:w-1/2 flex flex-col gap-2"
+                >
+                    <label>Unidad</label>
+                    <select
+                        {...register("unitMeasure", {
+                            required: "Debes seleccionar una unidad"
+                        })}
+                        className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
+                    >
+                        {
+                            units.map((row, index) => (
+                                <option value={row._id} key={index}>
+                                    {row.name}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {errors.unitMeasure && (
+                        <span className="text-red-500 font-normal text-sm font-pricedown">
+                            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                            {errors.unitMeasure.message}
+                        </span>
+                    )}
+                </motion.div>
             </div>
 
             <ImageUploadField

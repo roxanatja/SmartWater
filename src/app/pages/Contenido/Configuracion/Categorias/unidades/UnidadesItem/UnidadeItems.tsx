@@ -1,17 +1,17 @@
 import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./ItemsItem.css";
 import { Option } from "../../../../../components/Option/Option";
-import { Item } from "../../../../../../../type/Item";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { UnidadesContext } from "../UnidadesContext";
-import { ItemsApiConector } from "../../../../../../../api/classes";
+import { UnitMeasureApiConector } from "../../../../../../../api/classes";
+import { UnitMeasure } from "../../../../../../../type/Products/UnitMeasure";
 
 interface Props {
-    item: Item
+    unit: UnitMeasure
 }
 
-const UnidadeItems: FC<Props> = ({ item }) => {
+const UnidadeItems: FC<Props> = ({ unit }) => {
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const { setSelectedItem } = useContext(UnidadesContext);
 
@@ -22,7 +22,7 @@ const UnidadeItems: FC<Props> = ({ item }) => {
     };
 
     const Edit = () => {
-        setSelectedItem(item);
+        setSelectedItem(unit);
         setShowOptions(false);
     };
 
@@ -31,7 +31,7 @@ const UnidadeItems: FC<Props> = ({ item }) => {
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> esta zona, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminará</b> esta unidad, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
@@ -44,22 +44,22 @@ const UnidadeItems: FC<Props> = ({ item }) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                const response = await ItemsApiConector.delete({ productId: item?._id || '' }) as any;
+                                const response = await UnitMeasureApiConector.delete({ unitId: unit?._id || '' });
                                 if (!!response) {
-                                    if (response.mensaje) {
-                                        toast.success(response.mensaje, {
+                                    if (response.message.includes("in use")) {
+                                        toast.error("La unidad está en uso. No puede ser eliminada", {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                    } else {
+                                        toast.success("Categoría eliminada correctamente", {
                                             position: "top-center",
                                             duration: 2000
                                         });
                                         window.location.reload();
-                                    } else if (response.error) {
-                                        toast.error(response.error, {
-                                            position: "top-center",
-                                            duration: 2000
-                                        });
                                     }
                                 } else {
-                                    toast.error("Error al eliminar cliente", {
+                                    toast.error("Error al eliminar la unidad", {
                                         position: "top-center",
                                         duration: 2000
                                     });
@@ -107,10 +107,10 @@ const UnidadeItems: FC<Props> = ({ item }) => {
             >
                 <div className="flex flex-col gap-4 p-1">
                     <p>
-                        <strong>{item.name}</strong>
+                        <strong>{unit.name}</strong>
                     </p>
                     <div className="flex gap-4 items-center">
-                        <p className="text-sm">{item.description}</p>
+                        <p className="text-sm">{unit.description}</p>
                     </div>
                 </div>
                 <div className="flex gap-2 items-start flex-col pt-2 relative" ref={optionsRef}>

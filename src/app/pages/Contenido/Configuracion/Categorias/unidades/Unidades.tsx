@@ -3,13 +3,13 @@ import "./Items.css";
 import { PageTitle } from "../../../../components/PageTitle/PageTitle";
 import { useGlobalContext } from "../../../../../SmartwaterContext";
 import { category, UnidadesContext } from "./UnidadesContext";
-import { Item } from "../../../../../../type/Item";
-import { ItemsApiConector } from "../../../../../../api/classes";
+import { UnitMeasureApiConector } from "../../../../../../api/classes";
 import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
 import Modal from "../../../../EntryComponents/Modal";
 import UnidadesForm from "./UnidadesForm";
 import { UnidadeItems } from "./UnidadesItem/UnidadeItems";
 import { useNavigate, useParams } from "react-router-dom";
+import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
 
 const Unidades: FC = () => {
 
@@ -24,15 +24,15 @@ const Unidades: FC = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
     const ITEMS_PER_PAGE = 15
 
-    const [itemsToShow, setItemsToShow] = useState<Item[]>([])
-    const [filteredItems, setFilteredItems] = useState<Item[]>([])
-    const [items, setItems] = useState<Item[]>([])
+    const [itemsToShow, setItemsToShow] = useState<UnitMeasure[]>([])
+    const [filteredItems, setFilteredItems] = useState<UnitMeasure[]>([])
+    const [items, setItems] = useState<UnitMeasure[]>([])
 
     const fetchData = useCallback(async () => {
         setLoading(true)
 
-        const res = await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
-        const prods = res?.data || []
+        const res = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const prods = res || []
         setItems(prods)
         setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
 
@@ -45,7 +45,7 @@ const Unidades: FC = () => {
 
     useEffect(() => {
         if (items) {
-            const itms = items.filter(d => d.name.toLowerCase().includes(searchParam.toLowerCase()))
+            const itms = items.filter(d => d.name.toLowerCase().includes(searchParam.toLowerCase()) || d.description.toLowerCase().includes(searchParam.toLowerCase()))
             setFilteredItems(itms);
             setTotalPages(Math.ceil(itms.length / ITEMS_PER_PAGE))
             setPage(1);
@@ -64,7 +64,7 @@ const Unidades: FC = () => {
                 <PageTitle titulo="Configuración / Unidades" icon="../../../Configuracion-icon.svg" />
 
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados order={false} total={items.length} search={setSearchParam}>
+                    onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}>
                     <div className="w-full sm:w-1/2 mb-10">
                         <div className="switch-contenido">
                             <div
@@ -87,7 +87,7 @@ const Unidades: FC = () => {
                             itemsToShow.length > 0 &&
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {
-                                    itemsToShow.map(p => <UnidadeItems key={p._id} item={p} />)
+                                    itemsToShow.map(p => <UnidadeItems key={p._id} unit={p} />)
                                 }
                             </div>
                         }

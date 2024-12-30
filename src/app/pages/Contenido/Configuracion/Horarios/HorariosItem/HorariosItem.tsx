@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { HorarioContext } from "../HorarioContext";
 import { SchedulesApiConector } from "../../../../../../api/classes";
 import { Schedule } from "../../../../../../type/Schedule";
+import { convertTo12HourIntl } from "../../../../../../utils/helpers";
 
 interface Props {
     schedule: Schedule
@@ -31,7 +32,7 @@ const HorariosItem: FC<Props> = ({ schedule }) => {
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> esta zona, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminará</b> este horario, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
@@ -109,7 +110,7 @@ const HorariosItem: FC<Props> = ({ schedule }) => {
             >
                 <div className="flex flex-col gap-4 p-1">
                     <p>
-                        <strong>Horario: </strong>{schedule.startTime} - {schedule.endTime}
+                        <strong>Horario: </strong>{convertTo12HourIntl(schedule.startTime)} - {convertTo12HourIntl(schedule.endTime)}
                     </p>
                     <div className="flex gap-4 items-center">
                         <p className="text-sm">{schedule.days.join(", ")}</p>

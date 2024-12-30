@@ -10,6 +10,8 @@ import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginad
 import { CategoryProduct } from "../../../../../type/Products/Category";
 import Modal from "../../../EntryComponents/Modal";
 import ProductForm from "./ProductForm";
+import { UnitMeasure } from "../../../../../type/Products/UnitMeasure";
+import { UnitMeasureApiConector } from "../../../../../api/classes/unit-measure";
 
 const Productos: FC = () => {
     const { setLoading } = useGlobalContext()
@@ -30,6 +32,7 @@ const Productos: FC = () => {
     const optionsRef = useRef<HTMLDivElement>(null);
 
     const [categories, setCategories] = useState<CategoryProduct[]>([])
+    const [units, setUnits] = useState<UnitMeasure[]>([])
     const [checkedCategories, setCheckedCategories] = useState<string[]>([])
 
     const fetchData = useCallback(async () => {
@@ -42,6 +45,9 @@ const Productos: FC = () => {
 
         const resC = await CategoryProductApiConector.get()
         setCategories(resC || [])
+
+        const resU = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        setUnits(resU || [])
 
         setLoading(false)
     }, [setLoading, sort])
@@ -104,7 +110,7 @@ const Productos: FC = () => {
             <div className="px-10">
                 <PageTitle titulo="Configuración / Productos" icon="../../../Configuracion-icon.svg" />
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados total={products.length} search={setSearchParam} orderArray={order}
+                    onAdd={() => setShowModal(true)} resultados total={filteredProducts.length} search={setSearchParam} orderArray={order}
                     filtro={true} hasFilter={checkedCategories.length > 0} onFilter={() => setFiltro(true)}
                     filterInject={<>
                         {
@@ -153,7 +159,7 @@ const Productos: FC = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro de producto
                 </h2>
-                <ProductForm isOpen={showModal} onCancel={() => setShowModal(false)} categories={categories} />
+                <ProductForm isOpen={showModal} onCancel={() => setShowModal(false)} categories={categories} units={units} />
             </Modal>
 
             <Modal
@@ -167,7 +173,7 @@ const Productos: FC = () => {
                     isOpen={
                         selectedProduct._id !== "" ? true : false
                     }
-                    onCancel={() => { setSelectedProduct(product); setShowModal(false) }} categories={categories}
+                    onCancel={() => { setSelectedProduct(product); setShowModal(false) }} categories={categories} units={units}
                 />
             </Modal>
         </>

@@ -32,7 +32,7 @@ export abstract class CategoryProductApiConector {
         }
     }
 
-    static async update(params: ICategoryBody & ICategoryFilter): Promise<{ mensaje: string } | null> {
+    static async update(params: ICategoryBody & ICategoryFilter): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.categoryId}`, params.data)
             return res.data
@@ -41,7 +41,7 @@ export abstract class CategoryProductApiConector {
         }
     }
 
-    static async delete(params: ICategoryFilter): Promise<{ mensaje: string } | null> {
+    static async delete(params: ICategoryFilter): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.categoryId}/delete`)
             return res.data

@@ -17,6 +17,7 @@ import { PromotionApiConector } from './promotion'
 import { ProvidersApiConector } from './providers'
 import { SalesApiConector } from './sales'
 import { SchedulesApiConector } from './schedules'
+import { UnitMeasureApiConector } from './unit-measure'
 import { UsersApiConector } from './users'
 import { ZonesApiConector } from './zones'
 
@@ -40,6 +41,7 @@ export {
     ProvidersApiConector,
     SalesApiConector,
     SchedulesApiConector,
+    UnitMeasureApiConector,
     UsersApiConector,
     ZonesApiConector
 }

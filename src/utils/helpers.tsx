@@ -11,3 +11,18 @@ export const formatDateTime = (date: string, year: Intl.DateTimeFormatOptions['y
     var dateFormated = dateToFormat.toLocaleDateString('es-AR', options);
     return dateFormated;
 };
+
+export const convertTo12HourIntl = (time24: string) => {
+    const [hours, minutes] = time24.split(':').map(Number);
+
+    const date = new Date();
+    date.setHours(hours, minutes);
+
+    const formatter = new Intl.DateTimeFormat('es-AR', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    });
+
+    return formatter.format(date);
+}

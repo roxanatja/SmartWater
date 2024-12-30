@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ItemsApiConector } from "../../../../../../api/classes";
+import { CategoryProductApiConector } from "../../../../../../api/classes";
 import toast from "react-hot-toast";
 import Input from "../../../../EntryComponents/Inputs";
 import { CategoriesContext } from "./CategoriesContext";
-import { IItemBody } from "../../../../../../api/types/items";
+import { ICategoryBody } from "../../../../../../api/types/category-products";
 
 interface Props {
     isOpen: boolean;
@@ -12,30 +12,30 @@ interface Props {
 }
 
 const CategoriesWrapper = ({ isOpen, onCancel }: Props) => {
-    const { selectedItem } = useContext(CategoriesContext);
+    const { selectedCategory } = useContext(CategoriesContext);
     const [active, setActive] = useState(false);
 
     const {
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<IItemBody['data']>({
-        defaultValues: selectedItem._id === "" ? {} : { description: selectedItem.description, name: selectedItem.name },
+    } = useForm<ICategoryBody['data']>({
+        defaultValues: selectedCategory._id === "" ? {} : { description: selectedCategory.description, name: selectedCategory.name },
         mode: 'all'
     });
 
-    const onSubmit: SubmitHandler<IItemBody['data']> = async (data) => {
+    const onSubmit: SubmitHandler<ICategoryBody['data']> = async (data) => {
         let res = null
         setActive(true)
 
-        if (selectedItem._id !== "") {
-            res = await ItemsApiConector.update({ productId: selectedItem._id, data })
+        if (selectedCategory._id !== "") {
+            res = await CategoryProductApiConector.update({ categoryId: selectedCategory._id, data })
         } else {
-            res = await ItemsApiConector.create({ data })
+            res = await CategoryProductApiConector.create({ data })
         }
 
         if (res) {
-            toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            toast.success(`Item ${selectedCategory._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
             window.location.reload();
         } else {
             toast.error("Upps error al crear el item", { position: "bottom-center" });
@@ -81,7 +81,7 @@ const CategoriesWrapper = ({ isOpen, onCancel }: Props) => {
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
                             <>
-                                {selectedItem._id !== "" ? "Editar" : "Registrar"}
+                                {selectedCategory._id !== "" ? "Editar" : "Registrar"}
                             </>
                         )}
                     </button>

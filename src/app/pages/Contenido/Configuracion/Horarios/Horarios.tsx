@@ -63,7 +63,7 @@ const Horarios: FC = () => {
             <div className="px-10">
                 <PageTitle titulo="Configuración / Items" icon="../../../Configuracion-icon.svg" />
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados order={false} total={schedules.length} search={setSearchParam}>
+                    onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}>
                     <div className="w-full">
                         {
 

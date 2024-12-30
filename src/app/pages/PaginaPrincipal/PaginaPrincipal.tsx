@@ -34,6 +34,7 @@ import LoginFormWrapper from "../Contenido/LoginForm/LoginPageWrapper";
 import ProtectedRoute from "../EntryComponents/ProtectRouter";
 import { HorariosWrapper } from "../Contenido/Configuracion/Horarios/HorariosWrapper";
 import { CategoriesWrapper } from "../Contenido/Configuracion/Categorias/CategoriesWrapper";
+import DatosEmpresa from "../Contenido/Configuracion/DatosEmpresa/DatosEmpresa";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -41,7 +42,7 @@ const PaginaPrincipal: FC = () => {
       <Router>
         <div className="flex">
           <Sidebar />
-          <div className="Contenedor max-md:w-full relative bg-main-background">
+          <div className="Contenedor max-md:w-full relative bg-main-background !overflow-y-auto">
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
@@ -104,6 +105,10 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Configuracion/General"
                   element={<ConfiguracionGeneralWrapper />}
+                />
+                <Route
+                  path="/Configuracion/DatosEmpresa"
+                  element={<DatosEmpresa />}
                 />
                 <Route
                   path="/Configuracion/Usuarios"

@@ -12,7 +12,7 @@ type ProductosContextType = {
     setSelectedProduct: React.Dispatch<React.SetStateAction<Product>>;
 }
 
-export const product: Product = { _id: "", category: "", description: "", imageUrl: "", name: "", price: 0, priceBusiness: 0 }
+export const product: Product = { _id: "", category: "", description: "", imageUrl: "", name: "", price: 0, priceBusiness: 0, unitMeasure: "" }
 
 export const ProductosContext = createContext<ProductosContextType>(
     {} as ProductosContextType

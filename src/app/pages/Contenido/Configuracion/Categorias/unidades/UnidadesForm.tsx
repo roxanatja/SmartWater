@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ItemsApiConector } from "../../../../../../api/classes";
+import { UnitMeasureApiConector } from "../../../../../../api/classes";
 import toast from "react-hot-toast";
 import Input from "../../../../EntryComponents/Inputs";
 import { UnidadesContext } from "./UnidadesContext";
-import { IItemBody } from "../../../../../../api/types/items";
+import { IUnitBody } from "../../../../../../api/types/unit-measure";
 
 interface Props {
     isOpen: boolean;
@@ -19,19 +19,19 @@ const UnidadesForm = ({ isOpen, onCancel }: Props) => {
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<IItemBody['data']>({
+    } = useForm<IUnitBody['data']>({
         defaultValues: selectedItem._id === "" ? {} : { description: selectedItem.description, name: selectedItem.name },
         mode: 'all'
     });
 
-    const onSubmit: SubmitHandler<IItemBody['data']> = async (data) => {
+    const onSubmit: SubmitHandler<IUnitBody['data']> = async (data) => {
         let res = null
         setActive(true)
 
         if (selectedItem._id !== "") {
-            res = await ItemsApiConector.update({ productId: selectedItem._id, data })
+            res = await UnitMeasureApiConector.update({ unitId: selectedItem._id, data })
         } else {
-            res = await ItemsApiConector.create({ data })
+            res = await UnitMeasureApiConector.create({ data })
         }
 
         if (res) {

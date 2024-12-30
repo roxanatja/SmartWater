@@ -15,6 +15,7 @@ export interface IProductBody {
         imageUrl: string;
         category: string;
         priceBusiness: number;
+        unitMeasure: string;
     }
 }
 

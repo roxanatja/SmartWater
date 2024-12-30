@@ -1,19 +1,19 @@
 import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./ItemsItem.css";
 import { Option } from "../../../../../components/Option/Option";
-import { Item } from "../../../../../../../type/Item";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { CategoriesContext } from "../CategoriesContext";
-import { ItemsApiConector } from "../../../../../../../api/classes";
+import { CategoryProductApiConector } from "../../../../../../../api/classes";
+import { CategoryProduct } from "../../../../../../../type/Products/Category";
 
 interface Props {
-    item: Item
+    category: CategoryProduct
 }
 
-const CategoryItems: FC<Props> = ({ item }) => {
+const CategoryItems: FC<Props> = ({ category }) => {
     const [showOptions, setShowOptions] = useState<boolean>(false);
-    const { setSelectedItem } = useContext(CategoriesContext);
+    const { setSelectedCategory } = useContext(CategoriesContext);
 
     const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,7 @@ const CategoryItems: FC<Props> = ({ item }) => {
     };
 
     const Edit = () => {
-        setSelectedItem(item);
+        setSelectedCategory(category);
         setShowOptions(false);
     };
 
@@ -31,7 +31,7 @@ const CategoryItems: FC<Props> = ({ item }) => {
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> esta zona, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminará</b> esta categoría, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
@@ -44,19 +44,22 @@ const CategoryItems: FC<Props> = ({ item }) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                const response = await ItemsApiConector.delete({ productId: item?._id || '' }) as any;
+                                const response = await CategoryProductApiConector.delete({ categoryId: category?._id || '' });
                                 if (!!response) {
-                                    if (response.mensaje) {
-                                        toast.success(response.mensaje, {
-                                            position: "top-center",
-                                            duration: 2000
-                                        });
-                                        window.location.reload();
-                                    } else if (response.error) {
-                                        toast.error(response.error, {
-                                            position: "top-center",
-                                            duration: 2000
-                                        });
+                                    if (response.message) {
+                                        if (response.message.includes("in use")) {
+                                            toast.error("La categoría está en uso. No puede ser eliminada", {
+                                                position: "top-center",
+                                                duration: 2000
+                                            });
+
+                                        } else {
+                                            toast.success("Categoría eliminada correctamente", {
+                                                position: "top-center",
+                                                duration: 2000
+                                            });
+                                            window.location.reload();
+                                        }
                                     }
                                 } else {
                                     toast.error("Error al eliminar cliente", {
@@ -107,10 +110,10 @@ const CategoryItems: FC<Props> = ({ item }) => {
             >
                 <div className="flex flex-col gap-4 p-1">
                     <p>
-                        <strong>{item.name}</strong>
+                        <strong>{category.name}</strong>
                     </p>
                     <div className="flex gap-4 items-center">
-                        <p className="text-sm">{item.description}</p>
+                        <p className="text-sm">{category.description}</p>
                     </div>
                 </div>
                 <div className="flex gap-2 items-start flex-col pt-2 relative" ref={optionsRef}>

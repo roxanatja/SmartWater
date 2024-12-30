@@ -31,7 +31,7 @@ const ItemsItem: FC<Props> = ({ item }) => {
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> esta zona, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminará</b> este item, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
