@@ -80,7 +80,7 @@ const Usuarios: FC = () => {
                         usersToShow.length > 0 &&
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                             {
-                                usersToShow.map(p => <CuadroUsuarios key={user._id} user={p} />)
+                                usersToShow.map(p => <CuadroUsuarios key={user._id} user={p} zones={zonas} />)
                             }
                         </div>
                     }
