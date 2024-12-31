@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { BarriosContext } from './BarriosContext';
 import { IDistricBody } from '../../../../../api/types/districts';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -7,7 +7,7 @@ import { DistrictsApiConector, ZonesApiConector } from '../../../../../api/class
 import Input from '../../../EntryComponents/Inputs';
 import { AuthService } from '../../../../../api/services/AuthService';
 import { motion } from 'framer-motion'
-import { Zone } from '../../../../../type/City';
+import { District, Zone } from '../../../../../type/City';
 
 interface Props {
     isOpen: boolean;
@@ -19,9 +19,14 @@ const BarrioForm = ({ isOpen, onCancel, zonas }: Props) => {
     const { selectedDistrict } = useContext(BarriosContext);
     const [active, setActive] = useState(false);
 
+    const [suggestion, setSuggestion] = useState<District | null>(null);
+    const optionsRef = useRef<HTMLDivElement>(null);
+
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
         formState: { errors, isValid },
     } = useForm<IDistricBody['data'] & { zone: string }>({
         defaultValues: selectedDistrict._id === "" ? {} : { name: selectedDistrict.name, description: selectedDistrict.description },
@@ -50,36 +55,11 @@ const BarrioForm = ({ isOpen, onCancel, zonas }: Props) => {
                 setActive(false)
             }
         } else {
-            const exists = await DistrictsApiConector.findByNamaOrCity({
-                filters: { cityId, name: data.name }
-            })
-
-            let districtId = ""
-            if (exists?.exist && exists.exist.length > 0) {
-                districtId = exists.exist[0]._id
-            } else {
-                const res = await DistrictsApiConector.create({
-                    data: {
-                        cityId,
-                        description: data.description,
-                        name: data.name,
-                    }
-                })
-
-                if (res?.id) {
-                    districtId = res.id;
-                } else {
-                    toast.error("Upps error al crear el barrio", { position: "bottom-center" });
-                    setActive(false)
-                    return;
-                }
-            }
-
-            // FIXME: Error when assigning
-            const endRes = await ZonesApiConector.assignDistrict({ data: { cityId, district: districtId, zoneId: data.zone } })
+            // FIXME: Presenting issues while creating. If it already exists and takes the suggestion, there's not problem
+            const endRes = await ZonesApiConector.assignDistrict({ data: { cityId, districtName: data.name, zoneId: data.zone } })
 
             if (endRes) {
-                toast.success(exists?.exist && exists.exist.length > 0 ? "El barrio existía y se ha asignado a la zona seleccionada" : `Barrio creado correctamente`, { position: "bottom-center" });
+                toast.success(`Barrio creado correctamente`, { position: "bottom-center" });
                 window.location.reload();
                 if (onCancel) onCancel()
             } else {
@@ -87,21 +67,73 @@ const BarrioForm = ({ isOpen, onCancel, zonas }: Props) => {
                 setActive(false)
             }
         }
-
     };
+
+    const name = watch('name')
+    useEffect(() => {
+        const cityId = (AuthService.getUser()?.city?.id || "")
+
+        let int: NodeJS.Timeout | null = null
+        if (name && name.trim() !== "") {
+            int = setTimeout(async () => {
+                const exists = await DistrictsApiConector.findByNamaOrCity({
+                    filters: { cityId, name: name }
+                })
+
+                if (exists?.exist && !!exists.exist.name) {
+                    if (exists.exist.name !== name) {
+                        setSuggestion(exists.exist)
+                    } else {
+                        setSuggestion(null)
+                    }
+                } else {
+                    setSuggestion(null)
+                }
+            }, 250);
+        } else {
+            setSuggestion(null)
+        }
+
+        return () => {
+            if (int) {
+                clearTimeout(int)
+            }
+        }
+    }, [name])
+
+    const handleSuggestionSelect = () => {
+        if (suggestion) {
+            setValue('name', suggestion.name, { shouldValidate: true });
+            setSuggestion(null)
+        }
+    }
 
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-6 justify-center items-center w-full p-6"
         >
-            <Input
-                label="Nombre"
-                name="name"
-                register={register}
-                errors={errors.name}
-                required
-            />
+            <div className="relative w-full">
+                <Input
+                    label="Nombre"
+                    name="name"
+                    register={register}
+                    errors={errors.name}
+                    required
+                />
+
+                {suggestion && (
+                    <div ref={optionsRef} className="absolute w-full -bottom-12 left-0 bg-blocks rounded-xl max-h-[200px] overflow-auto">
+                        <div
+                            onClick={() => handleSuggestionSelect()}
+                            className="option-item bg-blocks"
+                        >
+                            {suggestion.name}
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <Input
                 textarea
                 label="Descripción"

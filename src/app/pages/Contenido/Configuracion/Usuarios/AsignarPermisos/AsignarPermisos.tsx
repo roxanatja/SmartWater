@@ -1,8 +1,10 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./AsignarPermisos.css";
 import { UsuariosContext } from "../UsuariosContext";
 import { Permission } from "../../../../../../type/User";
 import { Zone } from "../../../../../../type/City";
+import { UsersApiConector } from "../../../../../../api/classes";
+import toast from "react-hot-toast";
 
 interface Props {
     onCancel?: () => void;
@@ -12,16 +14,70 @@ interface Props {
 
 const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
     const { selectedUser } = useContext(UsuariosContext);
+    const [active, setActive] = useState<boolean>(false);
 
-    const [checkbox1, setCheckbox1] = useState<boolean>(false);
+    const [checkedPermissions, setCheckedPermissions] = useState<string[]>([]);
+    const [checkedZones, setCheckedZonaes] = useState<string[]>([]);
 
-    const handleCheckbox1Change = () => {
-        setCheckbox1(!checkbox1);
-    };
+    const handleZonesChange = (zone: string) => {
+        if (checkedZones.includes(zone)) {
+            setCheckedZonaes((prev) => prev.filter(z => z !== zone))
+        } else {
+            setCheckedZonaes((prev) => [...prev, zone])
+        }
+    }
+
+    const handlePermissionsChange = (perm: string) => {
+        if (checkedPermissions.includes(perm)) {
+            setCheckedPermissions((prev) => prev.filter(z => z !== perm))
+        } else {
+            setCheckedPermissions((prev) => [...prev, perm])
+        }
+    }
+
+    useEffect(() => {
+        if (selectedUser) {
+            setCheckedPermissions(selectedUser.permissions || [])
+            setCheckedZonaes(selectedUser.zones || [])
+        } else {
+            setCheckedZonaes([])
+            setCheckedPermissions([])
+        }
+    }, [selectedUser])
+
+    const handleSubmit = async () => {
+        setActive(true)
+        const promises = [
+            UsersApiConector.updateUserPermissions({ data: { permissions: checkedPermissions }, userId: selectedUser._id }),
+            UsersApiConector.updateUser({
+                data: {
+                    email: selectedUser.email,
+                    fullName: selectedUser.fullName,
+                    phoneNumber: selectedUser.phoneNumber,
+                    role: selectedUser.role,
+                    username: selectedUser.username,
+                    zones: checkedZones
+                }, userId: selectedUser._id
+            })
+        ]
+
+        const res = await Promise.all(promises)
+
+        res.forEach((r, index) => {
+            if (!!r && r.mensaje) {
+                toast.success(r.mensaje, { position: "bottom-center" });
+            } else {
+                toast.error(`Error al actualizar ${index === 0 ? "los permisos" : "las zonas"} del usuario.`, { position: "bottom-center" });
+            }
+        })
+
+        window.location.reload()
+        setActive(false)
+    }
 
     return (
         <>
-            <form onSubmit={(e) => e.preventDefault()}
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
                 className="flex flex-col gap-6 justify-center items-center w-full">
                 <div className="AsignarPermisos-tituloinput bg-blue_custom">
                     <span>Zonas</span>
@@ -39,8 +95,8 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                                     className="input-check accent-blue_custom"
                                     type="checkbox"
                                     id={z._id}
-                                    checked={checkbox1}
-                                    onChange={handleCheckbox1Change}
+                                    checked={checkedZones.includes(z._id)}
+                                    onChange={() => handleZonesChange(z._id)}
                                 />
                                 <label htmlFor={z._id} className="AsignarPermisos-text-check text-font-color">{z.name}</label>
                             </div>
@@ -63,8 +119,8 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                                     id={perm._id}
                                     className="input-check accent-blue_custom"
                                     type="checkbox"
-                                    checked={checkbox1}
-                                    onChange={handleCheckbox1Change}
+                                    checked={checkedPermissions.includes(perm._id)}
+                                    onChange={() => handlePermissionsChange(perm._id)}
                                 />
                                 <label htmlFor={perm._id} className="AsignarPermisos-text-check text-font-color">{perm.name}</label>
                             </div>
@@ -82,9 +138,14 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                         </button>
                         <button
                             type="submit"
-                            className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
+                            disabled={active}
+                            className="disabled:bg-gray-400 w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
                         >
-                            Actualizar
+                            {
+                                active ?
+                                    <i className="fa-solid fa-spinner animate-spin"></i> :
+                                    <span>Actualizar</span>
+                            }
                         </button>
                     </div>
                 </div>

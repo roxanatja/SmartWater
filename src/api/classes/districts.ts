@@ -18,7 +18,7 @@ export abstract class DistrictsApiConector {
         }
     }
 
-    static async findByNamaOrCity(params: IDistricSearchParams): Promise<{ exist: District[] } | null> {
+    static async findByNamaOrCity(params: IDistricSearchParams): Promise<{ exist: District } | null> {
         const query = generateQueryString(params)
 
         try {

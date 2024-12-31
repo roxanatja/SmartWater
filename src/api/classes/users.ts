@@ -66,7 +66,7 @@ export abstract class UsersApiConector {
         }
     }
 
-    static async updateUserPermissions(params: IPermissionsGetParams & IUserPermissionsUpdateBody & IUserFilter): Promise<{ data: Permission[] } & QueryMetadata | null> {
+    static async updateUserPermissions(params: IPermissionsGetParams & IUserPermissionsUpdateBody & IUserFilter): Promise<{ mensaje: string } | null> {
         const query = generateQueryString(params)
 
         try {
@@ -77,7 +77,7 @@ export abstract class UsersApiConector {
         }
     }
 
-    static async updateUser(params: IUserUpdateBody & IUserFilter): Promise<{ data: Permission[] } & QueryMetadata | null> {
+    static async updateUser(params: IUserUpdateBody & IUserFilter): Promise<{ mensaje: string } | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.userId}/update`, params.data)
             return res.data

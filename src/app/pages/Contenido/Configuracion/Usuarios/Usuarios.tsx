@@ -7,10 +7,11 @@ import { AddUsuario } from "./AddUsuario/AddUsuario";
 import { CuadroUsuarios } from "./CuadroUsuarios/CuadroUsuarios";
 import { AsignarPermisos } from "./AsignarPermisos/AsignarPermisos";
 import { Permission, User } from "../../../../../type/User";
-import { UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
+import { SchedulesApiConector, UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
 import Modal from "../../../EntryComponents/Modal";
 import { Zone } from "../../../../../type/City";
 import { useGlobalContext } from "../../../../SmartwaterContext";
+import { Schedule } from "../../../../../type/Schedule";
 
 const Usuarios: FC = () => {
     const { setLoading } = useGlobalContext()
@@ -28,6 +29,7 @@ const Usuarios: FC = () => {
 
     const [zonas, setZonas] = useState<Zone[]>([])
     const [permisos, setPermisos] = useState<Permission[]>([])
+    const [schedules, setSchedules] = useState<Schedule[]>([])
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -41,6 +43,8 @@ const Usuarios: FC = () => {
         setZonas(resZ?.data || [])
         const resP = await UsersApiConector.getPermissions({ pagination: { page: 1, pageSize: 3000 } })
         setPermisos(resP?.data || [])
+        const resS = await SchedulesApiConector.get()
+        setSchedules(resS || [])
 
         setLoading(false)
     }, [setLoading])
@@ -63,10 +67,6 @@ const Usuarios: FC = () => {
             setUsersToShow(filteredUsers.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
         }
     }, [filteredUsers, page])
-
-    const AgregarUsuario = () => {
-        setShowModal(true)
-    };
 
     return (
         <>
@@ -94,10 +94,10 @@ const Usuarios: FC = () => {
             </div>
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 top-0 z-30 bg-main-background">
                     Registrar usuario
                 </h2>
-                <AddUsuario />
+                <AddUsuario isOpen={showModal} onCancel={() => setShowModal(false)} schedules={schedules} />
             </Modal>
 
             <Modal
@@ -105,9 +105,13 @@ const Usuarios: FC = () => {
                 onClose={() => setSelectedUser(user)}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 top-0 z-30 bg-main-background">
-                    Editar Cliente
+                    Editar usuario
                 </h2>
-                <AddUsuario />
+                <AddUsuario isOpen={selectedUser._id !== "" && showMiniModal ? true : false} schedules={schedules}
+                    onCancel={() => {
+                        setSelectedUser(user)
+                        setShowMiniModal(false);
+                    }} />
             </Modal>
 
             <Modal

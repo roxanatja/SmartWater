@@ -1,11 +1,9 @@
 import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./BarriosItem.css";
 import { Option } from "../../../../components/Option/Option";
-import toast from "react-hot-toast";
 import { motion } from 'framer-motion'
 import { BarriosContext } from "../BarriosContext";
 import { District, Zone } from "../../../../../../type/City";
-import { DistrictsApiConector } from "../../../../../../api/classes";
 
 interface Props {
     district: District & { zones: Zone[] }
@@ -26,61 +24,6 @@ const BarriosItem: FC<Props> = ({ district }) => {
         setSelectedDistrict(district);
         setShowOptions(false);
     };
-
-    const Delete = async () => {
-        toast.error(
-            (t) => (
-                <div>
-                    <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> este barrio, <br /> pulsa <b>Proceder</b> para continuar
-                    </p>
-                    <div className="flex justify-center">
-                        <button
-                            className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
-                            onClick={() => { toast.dismiss(t.id); }}
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
-                            onClick={async () => {
-                                toast.dismiss(t.id);
-                                const response = await DistrictsApiConector.delete({ districtId: district?._id || '' }) as any;
-                                if (!!response) {
-                                    if (response.mensaje) {
-                                        toast.success(response.mensaje, {
-                                            position: "top-center",
-                                            duration: 2000
-                                        });
-                                        window.location.reload();
-                                    } else if (response.error) {
-                                        toast.error(response.error, {
-                                            position: "top-center",
-                                            duration: 2000
-                                        });
-                                    }
-                                } else {
-                                    toast.error("Error al eliminar barrio", {
-                                        position: "top-center",
-                                        duration: 2000
-                                    });
-                                }
-                            }}
-                        >
-                            Proceder
-                        </button>
-                    </div>
-                </div>
-            ),
-            {
-                className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
-                icon: null,
-                position: "top-center"
-            }
-        );
-        setShowOptions(false);
-    };
-
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -123,8 +66,6 @@ const BarriosItem: FC<Props> = ({ district }) => {
                         editAction={Edit}
                         visible={showOptions}
                         editar={true}
-                        eliminar={true}
-                        deleteAction={Delete}
                     />
                 </div>
             </motion.div>

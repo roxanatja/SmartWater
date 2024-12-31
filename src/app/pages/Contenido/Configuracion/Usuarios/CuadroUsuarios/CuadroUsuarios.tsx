@@ -146,7 +146,7 @@ const CuadroUsuarios: FC<{ user: User }> = ({ user }) => {
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }} className="w-[calc(100%_-_30px)]">
-                    <div className="w-full flex gap-12 items-center">
+                    <div className="w-full flex gap-6 items-center flex-wrap">
                         <div className="CuadroUsuarios-header1">
                             <div className="flex items-center gap-3 font-[500]">
                                 <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">

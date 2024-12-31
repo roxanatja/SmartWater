@@ -103,7 +103,7 @@ const Unidades: FC = () => {
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Registro de item
+                    Registro de unidad de medida
                 </h2>
                 <UnidadesForm isOpen={showModal} onCancel={() => setShowModal(false)} />
             </Modal>
@@ -113,7 +113,7 @@ const Unidades: FC = () => {
                 onClose={() => { setSelectedItem(category); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Editar item
+                    Editar unidad de medida
                 </h2>
                 <UnidadesForm
                     isOpen={

@@ -9,6 +9,7 @@ import Modal from "../../../EntryComponents/Modal";
 import HorariosForm from "./HorariosForm";
 import { Schedule } from "../../../../../type/Schedule";
 import { HorariosItem } from "./HorariosItem/HorariosItem";
+import { convertTo12HourIntl } from "../../../../../utils/helpers";
 
 const Horarios: FC = () => {
 
@@ -44,7 +45,11 @@ const Horarios: FC = () => {
         if (schedules) {
             const itms = schedules.filter(d => {
                 const param = searchParam.toLowerCase()
-                return d.startTime.toLowerCase().includes(param) || d.startTime.toLowerCase().includes(param) || d.days.some(day => day.toLowerCase().includes(param))
+                return d.startTime.toLowerCase().includes(param)
+                    || convertTo12HourIntl(d.startTime).toLowerCase().includes(param)
+                    || d.endTime.toLowerCase().includes(param)
+                    || convertTo12HourIntl(d.endTime).toLowerCase().includes(param)
+                    || d.days.some(day => day.toLowerCase().includes(param))
             })
             setFilteredItems(itms);
             setTotalPages(Math.ceil(itms.length / ITEMS_PER_PAGE))
@@ -61,7 +66,7 @@ const Horarios: FC = () => {
     return (
         <>
             <div className="px-10">
-                <PageTitle titulo="Configuración / Items" icon="../../../Configuracion-icon.svg" />
+                <PageTitle titulo="Configuración / Horarios de trabajo" icon="../../../Configuracion-icon.svg" />
                 <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}>
                     <div className="w-full">
@@ -86,7 +91,7 @@ const Horarios: FC = () => {
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Registro de item
+                    Registro de horario de trabajo
                 </h2>
                 <HorariosForm isOpen={showModal} onCancel={() => setShowModal(false)} />
             </Modal>
@@ -96,7 +101,7 @@ const Horarios: FC = () => {
                 onClose={() => { setSelectedSchedule(schedule); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Editar item
+                    Editar horario de trabajo
                 </h2>
                 <HorariosForm
                     isOpen={

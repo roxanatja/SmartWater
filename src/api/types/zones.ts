@@ -25,7 +25,7 @@ export interface IZoneUpdateBody {
 
 export interface IZoneAssignDistrictBody {
     data: {
-        district: string;
+        districtName: string;
         zoneId: string;
         cityId: string
     }

@@ -48,6 +48,7 @@ export interface IRegisterBody {
         password: string;
         email: string;
         role: string;
+        identity?: string;
     }
 }
 
