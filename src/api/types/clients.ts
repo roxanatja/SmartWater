@@ -59,10 +59,10 @@ export interface IClientRegisterParams {
         fullName: string;
         phoneNumber: string;
         email?: string;
-        address: string;
+        address?: string;
         comment: string;
-        ciFrontImage: string;
-        ciBackImage: string;
+        ciFrontImage?: string;
+        ciBackImage?: string;
         zone: string;
         district: string;
         location: {
@@ -70,9 +70,9 @@ export interface IClientRegisterParams {
             longitude: string;
         };
         averageRenewal: boolean;
-        // clientImage: string;
+        clientImage?: string;
         renewInDays?: number;
-        reference: string;
+        reference?: string;
         hasLoan: boolean;
         hasOrder: boolean;
         hasContract: boolean;
@@ -103,13 +103,15 @@ export interface IClientUpdateParams {
         };
         fullName: string;
         phoneNumber: string;
-        email: string;
-        address: string;
+        email?: string;
+        address?: string;
+        reference?: string;
         comment: string;
         zone: string;
         district: string;
-        ciFrontImage: string;
-        ciBackImage: string;
+        clientImage?: string;
+        ciFrontImage?: string;
+        ciBackImage?: string;
         location: {
             latitude: string;
             longitude: string;
@@ -127,18 +129,18 @@ export interface IClientForm {
     storeImage: string;
     fullName: string;
     phoneNumber: string;
-    email: string;
-    address: string;
-    comment: string;
-    ciFrontImage: string;
-    ciBackImage: string;
+    email?: string;
+    address?: string;
+    comment?: string;
+    ciFrontImage?: string;
+    ciBackImage?: string;
     zone: string;
     district: string;
     location: {
         latitude: string;
         longitude: string;
     };
-    // clientImage: string;
+    clientImage?: string;
     renewDate: string;
     reference?: string;
     hasLoan: boolean;

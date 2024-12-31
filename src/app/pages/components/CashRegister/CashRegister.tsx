@@ -6,9 +6,8 @@ import { Bills } from "../../../../type/Bills";
 import Input from "../../EntryComponents/Inputs";
 import { toast } from "react-hot-toast";
 import { UserData } from "../../../../type/UserData";
-import { Sale } from "../../../../type/Sale/Sale";
-import { BillsApiConector, ProductsApiConector, SalesApiConector } from "../../../../api/classes";
-import { IBillsBody } from "../../../../api/types/bills";
+import { BillsApiConector } from "../../../../api/classes";
+import { IBillByClientBody } from "../../../../api/types/bills";
 import { AuthService } from "../../../../api/services/AuthService";
 import { formatDateTime } from "../../../../utils/helpers";
 
@@ -18,9 +17,8 @@ interface CobroMiniModalProps {
 }
 
 const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
-  const [data, setData] = useState<{ bills: Bills[]; sales: Sale[] } | null>(null);
-  const [credict, setCredict] = useState<number | null>(null);
-  const [active, setActive] = useState(true);
+  const [data, setData] = useState<Bills[]>([]);
+  const [active, setActive] = useState(false);
 
   const {
     register,
@@ -29,7 +27,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
     setValue,
     watch,
     formState: { errors, isValid },
-  } = useForm<IBillsBody['data']>({
+  } = useForm<IBillByClientBody['data']>({
     defaultValues: {
       amount: 0,
       cashPayment: false,
@@ -40,37 +38,17 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
 
   const getBillsInformation = useCallback(async () => {
     const billsData = (await BillsApiConector.get({ filters: { client: client._id }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const salesData = (await SalesApiConector.get({ filters: { client: client._id }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-
-    const loansWithProductNames = salesData.map((loan) => {
-      return {
-        ...loan,
-        detail: loan.detail.map((detailItem) => {
-          const product = products.find((x) => x._id === detailItem.product);
-          return {
-            ...detailItem,
-            product: product ? product.name : "Unknown product",
-          };
-        }),
-      };
-    });
-    setData({
-      bills: billsData,
-      sales: loansWithProductNames.filter(
-        (x) => x.creditSale === true && x.total > 0
-      ),
-    });
+    setData(billsData);
   }, [client._id]);
 
   useEffect(() => {
     getBillsInformation();
   }, [getBillsInformation]);
 
-  const onSubmit: SubmitHandler<IBillsBody['data']> = async (data) => {
+  const onSubmit: SubmitHandler<IBillByClientBody['data']> = async (data) => {
     const userData: UserData | null = AuthService.getUser();
 
-    const response = await BillsApiConector.create({
+    const response = await BillsApiConector.createByClient({
       data: {
         ...data,
         client: client._id,
@@ -91,16 +69,11 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
   };
 
   const validateAmount = (value: number) => {
-    const credit = credict ? credict : client.credit
-    if (!watch("sale")) {
-      return "Tiene que selecionar una venta";
-    }
-
     if (value <= 0) {
       return "El monto no puede ser menor que 0";
     }
-    if (value > credit) {
-      return `El monto no puede exceder el saldo de ${credit} Bs.`;
+    if (value > client.credit) {
+      return `El monto no puede exceder el saldo de ${client.credit} Bs.`;
     }
 
     return true;
@@ -138,52 +111,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
           </div>
         </div>
       </div>
-      <div
-        className="flex justify-between items-center pb-2 border-b-2 mb-2 cursor-pointer"
-        onClick={() => setActive(!active)}
-      >
-        <p className="font-semibold text-sm">Ventas</p>
-        <i className={`fa-solid fa-angle-up ${!active && "rotate-180"}`}></i>
-      </div>
 
-      {active && (
-        <>
-          <div className="infoClientes-ventas">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-              {data?.sales.map((bill) => (
-                <div
-                  key={bill._id}
-                  className={`p-4 border rounded shadow hover:shadow-lg transition cursor-pointer ${watch("sale") === bill._id && "border-2 border-blue_custom"
-                    } ${errors.amount && !watch("sale") && "border-2 border-red-500"
-                    }`}
-                  onClick={() => {
-                    setValue("sale", bill._id, { shouldValidate: true });
-                    setValue("amount", bill.total, { shouldValidate: true });
-                    setCredict(bill.total);
-                  }}
-                >
-                  <h3 className="font-bold truncate">Venta ID: {bill._id}</h3>
-                  <p>
-                    <strong>Monto:</strong>{" "}
-                    {new Intl.NumberFormat("en-US", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    }).format(bill.total)}{" "}
-                    Bs.
-                  </p>
-                  <p>
-                    <strong>Credito:</strong> {bill.creditSale ? "Sí" : "No"}
-                  </p>
-                  <p>
-                    <strong>Registrada:</strong>{" "}
-                    {formatDateTime(bill.created, "numeric", "2-digit", "2-digit")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
       <div className="infoClientes-ventas">
         <div className="input-container flex flex-col w-full">
           <div className="RegistrarVenta-opciones flex justify-center items-start w-full flex-col">
@@ -237,6 +165,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
             type="number"
             placeholder="Monto a cobrar"
             min="0"
+            max={client.credit}
             step="0.01"
             errors={errors.amount}
             button={<span className="text-lg">Bs</span>}
@@ -255,7 +184,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       {!active && (
         <div className="infoClientes-ventas">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-            {data?.bills.map((bill) => (
+            {data.map((bill) => (
               <div
                 key={bill._id}
                 className="p-4 border rounded shadow hover:shadow-lg transition"

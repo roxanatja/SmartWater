@@ -3,6 +3,7 @@ export interface Client {
   user: string;
   isClient: boolean;
   storeImage: string;
+  clientImage?: string;
   code: string;
   fullName: string;
   phoneNumber: string;
@@ -30,7 +31,11 @@ export interface Client {
     name: string;
   };
   averageRenewal: boolean;
-  contracts: [];
+  contracts: {
+    link: string;
+    validUntil: string;
+    _id: string;
+  }[];
   created: string;
   updated: string;
   lastSale: string;

@@ -10,6 +10,7 @@ import { UserData } from "../../../type/UserData";
 import { IDevolutionBody } from "../../../api/types/devolutions";
 import { AuthService } from "../../../api/services/AuthService";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector } from "../../../api/classes";
+import { Contador } from "../components/Contador/Contador";
 
 const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Loans['detail']>([]);
@@ -220,6 +221,23 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     setAddedProducts(addedProducts.filter((_, i) => i !== index));
   };
 
+  const onChangeAmount = (itemName: string, quantity: number) => {
+    if (itemName && quantity) {
+      const idx = addedProducts.findIndex(a => a.item === itemName)
+      if (idx !== -1) {
+        setAddedProducts((prev => prev.map(a => {
+          if (a.item === itemName) {
+            return { ...a, quantity: quantity }
+          } else {
+            return a
+          }
+        })))
+      }
+
+      setValue("detail.0.quantity", 1);
+    }
+  }
+
   const currentItem = watch("detail")[0]?.item
   const quantityOptions: string[] = useMemo(() => {
     if (addedProducts && products && products.length > 0 && currentItem) {
@@ -383,7 +401,16 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                           <strong>{product.item}</strong>
                         </p>
                         <div className="flex gap-4 items-center">
-                          <p className="text-sm">Cantidad: {product.quantity}</p>
+                          <p className="text-sm">Cantidad:</p>
+                          <div className="flex-[3]">
+                            <Contador
+                              min={1}
+                              initialValue={product.quantity}
+                              max={products.filter(p => p.name === product.item).reduce((sum, current) => { return sum += current.quantity }, 0) || 0}
+                              onIncrementar={(count) => onChangeAmount(product.item, count)}
+                              onDecrementar={(count) => onChangeAmount(product.item, count)}
+                            />
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-2 items-center flex-col pr-4">

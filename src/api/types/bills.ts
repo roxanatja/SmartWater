@@ -32,7 +32,7 @@ export interface IBillByClientBody {
     data: {
         zone: string;
         user: string;
-        amount: string;
+        amount: number;
         client: string;
         cashPayment: boolean;
         paymentMethodCurrentAccount: boolean;

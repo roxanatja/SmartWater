@@ -8,6 +8,7 @@ import { Client } from "../../../type/Cliente/Client";
 import { formatDateTime } from "../../../utils/helpers";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, ZonesApiConector } from "../../../api/classes";
 import { Zone } from "../../../type/City";
+import { formatNumber } from "libphonenumber-js";
 
 const InfoClient = ({ client }: { client: Client }) => {
   const [city, setCity] = useState<{
@@ -72,11 +73,20 @@ const InfoClient = ({ client }: { client: Client }) => {
     <div className="pb-10">
       <div className="flex flex-col w-full justify-center items-start gap-4">
         <div className="flex gap-2 items-center">
-          <img
-            src={client.storeImage}
-            alt=""
-            className="w-8 h-8 rounded-full"
-          />
+          {client.storeImage ? (
+            <img
+              src={client.storeImage}
+              alt=""
+              className="infoClientes-imgStore w-8 h-8"
+            />
+          ) : (
+            <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center w-8 h-8">
+              <div className="opacity-0">.</div>
+              <p className="absolute font-extrabold whitespace-nowrap">
+                {client.fullName?.[0] || "S"}
+              </p>
+            </div>
+          )}
           <p className="text-sm">{client.fullName || "N/A"}</p>
         </div>
 
@@ -104,16 +114,13 @@ const InfoClient = ({ client }: { client: Client }) => {
                 {client.phoneNumber}
               </a>
 
-              <div
+              <a
                 className="items-center flex gap-2 cursor-pointer"
-                onClick={() => {
-                  navigator.clipboard.writeText(client.phoneLandLine || "N/A");
-                  toast.success("Línea fija copiada al portapapeles");
-                }}
+                href={formatNumber(client.phoneLandLine || "", "BO", "RFC3966") || "#"}
               >
                 <i className="fa-solid fa-phone p-2 bg-blue_custom text-white rounded-full"></i>
                 {client.phoneLandLine || "N/A"}
-              </div>
+              </a>
             </div>
 
             <a
@@ -133,12 +140,16 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <p>{client.code}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Dirrecion:</p>
-                  <p>{client.address}</p>
+                  <p className="font-medium">Datos de facturación:</p>
+                  <p>{client.billingInfo.name}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Referencia:</p>
-                  <p>{client.reference || "N/A"}</p>
+                  <p className="font-medium">Nit:</p>
+                  <p>{client.billingInfo.NIT}</p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-medium">Correo electrónico:</p>
+                  <p>{client.email}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Zona:</p>
@@ -149,8 +160,32 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <p>{city.district || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
+                  <p className="font-medium">Direción:</p>
+                  <p>{client.address}</p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-medium">Referencia:</p>
+                  <p>{client.reference || "N/A"}</p>
+                </li>
+                <li className="flex gap-2 text-base">
                   <p className="font-medium">Fecha de Registro:</p>
                   <p>{client.created ? formatDateTime(client.created, 'numeric', '2-digit', '2-digit', true) : "N/A"}</p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-medium">Período renovación:</p>
+                  <p>{client.renewInDays || "N/A"}</p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-medium">Renovación promedio:</p>
+                  <p>{client.averageRenewal ? "Sí" : "N/A"}</p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-medium">Próxima fecha de renovación:</p>
+                  <p>
+                    {client.lastSale
+                      ? formatDateTime(client.renewDate, 'numeric', '2-digit', '2-digit')
+                      : "Sin venta"}
+                  </p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Ultima venta:</p>
@@ -159,10 +194,6 @@ const InfoClient = ({ client }: { client: Client }) => {
                       ? formatDateTime(client.lastSale, 'numeric', '2-digit', '2-digit', true)
                       : "Sin venta"}
                   </p>
-                </li>
-                <li className="flex gap-2 text-base">
-                  <p className="font-medium">Renovacion Promedio:</p>
-                  <p>{client.renewInDays || "N/A"}</p>
                 </li>
               </ul>
             </div>
@@ -250,8 +281,19 @@ const InfoClient = ({ client }: { client: Client }) => {
             }
             {
               (client.hasContract) && (
-                <div className="text-base">
-                  <b>Actual: </b> Con contratos
+                <div className="flex flex-wrap gap-4">
+                  {
+                    client.contracts.map(cont => <>
+                      <div className="flex flex-col gap-2 items-center">
+                        <img
+                          src={cont.link || ''}
+                          className="w-80 h-44 rounded-md flex-1"
+                          alt={client.ciFrontImage}
+                        />
+                        <small className="text-gray-500 w-fit">Válido hasta: {formatDateTime(cont.validUntil, 'numeric', '2-digit', '2-digit')}</small>
+                      </div>
+                    </>)
+                  }
                 </div>
               )
             }

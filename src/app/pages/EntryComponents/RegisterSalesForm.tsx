@@ -318,7 +318,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         </div>
 
         <button
-          disabled={(!watch('creditSale') && !watch('paymentMethodCurrentAccount')) || addedProducts.length === 0}
+          disabled={addedProducts.length === 0}
           type="submit"
           className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >

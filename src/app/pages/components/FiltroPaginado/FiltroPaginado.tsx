@@ -151,7 +151,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
       detailsProduct = dataToSend
         .map((item) => `${item.quantity} ${item.itemName}`)
-        .join("\n");
+        .join(", \n");
       return detailsProduct;
     } else {
       return "SIN MOVIMIENTO";
@@ -221,7 +221,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
       devolutionDetails = dataToSend
         .map((item) => `${item.quantity} ${item.itemName}`)
-        .join("\n");
+        .join(", \n");
       return devolutionDetails;
     } else {
       return "SIN MOVIMIENTO";
@@ -346,7 +346,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
       loansDetails = dataToSend
         .map((item) => `${item.quantity} ${item.itemName}`)
-        .join("\n");
+        .join(", \n");
       return loansDetails;
     } else {
       return "SIN MOVIMIENTO";
@@ -422,7 +422,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
         ZONA: zone?.name || "Sin zona", // Buscar la zona
         BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
-        "TIEMPO DE RENOVACION": client.renewInDays || "No especificado", // Tiempo de renovación
+        "TIEMPO DE RENOVACION": client.renewInDays || "", // Tiempo de renovación
+        "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
         "FECHA DE REGISTRO": formatDateTime(
           client.created,
           "numeric",

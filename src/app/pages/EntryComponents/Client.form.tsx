@@ -228,7 +228,7 @@ const ClientForm = ({
         >
           <img
             src={
-              watch("storeImage") ||
+              watch("clientImage") ||
               "https://imgs.search.brave.com/8TK6e_BWCEnl1l51_KJIw2kP1zPhk79MhP75VA4Zlgs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2UwL2I3/LzZkL2UwYjc2ZDlk/OTRlZGM5YjU3Y2Q3/NWRiOTYzNzNlZWU2/LmpwZw"
             }
             alt="logo.png"
@@ -249,7 +249,7 @@ const ClientForm = ({
                   try {
                     const uploadResponse = await saveImage(file);
                     const downloadURL = uploadResponse.secure_url;
-                    setValue("storeImage", downloadURL);
+                    setValue("clientImage", downloadURL);
                   } catch (error) {
                     console.error("Error uploading to Cloudinary:", error);
                   } finally {
@@ -257,7 +257,6 @@ const ClientForm = ({
                   }
                 }
               }}
-              required={!watch("storeImage")}
             />
           </label>
         </button>
@@ -267,10 +266,10 @@ const ClientForm = ({
           </div>
         )}
 
-        {errors.storeImage && (
+        {errors.clientImage && (
           <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
             <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-            {errors?.storeImage?.message}
+            {errors?.clientImage?.message}
           </div>
         )}
       </motion.div>
@@ -294,6 +293,7 @@ const ClientForm = ({
           label="Numero de NIT"
           name="billingInfo.NIT"
           register={register}
+          numericalOnly
           errors={errors.billingInfo?.NIT}
           required
         />
@@ -303,8 +303,7 @@ const ClientForm = ({
           register={register}
           icon={<i className="fa-solid fa-phone"></i>}
           errors={errors.phoneLandLine}
-          validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
-          required
+          validateAmount={(value: string) => { if (value && !isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
         />
         <Input
           label="Numero de whatsapp"
@@ -345,7 +344,6 @@ const ClientForm = ({
             name="address"
             register={register}
             errors={errors.address}
-            required
           />
           <motion.div
             initial={{ opacity: 0 }}
@@ -371,7 +369,6 @@ const ClientForm = ({
           name="reference"
           register={register}
           errors={errors.reference}
-          required
         />
         {/* {selectedClient._id === "" && (
           <div className="col-span-2 max-sm:col-span-1">
@@ -478,6 +475,7 @@ const ClientForm = ({
           register={register}
           setValue={setValue}
           errors={errors}
+          required={false}
         />
         <ImageUploadField
           watchField={watch}
@@ -486,15 +484,16 @@ const ClientForm = ({
           register={register}
           setValue={setValue}
           errors={errors}
+          required={false}
         />
-        {/* <ImageUploadField
+        <ImageUploadField
           watchField={watch}
           fieldName={"storeImage"}
           label={"Por favor, adjunta foto de la tienda"}
           register={register}
           setValue={setValue}
           errors={errors}
-        />` */}
+        />
         <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">
             Selecciona una ubicación en el mapa
@@ -596,7 +595,7 @@ const ClientForm = ({
             <div className="flex gap-4 items-center justify-center font-semibold">
               <i
                 onClick={() => {
-                  handleCheckboxChangeReno("hasOrder");
+                  handleCheckboxChangeReno("dayrenew");
                 }}
                 className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("renewInDays") === 0
                   ? `text-zinc-300 hover:text-blue-900`
