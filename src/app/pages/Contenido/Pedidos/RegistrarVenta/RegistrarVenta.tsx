@@ -1,372 +1,39 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useContext } from "react";
 import "./RegistrarVenta.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { OptionScrooll } from "../../../components/OptionScrooll/OptionScrooll";
-import { GetProducts } from "../../../../../services/ProductsService";
-
-type ProductosAdd = {
-  id: number;
-  cantidadSeleccionada: string;
-  productoSeleccionado: string;
-  precioSeleccionado: string;
-};
+import { PedidosContext } from "../PedidosContext";
+import { client } from "../../Clientes/ClientesContext";
+import RegisterPedidoForm from "../../../EntryComponents/RegisterPedido";
+import { Client } from "../../../../../type/Cliente/Client";
 
 const RegistrarVenta: FC = () => {
-  const [opcionesVisibles, setOpcionesVisibles] = useState<boolean>(true);
-  const [checkbox1, setCheckbox1] = useState<boolean>(false);
-  const [checkbox2, setCheckbox2] = useState<boolean>(false);
-  const [checkbox3, setCheckbox3] = useState<boolean>(false);
-  const [productosAgregados, setProductosAgregados] = useState<
-    Array<ProductosAdd>
-  >([]);
-  const [selectedCantidad, setSelectedCantidad] = useState<string>("");
-  const [selectedProducto, setSelectedProducto] = useState<string>("");
-  const [selectedPrecio, setSelectedPrecio] = useState<string>("");
-  const [productos, setProductos] = useState<
-    { _id: string; name: string; price: string }[]
-  >([]);
+  const { setSelectedClient, selectedClient } = useContext(PedidosContext);
   const navigate = useNavigate();
 
-  const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const data = await GetProducts();
-      if (data) {
-        setProductos(data);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  const handleOpcionesClick = () => {
-    setOpcionesVisibles(!opcionesVisibles);
-  };
-
   const handleClick = () => {
-    navigate("/Pedidos");
-  };
-
-  const handleCheckbox1Change = () => {
-    setCheckbox1(!checkbox1);
-    if (checkbox2) {
-      setCheckbox2(false);
-    }
-    if (checkbox3) {
-      setCheckbox3(false);
-    }
-  };
-
-  const handleCheckbox2Change = () => {
-    setCheckbox2(!checkbox2);
-    if (checkbox1) {
-      setCheckbox1(false);
-    }
-    if (checkbox3) {
-      setCheckbox3(false);
-    }
-  };
-
-  const handleCheckbox3Change = () => {
-    setCheckbox3(!checkbox3);
-    if (checkbox1 || checkbox2) {
-      setCheckbox1(false);
-      setCheckbox2(false);
-    }
-  };
-
-  const AgregarProducto = () => {
-    var TodosProductos = [...productosAgregados];
-    var ProductoNew: ProductosAdd = {
-      id: productosAgregados.length + 1,
-      cantidadSeleccionada: selectedCantidad,
-      productoSeleccionado: selectedProducto,
-      precioSeleccionado: selectedPrecio,
-    };
-    TodosProductos.push(ProductoNew);
-    setProductosAgregados(TodosProductos);
-  };
-
-  const DeleteProducto = (id: number) => {
-    var TodosProductos = productosAgregados.filter((P) => P.id !== id);
-    setProductosAgregados(TodosProductos);
+    navigate("/Pedidos/EnCurso");
+    setSelectedClient(client);
   };
 
   return (
     <>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <PageTitle titulo="Pedidos" icon="../Pedidos-icon.svg" />
-        <div className="RegistrarVenta-titulo">
-          <button className="RegistrarVenta-btn" onClick={handleClick}>
-            <span className="material-symbols-outlined">arrow_back</span>
+      <div className="px-10">
+        <PageTitle titulo="Pedidos / Registrar pedido" icon="/Pedidos-icon.svg" />
+        <div
+          className="RegistrarVenta-titulo flex items-start cursor-pointer"
+          onClick={handleClick}
+        >
+          <button className="RegistrarVenta-btn">
+            <span className="material-symbols-outlined text-blue_custom translate-y-0.5">
+              arrow_back
+            </span>
           </button>
-          <span>Registrar venta</span>
+          <span className="text-blue_custom">Regresar</span>
         </div>
-        <div className="RegistrarVenta-scrooll">
-          <div className="RegistrarVenta-NombreCliente">
-            <img src="../Cliente2.svg" alt="" />
-            <span>Daniela Ayala</span>
-          </div>
-          <div className="RegistrarVenta-AgregarProducto">
-            <div className="RegistrarVenta-AgregarProductoTitulo">
-              <span>Agregar producto</span>
-              <button
-                onClick={handleOpcionesClick}
-                className={
-                  opcionesVisibles
-                    ? "RegistrarVenta-btnAgregarProducto AgregarProductoactive-btn"
-                    : "RegistrarVenta-btnAgregarProducto"
-                }
-              >
-                <span className="material-symbols-outlined">expand_more</span>
-              </button>
-            </div>
-            <div className="lineagris"></div>
-            {opcionesVisibles && (
-              <>
-                <div className="RegistrarVenta-opciones">
-                  <span>Seleccione una opción</span>
-                  <div className="RegistrarVenta-grupo-checbox">
-                    <div className="RegistrarVenta-grupo-check">
-                      <input
-                        className="input-check"
-                        type="checkbox"
-                        checked={checkbox1}
-                        onChange={handleCheckbox1Change}
-                      />
-                      <label className="text-check">Factura</label>
-                    </div>
-                    <div className="RegistrarVenta-grupo-check">
-                      <input
-                        className="input-check"
-                        type="checkbox"
-                        checked={checkbox2}
-                        onChange={handleCheckbox2Change}
-                      />
-                      <label className="text-check">Credito</label>
-                    </div>
-                    <div className="RegistrarVenta-grupo-check">
-                      <input
-                        className="input-check"
-                        type="checkbox"
-                        checked={checkbox3}
-                        onChange={handleCheckbox3Change}
-                      />
-                      <label className="text-check">Cuenta Corriente</label>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ width: "100%", marginTop: "25px" }}>
-                  <table style={{ width: "100%", borderSpacing: "0px" }}>
-                    <thead>
-                      <tr
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <th>
-                          <div className="RegistrarVenta-TablaTitulo2">
-                            <span>Cantidad</span>
-                          </div>
-                        </th>
-                        <th>
-                          <div className="RegistrarVenta-TablaTitulo2">
-                            <span>Producto</span>
-                          </div>
-                        </th>
-                        <th>
-                          <div className="RegistrarVenta-TablaTitulo2">
-                            <span>Precio</span>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          width: "100%",
-                        }}
-                      >
-                        <td>
-                          <div
-                            className="RegistrarVenta-TablaBody"
-                            style={{ borderRadius: "0px 0px 0px 20px" }}
-                          >
-                            <OptionScrooll
-                              options={Cantidad}
-                              onOptionChange={(selectedOption) =>
-                                setSelectedCantidad(selectedOption)
-                              }
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <div
-                            className="RegistrarVenta-TablaBody"
-                            style={{ borderRadius: "0px 0px 0px 0px" }}
-                          >
-                            <OptionScrooll
-                              options={productos.map((p) => p.name)}
-                              onOptionChange={setSelectedProducto}
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <div
-                            className="RegistrarVenta-TablaBody"
-                            style={{ borderRadius: "0px 0px 20px 0px" }}
-                          >
-                            <OptionScrooll
-                              options={productos.map((p) => p.price)}
-                              onOptionChange={setSelectedPrecio}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <button
-                  className="RegistrarVenta-agregarproducto"
-                  onClick={AgregarProducto}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="49"
-                    height="48"
-                    viewBox="0 0 49 48"
-                    fill="none"
-                  >
-                    <g filter="url(#filter0_d_9_26327)">
-                      <circle cx="24.5" cy="20" r="20" fill="#1A3D7D" />
-                      <circle cx="24.5" cy="20" r="19.5" stroke="#52A5F5" />
-                    </g>
-                    <path
-                      d="M23.3182 28.2758V21.1822H16.2246V18.8177H23.3182V11.7241H25.6827V18.8177H32.7763V21.1822H25.6827V28.2758H23.3182Z"
-                      fill="white"
-                    />
-                    <defs>
-                      <filter
-                        id="filter0_d_9_26327"
-                        x="0.5"
-                        y="0"
-                        width="48"
-                        height="48"
-                        filterUnits="userSpaceOnUse"
-                        colorInterpolationFilters="sRGB"
-                      >
-                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                        <feColorMatrix
-                          in="SourceAlpha"
-                          type="matrix"
-                          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                          result="hardAlpha"
-                        />
-                        <feOffset dy="4" />
-                        <feGaussianBlur stdDeviation="2" />
-                        <feComposite in2="hardAlpha" operator="out" />
-                        <feColorMatrix
-                          type="matrix"
-                          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
-                        />
-                        <feBlend
-                          mode="normal"
-                          in2="BackgroundImageFix"
-                          result="effect1_dropShadow_9_26327"
-                        />
-                        <feBlend
-                          mode="normal"
-                          in="SourceGraphic"
-                          in2="effect1_dropShadow_9_26327"
-                          result="shape"
-                        />
-                      </filter>
-                    </defs>
-                  </svg>
-                  <span>Agregar producto</span>
-                </button>
-                {productosAgregados.length > 0 ? (
-                  <>
-                    {productosAgregados.map((item, index) => (
-                      <div className="RegistrarVenta-productoAgregado">
-                        <div className="RegistrarVenta-productoAgregado1">
-                          <span>{item.productoSeleccionado}</span>
-                          <div className="RegistrarVenta-productoAgregadobtncontainer">
-                            <button
-                              className="RegistrarVenta-productoAgregadoBTN"
-                              onClick={() => DeleteProducto(item.id)}
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                              >
-                                <path
-                                  d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"
-                                  fill="#C50000"
-                                />
-                              </svg>
-                            </button>
-                            <button className="RegistrarVenta-productoAgregadoBTN">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                              >
-                                <path
-                                  d="M3 17.46V20.5C3 20.78 3.22 21 3.5 21H6.54C6.67 21 6.8 20.95 6.89 20.85L17.81 9.94L14.06 6.19L3.15 17.1C3.05 17.2 3 17.32 3 17.46ZM20.71 7.04C20.8027 6.94749 20.8762 6.8376 20.9264 6.71663C20.9766 6.59565 21.0024 6.46597 21.0024 6.335C21.0024 6.20403 20.9766 6.07435 20.9264 5.95338C20.8762 5.83241 20.8027 5.72252 20.71 5.63L18.37 3.29C18.2775 3.1973 18.1676 3.12375 18.0466 3.07357C17.9257 3.02339 17.796 2.99756 17.665 2.99756C17.534 2.99756 17.4043 3.02339 17.2834 3.07357C17.1624 3.12375 17.0525 3.1973 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                                  fill="#1A3D7D"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                        <div className="RegistrarVenta-productoAgregadoCantidad">
-                          <span>
-                            Cantidad:{" "}
-                            <span style={{ color: "#1A3D7D" }}>
-                              {item.cantidadSeleccionada}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </>
-                ) : null}
-              </>
-            )}
-          </div>
-          <div className="RegistrarVenta-AgregarComentario">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="23"
-              viewBox="0 0 24 23"
-              fill="none"
-            >
-              <path
-                d="M3 0C1.34531 0 0 1.23423 0 2.75229V15.1376C0 16.6557 1.34531 17.8899 3 17.8899H7.5V21.3303C7.5 21.5926 7.65938 21.8291 7.9125 21.9452C8.16563 22.0614 8.47031 22.0355 8.7 21.8807L14.4984 17.8899H21C22.6547 17.8899 24 16.6557 24 15.1376V2.75229C24 1.23423 22.6547 0 21 0H3Z"
-                fill="#1A3D7D"
-              />
-            </svg>
-            <span>Agregar comentario</span>
-          </div>
-        </div>
-        <div style={{ width: "100%", textAlign: "end", marginTop: "10px" }}>
-          <button className="RegistrarVenta-btnVender">
-            <span>Vender</span>
-          </button>
-        </div>
-      </form>
+
+        <RegisterPedidoForm selectedClient={selectedClient as unknown as Client} isNoClient={!selectedClient.isClient} />
+      </div>
     </>
   );
 };

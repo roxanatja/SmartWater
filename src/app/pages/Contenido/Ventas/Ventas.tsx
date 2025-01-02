@@ -23,9 +23,9 @@ const Ventas: FC = () => {
     setShowFiltro,
     showFiltro,
     setSelectedClient,
+    selectedClient
   } = useContext(VentasContext);
   const { setLoading } = useGlobalContext()
-  const { selectedClient } = useContext(VentasContext)
   const [currentData, setCurrentData] = useState<Array<Sale>>([]);
 
   const [products, setProducts] = useState<Product[]>([]);

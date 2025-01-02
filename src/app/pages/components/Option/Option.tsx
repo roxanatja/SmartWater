@@ -5,6 +5,8 @@ interface OptionsMenuProps {
   visible: boolean;
   editar?: boolean;
   eliminar?: boolean;
+  editarText?: string;
+  eliminarText?: string;
   editAction?: () => void;
   deleteAction?: () => void;
 }
@@ -12,8 +14,10 @@ interface OptionsMenuProps {
 const Option: FC<OptionsMenuProps> = ({
   visible,
   editar,
+  eliminarText,
   editAction,
   eliminar,
+  editarText,
   deleteAction,
 }) => {
   return (
@@ -34,7 +38,7 @@ const Option: FC<OptionsMenuProps> = ({
                   fill="currentColor"
                 />
               </svg>
-              <span>Editar</span>
+              <span>{editarText || "Editar"}</span>
             </div>
           )}
           {eliminar && (
@@ -51,7 +55,7 @@ const Option: FC<OptionsMenuProps> = ({
                   fill="currentColor"
                 />
               </svg>
-              <span>Eliminar</span>
+              <span>{eliminarText || "Eliminar"}</span>
             </div>
           )}
         </div>

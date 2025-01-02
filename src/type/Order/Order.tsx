@@ -26,6 +26,7 @@ type Order = {
   };
   created: string;
   updated: string;
+  attended?: string
 };
 
 export type { Order };
