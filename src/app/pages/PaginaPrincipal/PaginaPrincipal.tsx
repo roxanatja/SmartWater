@@ -35,6 +35,7 @@ import ProtectedRoute from "../EntryComponents/ProtectRouter";
 import { HorariosWrapper } from "../Contenido/Configuracion/Horarios/HorariosWrapper";
 import { CategoriesWrapper } from "../Contenido/Configuracion/Categorias/CategoriesWrapper";
 import DatosEmpresa from "../Contenido/Configuracion/DatosEmpresa/DatosEmpresa";
+import { PromocionesWrapper } from "../Contenido/Configuracion/Promociones/PromocionesWrapper";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -123,6 +124,7 @@ const PaginaPrincipal: FC = () => {
                   element={<BarriosWrapper />}
                 />
                 <Route path="/Configuracion/Zonas" element={<ZonasWrapper />} />
+                <Route path="/Configuracion/Promociones" element={<PromocionesWrapper />} />
                 <Route path="/Configuracion/CategoriasUnidades" element={<Navigate to={"/Configuracion/CategoriasUnidades/Categorias"} replace={true} />} />
                 <Route path="/Configuracion/CategoriasUnidades/:section" element={<CategoriesWrapper />} />
                 <Route

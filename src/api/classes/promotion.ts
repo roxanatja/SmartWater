@@ -8,7 +8,11 @@ export abstract class PromotionApiConector {
     static async getPromotions(): Promise<Promotion[] | null> {
         try {
             const res = await ApiConnector.getInstance().get(`${this.root_path}`)
-            return res.data
+            if (res.data?.message) {
+                return null
+            } else {
+                return res.data
+            }
         } catch (error) {
             return null
         }
@@ -32,7 +36,7 @@ export abstract class PromotionApiConector {
         }
     }
 
-    static async deletePromotion(params: IPromotionFilter): Promise<any | null> {
+    static async deletePromotion(params: IPromotionFilter): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.promotionId}/delete`)
             return res.data
