@@ -178,6 +178,7 @@ const FiltroClientes = ({
               <span className="flex-[2]">Por renovar hasta en</span>
               <div className="flex-[3]">
                 <Contador
+                  initialValue={watch('daysToRenew')}
                   onIncrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
                   onDecrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
                 />
@@ -192,6 +193,7 @@ const FiltroClientes = ({
               <span className="flex-[2]">Renovado hace más de</span>
               <div className="flex-[3]">
                 <Contador
+                  initialValue={watch('daysSinceRenewed')}
                   onIncrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
                   onDecrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
                 />

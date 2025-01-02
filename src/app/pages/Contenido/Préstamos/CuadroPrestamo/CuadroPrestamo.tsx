@@ -8,6 +8,7 @@ import { formatDateTime } from "../../../../../utils/helpers";
 import React from "react";
 import toast from "react-hot-toast";
 import { LoansApiConector } from "../../../../../api/classes";
+import { Client } from "../../../../../type/Cliente/Client";
 
 type Prestamo = {
   estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null;
@@ -22,7 +23,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
   estadoContrato,
   info,
 }) => {
-  const { setShowMiniModal } = useContext(PrestamosContext);
+  const { setShowModal, setSelectedClient } = useContext(PrestamosContext);
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const optionsRef = useRef<HTMLDivElement>(null);
@@ -109,26 +110,29 @@ const CuadroPrestamo: FC<Prestamo> = ({
           >
             <div className={`flex items-center justify-between ${info ? "w-full" : "w-[calc(100%_-_60px)]"}`}>
               <div className="CuadroVentaCliente-header flex gap-4 items-center">
-                <img
-                  src={
-                    loan.client[0]?.storeImage
-                      ? loan.client[0]?.storeImage
-                      : info
-                        ? "../Cliente2.svg"
-                        : "./Cliente2.svg"
-                  }
-                  alt=""
-                  className="w-8 h-8 rounded-full"
-                />
-                <span>{loan.client[0]?.fullName}</span>
+                {loan.client[0]?.storeImage ? (
+                  <img
+                    src={loan.client[0]?.storeImage}
+                    alt=""
+                    className="infoClientes-imgStore"
+                  />
+                ) : (
+                  <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                    <div className="opacity-0">.</div>
+                    <p className="absolute font-extrabold whitespace-nowrap">
+                      {loan.client[0]?.fullName?.[0] || "S"}
+                    </p>
+                  </div>
+                )}
+                <span>{loan.client[0]?.fullName || "Sin nombre"}</span>
               </div>
               <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
                 <span>
                   {formatDateTime(
                     loan.created,
                     "numeric",
-                    "numeric",
-                    "numeric"
+                    "2-digit",
+                    "2-digit"
                   )}
                 </span>
               </div>
@@ -136,7 +140,10 @@ const CuadroPrestamo: FC<Prestamo> = ({
             {
               !info &&
               <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
-                <button type="button" className="btn" onClick={() => setShowMiniModal(true)}>
+                <button type="button" className="btn" onClick={() => {
+                  setShowModal(true);
+                  setSelectedClient(loan.client[0] as unknown as Client);
+                }}>
                   <img src={info ? "../Opciones-icon.svg" : "./Opciones-icon.svg"} alt="" className="invert-0 dark:invert" />
                 </button>
 
@@ -158,7 +165,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
           <div className="CuadroVentaCliente-text mb-4">
             <span>
               No. Cliente:{" "}
-              <span className="text-blue_custom">{loan.client[0]?.code}</span>
+              <span className="text-blue_custom">{loan.client[0]?.code || "Sin código"}</span>
             </span>
           </div>
         </div>
@@ -191,10 +198,12 @@ const CuadroPrestamo: FC<Prestamo> = ({
                           {product ? product.name : "Producto no encontrado"}
                         </span>
                       </div>
-                      <div className="CuadroVentaCliente-TextContainer font-semibold text-center">
-                        <span className="CuadroVentaCliente-text">
-                          {detail.quantity}
-                        </span>
+                      <div className="flex w-full justify-center">
+                        <div className="CuadroVentaCliente-TextContainer font-semibold text-center !bg-transparent !border-blue_custom">
+                          <span className="CuadroVentaCliente-text">
+                            {detail.quantity}
+                          </span>
+                        </div>
                       </div>
                     </React.Fragment>
                   );
@@ -205,58 +214,61 @@ const CuadroPrestamo: FC<Prestamo> = ({
             )}
           </div>
 
-          {estadoContrato === "Con Contrato" ? (
-            <div className="flex items-center gap-2 mt-4">
-              <img
-                src={info ? "../ConContrato.svg" : "./ConContrato.svg"}
-                alt=""
-                className="w-5 h-5"
-              />
-              <span className="CuadroPrestamo-texto text-xs font-medium">
-                Contrato
-              </span>
-            </div>
-          ) : estadoContrato === "Sin Contrato" ? (
-            <div className="flex items-center gap-2 mt-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="29"
-                height="29"
-                viewBox="0 0 29 29"
-                fill="none"
-              >
-                <image
-                  xlinkHref={info ? "../ConContrato.svg" : "./ConContrato.svg"}
-                  x="4"
-                  y="5"
-                  width="21"
-                  height="21"
+          <div className="w-full flex items-end flex-col">
+            <div className="mx-auto w-3/4 border-t-font-color/20 border"></div>
+            {estadoContrato === "Con Contrato" ? (
+              <div className="flex items-center gap-2 mt-4">
+                <img
+                  src={info ? "../ConContrato.svg" : "./ConContrato.svg"}
+                  alt=""
+                  className="w-5 h-5"
                 />
-                <circle
-                  cx="14.5"
-                  cy="14.5"
-                  r="13"
-                  stroke="#FF0000"
-                  strokeWidth="3"
+                <span className="CuadroPrestamo-texto text-xs font-medium">
+                  Contrato
+                </span>
+              </div>
+            ) : estadoContrato === "Sin Contrato" ? (
+              <div className="flex items-center gap-2 mt-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="29"
+                  height="29"
+                  viewBox="0 0 29 29"
+                  fill="none"
+                >
+                  <image
+                    xlinkHref={info ? "../ConContrato.svg" : "./ConContrato.svg"}
+                    x="4"
+                    y="5"
+                    width="21"
+                    height="21"
+                  />
+                  <circle
+                    cx="14.5"
+                    cy="14.5"
+                    r="13"
+                    stroke="#FF0000"
+                    strokeWidth="3"
+                  />
+                  <path d="M7.0 22.9L23.1 6" stroke="#FF0000" strokeWidth="3" />
+                </svg>
+                <span className="CuadroPrestamo-texto text-xs font-medium">
+                  Sin Contrato
+                </span>
+              </div>
+            ) : estadoContrato === "Contrato Vencido" ? (
+              <div className="flex items-center gap-2 mt-4">
+                <img
+                  src={info ? "../ContratoVencido.svg" : "./ContratoVencido.svg"}
+                  alt=""
+                  className="w-5 h-5"
                 />
-                <path d="M7.0 22.9L23.1 6" stroke="#FF0000" strokeWidth="3" />
-              </svg>
-              <span className="CuadroPrestamo-texto text-xs font-medium">
-                Sin Contrato
-              </span>
-            </div>
-          ) : estadoContrato === "Contrato Vencido" ? (
-            <div className="flex items-center gap-2 mt-4">
-              <img
-                src={info ? "../ContratoVencido.svg" : "./ContratoVencido.svg"}
-                alt=""
-                className="w-5 h-5"
-              />
-              <span className="CuadroPrestamo-texto text-xs font-medium">
-                Contrato Vencido
-              </span>
-            </div>
-          ) : null}
+                <span className="CuadroPrestamo-texto text-xs font-medium">
+                  Contrato Vencido
+                </span>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </>

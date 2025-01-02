@@ -1,105 +1,110 @@
 import { CuadroPrestamo } from "./CuadroPrestamo/CuadroPrestamo";
 import { OpcionesPrestamo } from "./CuadroPrestamo/OpcionesPrestamo";
-import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { PrestamosContext } from "./PrestamosContext";
-import FiltroPrestamos from "./FiltroPrestamos/FiltroPrestamos";
-import { GetLoans } from "../../../../services/LoansService";
-import { GetProducts } from "../../../../services/ProductsService";
 import Product from "../../../../type/Products/Products";
 import { Loans } from "../../../../type/Loans/Loans";
 import Modal from "../../EntryComponents/Modal";
+import { useGlobalContext } from "../../../SmartwaterContext";
+import { ILoansGetParams } from "../../../../api/types/loans";
+import { ClientsApiConector, LoansApiConector, ProductsApiConector } from "../../../../api/classes";
+import { QueryMetadata } from "../../../../api/types/common";
+import FiltroPrestamos from "./FiltroPrestamos/FiltroPrestamos";
+import { client } from "../Clientes/ClientesContext";
 
 const Prestamos: FC = () => {
-  const { showMiniModal, showFiltro, setShowFiltro } =
-    useContext(PrestamosContext);
-  const [loans, setLoans] = useState<Array<Loans>>([]);
+  const { showFiltro, setShowFiltro, setShowModal, showModal, selectedClient, setSelectedClient } = useContext(PrestamosContext);
+  const { setLoading } = useGlobalContext()
+
+  const [currentData, setCurrentData] = useState<Loans[]>([]);
   const [products, setProducts] = useState<Array<Product>>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+
+  const itemsPerPage: number = 12;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
-  const itemsPerPage: number = 9;
-  const [currentData, setCurrentData] = useState<Loans[]>([]);
-  const [savedFilters, setSavedFilters] = useState({});
+  const [total, setTotal] = useState<number>(0);
 
-  const getLoans = useCallback(async () => {
-    try {
-      await GetLoans().then((resp) => {
-        setLoans(resp.data);
-        setCurrentData(resp.data.slice(0, itemsPerPage));
-        setTotalPage(Math.ceil(resp.data.length / itemsPerPage));
-        setCurrentPage(1);
-      });
+  const [clientsFilter, setClientsFilter] = useState<string[] | null>(null);
+  const [searchParam, setSearchParam] = useState<string>('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
+  const [savedFilters, setSavedFilters] = useState<ILoansGetParams['filters']>({});
 
-      setLoading(false);
-    } catch (e) {
-      console.log(e);
-      setError(true);
-      setLoading(false);
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
+
+  const getSales = useCallback(async () => {
+    setLoading(true)
+
+    const promises: Promise<{ data: Loans[] } & QueryMetadata | null>[] = []
+
+    if (clientsFilter) {
+      clientsFilter.forEach(cf =>
+        promises.push(LoansApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf } }))
+      )
+    } else {
+      promises.push(LoansApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: savedFilters }))
     }
-  }, []);
 
-  const getProducts = useCallback(async () => {
-    try {
-      await GetProducts().then((resp) => {
-        setProducts(resp.data);
-      });
-    } catch (e) {
-      console.error(e);
+    const responses = await Promise.all(promises)
+    const datLoans: Loans[] = []
+    let totalcount: number = 0
+    responses.forEach(r => {
+      datLoans.push(...(r?.data || []))
+      totalcount += r?.metadata.totalCount || 0
+    })
+
+    setCurrentData(datLoans);
+    setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
+    setTotal(totalcount)
+    setLoading(false)
+  }, [currentPage, setLoading, savedFilters, sort, clientsFilter]);
+
+  const orderArray = (orden: string) => {
+    if (orden === "new") {
+      setSort('desc')
+    } else if (orden === "older") {
+      setSort('asc')
     }
-  }, []);
+  };
 
   useEffect(() => {
-    getLoans();
-    getProducts();
-  }, [getLoans, getProducts]);
+    const getData = setTimeout(async () => {
+      if (searchParam && searchParam.trim() !== "") {
+        const clients = await ClientsApiConector.searchClients({ filters: { text: searchParam } })
+        const clientsData = clients?.data || []
+        if (clientsData.length > 0) {
+          setClientsFilter(clientsData.map(c => c._id))
+        } else {
+          setClientsFilter([])
+        }
+        setCurrentPage(1);
+      } else {
+        setClientsFilter(null)
+      }
+    }, 800);
+    return () => clearTimeout(getData)
+  }, [searchParam])
 
-  if (loading) {
-    return <p>Cargando Prestamos...</p>;
-  }
-
-  if (error) {
-    return (
-      <p>
-        Ocurrio un error en la carga de datos, intentelo nuevamente en unos
-        minutos.
-      </p>
-    );
-  }
-
-  const Onfilter = () => {
-    setShowFiltro(true);
-  };
-
-  const searchLoans = (e: string) => {
-    const value = e;
-
-    if (value === "") {
-      setCurrentData(loans.slice(0, itemsPerPage));
-      setTotalPage(Math.ceil(loans.length / itemsPerPage));
-      setCurrentPage(1);
-      return;
-    } else {
-      let clientFilter = loans.filter(
-        (loan) =>
-          loan.client?.[0]?.fullName
-            ?.toLowerCase()
-            .includes(value.toLowerCase()) || null
-      );
-      setCurrentData(clientFilter.slice(0, itemsPerPage));
-      setTotalPage(Math.ceil(clientFilter.length / itemsPerPage));
-      setCurrentPage(1);
+  useEffect(() => {
+    const fetchZones = async () => {
+      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
     }
-  };
+    fetchZones()
+  }, [])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    const startIndex: number = (page - 1) * itemsPerPage;
-    const endIndex: number = startIndex + itemsPerPage;
-    setCurrentData(loans.slice(startIndex, endIndex));
+  };
+
+  useEffect(() => {
+    getSales();
+  }, [getSales]);
+
+  const handleFilterChange = (filters: ILoansGetParams['filters']) => {
+    setCurrentPage(1);
+    setSavedFilters(filters);
   };
 
   const getContractState = (
@@ -117,55 +122,76 @@ const Prestamos: FC = () => {
 
   return (
     <>
-      <div>
+      <div className="px-10">
         <PageTitle titulo="Préstamos" icon="./Prestamos-icon.svg" />
         <FiltroPaginado
-          filtro
-          search={searchLoans}
-          resultadosPrestamo
+          ref={filterRef}
           paginacion={true}
           totalPage={totalPage}
           currentPage={currentPage}
           handlePageChange={handlePageChange}
-          onFilter={Onfilter}
-          total={loans.length}
+          resultados
+          filtro
+          total={total}
+          search={setSearchParam}
+          orderArray={orderArray}
+          onFilter={() => setShowFiltro(true)}
+          hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
+          searchPlaceholder="Buscar por nombre de cliente"
+          infoPedidos
         >
-          <div className="grid grid-cols-3 gap-4 w-full pt-4 ">
-            {currentData.map((loan, index) => {
-              const contratcEstate = getContractState(
-                loan.hasContract,
-                loan.hasExpiredContract
-              );
-              return (
-                <CuadroPrestamo
-                  key={index}
+          {
+            currentData.length > 0 &&
+            <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
+              {currentData.map((loan: Loans) => {
+                const contratcEstate = getContractState(
+                  loan.hasContract,
+                  loan.hasExpiredContract
+                );
+
+                return <CuadroPrestamo
+                  key={loan._id}
                   loan={loan}
                   productos={products}
                   estadoContrato={contratcEstate}
                 />
-              );
-            })}
-          </div>
+              })}
+            </div>
+          }
+          {
+            currentData.length === 0 &&
+            <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+              Sin resultados
+            </div>
+          }
         </FiltroPaginado>
       </div>
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroPrestamos
-          loans={loans}
-          onChange={(val, filter) => {
-            if (filter === "quit") {
-              setCurrentData(val.slice(0, itemsPerPage));
-              setTotalPage(Math.ceil(val.length / itemsPerPage));
-              setCurrentPage(1);
-            } else {
-              setCurrentData(val);
-            }
-            setSavedFilters(filter);
-          }}
+          onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
       </Modal>
 
-      {showMiniModal && <OpcionesPrestamo />}
+
+      <Modal
+        isOpen={showModal && selectedClient._id !== ""}
+        onClose={() => {
+          setSelectedClient(client);
+          setShowModal(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
+          Opciones Cliente
+        </h2>
+        <div className="p-6">
+          <OpcionesPrestamo onClose={() => {
+            setShowModal(false);
+            setSelectedClient(client);
+          }} />
+        </div>
+      </Modal >
     </>
   );
 };

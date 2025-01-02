@@ -1,6 +1,5 @@
 import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Sale } from "../../../../../type/Sale/Sale";
 import { VentasContext } from "../VentasContext";
 import { ISalesGetParams } from "../../../../../api/types/sales";
 import { Zone } from "../../../../../type/City";
@@ -38,13 +37,11 @@ const initialState: ISaleFilters = {
 }
 
 const FiltroVenta = ({
-  sales,
   onChange,
   initialFilters,
   zones,
 }: {
   zones: Zone[];
-  sales: Sale[];
   onChange: (filters: ISalesGetParams['filters']) => void;
   initialFilters: ISalesGetParams['filters'];
 }) => {

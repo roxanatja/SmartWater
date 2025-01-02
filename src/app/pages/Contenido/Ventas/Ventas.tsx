@@ -31,7 +31,7 @@ const Ventas: FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
 
-  const itemsPerPage: number = 10;
+  const itemsPerPage: number = 12;
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -157,7 +157,7 @@ const Ventas: FC = () => {
         </FiltroPaginado>
       </div>
 
-      < Modal
+      <Modal
         isOpen={showModal && selectedClient._id !== ""}
         onClose={() => {
           setSelectedClient(client);
@@ -181,7 +181,6 @@ const Ventas: FC = () => {
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroVenta
           zones={zones}
-          sales={currentData}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
