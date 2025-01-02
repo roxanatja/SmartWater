@@ -51,12 +51,10 @@ const Pedidos: FC = () => {
 
       if (clientsFilter) {
         clientsFilter.forEach(cf =>
-          // promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf, attended: section === "Atendidos" } }))
-          promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf } }))
+          promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf, attended: section === "Atendidos" } }))
         )
       } else {
-        // promises.push(OrdersApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { ...savedFilters, attended: section === "Atendidos" } }))
-        promises.push(OrdersApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { ...savedFilters } }))
+        promises.push(OrdersApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { ...savedFilters, attended: section === "Atendidos" } }))
       }
 
       const responses = await Promise.all(promises)
