@@ -4,10 +4,10 @@ import { CuadroClientes } from "../../components/CuadroClientes/CuadroClientes";
 import { CuadroInformativo } from "../../components/CuadroInformativo/CuadroInformativo";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { FC } from "react";
-import { Sale } from "../../../../type/Sale/Sale";
 import PedidosResumido from "../Pedidos/CuadroPedidos/PedidosResumido";
 import { ClientsApiConector, LoansApiConector, OrdersApiConector, SalesApiConector } from "../../../../api/classes";
 import "./Inicio.css";
+import moment from "moment";
 
 const Inicio: FC = () => {
   const [clientsCount, setClientsCount] = useState<number | undefined>(undefined);
@@ -19,6 +19,7 @@ const Inicio: FC = () => {
   const [activeOrdersCount, setActiveordersCount] = useState<number | undefined>(undefined);
   const [ordersLastMonthCount, setOrdersLastMonthCount] = useState<number | undefined>(undefined);
   const [totalIncome, setTotalIncome] = useState<number>(0);
+  const [totalIncomeMonth, setTotalIncomeMonth] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,13 +32,19 @@ const Inicio: FC = () => {
           ClientsApiConector.getClients({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
           LoansApiConector.get({ pagination: { page: 1, pageSize: 1 } }),
           LoansApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
-          SalesApiConector.get({}),
+          SalesApiConector.get({ pagination: { page: 1, pageSize: 1 } }),
           SalesApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
           OrdersApiConector.get({ filters: { attended: false }, pagination: { page: 1, pageSize: 1 } }),
           OrdersApiConector.get({ filters: { attended: false, month, year }, pagination: { page: 1, pageSize: 1 } })
         ]
 
-        const [clientsData, clientsLastMonth, loansData, loansLastMonth, salesData, salesLastMonth, activeOrdersCount, ordersLastMonthCount] = await Promise.all(promises)
+        const salesPromises = [
+          SalesApiConector.getSalesConsolidated({}),
+          SalesApiConector.getSalesConsolidated({ filters: { initialDate: moment().startOf('month').toDate().toISOString(), finalDate: moment().endOf('month').toDate().toISOString() } })
+        ]
+
+        const [clientsData, clientsLastMonth, loansData, loansLastMonth, salesData, salesLastMonth, activeOrdersCountRes, ordersLastMonthCountRes] = await Promise.all(promises)
+        const [salesConsolidated, salesConsolidatedEnd] = await Promise.all(salesPromises)
 
         // Cargar clientes y calcular clientes del último mes (julio en este momento)
         setClientsCount(clientsData?.metadata.totalCount || 0);
@@ -48,14 +55,17 @@ const Inicio: FC = () => {
         setLoansLastMonthCount(loansLastMonth?.metadata.totalCount || 0); // Préstamos del último mes
 
         // Cargar ventas activas y calcular ventas del último mes (julio en este momento)
-        setActiveSalesCount(salesData?.metadata.totalCount); // Total de ventas activas
-        setSalesLastMonthCount(salesLastMonth?.metadata.totalCount); // Ventas del último mes
+        setActiveSalesCount(salesData?.metadata.totalCount || 0); // Total de ventas activas
+        setSalesLastMonthCount(salesLastMonth?.metadata.totalCount || 0); // Ventas del último mes
 
-        setActiveordersCount(activeOrdersCount?.metadata.totalCount); // Total de ventas activas
-        setOrdersLastMonthCount(ordersLastMonthCount?.metadata.totalCount); // Ventas del último mes
+        setActiveordersCount(activeOrdersCountRes?.metadata.totalCount || 0); // Total de ventas activas
+        setOrdersLastMonthCount(ordersLastMonthCountRes?.metadata.totalCount || 0); // Ventas del último mes
 
-        const totalIncome = (salesData?.data as Sale[]).reduce((sum: number, sale: Sale) => sum + sale.total, 0);
-        setTotalIncome(totalIncome);
+
+        const totalIncome = (salesConsolidated || []).reduce((sum, res) => sum += res.total * res.quantity, 0);
+        setTotalIncome(parseFloat(totalIncome.toFixed(2)));
+        const totalIncomeMonth = (salesConsolidatedEnd || []).reduce((sum, res) => sum += res.total * res.quantity, 0);
+        setTotalIncomeMonth(parseFloat(totalIncomeMonth.toFixed(2)));
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -78,8 +88,8 @@ const Inicio: FC = () => {
           <CuadroInformativo
             titulo="Clientes nuevos"
             numero={
-              clientsLastMonthCount !== undefined
-                ? clientsLastMonthCount.toString()
+              clientsCount !== undefined
+                ? clientsCount.toString()
                 : ""
             }
             porcentaje={
@@ -139,7 +149,7 @@ const Inicio: FC = () => {
             titulo="Ingresos Totales"
             numero={totalIncome.toString()}
             letra="Bs"
-            porcentaje={100}
+            porcentaje={calculatePercentage(totalIncomeMonth, totalIncome)}
           />
         </div>
         <div className="sub-title">

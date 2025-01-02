@@ -37,6 +37,7 @@ const CuadroInformativo: React.FC<CuadroInformativoProps> = ({
     if (percentage === 0) return "+0%";
 
     const sign = percentage >= 0 ? "+" : "-";
+    if (Math.abs(percentage) < 0.1) return `${sign}<0.1%`;
     return `${sign}${percentage.toFixed(1)}%`;
   };
 
