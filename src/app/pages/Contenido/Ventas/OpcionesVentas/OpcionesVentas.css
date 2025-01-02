@@ -24,7 +24,6 @@
 .opcionesClientes-Item{
     display: flex;
     justify-content: space-between;
-    color: #1A3D7D;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-style: normal;

@@ -14,6 +14,7 @@ type Sale = {
   }>;
   total: number;
   creditSale: boolean;
+  hasInvoice: boolean;
   created: string;
   updated: string;
 };

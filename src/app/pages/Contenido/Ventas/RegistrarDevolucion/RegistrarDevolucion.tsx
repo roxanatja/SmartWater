@@ -16,18 +16,18 @@ const RegistrarDevolucion = () => {
 
   return (
     <>
-      <div>
-        <PageTitle titulo="Clientes/Devolucion" icon="../clientes-icon.svg" />
+      <div className="px-10">
+        <PageTitle titulo="Ventas / Registrar devolución" icon="/Ventas-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}
         >
-          <button className="RegistrarVenta-btn">
+          <button className="RegistrarVenta-btn text-blue_custom">
             <span className="material-symbols-outlined translate-y-0.5">
               arrow_back
             </span>
           </button>
-          <span>Regresar</span>
+          <span className="text-blue_custom">Regresar</span>
         </div>
         <RegisterDevoluForm selectedClient={selectedClient} />
       </div>

@@ -8,6 +8,7 @@ import Input from "../../EntryComponents/Inputs";
 import { Client } from "../../../../type/Cliente/Client";
 import { ClientsApiConector, DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, SalesApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { District, Zone } from "../../../../type/City";
+import { Sale } from "../../../../type/Sale/Sale";
 
 type Componentes = {
   order?: boolean;
@@ -104,13 +105,12 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     return district;
   };
 
-  const setDetailSale = (details: Array<any>, products: any) => {
+  const setDetailSale = (details: Sale['detail'], products: any) => {
     //Guarda los detalles de la venta
-    var detailsProduct: string = "";
-    details.forEach((detail: any) => {
+    const detailsProduct: string = details.map((detail) => {
       const product = products.find((product: any) => product._id === detail.product);
-      detailsProduct += `Producto: ${product.name} Cantidad: ${detail.quantity}\n`;
-    })
+      return `Producto: ${product.name}, Cantidad: ${detail.quantity}, Precio: ${detail.price} Bs.`;
+    }).join("; \n")
     return detailsProduct;
   };
 
@@ -119,7 +119,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     if (loans.length > 0) {
       const prod: Array<string> = [];
       const dataToSend: Array<{ itemName: string; quantity: number }> = [];
-      var detailsProduct: string = "";
+      let detailsProduct: string = "";
       loans.forEach((loan: any) => {
         loan.detail.forEach((detail: any) => {
           const product = products.find(
@@ -188,7 +188,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     if (devolution.length > 0) {
       const prod: Array<string> = [];
       const dataToSend: Array<{ itemName: string; quantity: number }> = [];
-      var devolutionDetails: string = "";
+      let devolutionDetails: string = "";
 
       devolution.forEach(async (devolution: any) => {
         devolution.detail.forEach((detail: any) => {
@@ -238,7 +238,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     let devolution = devolutions.filter(
       (devolution: any) => devolution.client === id
     );
-    var loansDetails: string = "";
+    let loansDetails: string = "";
     const prod: Array<string> = [];
     const dataToSend: Array<{ itemName: string; quantity: number }> = [];
 
@@ -353,6 +353,18 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
+  const getSaleClientContract = (client: Client) => {
+    if (!client.hasLoan) {
+      return "SIN PRESTAMO"
+    } else {
+      if (client.hasExpiredContract) {
+        return "PRESTAMO CON CONTRATO VENCIDO"
+      } else {
+        return client.hasContract ? "PRESTAMO CON CONTRATO" : "PRESTAMO SIN CONTRATO"
+      }
+    }
+  }
+
   const getDataWithClientNames = async () => {
     const data = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
@@ -368,21 +380,22 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         throw new Error(`Cliente no encontrado para la venta ${sale._id}`);
       }
 
+      const zone = await searchZone(sale.zone, zones)
+
       const typeDataToExport = {
-        cliente: client.fullName,
-        usuario: searchUser(sale.user, userList),
-        comentario: sale.comment ? sale.comment : "Sin comentario",
-        detalle: setDetailSale(sale.detail, products),
-        Total: sale.total,
-        zona: searchZone(sale.zone, zones),
-        Pago: sale.creditSale ? "Credito" : "Al contado",
-        creado: formatDateTime(sale.created, "numeric", "long", "2-digit"),
-        actualizado: formatDateTime(
-          sale.updated,
-          "numeric",
-          "long",
-          "2-digit"
-        ),
+        FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit"),
+        USUARIO: searchUser(sale.user, userList),
+        "CODIGO CLIENTE": client.code,
+        ZONA: zone?.name || "Sin zona",
+        BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+        DIRECCION: client.address,
+        NOMBRE: client.fullName,
+        COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
+        PRODUCTOS: setDetailSale(sale.detail, products),
+        SUBTOTAL: sale.detail.reduce((cont, prev) => cont += prev.price * prev.quantity, 0),
+        PAGO: sale.creditSale ? "Credito" : "Al contado",
+        "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
+        "DE CLIENTES": getSaleClientContract(client)
       };
 
       dataWithClientNames.push(typeDataToExport);
@@ -623,7 +636,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             </div>
           </div>
           {infoPedidos && (
-            <div className="infoPedidos-filtro">
+            <div className="ml-6 mb-8 infoPedidos-filtro bg-blocks dark:border-blocks">
               <div
                 style={{
                   display: "flex",
@@ -634,10 +647,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 <div className="infoPedidosLetras-filtro">
                   <span>10 botellones 20 lt</span>
                 </div>
-                <div
-                  className="infoPedidosLetras-filtro"
-                  style={{ color: "#1A3D7D", fontWeight: "600" }}
-                >
+                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
                   <span>35 Bs</span>
                 </div>
               </div>
@@ -651,10 +661,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 <div className="infoPedidosLetras-filtro">
                   <span>5 botellones 10 lt</span>
                 </div>
-                <div
-                  className="infoPedidosLetras-filtro"
-                  style={{ color: "#1A3D7D", fontWeight: "600" }}
-                >
+                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
                   <span>35 Bs</span>
                 </div>
               </div>
@@ -668,10 +675,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 <div className="infoPedidosLetras-filtro">
                   <span>1 Dispensador</span>
                 </div>
-                <div
-                  className="infoPedidosLetras-filtro"
-                  style={{ color: "#1A3D7D", fontWeight: "600" }}
-                >
+                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
                   <span>35 Bs</span>
                 </div>
               </div>

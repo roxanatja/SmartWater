@@ -17,18 +17,18 @@ const RegistrarVenta: FC = () => {
 
   return (
     <>
-      <div>
-        <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
+      <div className="px-10">
+        <PageTitle titulo="Ventas / Registrar venta" icon="../Ventas-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}
         >
           <button className="RegistrarVenta-btn">
-            <span className="material-symbols-outlined translate-y-0.5">
+            <span className="material-symbols-outlined text-blue_custom translate-y-0.5">
               arrow_back
             </span>
           </button>
-          <span>Regresar</span>
+          <span className="text-blue_custom">Regresar</span>
         </div>
         <RegisterSalesForm selectedClient={selectedClient} />
       </div>

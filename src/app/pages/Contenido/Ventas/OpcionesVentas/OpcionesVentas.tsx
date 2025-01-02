@@ -17,7 +17,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
             alt=""
             style={{ marginRight: "15px" }}
           />
-          <span>Registrar Ventas</span>
+          <span className="text-blue_custom">Registrar Ventas</span>
         </div>
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
@@ -31,7 +31,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
             alt=""
             style={{ marginRight: "14px" }}
           />
-          <span>Registrar pedido</span>
+          <span className="text-blue_custom">Registrar pedido</span>
         </div>
 
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
@@ -46,7 +46,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
             alt=""
             style={{ marginRight: "15px" }}
           />
-          <span>Registrar préstamo</span>
+          <span className="text-blue_custom">Registrar préstamo</span>
         </div>
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
@@ -71,7 +71,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
               stroke-linejoin="round"
             />
           </svg>
-          <span>Registrar devolución parcial</span>
+          <span className="text-blue_custom">Registrar devolución parcial</span>
         </div>
         <button
           type="button"
@@ -79,12 +79,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
           style={{ marginTop: "5px" }}
           onClick={() => setSelectedOption(false)}
         >
-          <span
-            className="material-symbols-outlined"
-            style={{ color: "#1A3D7D" }}
-          >
-            chevron_right
-          </span>
+          <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
         </button>
       </Link>
       <Link
@@ -115,7 +110,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
               stroke-linejoin="round"
             />
           </svg>
-          <span>Registrar devolución total</span>
+          <span className="text-blue_custom">Registrar devolución total</span>
         </div>
 
         <button
@@ -124,12 +119,7 @@ const OpcionesVentas = ({ onClose }: { onClose: () => void }) => {
           style={{ marginTop: "5px" }}
           onClick={() => setSelectedOption(true)}
         >
-          <span
-            className="material-symbols-outlined"
-            style={{ color: "#1A3D7D" }}
-          >
-            chevron_right
-          </span>
+          <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
         </button>
       </Link>
       <div

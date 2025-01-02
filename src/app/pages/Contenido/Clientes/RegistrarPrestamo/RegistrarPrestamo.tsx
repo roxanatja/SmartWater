@@ -23,7 +23,7 @@ const RegistrarPrestamo = () => {
   return (
     <>
       <div className="px-10">
-        <PageTitle titulo="Clientes/Prestamos" icon="../clientes-icon.svg" />
+        <PageTitle titulo="Clientes/ Registrar préstamo" icon="../clientes-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}

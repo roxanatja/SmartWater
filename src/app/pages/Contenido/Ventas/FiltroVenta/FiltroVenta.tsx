@@ -1,414 +1,389 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import GetApiMethod from "../../../../../Class/api.class";
-import { Zone } from "../../../../../Class/types.data";
 import { Sale } from "../../../../../type/Sale/Sale";
 import { VentasContext } from "../VentasContext";
+import { ISalesGetParams } from "../../../../../api/types/sales";
+import { Zone } from "../../../../../type/City";
+
+interface ISaleFilters {
+  credit: boolean;
+  currentAccount: boolean;
+  withInvoice: boolean;
+  withoutInvoice: boolean;
+  withContract: boolean;
+  withoutContract: boolean;
+  withExpiredContract: boolean;
+  withoutExpiredContract: boolean;
+  withLoan: boolean;
+  withoutLoan: boolean;
+  fromDate: string | null;
+  toDate: string | null;
+  zones: { [key: string]: string };
+}
+
+const initialState: ISaleFilters = {
+  credit: false,
+  currentAccount: false,
+  withInvoice: false,
+  withoutInvoice: false,
+  withContract: false,
+  withoutContract: false,
+  withExpiredContract: false,
+  withoutExpiredContract: false,
+  withLoan: false,
+  withoutLoan: false,
+  fromDate: null,
+  toDate: null,
+  zones: {},
+}
 
 const FiltroVenta = ({
   sales,
   onChange,
   initialFilters,
+  zones,
 }: {
+  zones: Zone[];
   sales: Sale[];
-  onChange: (value: Sale[], filter: any) => void;
-  initialFilters: any;
+  onChange: (filters: ISalesGetParams['filters']) => void;
+  initialFilters: ISalesGetParams['filters'];
 }) => {
-  const { register, handleSubmit } = useForm({
-    defaultValues: initialFilters || {},
+  const { register, handleSubmit, setValue, watch } = useForm<ISaleFilters>({
+    defaultValues: initialState || {},
   });
-  const { setShowFiltro } = useContext(VentasContext);
-  const [data, setData] = useState<{ zones: Zone[] }>();
-
-  const getData = useCallback(async () => {
-    const api = new GetApiMethod();
-    return setData({
-      zones: await api.getZone(),
-    });
-  }, []);
 
   useEffect(() => {
-    getData();
-  }, [getData]);
-
-  const onSubmit = (data: any) => {
-    const filteredSales = sales?.filter((sale) => {
-      const {
-        fechaDesde,
-        fechaHasta,
-        ventaCredito,
-        ventaContado,
-        conFactura,
-        sinFactura,
-        conPrestamo,
-        sinPrestamo,
-        conContrato,
-        sinContrato,
-      } = data;
-
-      const saleDate = new Date(sale.created); // Supone que `created` es un string en formato ISO
-      const startDate = fechaDesde ? new Date(fechaDesde) : null;
-      const endDate = fechaHasta ? new Date(fechaHasta) : null;
-
-      // Filtrar por fecha
-      const dateFilter =
-        (startDate ? saleDate >= startDate : true) &&
-        (endDate ? saleDate <= endDate : true);
-
-      // Filtrar por tipo de venta
-      const saleTypeFilter =
-        (ventaCredito ? sale.creditSale === true : true) &&
-        (ventaContado ? sale.creditSale === false : true);
-
-      // Filtrar por factura
-      const invoiceFilter =
-        (conFactura ? sale.detail.some((item) => item.price > 0) : true) && // Supone que si hay un precio es con factura
-        (sinFactura ? sale.detail.every((item) => item.price === 0) : true);
-
-      // Filtrar por clientes
-      const clientFilter =
-        (conPrestamo ? sale.client.some((client) => client.hasLoan) : true) &&
-        (sinPrestamo ? !sale.client.some((client) => client.hasLoan) : true) &&
-        (conContrato
-          ? sale.client.some((client) => client.hasContract)
-          : true) &&
-        (sinContrato
-          ? !sale.client.some((client) => client.hasContract)
-          : true);
-
-      // Filtrar por zonas
-      const zonesFilter = data.zones
-        ? Object.keys(data.zones).some(
-            (zone) => data.zones[zone] && sale?.client?.[0]?.zone === zone
-          )
-        : true;
-
-      return (
-        dateFilter &&
-        saleTypeFilter &&
-        invoiceFilter &&
-        clientFilter &&
-        zonesFilter
-      );
-    });
-
-    // Llama a onChange si está definido para actualizar las ventas filtradas
-    if (onChange) {
-      onChange(filteredSales, data);
+    if (initialFilters) {
+      if (initialFilters.hasOwnProperty('creditSale')) {
+        setValue('credit', !!initialFilters.creditSale, { shouldValidate: true })
+        setValue('currentAccount', !initialFilters.creditSale, { shouldValidate: true })
+      }
+      if (initialFilters.hasOwnProperty('hasInvoice')) {
+        setValue('withInvoice', !!initialFilters.hasInvoice, { shouldValidate: true })
+        setValue('withoutInvoice', !initialFilters.hasInvoice, { shouldValidate: true })
+      }
+      if (initialFilters.hasOwnProperty('hasClientContract')) {
+        setValue('withContract', !!initialFilters.hasClientContract, { shouldValidate: true })
+        setValue('withoutContract', !initialFilters.hasClientContract, { shouldValidate: true })
+      }
+      if (initialFilters.hasOwnProperty('hasClientLoan')) {
+        setValue('withLoan', !!initialFilters.hasClientLoan, { shouldValidate: true })
+        setValue('withoutLoan', !initialFilters.hasClientLoan, { shouldValidate: true })
+      }
+      if (initialFilters.hasOwnProperty('hasClientExpiredContracts')) {
+        setValue('withExpiredContract', !!initialFilters.hasClientExpiredContracts, { shouldValidate: true })
+        setValue('withoutExpiredContract', !initialFilters.hasClientExpiredContracts, { shouldValidate: true })
+      }
+      if (initialFilters.initialDate) {
+        setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
+      }
+      if (initialFilters.finalDate) {
+        setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
+      }
+      if (initialFilters.zone) {
+        initialFilters.zone.split(",").forEach((z) => {
+          setValue(`zones.${z}`, z, { shouldValidate: true })
+        })
+      }
     }
+  }, [initialFilters, setValue])
+
+  const { setShowFiltro } = useContext(VentasContext);
+
+  const onSubmit = (data: ISaleFilters) => {
+    const filters = filterClients(data);
+    onChange(filters);
     setShowFiltro(false);
   };
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="p-6">
-        <h2 className="text-lg font-bold text-blue_custom">Filtrar</h2>
-        <div className="p-4">
-          <div className="FiltroVenta-FechaContainer">
-            <h4 className="FiltroVenta-titulos text-md font-semibold">
-              Fechas
-            </h4>
-            <div className="FiltroVenta-Fechascontainer grid grid-cols-2 gap-4 w-full">
-              <div className="FiltroVenta-Fecha w-full">
-                <label className="block">De</label>
-                <div className="FiltroVenta-FechaInput flex items-center justify-between border-gray-300 p-2 rounded">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="24"
-                    viewBox="0 0 22 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M19.2 2.4H18V0H15.6V2.4H6V0H3.6V2.4H2.4C1.068 2.4 0 3.468 0 4.8V21.6C0 22.2365 0.252856 22.847 0.702944 23.2971C1.15303 23.7471 1.76348 24 2.4 24H19.2C20.52 24 21.6 22.92 21.6 21.6V4.8C21.6 4.16348 21.3471 3.55303 20.8971 3.10294C20.447 2.65286 19.8365 2.4 19.2 2.4ZM19.2 21.6H2.4V8.4H19.2V21.6ZM10.8 19.2V16.8H6V13.2H10.8V10.8L15.6 15L10.8 19.2Z"
-                      fill="black"
-                    />
-                  </svg>
-                  <input
-                    type="date"
-                    {...register("fechaDesde")}
-                    className="ml-2 border-none outline-none"
-                  />
-                </div>
-              </div>
-              <div className="FiltroVenta-Fecha w-full">
-                <label className="block">A</label>
-                <div className="FiltroVenta-FechaInput flex items-center justify-between border-gray-300 p-2 rounded">
-                  <img src="/factura.svg" alt="" className="w-5 h-5" />
-                  <input
-                    type="date"
-                    {...register("fechaHasta")}
-                    className="ml-2 border-none outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-            <h4 className="FiltroVenta-titulos text-md font-semibold">
-              Ventas
-            </h4>
-            <div className="FiltroVenta-itemCheckContainer">
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("ventaCredito")}
-                  />
-                  <span>A crédito</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("ventaContado")}
-                  />
-                  <span>De contado</span>
-                </div>
-              </div>
-            </div>
-            <div className="FiltroVenta-titulos">
-              <span>Factura</span>
-            </div>
-            <div className="FiltroVenta-itemCheckContainer">
-              <div className="FiltroVenta-itemCheck flex items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("conFactura")}
-                  />
-                  <img
-                    src="./archivo-factura-dolar.svg"
-                    alt=""
-                    className="w-5 h-5"
-                  />
-                  <span>Con Factura</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("sinFactura")}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="11"
-                      stroke="#F40101"
-                      strokeWidth="2"
-                    />
-                    <image
-                      xlinkHref="../../archivo-factura-dolar-mini.svg"
-                      x="6"
-                      y="5"
-                      width="14"
-                      height="14"
-                    />
-                    <line
-                      x1="6"
-                      y1="6"
-                      x2="18"
-                      y2="18"
-                      stroke="#FF0000"
-                      strokeWidth="3"
-                    />
-                  </svg>
-                  <span>Sin Factura</span>
-                </div>
-              </div>
-            </div>
-            <div className="FiltroVenta-titulos">
-              <span>De Clientes</span>
-            </div>
-            <div className="FiltroVenta-itemCheckContainer">
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("conPrestamo")}
-                  />
-                  <img
-                    src="/presta.svg"
-                    alt="/presta.svg"
-                    className="w-5 h-5"
-                  />
-                  <span>Con préstamo</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("sinPrestamo")}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="11"
-                      stroke="#F40101"
-                      strokeWidth="2"
-                    />
-                    <image
-                      xlinkHref="../../Dispensador-iconsvg.svg"
-                      x="5"
-                      y="6"
-                      width="14"
-                      height="14"
-                    />
-                    <line
-                      x1="6"
-                      y1="6"
-                      x2="18"
-                      y2="18"
-                      stroke="#FF0000"
-                      strokeWidth="3"
-                    />
-                  </svg>
-                  <span>Sin Préstamo</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("conContrato")}
-                  />
-                  <img
-                    src="/concontrato.svg"
-                    alt="/concontrato.svg"
-                    className="w-5 h-5"
-                  />
-                  <span>Con contrato</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("sinContrato")}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="29"
-                    height="29"
-                    viewBox="0 0 29 29"
-                    fill="none"
-                  >
-                    <image
-                      xlinkHref="../../ConContrato.svg"
-                      x="4"
-                      y="5"
-                      width="21"
-                      height="21"
-                    />
-                    <circle
-                      cx="14.5"
-                      cy="14.5"
-                      r="13"
-                      stroke="#FF0000"
-                      strokeWidth="3"
-                    />
-                    <path
-                      d="M7.0 22.9L23.1 6"
-                      stroke="#FF0000"
-                      strokeWidth="3"
-                    />
-                  </svg>
-                  <span>Sin contrato</span>
-                </div>
-              </div>
-            </div>
-            <div className="FiltroVenta-titulos">
-              <span>Distribuidores</span>
-            </div>
-            <div className="FiltroVenta-itemCheckContainer">
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("distribuidor1")}
-                  />
-                  <span>Distribuidor 1</span>
-                </div>
-              </div>
-              <div className="FiltroVenta-itemCheck flex justify-between items-center">
-                <div className="FiltroVenta-item">
-                  <input
-                    className="input-check"
-                    type="checkbox"
-                    {...register("distribuidor2")}
-                  />
-                  <span>Distribuidor 2</span>
-                </div>
-              </div>
-            </div>
+  const filterClients = (filters: ISaleFilters): ISalesGetParams['filters'] => {
+    const result: ISalesGetParams['filters'] = {}
 
-            <div className="w-full flex flex-col gap-4">
-              <label className="font-bold">Zonas</label>
-              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-3 w-full">
-                {data?.zones?.map((zone, index) => (
-                  <div key={index} className="flex items-center gap-2 w-full">
-                    <input
-                      type="checkbox"
-                      {...register(`zones.${zone._id}`)}
-                      value={zone._id}
-                      id={`zone-${zone._id}`}
-                    />
-                    <label
-                      htmlFor={`zone-${zone._id}`}
-                      className="font-medium text-sm"
-                    >
-                      {zone.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
+    if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
+    if (filters.toDate) { result.finalDate = filters.toDate.toString() }
+
+    if (filters.zones) {
+      const zones = Object.values(filters.zones).filter(z => !!z).join(',')
+      if (zones !== "") { result.zone = zones }
+    }
+
+    if (!((!!filters.withContract && !!filters.withoutContract) || (!filters.withContract && !filters.withoutContract))) {
+      result.hasClientContract = filters.withContract
+    }
+
+    if (!((!!filters.credit && !!filters.currentAccount) || (!filters.credit && !filters.currentAccount))) {
+      result.creditSale = filters.credit
+    }
+
+    if (!((!!filters.withExpiredContract && !!filters.withoutExpiredContract) || (!filters.withExpiredContract && !filters.withoutExpiredContract))) {
+      result.hasClientExpiredContracts = filters.withExpiredContract
+    }
+
+    if (!((!!filters.withLoan && !!filters.withoutLoan) || (!filters.withLoan && !filters.withoutLoan))) {
+      result.hasClientLoan = filters.withLoan
+    }
+
+    if (!((!!filters.withInvoice && !!filters.withoutInvoice) || (!filters.withInvoice && !filters.withoutInvoice))) {
+      result.hasInvoice = filters.withInvoice
+    }
+
+    return result
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-8">
+      <div className="flex flex-col sm:flex-row mb-4">
+        <div className="flex-1">
+          <div className="FiltroClientes-Fechastitulo mb-2">
+            <span className="text-blue_custom font-semibold">Fechas</span>
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+              <span className="text-left text-sm">De</span>
+              <input
+                max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
+                type="date"
+                {...register("fromDate")}
+                className="border-0 rounded outline-none font-semibold w-full bg-transparent"
+              />
             </div>
-            <div className="flex justify-between w-full items-center gap-3 px-4 translate-y-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowFiltro(false);
-                  if (onChange) onChange(sales, {});
-                }}
-                className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
-              >
-                Quitar Filtros
-              </button>
-              <button
-                type="submit"
-                className="mt-4 bg-blue-500 border-2 border-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold"
-              >
-                Aplicar Filtros
-              </button>
+            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+              <span className="text-left text-sm">A</span>
+              <input
+                min={watch('fromDate')?.toString()}
+                max={new Date().toISOString().split("T")[0]}
+                type="date"
+                {...register("toDate")}
+                className="border-0  rounded outline-none font-semibold w-full bg-transparent"
+              />
             </div>
           </div>
         </div>
       </div>
-    </form>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+        {/* Credit */}
+        <div className="">
+          <div className="FiltroClientes-RenovaciónTitulo mb-2">
+            <span className="text-blue_custom font-semibold opacity-0">h</span>
+          </div>
+          <div className="FiltroClientes-Cuentas flex flex-col">
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check3"
+                    {...register("credit")}
+                  />
+                  <label htmlFor="check3" className="text-sm" >
+                    A crédito
+                  </label>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check4"
+                    {...register("currentAccount")}
+                  />
+                  <label htmlFor="check4" className="text-sm" >
+                    De contado
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Factura */}
+        <div className="">
+          <div className="FiltroClientes-RenovaciónTitulo mb-2">
+            <span className="text-blue_custom font-semibold">Factura</span>
+          </div>
+          <div className="FiltroClientes-Cuentas flex flex-col">
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check5"
+                    {...register("withInvoice")}
+                  />
+                  <label htmlFor="check5" className="text-sm" >
+                    Con factura
+                  </label>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check6"
+                    {...register("withoutInvoice")}
+                  />
+                  <label htmlFor="check6" className="text-sm" >
+                    Sin factura
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Prestamos */}
+        <div className="">
+          <div className="FiltroClientes-RenovaciónTitulo mb-2">
+            <span className="text-blue_custom font-semibold">Préstamo</span>
+          </div>
+          <div className="FiltroClientes-Cuentas flex flex-col">
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check1"
+                    {...register("withLoan")}
+                  />
+                  <label htmlFor="check1" className="text-sm" >
+                    Con préstamo
+                  </label>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check2"
+                    {...register("withoutLoan")}
+                  />
+                  <label htmlFor="check2" className="text-sm" >
+                    Sin préstamo
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contratos */}
+        <div className="">
+          <div className="FiltroClientes-RenovaciónTitulo mb-2">
+            <span className="text-blue_custom font-semibold">Contratos</span>
+          </div>
+          <div className="FiltroClientes-Cuentas flex flex-col">
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check7"
+                    {...register("withContract")}
+                  />
+                  <label htmlFor="check7" className="text-sm" >
+                    Con contratos
+                  </label>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check8"
+                    {...register("withoutContract")}
+                  />
+                  <label htmlFor="check8" className="text-sm" >
+                    Sin contratos
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contratos expirados */}
+        <div className="">
+          <div className="FiltroClientes-RenovaciónTitulo mb-2">
+            <span className="text-blue_custom font-semibold">Contratos expirados</span>
+          </div>
+          <div className="FiltroClientes-Cuentas flex flex-col">
+            <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col w-full gap-2">
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check9"
+                    {...register("withExpiredContract")}
+                  />
+                  <label htmlFor="check9" className="text-sm" >
+                    Con contratos expirados
+                  </label>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <input
+                    className="input-check accent-blue_custom"
+                    type="checkbox"
+                    id="check10"
+                    {...register("withoutExpiredContract")}
+                  />
+                  <label htmlFor="check10" className="text-sm" >
+                    Sin contratos expirados
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div className="w-full flex flex-col gap-2 mb-8">
+        <label className="font-semibold text-blue_custom">Zonas</label>
+        <div className="flex flex-wrap gap-x-6 gap-y-4">
+          {zones.map((zone, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3"
+            >
+              <input
+                className="input-check accent-blue_custom"
+                type="checkbox"
+                {...register(`zones.${zone._id}`)}
+                value={zone._id}
+                id={`zone-${zone._id}`}
+              />
+              <label
+                htmlFor={`zone-${zone._id}`}
+                className="text-sm"
+              >
+                {zone.name}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-between w-full items-center gap-3 px-4">
+        <button
+          type="button"
+          onClick={() => {
+            setShowFiltro(false);
+            onChange({});
+          }}
+          className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
+        >
+          Quitar Filtros
+        </button>
+        <button
+          type="submit"
+          className="mt-4 bg-blue-500 border-2 border-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold"
+        >
+          Aplicar Filtros
+        </button>
+      </div>
+    </form >
   );
 };
 
