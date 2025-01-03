@@ -16,13 +16,6 @@ const Promotions: FC = () => {
     const { setShowModal, showModal, setSelectedItem, selectedItem } = useContext(PromocionesContext)
 
     // const [searchParam, setSearchParam] = useState<string>('');
-
-    const [page, setPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(1);
-    const ITEMS_PER_PAGE = 9
-
-    const [itemsToShow, setItemsToShow] = useState<Promotion[]>([])
-    const [filteredItems, setFilteredItems] = useState<Promotion[]>([])
     const [items, setItems] = useState<Promotion[]>([])
 
     const fetchData = useCallback(async () => {
@@ -31,7 +24,6 @@ const Promotions: FC = () => {
         const res = await PromotionApiConector.getPromotions()
         const prods = res || []
         setItems(prods)
-        setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
 
         setLoading(false)
     }, [setLoading])
@@ -40,41 +32,24 @@ const Promotions: FC = () => {
         fetchData()
     }, [fetchData])
 
-    useEffect(() => {
-        if (items) {
-            console.log(items)
-            // const itms = items.filter(d => d.name.toLowerCase().includes(searchParam.toLowerCase()))
-            setFilteredItems(items || []);
-            setTotalPages(Math.ceil(items.length / ITEMS_PER_PAGE))
-            setPage(1);
-        }
-    }, [items])
-
-    useEffect(() => {
-        if (filteredItems) {
-            console.log(filteredItems)
-            setItemsToShow(filteredItems.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
-        }
-    }, [filteredItems, page])
-
     return (
         <>
             <div className="px-10">
                 <PageTitle titulo="Configuración / Promociones" icon="../../../Configuracion-icon.svg" />
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados={false} order={false} hasSearch={false} total={filteredItems.length}>
+                <FiltroPaginado add={items.length === 0}
+                    onAdd={() => setShowModal(true)} resultados={false} order={false} hasSearch={false} total={items.length}>
                     <div className="w-full">
                         {
 
-                            itemsToShow.length > 0 &&
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            items.length > 0 &&
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {
-                                    itemsToShow.map(p => <PromotionsItem key={p._id} promotion={p} />)
+                                    items.map(p => <PromotionsItem key={p._id} promotion={p} />)
                                 }
                             </div>
                         }
                         {
-                            itemsToShow.length === 0 &&
+                            items.length === 0 &&
                             <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
                                 Sin resultados
                             </div>
@@ -85,7 +60,7 @@ const Promotions: FC = () => {
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Registro de item
+                    Agregar promoción
                 </h2>
                 <PromotionsForm isOpen={showModal} onCancel={() => setShowModal(false)} />
             </Modal>
@@ -95,7 +70,7 @@ const Promotions: FC = () => {
                 onClose={() => { setSelectedItem(promotion); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Editar item
+                    Editar promoción
                 </h2>
                 <PromotionsForm
                     isOpen={

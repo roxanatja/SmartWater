@@ -199,12 +199,16 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                         <button
                             type="submit"
                             disabled={active || !isValid}
-                            className="disabled:bg-gray-400 w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
+                            className="disabled:bg-gray-400 w-full bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
                         >
                             {
                                 active ?
                                     <i className="fa-solid fa-spinner animate-spin"></i> :
-                                    <span>Actualizar</span>
+                                    <span>
+                                        { 
+                                            selectedUser._id !== "" ? "Actualizar usuario" : "Regestrir usuario"
+                                        }
+                                    </span>
                             }
                         </button>
                     </div>

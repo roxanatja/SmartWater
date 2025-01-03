@@ -41,7 +41,7 @@ export abstract class AccountEntryApiConector {
         }
     }
 
-    static async delete(params: IAccountFilter): Promise<{ mensaje: string } | null> {
+    static async delete(params: IAccountFilter): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.accountId}/delete`)
             return res.data

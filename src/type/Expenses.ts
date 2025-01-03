@@ -4,11 +4,11 @@ export type Expense = {
     accountEntry: string;
     user: string;
     provider: string;
+    creditBuy: boolean;
     paymentMethodCurrentAccount: boolean;
     hasInVoice: boolean;
     documentNumber: string;
     comment: string;
     created: string;
     updated: string;
-    creditbuy: boolean;
 }

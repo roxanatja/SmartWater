@@ -95,7 +95,7 @@ const Usuarios: FC = () => {
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 top-0 z-30 bg-main-background">
-                    Registrar usuario
+                    Registro de usuario
                 </h2>
                 <AddUsuario isOpen={showModal} onCancel={() => setShowModal(false)} schedules={schedules} />
             </Modal>

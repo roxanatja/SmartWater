@@ -1,153 +1,85 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC } from "react";
 import "./EgresosGastos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
-import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
-import { SmartwaterContext } from "../../../../SmartwaterContext";
 import { CuentasContales } from "./CuentasContales/CuentasContales";
-import { EgresosGastosContext } from "./EgresosGastosContext";
-import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
-import Modal from "../../../EntryComponents/Modal";
-import RegisterAccount from "../../../EntryComponents/RegisterAccount";
-import { Account } from "../../../../../type/AccountEntry";
-import ApiMethodAccountEntry from "../../../../../Class/api.entryaco";
-import { AddEgresosGastos } from "./AddEgresosGastos/AddEgresosGastos";
-import { Providers } from "../../../../../type/providers";
-import ApiMethodProvider from "../../../../../Class/api.providers";
-import ApiMethodInvoceExpense from "../../../../../Class/api.invoceexpe";
-import { User } from "../../../../../type/User";
-import { CuadroRegistrarEyG } from "./RegistrosEyG/CuadroRegistrarEyG";
+import { useNavigate, useParams } from "react-router-dom";
+import RegistroEyG from "./RegistrosEyG/RegistroEyG";
 
 const EgresosGastos: FC = () => {
-  const { selectedOption, setSelectedOption } = useContext(SmartwaterContext);
-  const [data, setData] = useState<{
-    accounts?: Account[];
-    providers?: Providers[];
-    expense?: any[];
-    users?: User[];
-    expeGroup?: any[];
-  }>();
+  const params = useParams()
+  const navigate = useNavigate()
 
-  const groupExpensesById = (expenses: any[]) => {
-    const groupedExpenses = expenses.reduce((acc, expense) => {
-      // Si ya existe el _id en el acumulador, suma el amount
-      if (acc[expense.accountEntry]) {
-        acc[expense.accountEntry].amount += expense.amount;
-      } else {
-        // Si no existe, lo añade al acumulador
-        acc[expense.accountEntry] = { ...expense };
-      }
-      return acc;
-    }, {} as { [key: string]: any[][0] });
+  // const groupExpensesById = (expenses: any[]) => {
+  //   const groupedExpenses = expenses.reduce((acc, expense) => {
+  //     // Si ya existe el _id en el acumulador, suma el amount
+  //     if (acc[expense.accountEntry]) {
+  //       acc[expense.accountEntry].amount += expense.amount;
+  //     } else {
+  //       // Si no existe, lo añade al acumulador
+  //       acc[expense.accountEntry] = { ...expense };
+  //     }
+  //     return acc;
+  //   }, {} as { [key: string]: any[][0] });
 
-    return Object.values(groupedExpenses);
-  };
+  //   return Object.values(groupedExpenses);
+  // };
 
-  const getData = useCallback(async () => {
-    const api = new ApiMethodAccountEntry();
-    const apiProvi = new ApiMethodProvider();
-    const apiex = new ApiMethodInvoceExpense();
-    const expenseData = await apiex.loadExpense();
-    return setData({
-      accounts: await api.loadAccounts(),
-      providers: await apiProvi.loadProvider(),
-      expense: expenseData,
-      users: await api.getUser(),
-      expeGroup: groupExpensesById(expenseData),
-    });
-  }, []);
+  // const getData = useCallback(async () => {
+  //   const api = new ApiMethodAccountEntry();
+  //   const apiProvi = new ApiMethodProvider();
+  //   const apiex = new ApiMethodInvoceExpense();
+  //   const expenseData = await apiex.loadExpense();
+  //   return setData({
+  //     accounts: await api.loadAccounts(),
+  //     providers: await apiProvi.loadProvider(),
+  //     expense: expenseData,
+  //     users: await api.getUser(),
+  //     expeGroup: groupExpensesById(expenseData),
+  //   });
+  // }, []);
 
-  useEffect(() => {
-    getData();
-  }, [getData]);
+  // useEffect(() => {
+  //   getData();
+  // }, [getData]);
 
-  const { showModal, setShowModal, showFiltro, setShowFiltro } =
-    useContext(EgresosGastosContext);
+  // const { showModal, setShowModal, showFiltro, setShowFiltro } =
+  //   useContext(EgresosGastosContext);
 
-  const handleModal = () => {
-    setShowModal(true);
-  };
+  // const handleModal = () => {
+  //   setShowModal(true);
+  // };
 
-  const Onfilter = () => {
-    setShowFiltro(true);
-  };
+  // const Onfilter = () => {
+  //   setShowFiltro(true);
+  // };
 
-  useEffect(() => {
-    setSelectedOption(false);
-  }, [setSelectedOption]);
+
+  if (!params?.section) { return null }
+  if (!["Cuentas", "Registro"].includes(params.section)) { navigate("/Finanzas/EgresosGastos/Cuentas", { replace: true }) }
 
   return (
     <>
-      <div>
+      <div className="px-10">
         <PageTitle
-          titulo="Cuentas Egresos y gastos"
+          titulo="Finanzas / Cuentas, egresos y gastos"
           icon="../../Finanzas-icon.svg"
         />
-        {selectedOption === false ? (
-          <FiltroPaginado
-            filtro
-            swith
-            finanzas
-            opcionesSwitch1="Cuentas contables"
-            opcionesSwitch2="Registros Egresos y Gastos"
-          >
-            <div className="flex flex-wrap gap-4 pl-4">
-              <CuentasContales accounts={data?.accounts} />
-            </div>
-          </FiltroPaginado>
-        ) : (
-          <FiltroPaginado
-            filtro
-            swith
-            finanzas
-            add
-            onAdd={handleModal}
-            opcionesSwitch1="Cuentas contables"
-            opcionesSwitch2="Registros Egresos y Gastos"
-            onFilter={Onfilter}
-          >
-            <div className="flex flex-col gap-4 p-6">
-              <div className="RegistrosEyG-Cuadro1">
-                {data?.expeGroup &&
-                  data.expeGroup.map((row, index) => (
-                    <div className="RegistrosEyG-Cuadro1-text" key={index}>
-                      <span>
-                        {data.accounts?.find((x) => x._id === row.accountEntry)
-                          ?.name || "Cuenta no Reconociada"}
-                      </span>
-                      <span>{row.amount.toLocaleString()} Bs.</span>
-                    </div>
-                  ))}
-              </div>
+        {params.section === "Cuentas" ? (
+          <CuentasContales />
 
-              <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-4 pl-4">
-                {data?.expense &&
-                  data?.expense.map((row, index) => (
-                    <CuadroRegistrarEyG
-                      key={index}
-                      expense={row}
-                      accounts={data?.accounts}
-                      users={data?.users}
-                    />
-                  ))}
-              </div>
-            </div>
-          </FiltroPaginado>
+        ) : (
+          <RegistroEyG />
         )}
       </div>
-      {showFiltro && <FiltroEgresosGastos />}
 
-      <Modal
-        isOpen={showModal && !selectedOption}
-        onClose={() => setShowModal(false)}
-      >
-        <RegisterAccount handleOnsubmit={() => getData()} />
-      </Modal>
+      {/* {showFiltro && <FiltroEgresosGastos />}
+
       <Modal
         isOpen={showModal && selectedOption}
         onClose={() => setShowModal(false)}
       >
         <AddEgresosGastos data={data} handleOnsubmit={() => getData()} />
-      </Modal>
+      </Modal> */}
     </>
   );
 };
