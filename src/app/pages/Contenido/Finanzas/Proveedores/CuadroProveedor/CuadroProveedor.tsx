@@ -40,19 +40,19 @@ const CuadroProveedor = ({ provider }: { provider: Providers }) => {
               className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
               onClick={async () => {
                 toast.dismiss(t.id);
-                const response = await ProvidersApiConector.delete({ providerId: provider?._id || '' }) as any;
+                const response = await ProvidersApiConector.delete({ providerId: provider?._id || '' });
                 if (!!response) {
-                  if (response.mensaje) {
+                  if (response.mensaje.includes("No")) {
+                    toast.error(response.mensaje, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                  } else if (response.mensaje) {
                     toast.success(response.mensaje, {
                       position: "top-center",
                       duration: 2000
                     });
                     window.location.reload();
-                  } else if (response.error) {
-                    toast.error(response.error, {
-                      position: "top-center",
-                      duration: 2000
-                    });
                   }
                 } else {
                   toast.error("Error al eliminar el proveedor", {
