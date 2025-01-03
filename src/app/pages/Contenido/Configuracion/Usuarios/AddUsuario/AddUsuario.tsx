@@ -10,7 +10,6 @@ import { UsersApiConector } from "../../../../../../api/classes";
 import Input from "../../../../EntryComponents/Inputs";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { Schedule } from "../../../../../../type/Schedule";
-import { convertTo12HourIntl } from "../../../../../../utils/helpers";
 
 interface Props {
     isOpen: boolean;

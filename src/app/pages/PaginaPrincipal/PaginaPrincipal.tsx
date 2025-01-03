@@ -55,6 +55,10 @@ const PaginaPrincipal: FC = () => {
                 <Route path="/Ventas/*" element={<VentasWrapper />} />
                 <Route path="/Prestamos/*" element={<PrestamosWrapper />} />
                 <Route path="/Pedidos/*" element={<PedidosWrapper />} />
+                <Route
+                  path="/Finanzas/Proveedores"
+                  element={<ProveedoresWrapper />}
+                />
                 {/* <Route
                   path="/MapaClientes/*"
                   element={<MapaClientesWrapper />}
@@ -74,10 +78,6 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Finanzas/EgresosGastos"
                   element={<EgresosGastosWrapper />}
-                />
-                <Route
-                  path="/Finanzas/Proveedores"
-                  element={<ProveedoresWrapper />}
                 />
                 <Route
                   path="/Finanzas/CuentasPorPagar/*"

@@ -10,20 +10,22 @@ type ProveedoresContextType = {
   setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
   showFiltro: boolean;
   setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
-  setProvider: React.Dispatch<React.SetStateAction<Providers | null>>;
-  provider: Providers | null;
+  setProvider: React.Dispatch<React.SetStateAction<Providers>>;
+  provider: Providers;
 };
 
 export const ProveedoresContext = createContext<ProveedoresContextType>(
   {} as ProveedoresContextType
 );
 
+export const providerBlank: Providers = { _id: "", address: "", created: "", email: "", fullName: "", NIT: "", phoneNumber: "", updated: "" }
+
 export const ProveedoresProvider = ({ children }: any) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<boolean>(false);
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
-  const [provider, setProvider] = useState<Providers | null>(null);
+  const [provider, setProvider] = useState<Providers>(providerBlank);
 
   return (
     <ProveedoresContext.Provider
