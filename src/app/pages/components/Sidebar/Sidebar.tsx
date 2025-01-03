@@ -96,7 +96,7 @@ const Sidebar: FC = () => {
             <AsideSubMenu
               tituloItem="Finanzas"
               icon="../../../Finanzas-icon.svg"
-              to="/Finanzas/ArqueoDeCajas"
+              to="/Finanzas"
               opciones={[
                 {
                   titulo: "Arqueo de cajas",
@@ -123,12 +123,39 @@ const Sidebar: FC = () => {
                   to: "/Finanzas/CuentasPorPagar",
                   id: 4,
                 },
+                {
+                  titulo: "Inventarios",
+                  to: "/Finanzas/Inventarios",
+                  id: 4,
+                  opciones: [
+                    {
+                      titulo: "Inventarios Físicos",
+                      to: "/Finanzas/Inventarios/Fisicos",
+                      id: 0,
+                    },
+                    {
+                      titulo: "Inventarios Físicos valorados",
+                      to: "/Finanzas/Inventarios/Valorados",
+                      id: 1,
+                    },
+                    {
+                      titulo: "Otros ingresos y salidas",
+                      to: "/Finanzas/Inventarios/Otros",
+                      id: 2,
+                    },
+                  ]
+                },
+                {
+                  titulo: "Comisiones",
+                  to: "/Finanzas/Comisiones",
+                  id: 5,
+                },
               ]}
             />
             <AsideSubMenu
               tituloItem="Reportes"
               icon="../../../Reportes-icon.svg"
-              to="/Reportes/Ingresos"
+              to="/Reportes"
               opciones={[
                 {
                   titulo: "Ingresos (cuentas por cobrar)",
@@ -146,7 +173,7 @@ const Sidebar: FC = () => {
             <AsideSubMenu
               tituloItem="Configuración"
               icon="../../../Configuracion-icon.svg"
-              to="/Configuración/ConfiguraciónGeneral"
+              to="/Configuracion"
               opciones={[
                 { titulo: "Configuración general", to: "/Configuracion/General", id: 0 },
                 { titulo: "Datos de la empresa", to: "/Configuracion/DatosEmpresa", id: 1 },
