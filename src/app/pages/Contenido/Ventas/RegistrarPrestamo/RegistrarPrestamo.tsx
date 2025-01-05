@@ -1,6 +1,6 @@
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 import RegisterPrestaForm from "../../../EntryComponents/RegisterPrestamo";
 import { VentasContext } from "../VentasContext";
@@ -13,6 +13,12 @@ const RegistrarPrestamo = () => {
     navigate("/Ventas");
     setSelectedClient(client);
   };
+
+  useEffect(() => {
+    if (selectedClient._id === "") {
+      navigate("/Ventas")
+    }
+  }, [selectedClient, navigate])
 
   return (
     <>

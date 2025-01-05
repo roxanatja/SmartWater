@@ -49,12 +49,25 @@ const Pedidos: FC = () => {
 
       const promises: Promise<{ data: Order[] } & QueryMetadata | null>[] = []
 
+      const filters = { ...savedFilters }
+
+      if (section === "Atendidos") {
+        if (!filters.attendedDate) {
+          filters.attendedDate = (new Date()).toISOString()
+        }
+        if (filters.hasOwnProperty('attended')) {
+          delete filters.attended
+        }
+      } else {
+        filters.attended = false
+      }
+
       if (clientsFilter) {
         clientsFilter.forEach(cf =>
-          promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf, attended: section === "Atendidos" } }))
+          promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...filters, client: cf } }))
         )
       } else {
-        promises.push(OrdersApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { ...savedFilters, attended: section === "Atendidos" } }))
+        promises.push(OrdersApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters }))
       }
 
       const responses = await Promise.all(promises)
@@ -145,18 +158,28 @@ const Pedidos: FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
           searchPlaceholder="Buscar por nombre o teléfono de cliente"
         >
-          <div className="w-full pb-10 sticky top-0 bg-main-background z-[20]">
+          <div className="w-full pb-10 sticky top-0 bg-main-background z-[40]">
             <div className="w-full sm:w-1/2">
               <div className="switch-contenido">
                 <div
                   className={`switch-option ${params.section === "EnCurso" ? "selected" : ""}`}
-                  onClick={() => navigate("/Pedidos/EnCurso")}
+                  onClick={() => {
+                    setSavedFilters({});
+                    filterRef.current?.clearSearch()
+                    setSearchParam("")
+                    navigate("/Pedidos/EnCurso")
+                  }}
                 >
                   En curso
                 </div>
                 <div
                   className={`switch-option ${params.section === "Atendidos" ? "selected" : ""}`}
-                  onClick={() => navigate("/Pedidos/Atendidos")}
+                  onClick={() => {
+                    setSavedFilters({});
+                    filterRef.current?.clearSearch()
+                    setSearchParam("")
+                    navigate("/Pedidos/Atendidos")
+                  }}
                 >
                   Atendidos
                 </div>

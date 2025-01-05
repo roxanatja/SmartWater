@@ -115,33 +115,36 @@ const FiltroPedidos: FC<{
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col sm:flex-row mb-4">
-                    <div className="flex-1">
-                        <div className="FiltroClientes-Fechastitulo mb-2">
-                            <span className="text-blue_custom font-semibold">Fecha de entrega</span>
-                        </div>
-                        <div className="flex gap-3 flex-wrap">
-                            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
-                                <span className="text-left text-sm">De</span>
-                                <input
-                                    max={watch('toDateDeliver')?.toString()}
-                                    type="date"
-                                    {...register("fromDateDeliver")}
-                                    className="border-0 rounded outline-none font-semibold w-full bg-transparent"
-                                />
+                {
+                    !isAttended &&
+                    <div className="flex flex-col sm:flex-row mb-4">
+                        <div className="flex-1">
+                            <div className="FiltroClientes-Fechastitulo mb-2">
+                                <span className="text-blue_custom font-semibold">Fecha de entrega</span>
                             </div>
-                            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
-                                <span className="text-left text-sm">A</span>
-                                <input
-                                    min={watch('fromDateDeliver')?.toString()}
-                                    type="date"
-                                    {...register("toDateDeliver")}
-                                    className="border-0  rounded outline-none font-semibold w-full bg-transparent"
-                                />
+                            <div className="flex gap-3 flex-wrap">
+                                <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+                                    <span className="text-left text-sm">De</span>
+                                    <input
+                                        max={watch('toDateDeliver')?.toString()}
+                                        type="date"
+                                        {...register("fromDateDeliver")}
+                                        className="border-0 rounded outline-none font-semibold w-full bg-transparent"
+                                    />
+                                </div>
+                                <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+                                    <span className="text-left text-sm">A</span>
+                                    <input
+                                        min={watch('fromDateDeliver')?.toString()}
+                                        type="date"
+                                        {...register("toDateDeliver")}
+                                        className="border-0  rounded outline-none font-semibold w-full bg-transparent"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
                 {
                     isAttended &&
                     <div className="flex flex-col sm:flex-row mb-4">

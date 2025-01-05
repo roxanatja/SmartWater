@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect } from "react";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +14,12 @@ const RegistrarVenta: FC = () => {
     navigate("/Ventas");
     setSelectedClient(client);
   };
+  
+  useEffect(() => {
+    if (selectedClient._id === "") {
+        navigate("/Ventas")
+    }
+}, [selectedClient, navigate])
 
   return (
     <>

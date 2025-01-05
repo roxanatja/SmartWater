@@ -24,7 +24,7 @@ export interface IOrderBody {
         client?: string;
         distributorRedirectId?: string;
         comment: string;
-        deliverDate?: string;
+        deliverDate: string;
         detail: {
             product: string;
             quantity: number;
@@ -36,7 +36,6 @@ export interface IOrderBody {
             address: string;
             district: string;
             zone: string;
-            cityId?: string;
             location: {
                 latitude: string;
                 longitude: string;
@@ -58,6 +57,7 @@ export interface IUpdateOrderBody {
             phoneNumber: string;
             address: string;
             district: string;
+            zone: string;
             location: {
                 latitude: string;
                 longitude: string;

@@ -14,7 +14,8 @@ import { OrdersApiConector, ProductsApiConector, ZonesApiConector } from "../../
 import { District, Zone } from "../../../type/City";
 import { IOrderBody } from "../../../api/types/orders";
 import { AuthService } from "../../../api/services/AuthService";
-import { formatIncompletePhoneNumber } from "libphonenumber-js";
+import { formatIncompletePhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -25,13 +26,15 @@ const RegisterPedidoForm = ({
 }) => {
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
-  const [mapview, setMapview] = useState(false);
+  const [mapview, setMapview] = useState(true);
   const [active, setActive] = useState(false);
   const [editar, setEditar] = useState<{
     quantity: number;
     item: number;
     index: number;
   } | null>(null);
+
+  const navigate = useNavigate()
 
   const [addedProducts, setAddedProducts] = useState<IOrderBody['data']['detail']>([]);
 
@@ -53,12 +56,13 @@ const RegisterPedidoForm = ({
     register,
     handleSubmit,
     watch, reset,
-    setValue,
+    setValue, formState: { isValid, errors }
   } = useForm<IOrderBody['data']>({
     defaultValues: {
       detail: [{ product: "", quantity: 0 }],
       deliverDate: "",
     },
+    mode: 'all'
   });
 
   const getCitys = useCallback(async () => {
@@ -68,8 +72,8 @@ const RegisterPedidoForm = ({
     setDisti(d.districts);
 
     if (isNoClient) {
-      setValue("clientNotRegistered.zone", d._id);
-      setValue("clientNotRegistered.district", d.districts[0]._id);
+      setValue('clientNotRegistered.district', selectedClient.district, { shouldValidate: true });
+      setValue('clientNotRegistered.zone', selectedClient.zone, { shouldValidate: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue]);
@@ -79,6 +83,18 @@ const RegisterPedidoForm = ({
       getCitys();
     }
   }, [getCitys, isNoClient]);
+
+  useEffect(() => {
+    if (isNoClient && selectedClient) {
+      setValue('clientNotRegistered.address', selectedClient.address, { shouldValidate: true });
+      setValue('clientNotRegistered.district', selectedClient.district, { shouldValidate: true });
+      setValue('clientNotRegistered.zone', selectedClient.zone, { shouldValidate: true });
+      setValue('clientNotRegistered.fullName', selectedClient.fullName, { shouldValidate: true });
+      setValue('clientNotRegistered.location.longitude', selectedClient.location.longitude, { shouldValidate: true });
+      setValue('clientNotRegistered.location.latitude', selectedClient.location.latitude, { shouldValidate: true });
+      setValue('clientNotRegistered.phoneNumber', selectedClient.phoneNumber, { shouldValidate: true });
+    }
+  }, [isNoClient, selectedClient, setValue])
 
   const handleAddProduct = () => {
     const product = watch("detail")[0].product;
@@ -148,25 +164,19 @@ const RegisterPedidoForm = ({
         })),
         user: userData?._id || "",
         client: selectedClient._id,
-        deliverDate: data.deliverDate.replace(/\//g, "-"),
-        // clientNotRegistered: {
-        //   address: cl.address,
-        //   district: cl.district,
-        //   fullName: cl.fullName,
-        //   location: cl.location,
-        //   phoneNumber: cl.phoneNumber,
-        //   zone: cl.zone,
-        //   cityId: userData?.city?.id || '',
-        // },
+        deliverDate: data.deliverDate.replace(/\//g, "-")
       };
     }
 
+    // FIXME: Cuando se registra no se está asignando la zona. Esta se registra cuando se edita
     const res = await OrdersApiConector.create({ data: values })
 
     if (res) {
       toast.success("Pedido registrado");
       reset();
       setAddedProducts([]);
+      window.location.reload()
+      navigate(-1);
     } else {
       toast.error("Upss error al registrar pedido");
     }
@@ -302,93 +312,51 @@ const RegisterPedidoForm = ({
               </div>
             </div>
 
-            {isNoClient && (
-              <>
-                <div className="grid grid-cols-3 max-sm:grid-cols-1 w-full gap-2">
-                  <div className="relative w-full flex items-center">
-                    {/* <i
-                    className={`fa-solid fa-user text-2xl text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.fullName && "text-red-500"
-                    }`}
-                  ></i> */}
-                    {/* <input
-                    {...register("clientNotRegistered.fullName", {
-                      required: true,
-                    })}
+            {
+              isNoClient && <div className="rounded-[20px] border border-font-color pt-6 pb-8 px-8 flex flex-col gap-6">
+                <div className="text-base font-bold">Datos del cliente</div>
+
+                <div className="flex flex-col md:flex-row gap-6">
+                  <Input
+                    label="Nombre completo"
                     name="clientNotRegistered.fullName"
-                    placeholder="Nombre Completo"
-                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
-                      errors?.clientNotRegistered?.fullName &&
-                      "placeholder:text-red-500 border-red-500"
-                    }`}
-                  /> */}
-                  </div>
-
-                  <div className="relative w-full flex items-center">
-                    {/* <i
-                    className={`fa-solid fa-phone text-2xl text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.phoneNumber && "text-red-500"
-                    }`}
-                  ></i>
-                  <input
-                    {...register("clientNotRegistered.phoneNumber", {
-                      required: true,
-                    })}
+                    icon={<i className={`fa-solid fa-user text-2xl ${errors?.clientNotRegistered?.fullName && "text-red-500"}`}></i>}
+                    register={register}
+                    errors={errors.clientNotRegistered?.fullName}
+                    required
+                  />
+                  <Input
+                    label="Teléfono"
                     name="clientNotRegistered.phoneNumber"
-                    placeholder="Numero de Telefono"
-                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
-                      errors?.clientNotRegistered?.phoneNumber &&
-                      "placeholder:text-red-500 border-red-500"
-                    }`}
-                  /> */}
-                  </div>
-
-                  <div className="relative w-full flex items-center">
-                    {/* <i
-                    className={`fa-solid fa-location-dot text-2xl text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.address && "text-red-500"
-                    }`}
-                  ></i>
-                  <input
-                    {...register("clientNotRegistered.address", {
-                      required: true,
-                    })}
-                    name="clientNotRegistered.address"
-                    placeholder="Dirrecion"
-                    className={`placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 ${
-                      errors?.clientNotRegistered?.address &&
-                      "placeholder:text-red-500 border-red-500"
-                    }`}
-                  /> */}
-                  </div>
+                    icon={<i className={`fa-solid fa-phone text-2xl ${errors?.clientNotRegistered?.phoneNumber && "text-red-500"}`}></i>}
+                    register={register}
+                    errors={errors.clientNotRegistered?.phoneNumber}
+                    required
+                    validateAmount={(value: string) => { if (value && !isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
+                  />
                 </div>
-              </>
-            )}
-
-            {isNoClient && (
-              <>
-                <div className="flex flex-row gap-4 w-full justify-start items-center">
-                  <div className="relative flex items-center">
-                    <i
-                      className={`fa-solid fa-location-crosshairs text-2xl pl-2 text-blue_custom absolute `}
-                    ></i>
+                <Input
+                  label="Dirección"
+                  name="clientNotRegistered.address"
+                  icon={<i className={`fa-solid fa-location-dot text-2xl ${errors?.clientNotRegistered?.address && "text-red-500"}`}></i>}
+                  register={register}
+                  errors={errors.clientNotRegistered?.address}
+                  required
+                />
+                <div className="flex flex-col md:flex-row gap-6">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full flex flex-col gap-2"
+                  >
+                    <label>Zona</label>
                     <select
                       {...register("clientNotRegistered.zone", {
                         required: "se requiere una zona",
-                        onChange: (e) => {
-                          const da = city.find((x) => x._id === e.target.value);
-                          if (da && da.districts.length > 0) {
-                            setDisti(da.districts);
-                            setValue(
-                              "clientNotRegistered.district",
-                              da.districts?.[0]?._id || ""
-                            );
-                          } else {
-                            setDisti([]);
-                          }
-                        },
                       })}
-                      className="p-2 px-6 ps-10 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-blue_custom font-medium  text-blue_custom"
+                      className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
                     >
                       {city.length > 0 &&
                         city.map((city, index) => (
@@ -397,17 +365,24 @@ const RegisterPedidoForm = ({
                           </option>
                         ))}
                     </select>
-                  </div>
-
-                  <div className="relative flex items-center">
-                    {/* <i
-                    className={`fa-solid fa-location-dot text-2xl pl-2 text-blue_custom absolute ${
-                      errors?.clientNotRegistered?.district && "text-red-500"
-                    }`}
-                  ></i> */}
+                    {errors.clientNotRegistered?.zone && (
+                      <span className="text-red-500 font-normal text-sm font-pricedown">
+                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                        {errors.clientNotRegistered.zone.message}
+                      </span>
+                    )}
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full flex flex-col gap-2"
+                  >
+                    <label>Barrio</label>
                     <select
                       {...register("clientNotRegistered.district")}
-                      className="p-2 px-6 ps-10 py-2.5 rounded-md font-pricedown focus:outline-4 bg-transparent outline outline-2 outline-blue_custom font-medium  text-blue_custom"
+                      className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
                     >
                       {disti && disti.length > 0 ? (
                         disti.map((row, index) => (
@@ -419,73 +394,40 @@ const RegisterPedidoForm = ({
                         <option value={"null"}>Sin resultados</option>
                       )}
                     </select>
-                  </div>
+                    {errors.clientNotRegistered?.district && (
+                      <span className="text-red-500 font-normal text-sm font-pricedown">
+                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                        {errors.clientNotRegistered.district.message}
+                      </span>
+                    )}
+                  </motion.div>
                 </div>
-              </>
-            )}
 
-            {isNoClient && (
-              <>
-                <div
-                  className="RegistrarPedido-AgregarProductoTitulo border-b-2 border-blue_custom pb-2 cursor-pointer"
-                  onClick={() => {
-                    setMapview(!mapview);
-                  }}
-                >
-                  <div className="text-md text-blue_custom flex gap-2 items-center">
-                    <i className="fa-solid text-xl fa-location-dot text-blue_custom"></i>
-                    <p className="text-base">Agregar ubicacion</p>
-                  </div>
+                <div className="w-full col-span-2 max-sm:col-span-1 relative">
+                  <h1 className="text-sm font-medium">
+                    Selecciona una ubicación en el mapa
+                  </h1>
+                  <GoogleMapWithSelection
+                    visible={isNoClient}
+                    disable={mapview}
+                    linkAddress={watch("linkAddress")}
+                    latitude={Number(watch("clientNotRegistered.location.latitude"))}
+                    longitude={Number(watch("clientNotRegistered.location.longitude"))}
+                    onChange={(coordinates: { lat: number; lng: number }) => {
+                      setValue("clientNotRegistered.location.latitude", `${coordinates.lat}`);
+                      setValue("clientNotRegistered.location.longitude", `${coordinates.lng}`);
+                    }}
+                  />
                   <button
                     type="button"
-                    className={
-                      mapview
-                        ? "RegistrarPedido-btnAgregarProducto AgregarProductoactive-btn"
-                        : "RegistrarPedido-btnAgregarProducto"
-                    }
+                    onClick={() => setMapview(!mapview)}
+                    className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-[10] right-14"
                   >
-                    <span className="material-symbols-outlined">expand_more</span>
+                    {mapview ? "Editar" : "Bloquear"}
                   </button>
                 </div>
-
-                {mapview && (
-                  <div className="w-full col-span-2 max-sm:col-span-1">
-                    <div className="flex flex-col w-full gap-2">
-                      <Input
-                        label="Enlace de ubicación"
-                        name="linkAddress"
-                        placeholder="(Opcional)"
-                        register={register}
-                        icon={<i className="fa-solid fa-location-dot"></i>}
-                      />
-                      <h1 className="text-sm font-medium">
-                        Selecciona una ubicación en el mapa
-                      </h1>
-                      <GoogleMapWithSelection
-                        visible={isNoClient}
-                        linkAddress={watch("linkAddress")}
-                        latitude={Number(
-                          watch("clientNotRegistered.location.latitude")
-                        )}
-                        longitude={Number(
-                          watch("clientNotRegistered.location.longitude")
-                        )}
-                        onChange={(coordinates: { lat: number; lng: number }) => {
-                          setValue(
-                            "clientNotRegistered.location.latitude",
-                            `${coordinates.lat}`
-                          );
-                          setValue(
-                            "clientNotRegistered.location.longitude",
-                            `${coordinates.lng}`
-                          );
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+              </div>
+            }
 
             <div className="relative w-full flex items-start">
               <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
@@ -548,8 +490,8 @@ const RegisterPedidoForm = ({
 
           <button
             type="submit"
-            disabled={!watch('deliverDate') || addedProducts.length === 0}
-            className="disabled:bg-gray-400 outline outline-2 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
+            disabled={(!isValid || !watch('deliverDate')) || addedProducts.length === 0}
+            className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
           >
             {active ? (
               <i className="fa-solid fa-spinner animate-spin"></i>

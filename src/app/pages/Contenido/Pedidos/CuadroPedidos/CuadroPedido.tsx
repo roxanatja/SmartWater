@@ -212,45 +212,50 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
             </div>
 
             {/* Productos del pedido */}
-            <div className="flex flex-wrap CuadroVentaCliente-productos items-end justify-end">
+            <div className="flex flex-wrap CuadroVentaCliente-productos items-end justify-end w-[calc(100%_-_30px)]">
               <div className="w-full max-h-28 overflow-y-auto mb-6">
                 {order.detail.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="font-bold text-left sticky top-0 col-span-2">
-                      <span>Productos</span>
+                  <div className="relative">
+                    <div className="grid grid-cols-3 gap-4 sticky top-0 bg-blocks mb-3">
+                      <div className="font-bold text-left col-span-2">
+                        <span>Productos</span>
+                      </div>
+                      <div className="font-bold text-center">
+                        <span>Cantidad</span>
+                      </div>
                     </div>
-                    <div className="font-bold sticky top-0 text-center">
-                      <span>Cantidad</span>
-                    </div>
-                    {order.detail.map((detail, index: number) => {
-                      let product = products.find(
-                        (product) => product._id === detail.product
-                      );
-                      return (
-                        <React.Fragment key={index}>
-                          <div className="flex items-center gap-2 col-span-2">
-                            <img
-                              src={
-                                product?.imageUrl ||
-                                "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
-                              }
-                              alt=""
-                              className="w-7 h-7 rounded-full"
-                            />
-                            <span className="CuadroVentaCliente-text">
-                              {product ? product.name : "Producto no encontrado"}
-                            </span>
-                          </div>
-                          <div className="flex w-full justify-center">
-                            <div className="CuadroVentaCliente-TextContainer font-semibold text-center !bg-transparent !border-blue_custom">
+                    <div className="grid grid-cols-3 gap-4">
+
+                      {order.detail.map((detail, index: number) => {
+                        let product = products.find(
+                          (product) => product._id === detail.product
+                        );
+                        return (
+                          <React.Fragment key={index}>
+                            <div className="flex items-center gap-2 col-span-2">
+                              <img
+                                src={
+                                  product?.imageUrl ||
+                                  "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
+                                }
+                                alt=""
+                                className="w-7 h-7 rounded-full"
+                              />
                               <span className="CuadroVentaCliente-text">
-                                {detail.quantity}
+                                {product ? product.name : "Producto no encontrado"}
                               </span>
                             </div>
-                          </div>
-                        </React.Fragment>
-                      );
-                    })}
+                            <div className="flex w-full justify-center">
+                              <div className="CuadroVentaCliente-TextContainer font-semibold text-center !bg-transparent !border-blue_custom">
+                                <span className="CuadroVentaCliente-text">
+                                  {detail.quantity}
+                                </span>
+                              </div>
+                            </div>
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : (
                   <p>No hay items para mostrar</p>
@@ -265,7 +270,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
               <div className="PedidosCurso-infoEntrega flex flex-col gap-1 items-center">
                 <span>Entrega programada</span>
                 <span className="text-blue_custom">
-                  {formatDateTime(order.deliverDate, 'numeric', '2-digit', '2-digit')}
+                  {formatDateTime(order.deliverDate, 'numeric', '2-digit', '2-digit', false, true)}
                 </span>
               </div>
               {
@@ -273,7 +278,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                 <div className="PedidosCurso-infoEntrega flex flex-col gap-1 items-center">
                   <span>Fecha de atención</span>
                   <span className="text-blue_custom">
-                    {formatDateTime(order.attended, 'numeric', '2-digit', '2-digit')}
+                    {formatDateTime(order.attended, 'numeric', '2-digit', '2-digit', false, true)}
                   </span>
                 </div>
               }
