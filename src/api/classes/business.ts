@@ -6,7 +6,6 @@ export interface IBusinessGetOneParams {
 }
 
 export interface IBusinessUpdateParams {
-    businessId: string;
     data: {
         phoneNumber: string;
         email: string;
@@ -30,7 +29,16 @@ export abstract class BussinessApiConector {
 
     static async updateBusiness(params: IBusinessUpdateParams): Promise<Business | null> {
         try {
-            const res = await ApiConnector.getInstance().put(`/business/${params.businessId}`, params.data)
+            const res = await ApiConnector.getInstance().put(`/business`, params.data)
+            return res.data as Business | null
+        } catch (error) {
+            return null
+        }
+    }
+
+    static async information(): Promise<Business | null> {
+        try {
+            const res = await ApiConnector.getInstance().get(`/business/information`)
             return res.data as Business | null
         } catch (error) {
             return null

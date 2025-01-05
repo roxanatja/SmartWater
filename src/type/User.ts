@@ -10,7 +10,9 @@ export type User = {
   zones?: string[];
   permissions?: string[];
   tokenFCM: string;
+  identification: string;
   schedules: {
+    _id: string;
     startTime: string;
     endTime: string;
     days: string[];

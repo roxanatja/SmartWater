@@ -36,6 +36,7 @@ const Usuarios: FC = () => {
 
         const res = await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user' } })
         const prods = res?.data || []
+        console.log(res)
         setUsers(prods)
         setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
 
@@ -54,8 +55,10 @@ const Usuarios: FC = () => {
     }, [fetchData])
 
     useEffect(() => {
+        console.log("filtering", searchParam)
         if (users) {
-            const itms = users.filter(d => d.fullName.toLowerCase().includes(searchParam.toLowerCase()) || d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase()))
+            const itms = users.filter(d => (!!d.fullName && d.fullName.toLowerCase().includes(searchParam.toLowerCase())) || (!!d.phoneNumber && d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase())))
+            console.log("filtering", itms)
             setFilteredUsers(itms);
             setTotalPages(Math.ceil(itms.length / ITEMS_PER_PAGE))
             setPage(1);
@@ -63,7 +66,9 @@ const Usuarios: FC = () => {
     }, [users, searchParam])
 
     useEffect(() => {
+        console.log("paginating", filteredUsers, page)
         if (filteredUsers) {
+            console.log("paginating", filteredUsers.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
             setUsersToShow(filteredUsers.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
         }
     }, [filteredUsers, page])

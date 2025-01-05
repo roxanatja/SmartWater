@@ -55,8 +55,9 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                     fullName: selectedUser.fullName,
                     phoneNumber: selectedUser.phoneNumber,
                     role: selectedUser.role,
-                    username: selectedUser.username,
-                    zones: checkedZones
+                    zones: checkedZones,
+                    identification: selectedUser.identification,
+                    schedules: selectedUser.schedules.map(sc => sc._id)
                 }, userId: selectedUser._id
             })
         ]

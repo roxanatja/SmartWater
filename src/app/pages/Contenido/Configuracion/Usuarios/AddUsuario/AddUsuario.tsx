@@ -21,14 +21,24 @@ interface Props {
 const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
     const { selectedUser } = useContext(UsuariosContext);
     const [active, setActive] = useState(false);
-    const [checkedSchedules, setCheckedSchedules] = useState<{ startTime: string; endTime: String; }[]>([]);
+    const [checkedSchedules, setCheckedSchedules] = useState<string[]>([]);
 
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
         formState: { errors, isValid },
     } = useForm<IRegisterBody['data']>({
-        defaultValues: selectedUser._id === "" ? {} : { email: selectedUser.email, fullName: selectedUser.fullName, phoneNumber: selectedUser.phoneNumber, password: "", role: selectedUser.role },
+        defaultValues: selectedUser._id === "" ? {} : {
+            email: selectedUser.email,
+            fullName: selectedUser.fullName,
+            phoneNumber: selectedUser.phoneNumber,
+            password: "",
+            role: selectedUser.role,
+            deactivated: false,
+            identification: selectedUser.identification
+        },
         mode: 'all'
     });
 
@@ -37,43 +47,46 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
         setActive(true)
 
         if (selectedUser._id !== "") {
-            // res = await ZonesApiConector.update({
-            //     zoneId: selectedUser._id,
-            //     data: {
-            //         ...data,
-            //         districts: selectedZone.districts.map(d => d._id)
-            //     }
-            // })
+            res = await UsersApiConector.updateUser({
+                userId: selectedUser._id,
+                data: {
+                    ...data,
+                    schedules: checkedSchedules
+                }
+            })
         } else {
-            res = await UsersApiConector.registerUser({ data })
+            res = await UsersApiConector.registerUser({
+                data: {
+                    ...data,
+                    schedules: checkedSchedules
+                }
+            })
         }
 
         if (res) {
-            toast.success(`Zona ${selectedUser._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
+            toast.success(`Usuario distribuidor ${selectedUser._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
             window.location.reload();
         } else {
-            toast.error("Upps error al crear la zona", { position: "bottom-center" });
+            toast.error("Upps error al crear el usuario distribuidor", { position: "bottom-center" });
             setActive(false)
         }
     };
 
-    const handleScheduleChange = (schedule: Schedule) => {
-        const idx = checkedSchedules.findIndex(sc => (sc.startTime === schedule.startTime && sc.endTime === schedule.endTime))
-        if (idx !== -1) {
-            setCheckedSchedules((prev) => prev.filter((_, index) => index !== idx))
+    const handleScheduleChange = (schedule: string) => {
+        if (checkedSchedules.includes(schedule)) {
+            setCheckedSchedules((prev) => prev.filter(z => z !== schedule))
         } else {
-            setCheckedSchedules((prev) => [...prev, { startTime: schedule.startTime, endTime: schedule.endTime }])
+            setCheckedSchedules((prev) => [...prev, schedule])
         }
     }
 
     useEffect(() => {
         if (selectedUser) {
-            setCheckedSchedules(selectedUser.schedules.map(sc => ({ startTime: sc.startTime, endTime: sc.endTime })) || [])
+            setCheckedSchedules(selectedUser.schedules.map(sc => sc._id) || [])
         } else {
             setCheckedSchedules([])
         }
     }, [selectedUser])
-
 
     return (
         <>
@@ -88,13 +101,13 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                 />
 
                 <div className="flex flex-col sm:flex-row gap-6 items-center w-full">
-                    {/* FIXME: It's not in the endpoint */}
                     <Input
                         label="Identidad"
-                        name="identity"
+                        name="identification"
                         register={register}
-                        errors={errors.identity}
+                        errors={errors.identification}
                         required
+                        numericalOnly
                     />
                     <Input
                         label="Correo electrónico"
@@ -116,8 +129,7 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                     />
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-6 items-center w-full">
-                    {/* FIXME: It's not in the endpoint */}
+                <div className="flex flex-col sm:flex-row gap-6 items-start w-full">
                     <Input
                         label="Teléfono"
                         name="phoneNumber"
@@ -126,15 +138,21 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                         required
                         validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
                     />
-                    <Input
-                        label="Contraseña"
-                        name="password"
-                        type="password"
-                        autoComplete="off"
-                        register={register}
-                        errors={errors.password}
-                        required
-                    />
+                    <div className="flex flex-col gap-2 w-full">
+                        <Input
+                            label="Contraseña"
+                            name="password"
+                            type="password"
+                            autoComplete="off"
+                            register={register}
+                            errors={errors.password}
+                            required={selectedUser._id === ""}
+                        />
+                        {
+                            selectedUser._id !== "" &&
+                            <small className="text-xs pl-1">Dejar en blanco para no modificar la contraseña</small>
+                        }
+                    </div>
                 </div>
 
                 <motion.div
@@ -178,14 +196,24 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                                         id={sc._id}
                                         className="input-check accent-blue_custom"
                                         type="checkbox"
-                                        checked={checkedSchedules.some(schedule => (sc.startTime === schedule.startTime && sc.endTime === schedule.endTime))}
-                                        onChange={() => handleScheduleChange(sc)}
+                                        checked={checkedSchedules.includes(sc._id)}
+                                        onChange={() => handleScheduleChange(sc._id)}
                                     />
                                     <label htmlFor={sc._id} className="AsignarPermisos-text-check text-font-color">{sc.startTime} a {sc.endTime}</label>
                                 </div>
                             )
                         }
                     </div>
+                </div>
+
+                <div className="w-full flex justify-end items-center gap-2">
+                    <span>Estado:</span>
+                    <label className="ConfiguracionGeneral-switch-container">
+                        <input className="inputSwitch" type="checkbox" checked={!watch('deactivated')} onChange={(e) => {
+                            setValue('deactivated', !e.target.checked, { shouldValidate: true })
+                        }} />
+                        <span className="slider"></span>
+                    </label>
                 </div>
 
                 <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
@@ -205,8 +233,8 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
                                 active ?
                                     <i className="fa-solid fa-spinner animate-spin"></i> :
                                     <span>
-                                        { 
-                                            selectedUser._id !== "" ? "Actualizar usuario" : "Regestrir usuario"
+                                        {
+                                            selectedUser._id !== "" ? "Actualizar usuario" : "Registrar usuario"
                                         }
                                     </span>
                             }

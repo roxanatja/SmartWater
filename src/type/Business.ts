@@ -1,7 +1,9 @@
 export type Business = {
+    companyName: string;
+    imageUrl: string;
     phoneNumber: string;
     email: string;
     address: string;
-    imageUrl: string;
-    companyName: string;
+    nit: string;
+    city: string;
 }

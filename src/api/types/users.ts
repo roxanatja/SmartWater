@@ -17,12 +17,14 @@ export interface IPermissionsGetParams extends Search {
 
 export interface IUserUpdateBody {
     data: {
-        username?: string;
         phoneNumber?: string;
         fullName?: string;
+        identification?: string;
         role?: string;
         email?: string;
         zones?: string[];
+        password?: string;
+        schedules?: string[];
     }
 }
 
@@ -45,10 +47,12 @@ export interface IRegisterBody {
     data: {
         phoneNumber: string;
         fullName: string;
+        identification: string;
         password: string;
         email: string;
         role: string;
-        identity?: string;
+        schedules: string[];
+        deactivated: boolean;
     }
 }
 

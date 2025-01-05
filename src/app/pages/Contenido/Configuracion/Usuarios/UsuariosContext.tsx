@@ -28,7 +28,8 @@ export const user: User = {
     zones: [],
     permissions: [],
     tokenFCM: "",
-    schedules: []
+    schedules: [],
+    identification: ""
 }
 
 export const UsuariosProvider = ({ children }: any) => {

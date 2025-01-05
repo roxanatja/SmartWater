@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react"
 import { PageTitle } from "../../../components/PageTitle/PageTitle"
 import { SubmitHandler, useForm } from "react-hook-form"
-import { IBusinessUpdateParams } from "../../../../../api/classes/business"
+import { BussinessApiConector, IBusinessUpdateParams } from "../../../../../api/classes/business"
 import Input from "../../../EntryComponents/Inputs"
-import { City } from "../../../../../type/City"
-import { motion } from "framer-motion"
-import { CitiesApiConector } from "../../../../../api/classes"
 import ImageUploadField from "../../../EntryComponents/ImageUploadField"
 import { isValidPhoneNumber } from "libphonenumber-js"
 import * as Yup from "yup"
+import { Business } from "../../../../../type/Business"
+import toast from "react-hot-toast"
 
 const DatosEmpresa = () => {
-    // const [user] = useState<UserData | null>(AuthService.getUser())
-    const [cities, setCities] = useState<City[]>([])
-
+    const [dataBusiness, setDataBusiness] = useState<Business | null>(null)
     const [active, setActive] = useState<boolean>(false)
 
     const { register, watch, setValue, formState: { errors, isValid }, handleSubmit, reset } = useForm<IBusinessUpdateParams['data']>({
@@ -22,12 +19,36 @@ const DatosEmpresa = () => {
     })
 
     useEffect(() => {
-        CitiesApiConector.getAll().then(res => { setCities(res || []) })
-    })
+        BussinessApiConector.information().then(res => {
+            if (res) {
+                setDataBusiness(res);
+
+                setValue('address', res.address, { shouldValidate: true })
+                setValue('city', res.city, { shouldValidate: true })
+                setValue('companyName', res.companyName, { shouldValidate: true })
+                setValue('email', res.email, { shouldValidate: true })
+                setValue('imageUrl', res.imageUrl, { shouldValidate: true })
+                setValue('nit', res.nit, { shouldValidate: true })
+                setValue('phoneNumber', res.phoneNumber, { shouldValidate: true })
+            } else {
+                setDataBusiness(null)
+                reset()
+            }
+        })
+    }, [reset, setValue])
 
     const onSubmit: SubmitHandler<IBusinessUpdateParams['data']> = async (data) => {
         setActive(true)
-        console.log(data)
+
+        const res = await BussinessApiConector.updateBusiness({ data: { address: data.address, companyName: data.companyName, email: data.email, imageUrl: data.imageUrl, phoneNumber: data.phoneNumber } })
+
+        if (res) {
+            toast.success("Datos de la empresa actualizados con éxito", { duration: 2000 })
+            window.location.reload()
+        } else {
+            toast.error("Upss. Ocurrió un error actualizando los datos de la empresa", { duration: 2000 })
+        }
+
         setActive(false)
     };
 
@@ -43,7 +64,6 @@ const DatosEmpresa = () => {
                 <div className="flex flex-col md:flex-row gap-6 md:gap-12 w-full mt-10">
                     <div className="flex flex-col gap-6 w-full md:w-1/2">
                         <Input
-                            max={watch("companyName")}
                             label="Nombre"
                             name="companyName"
                             register={register}
@@ -51,7 +71,6 @@ const DatosEmpresa = () => {
                             required
                         />
                         <Input
-                            max={watch("phoneNumber")}
                             label="Número de teléfono"
                             name="phoneNumber"
                             type="tel"
@@ -61,7 +80,6 @@ const DatosEmpresa = () => {
                             required
                         />
                         <Input
-                            max={watch("email")}
                             label="Correo electrónico"
                             name="email"
                             type="email"
@@ -79,7 +97,6 @@ const DatosEmpresa = () => {
                             }}
                         />
                         <Input
-                            max={watch("address")}
                             label="Dirección"
                             name="address"
                             register={register}
@@ -87,43 +104,23 @@ const DatosEmpresa = () => {
                             required
                         />
                         <Input
-                            max={watch("nit")}
                             label="Nit"
                             name="nit"
                             register={register}
                             errors={errors.nit}
                             required
+                            disabled
+                            className="dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
                         />
-
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="w-full flex flex-col gap-2"
-                        >
-                            <label>Ciudad donde opera</label>
-                            <select
-                                {...register("city", {
-                                    required: "Debes seleccionar una ciudad"
-                                })}
-                                className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
-                            >
-                                {
-                                    cities.map((row, index) => (
-                                        <option value={row._id} key={index}>
-                                            {row.name}
-                                        </option>
-                                    ))
-                                }
-                            </select>
-                            {errors.city && (
-                                <span className="text-red-500 font-normal text-sm font-pricedown">
-                                    <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                                    {errors.city.message}
-                                </span>
-                            )}
-                        </motion.div>
+                        <Input
+                            label="Ciudad donde opera"
+                            name="city"
+                            register={register}
+                            errors={errors.city}
+                            required
+                            disabled
+                            className="dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
+                        />
                     </div>
 
                     <div className="w-full md:w-1/2">
@@ -149,7 +146,9 @@ const DatosEmpresa = () => {
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
                             <>
-                                Registrar
+                                {
+                                    !dataBusiness ? "Registrar" : "Actualizar"
+                                }
                             </>
                         )}
                     </button>
