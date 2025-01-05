@@ -5,10 +5,13 @@ import { ClientsApiConector, OrdersApiConector } from "../../../../../api/classe
 import { Order } from "../../../../../type/Order/Order";
 import Modal from "../../../EntryComponents/Modal";
 import { CuadroRealizarPedido } from "../../../components/CuadroRealizarPedido/CuadroRealizarPedido";
+import Product from "../../../../../type/Products/Products";
+import { UnitMeasure } from "../../../../../type/Products/UnitMeasure";
+import { formatDateTime } from "../../../../../utils/helpers";
 
 const PedidosResumido = () => {
   const [showMiniModal, setShowMiniModal] = useState(false);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<(Order)[]>([]);
 
   useEffect(() => {
@@ -68,7 +71,7 @@ const PedidosResumido = () => {
       </div>
 
       <div className="todos-clientes w-full">
-        {orders.slice(0, 4).map((order, index) => {
+        {orders.map((order, index) => {
           const product = products.find(
             (product) => product._id === order.detail[0]?.product
           );
@@ -80,12 +83,11 @@ const PedidosResumido = () => {
             return null;
           }
 
-          const quantityText =
-            order.detail[0]?.quantity === 1 ? "botella" : "botellas";
+          const quantityText = (product.unitMeasure as UnitMeasure).name
 
           return (
-            <div key={index} className="pedidosResumido-body w-full">
-              <div className="pedidosResumido-datos flex-1">
+            <div key={index} className="pedidosResumido-body w-full grid grid-cols-4">
+              <div className="pedidosResumido-datos flex-1 col-span-2">
                 {
                   !!order.client &&
                   <>
@@ -96,7 +98,7 @@ const PedidosResumido = () => {
                           <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
                             <div className="opacity-0">.</div>
                             <p className="absolute font-extrabold ">
-                              {order.client.fullName?.[0]}
+                              {order.client.fullName?.[0] || "S"}
                             </p>
                           </div>
                         )
@@ -117,22 +119,20 @@ const PedidosResumido = () => {
                   </>
                 }
               </div>
-              <div className="flex items-center flex-1 gap-3">
-                <span className="pedidosResumido-ultimaventa border-blue_custom text-blue_custom">
-                  {new Date(order.created).toLocaleDateString()}
+              <span className="pedidosResumido-ultimaventa border-blue_custom text-blue_custom">
+                {formatDateTime(order.created, 'numeric', '2-digit', '2-digit', false, true)}
+              </span>
+              <div className="flex items-center gap-2 text-sm">
+                {product.imageUrl && (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="pedidosResumido-productImage"
+                  />
+                )}
+                <span className="whitespace-nowrap">
+                  {order.detail[0]?.quantity} {quantityText}
                 </span>
-                <div className="flex items-center gap-2 text-sm">
-                  {product.imageUrl && (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="pedidosResumido-productImage"
-                    />
-                  )}
-                  <span className="whitespace-nowrap">
-                    {order.detail[0]?.quantity} {quantityText}
-                  </span>
-                </div>
               </div>
             </div>
           );

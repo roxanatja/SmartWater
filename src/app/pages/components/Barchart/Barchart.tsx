@@ -79,7 +79,7 @@ const BarChart = () => {
   return (
     <div className="BarContainer bg-blocks dark:border-blocks !h-auto w-full p-10">
       <h4 className="mb-4 font-[600] text-lg">Ventas de productos</h4>
-      <div className="w-full overflow-auto px-5">
+      <div className="w-full overflow-auto px-16">
         <Bar data={data} options={{
           responsive: true,
           plugins: {

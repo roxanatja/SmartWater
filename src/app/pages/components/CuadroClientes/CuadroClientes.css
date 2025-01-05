@@ -70,6 +70,7 @@
   display: flex;
   padding: 5px 15px;
   align-items: flex-start;
+  justify-content: center;
   gap: 5px;
   border-radius: 10px;
   border: 1px solid #1a3d7d;
@@ -96,9 +97,6 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
-  width: 130px;
-  /* height: 40px; */
-  gap: 19px;
 }
 
 .img-cliente {

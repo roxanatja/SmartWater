@@ -50,6 +50,7 @@
   display: flex;
   padding: 5px 15px;
   align-items: flex-start;
+  justify-content: center;
   border-radius: 10px;
   border: 1px solid #1a3d7d;
   color: #1a3d7d;
