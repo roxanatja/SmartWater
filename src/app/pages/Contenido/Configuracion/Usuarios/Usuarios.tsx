@@ -77,7 +77,7 @@ const Usuarios: FC = () => {
         <>
             <div className="px-10">
                 <PageTitle titulo="Configuración / Usuarios" icon="../../../Configuracion-icon.svg" />
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={filteredUsers.length} search={setSearchParam}
                     searchPlaceholder="Buscar usuarios por nombre o teléfono">
                     {

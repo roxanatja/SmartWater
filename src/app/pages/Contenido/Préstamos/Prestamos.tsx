@@ -126,7 +126,7 @@ const Prestamos: FC = () => {
         <PageTitle titulo="Préstamos" icon="./Prestamos-icon.svg" />
         <FiltroPaginado
           ref={filterRef}
-          paginacion={true}
+          paginacion={totalPage > 1}
           totalPage={totalPage}
           currentPage={currentPage}
           handlePageChange={handlePageChange}

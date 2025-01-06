@@ -69,6 +69,8 @@ const ClientForm = ({
           district: data.district,
           fullName: data.fullName,
           location: data.location,
+          reference: data.reference,
+          clientImage: data.clientImage,
           phoneNumber: formatNumber(data.phoneNumber, "BO", "E.164"),
           renewInDays: data.dayrenew ? data.renewInDays : null,
           storeImage: data.storeImage,

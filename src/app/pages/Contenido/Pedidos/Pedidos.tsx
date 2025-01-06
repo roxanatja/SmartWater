@@ -145,7 +145,7 @@ const Pedidos: FC = () => {
         <FiltroPaginado
           ref={filterRef}
           add={false}
-          paginacion={true}
+          paginacion={totalPage > 1}
           totalPage={totalPage}
           currentPage={currentPage}
           handlePageChange={handlePageChange}

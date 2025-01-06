@@ -65,7 +65,7 @@ const Categories: FC = () => {
                 <PageTitle titulo="Configuración / Categorías de productos" icon="../../../Configuracion-icon.svg" />
 
 
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}>
                     <div className="w-full sm:w-1/2 mb-10">
                         <div className="switch-contenido">

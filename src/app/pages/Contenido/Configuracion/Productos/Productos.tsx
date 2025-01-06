@@ -109,7 +109,7 @@ const Productos: FC = () => {
         <>
             <div className="px-10">
                 <PageTitle titulo="Configuración / Productos" icon="../../../Configuracion-icon.svg" />
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados total={filteredProducts.length} search={setSearchParam} orderArray={order}
                     filtro={true} hasFilter={checkedCategories.length > 0} onFilter={() => setFiltro(true)}
                     filterInject={<>

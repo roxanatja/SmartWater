@@ -110,7 +110,7 @@ const Clientes: FC = () => {
         add={true}
         exportar={true}
         typeDataToExport="clients"
-        paginacion={true}
+        paginacion={totalPage > 1}
         totalPage={totalPage}
         currentPage={currentPage}
         handlePageChange={handlePageChange}

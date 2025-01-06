@@ -96,7 +96,7 @@ const Barrios: FC = () => {
         <>
             <div className="px-10">
                 <PageTitle titulo="Configuración / Barrios" icon="../../../Configuracion-icon.svg" />
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     filtro={true} onAdd={() => setShowModal(true)} resultados total={filteredDistricts.length} onFilter={() => setFiltro(true)}
                     hasFilter={!!checkedZones && checkedZones.length !== zones.length} order={false} search={setSearchParam}
                     filterInject={<>

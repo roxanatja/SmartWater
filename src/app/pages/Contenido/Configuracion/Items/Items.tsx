@@ -59,7 +59,7 @@ const Items: FC = () => {
         <>
             <div className="px-10">
                 <PageTitle titulo="Configuración / Items" icon="../../../Configuracion-icon.svg" />
-                <FiltroPaginado add={true} paginacion={true} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
+                <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}>
                     <div className="w-full">
                         {

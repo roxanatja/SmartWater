@@ -126,7 +126,7 @@ const Ventas: FC = () => {
           add={false}
           exportar={true}
           typeDataToExport={"sales"}
-          paginacion={true}
+          paginacion={totalPage > 1}
           totalPage={totalPage}
           currentPage={currentPage}
           handlePageChange={handlePageChange}
