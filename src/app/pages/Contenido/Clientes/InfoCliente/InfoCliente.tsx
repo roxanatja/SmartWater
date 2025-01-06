@@ -144,7 +144,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
                   className="infoClientes-imgStore"
                 />
               ) : (
-                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
                   <div className="opacity-0">.</div>
                   <p className="absolute font-extrabold whitespace-nowrap">
                     {client.fullName?.[0] || "S"}

@@ -22,6 +22,7 @@ type Componentes = {
   currentPage?: number;
   handlePageChange?: (page: number) => void;
   infoPedidos?: boolean;
+  infoPedidosData?: { text: string; value: string; }[];
   resultados?: boolean;
   resultadosPrestamo?: boolean;
   children?: ReactNode;
@@ -40,6 +41,7 @@ type Componentes = {
   suggestions?: string[];
   hasFilter?: boolean;
   filterInject?: ReactNode;
+  otherResults?: { text: string; value: string; }[];
 };
 
 export interface IFiltroPaginadoReference {
@@ -60,6 +62,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   children,
   onAdd,
   infoPedidos,
+  infoPedidosData,
   resultados,
   swith,
   opcionesSwitch1,
@@ -75,7 +78,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   search,
   suggestions,
   hasFilter,
-  filterInject
+  filterInject,
+  otherResults
 }, ref) => {
   useImperativeHandle(ref, () => ({
     clearSearch() {
@@ -523,11 +527,20 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
               </form>
             }
             {resultados && (
-              <div className="flex justify-end items-center gap-4 py-3 pb-6 max-sm:flex-col max-sm:items-start">
+              <div className="flex justify-end items-center gap-4 py-3 pb-6 flex-wrap">
                 <div className="resultado-busqueda">
                   <span>Resultados:</span>
                   <span className="text-blue_custom"> {total}</span>
                 </div>
+                {
+                  (otherResults && otherResults.length > 0) &&
+                  otherResults.map(res =>
+                    <div className="resultado-busqueda">
+                      <span>{res.text}</span>
+                      <span className="text-blue_custom"> {res.value}</span>
+                    </div>
+                  )
+                }
                 {
                   order &&
                   < div className="resultado-busqueda">
@@ -637,48 +650,29 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           </div>
           {infoPedidos && (
             <div className="ml-6 mb-8 infoPedidos-filtro bg-blocks dark:border-blocks">
-              <div
-                style={{
-                  display: "flex",
-                  gap: "17px",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div className="infoPedidosLetras-filtro">
-                  <span>10 botellones 20 lt</span>
-                </div>
-                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
-                  <span>35 Bs</span>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "17px",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div className="infoPedidosLetras-filtro">
-                  <span>5 botellones 10 lt</span>
-                </div>
-                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
-                  <span>35 Bs</span>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-
-                  justifyContent: "space-between",
-                }}
-              >
-                <div className="infoPedidosLetras-filtro">
-                  <span>1 Dispensador</span>
-                </div>
-                <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
-                  <span>35 Bs</span>
-                </div>
-              </div>
+              {
+                (infoPedidosData && infoPedidosData.length > 0) ?
+                  <>
+                    {
+                      infoPedidosData.map(dat => (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "17px",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div className="infoPedidosLetras-filtro">
+                            <span>{dat.text}</span>
+                          </div>
+                          <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
+                            <span>{dat.value}</span>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </> : <div className="w-full h-full flex items-center justify-center">Sin data</div>
+              }
             </div>
           )}
         </div>
