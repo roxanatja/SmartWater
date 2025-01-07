@@ -10,6 +10,8 @@ type UsuariosContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     selectedUser: User;
     setSelectedUser: React.Dispatch<React.SetStateAction<User>>;
+    showFiltro: boolean;
+    setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const UsuariosContext = createContext<UsuariosContextType>(
@@ -36,6 +38,7 @@ export const UsuariosProvider = ({ children }: any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
+    const [showFiltro, setShowFiltro] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User>(user);
 
     return (
@@ -46,6 +49,8 @@ export const UsuariosProvider = ({ children }: any) => {
             setShowMiniModal,
             selectedOption,
             setSelectedOption,
+            showFiltro,
+            setShowFiltro,
             selectedUser,
             setSelectedUser
         }}>

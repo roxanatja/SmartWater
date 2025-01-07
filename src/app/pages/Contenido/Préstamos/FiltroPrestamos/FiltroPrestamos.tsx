@@ -4,6 +4,8 @@ import "./FiltroPrestamos.css";
 import { PrestamosContext } from "../PrestamosContext";
 import { Contador } from "../../../components/Contador/Contador";
 import { ILoansGetParams } from "../../../../../api/types/loans";
+import { Zone } from "../../../../../type/City";
+import { User } from "../../../../../type/User";
 
 interface ILoanFilters {
   withContract: boolean;
@@ -14,6 +16,9 @@ interface ILoanFilters {
   toDate: string | null;
   daysToRenew: number;
   daysSinceRenewed: number;
+
+  distributor: { [key: string]: string };
+  zones: { [key: string]: string };
 }
 
 const initialState: ILoanFilters = {
@@ -25,12 +30,19 @@ const initialState: ILoanFilters = {
   toDate: null,
   daysToRenew: 0,
   daysSinceRenewed: 0,
+
+  distributor: {},
+  zones: {},
 }
 
 const FiltroPrestamos = ({
   onChange,
   initialFilters,
+  zones,
+  distribuidores
 }: {
+  zones: Zone[];
+  distribuidores: User[];
   onChange: (filters: ILoansGetParams['filters']) => void;
   initialFilters: ILoansGetParams['filters'];
 }) => {
@@ -61,6 +73,17 @@ const FiltroPrestamos = ({
       if (initialFilters.renewedAgo) {
         setValue('daysSinceRenewed', initialFilters.renewedAgo, { shouldValidate: true })
       }
+
+      if (initialFilters.zone) {
+        initialFilters.zone.split(",").forEach((z) => {
+          setValue(`zones.${z}`, z, { shouldValidate: true })
+        })
+      }
+      if (initialFilters.distributor) {
+        initialFilters.distributor.split(",").forEach((z) => {
+          setValue(`distributor.${z}`, z, { shouldValidate: true })
+        })
+      }
     }
   }, [initialFilters, setValue])
 
@@ -85,6 +108,16 @@ const FiltroPrestamos = ({
 
     if (!((!!filters.withExpiredContract && !!filters.withoutExpiredContract) || (!filters.withExpiredContract && !filters.withoutExpiredContract))) {
       result.hasExpiredContract = filters.withExpiredContract
+    }
+
+    if (filters.zones) {
+      const zones = Object.values(filters.zones).filter(z => !!z).join(',')
+      if (zones !== "") { result.zone = zones }
+    }
+
+    if (filters.distributor) {
+      const dists = Object.values(filters.distributor).filter(z => !!z).join(',')
+      if (dists !== "") { result.distributor = dists }
     }
 
     return result
@@ -229,6 +262,58 @@ const FiltroPrestamos = ({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="w-full flex flex-col gap-2 mb-8">
+        <label className="font-semibold text-blue_custom">Distribuidores</label>
+        <div className="flex flex-wrap gap-x-6 gap-y-4">
+          {distribuidores.map((dist, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3"
+            >
+              <input
+                className="input-check accent-blue_custom"
+                type="checkbox"
+                {...register(`distributor.${dist._id}`)}
+                value={dist._id}
+                id={`dist-${dist._id}`}
+              />
+              <label
+                htmlFor={`dist-${dist._id}`}
+                className="text-sm"
+              >
+                {dist.fullName || "Sin nombre"}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-full flex flex-col gap-2 mb-8">
+        <label className="font-semibold text-blue_custom">Zonas</label>
+        <div className="flex flex-wrap gap-x-6 gap-y-4">
+          {zones.map((zone, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3"
+            >
+              <input
+                className="input-check accent-blue_custom"
+                type="checkbox"
+                {...register(`zones.${zone._id}`)}
+                value={zone._id}
+                id={`zone-${zone._id}`}
+              />
+              <label
+                htmlFor={`zone-${zone._id}`}
+                className="text-sm"
+              >
+                {zone.name}
+              </label>
+            </div>
+          ))}
         </div>
       </div>
 

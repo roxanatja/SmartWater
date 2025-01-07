@@ -2,6 +2,7 @@ import { Search } from "./common";
 
 export interface IUsersGetParams extends Search {
     filters?: {
+        desactivated?: boolean;
         role?: string;
         year?: number;
         month?: number;
@@ -20,6 +21,7 @@ export interface IUserUpdateBody {
         phoneNumber?: string;
         fullName?: string;
         identification?: string;
+        deactivated?: boolean;
         role?: string;
         email?: string;
         zones?: string[];

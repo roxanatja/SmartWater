@@ -35,7 +35,6 @@ const Barrios: FC = () => {
 
         const res = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
         setZones(res?.data || [])
-        setCheckedZones(res?.data?.map(z => z._id) || [])
 
         const resD = await DistrictsApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
         const dists = resD?.data || []
@@ -52,8 +51,12 @@ const Barrios: FC = () => {
     useEffect(() => {
         if (districts) {
             const dis = districts.filter(d => {
-                const filteredZones = zones.filter(z => checkedZones.includes(z._id))
-                return filteredZones.some(z => z.districts.some(di => d._id === di._id))
+                if (checkedZones.length > 0) {
+                    const filteredZones = zones.filter(z => checkedZones.includes(z._id))
+                    return filteredZones.some(z => z.districts.some(di => d._id === di._id))
+                } else {
+                    return true
+                }
             }).filter(d => d.name.toLowerCase().includes(searchParam.toLowerCase()))
             setFilteredDistricts(dis);
             setTotalPages(Math.ceil(dis.length / ITEMS_PER_PAGE))
@@ -98,12 +101,13 @@ const Barrios: FC = () => {
                 <PageTitle titulo="Configuración / Barrios" icon="../../../Configuracion-icon.svg" />
                 <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     filtro={true} onAdd={() => setShowModal(true)} resultados total={filteredDistricts.length} onFilter={() => setFiltro(true)}
-                    hasFilter={!!checkedZones && checkedZones.length !== zones.length} order={false} search={setSearchParam}
+                    hasFilter={checkedZones.length > 0} order={false} search={setSearchParam}
                     filterInject={<>
                         {
                             filtro &&
                             <div ref={optionsRef} className="z-[30] border border-[#f2f2f2] dark:border-blocks shadow-md dark:shadow-slate-200/25 absolute top-8 left-0 min-w-[148px] h-auto rounded-[20px] flex items-center justify-center flex-col bg-blocks">
                                 <div className="w-full flex flex-col gap-2 py-3 px-5">
+                                    <strong className="mb-2">Zonas</strong>
                                     {
                                         zones.map(z => (
                                             <div key={z._id} className="Barrios-grupo-check">

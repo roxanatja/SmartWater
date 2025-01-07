@@ -13,12 +13,13 @@ import { Schedule } from "../../../../../../type/Schedule";
 
 interface Props {
     isOpen: boolean;
+    isDeactivated?: boolean;
     onCancel?: () => void;
     schedules: Schedule[]
 }
 
 
-const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
+const AddUsuario = ({ isOpen, onCancel, schedules, isDeactivated = false }: Props) => {
     const { selectedUser } = useContext(UsuariosContext);
     const [active, setActive] = useState(false);
     const [checkedSchedules, setCheckedSchedules] = useState<string[]>([]);
@@ -36,7 +37,7 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
             phoneNumber: selectedUser.phoneNumber,
             password: "",
             role: selectedUser.role,
-            deactivated: false,
+            deactivated: isDeactivated,
             identification: selectedUser.identification
         },
         mode: 'all'
@@ -92,6 +93,8 @@ const AddUsuario = ({ isOpen, onCancel, schedules }: Props) => {
         <>
             <form onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-6 justify-center items-center w-full p-6">
+                {JSON.stringify(isDeactivated)}
+
                 <Input
                     label="Nombre completo"
                     name="fullName"
