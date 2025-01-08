@@ -649,7 +649,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             </div>
           </div>
           {infoPedidos && (
-            <div className="ml-6 mb-8 infoPedidos-filtro bg-blocks dark:border-blocks">
+            <div className="ml-6 mb-8 infoPedidos-filtro bg-blocks dark:border-blocks overflow-auto text-xs">
               {
                 (infoPedidosData && infoPedidosData.length > 0) ?
                   <>
@@ -665,7 +665,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                           <div className="infoPedidosLetras-filtro">
                             <span>{dat.text}</span>
                           </div>
-                          <div className="infoPedidosLetras-filtro text-blue_custom font-[600]">
+                          <div className="infoPedidosLetras-filtro text-blue_custom font-[600] whitespace-nowrap">
                             <span>{dat.value}</span>
                           </div>
                         </div>
@@ -777,12 +777,12 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           </div>
         )}
         <div
-          className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[80px]"
+          className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[140px]"
             }`}
         >
           {children}
         </div>
-        <div className="flex justify-between absolute right-0 bottom-0 px-5 w-full h-[130px] bg-main-background z-[40]">
+        <div className="flex justify-between sticky right-0 bottom-0 px-5 w-full h-[130px] bg-main-background z-[40]">
           {exportar ? (
             <div className="flex flex-col justify-center items-center">
               <button

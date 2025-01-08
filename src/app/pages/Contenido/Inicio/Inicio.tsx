@@ -83,7 +83,7 @@ const Inicio: FC = () => {
 
   return (
     <>
-      <div className="px-10 pb-10">
+      <div className="px-10 pb-10 h-screen overflow-y-auto">
         <PageTitle titulo="Inicio" icon="./home-icon.svg" />
         <div className="Cuadros-informativos">
           <CuadroInformativo

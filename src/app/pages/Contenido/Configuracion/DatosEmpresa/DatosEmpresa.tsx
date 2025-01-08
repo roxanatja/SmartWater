@@ -57,7 +57,7 @@ const DatosEmpresa = () => {
     }
 
     return (
-        <div className="px-10">
+        <div className="px-10 h-screen overflow-y-auto pb-10">
             <PageTitle titulo="Configuración / Datos de la empresa" icon="../../../Configuracion-icon.svg" />
 
             <form onSubmit={handleSubmit(onSubmit)}>

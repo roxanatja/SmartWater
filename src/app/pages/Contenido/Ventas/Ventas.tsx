@@ -6,7 +6,7 @@ import "./Ventas.css";
 import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { VentasContext } from "./VentasContext";
 import FiltroVenta from "./FiltroVenta/FiltroVenta";
-import { Sale } from "../../../../type/Sale/Sale";
+import { Sale, SaleProduct } from "../../../../type/Sale/Sale";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
 import { useGlobalContext } from "../../../SmartwaterContext";
@@ -15,6 +15,7 @@ import { ISalesGetParams } from "../../../../api/types/sales";
 import Product from "../../../../type/Products/Products";
 import { Zone } from "../../../../type/City";
 import { QueryMetadata } from "../../../../api/types/common";
+import millify from "millify";
 
 const Ventas: FC = () => {
   const {
@@ -27,6 +28,7 @@ const Ventas: FC = () => {
   } = useContext(VentasContext);
   const { setLoading } = useGlobalContext()
   const [currentData, setCurrentData] = useState<Array<Sale>>([]);
+  const [summary, setSumary] = useState<Array<SaleProduct>>([]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
@@ -69,6 +71,12 @@ const Ventas: FC = () => {
     setTotal(totalcount)
     setLoading(false)
   }, [currentPage, setLoading, savedFilters, sort, clientsFilter]);
+
+  useEffect(() => {
+    SalesApiConector.getSalesProducts({ filters: { initialDate: "2020-01-01", finalDate: (new Date()).toISOString() } }).then(res => {
+      setSumary(res || [])
+    })
+  }, [])
 
   const orderArray = (orden: string) => {
     if (orden === "new") {
@@ -139,6 +147,7 @@ const Ventas: FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
           searchPlaceholder="Buscar por nombre o teléfono de cliente"
           infoPedidos={true}
+          infoPedidosData={summary.filter(s => s.cant > 0).map(s => ({ text: `${s.cant} ${s.prod}`, value: `${millify(s.total, { precision: 2 })} Bs.` }))}
         >
           {
             currentData.length > 0 &&

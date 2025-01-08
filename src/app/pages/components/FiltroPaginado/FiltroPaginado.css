@@ -173,13 +173,10 @@
     padding: 15px 11px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 .infoPedidosLetras-filtro{
     font-family: 'Poppins', sans-serif;
-    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
-    letter-spacing: 0.42px;
 }

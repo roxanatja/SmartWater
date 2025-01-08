@@ -14,6 +14,7 @@ import "./RegistrosEyG.css"
 import { CuadroRegistrarEyG } from './CuadroRegistrarEyG'
 import Modal from '../../../../EntryComponents/Modal'
 import { FiltroEgresosGastos } from '../FiltroEgresosGastos/FiltroEgresosGastos'
+import millify from 'millify'
 
 const RegistroEyG = () => {
     const navigate = useNavigate()
@@ -160,17 +161,17 @@ const RegistroEyG = () => {
                 onFilter={() => setShowFiltro(true)}
                 hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
                 searchPlaceholder="Buscar por nombre de usuario"
-                // infoPedidos
-                // infoPedidosData={
-                //     Object.keys(grouppedData)
-                //         .sort((a, b) => a > b ? 1 : a === b ? 0 : -1)
-                //         .map(row => (
-                //             {
-                //                 text: (accounts?.find((x) => x._id === row)?.name || "Cuenta no Reconociada"),
-                //                 value: `${grouppedData[row].toLocaleString()} Bs.`
-                //             }
-                //         ))
-                // }
+                infoPedidos
+                infoPedidosData={
+                    Object.keys(grouppedData)
+                        .sort((a, b) => a > b ? 1 : a === b ? 0 : -1)
+                        .map(row => (
+                            {
+                                text: (accounts?.find((x) => x._id === row)?.name || "Cuenta no Reconociada"),
+                                value: `${millify(grouppedData[row], { precision: 2 })} Bs.`
+                            }
+                        ))
+                }
                 otherResults={[{ text: "Total de egresos", value: `${items.reduce((cont, curr) => cont += curr.amount, 0).toLocaleString()} Bs.` }]}
             >
                 <div className="w-full pb-6 sticky top-0 bg-main-background z-[20]">
@@ -192,7 +193,7 @@ const RegistroEyG = () => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                    {
+                    {/* {
                         (grouppedData && Object.keys(grouppedData).length > 0) &&
                         <div className=" sticky top-16 bg-main-background pb-4 z-[20]">
                             <div className="RegistrosEyG-Cuadro1 bg-blocks dark:border-blocks max-h-32 overflow-auto">
@@ -210,9 +211,9 @@ const RegistroEyG = () => {
                                 }
                             </div>
                         </div>
-                    }
+                    } */}
 
-                    <div className="w-full">
+                    <div className="w-full pb-10">
                         {
 
                             itemsToShow.length > 0 &&
