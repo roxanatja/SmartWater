@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
-import Product from "../../../type/Products/Products";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import DatePicker from "react-datepicker";
@@ -11,10 +10,11 @@ import { Client } from "../../../type/Cliente/Client";
 import { UserData } from "../../../type/UserData";
 import { ILoanBody } from "../../../api/types/loans";
 import { AuthService } from "../../../api/services/AuthService";
-import { LoansApiConector, ProductsApiConector } from "../../../api/classes";
+import { ItemsApiConector, LoansApiConector } from "../../../api/classes";
+import { Item } from "../../../type/Item";
 
 const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
-  const [products, setProducts] = useState<Product[] | null>(null);
+  const [products, setProducts] = useState<Item[] | null>(null);
   const [active, setActive] = useState(false);
 
   const [addedProducts, setAddedProducts] = useState<ILoanBody['data']['detail']>([]);
@@ -75,7 +75,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   };
 
   const getProduct = useCallback(async () => {
-    const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const res = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     setProducts(res);
   }, []);
 
@@ -149,7 +149,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
         <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10">
           <div className="grid grid-cols-2 gap-10 w-full text-md font-medium text-center -mb-8">
             <p>Cantidad</p>
-            <p>Producto</p>
+            <p>Item</p>
           </div>
           <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
             <OptionScrooll

@@ -197,7 +197,7 @@ const FiltroPrestamos = ({
         {/* Contratos */}
         <div className="">
           <div className="FiltroClientes-RenovaciónTitulo mb-2">
-            <span className="text-blue_custom font-semibold">Contratos</span>
+            <span className="text-blue_custom font-semibold">Contratos vigentes</span>
           </div>
           <div className="FiltroClientes-Cuentas flex flex-col">
             <div className="flex flex-col gap-3 w-full">
@@ -210,7 +210,7 @@ const FiltroPrestamos = ({
                     {...register("withContract")}
                   />
                   <label htmlFor="check7" className="text-sm" >
-                    Con contratos
+                    Con contratos vigentes
                   </label>
                 </div>
                 <div className="flex gap-3 items-center">
@@ -221,7 +221,7 @@ const FiltroPrestamos = ({
                     {...register("withoutContract")}
                   />
                   <label htmlFor="check8" className="text-sm" >
-                    Sin contratos
+                    Sin contratos vigentes
                   </label>
                 </div>
               </div>
@@ -232,7 +232,7 @@ const FiltroPrestamos = ({
         {/* Contratos expirados */}
         <div className="">
           <div className="FiltroClientes-RenovaciónTitulo mb-2">
-            <span className="text-blue_custom font-semibold">Contratos expirados</span>
+            <span className="text-blue_custom font-semibold">Contratos vencidos</span>
           </div>
           <div className="FiltroClientes-Cuentas flex flex-col">
             <div className="flex flex-col gap-3 w-full">
@@ -245,7 +245,7 @@ const FiltroPrestamos = ({
                     {...register("withExpiredContract")}
                   />
                   <label htmlFor="check9" className="text-sm" >
-                    Con contratos expirados
+                    Con contratos vencidos
                   </label>
                 </div>
                 <div className="flex gap-3 items-center">
@@ -256,7 +256,7 @@ const FiltroPrestamos = ({
                     {...register("withoutExpiredContract")}
                   />
                   <label htmlFor="check10" className="text-sm" >
-                    Sin contratos expirados
+                    Sin contratos vencidos
                   </label>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { PedidosContext } from "../PedidosContext";
 import { Zone } from "../../../../../type/City";
 import { IOrdersGetParams } from "../../../../../api/types/orders";
 import { useForm } from "react-hook-form";
+import { User } from "../../../../../type/User";
 
 interface IOrderFilters {
     fromDate: string | null;
@@ -12,6 +13,7 @@ interface IOrderFilters {
     fromDateDeliver: string | null;
     toDateDeliver: string | null;
 
+    distrib: { [key: string]: string };
     zones: { [key: string]: string };
 }
 
@@ -22,14 +24,16 @@ const initialState: IOrderFilters = {
     attendedDate: null,
     toDateDeliver: null,
     zones: {},
+    distrib: {},
 }
 
 const FiltroPedidos: FC<{
     isAttended: boolean;
+    distribuidores: User[];
     zones: Zone[];
     onChange: (filters: IOrdersGetParams['filters']) => void;
     initialFilters: IOrdersGetParams['filters'];
-}> = ({ isAttended, initialFilters, onChange, zones }) => {
+}> = ({ isAttended, initialFilters, onChange, zones, distribuidores }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IOrderFilters>({
         defaultValues: initialState || {},
     });
@@ -56,6 +60,11 @@ const FiltroPedidos: FC<{
                     setValue(`zones.${z}`, z, { shouldValidate: true })
                 })
             }
+            if (initialFilters.distributorRedirectId) {
+                initialFilters.distributorRedirectId.split(",").forEach((z) => {
+                    setValue(`distrib.${z}`, z, { shouldValidate: true })
+                })
+            }
         }
     }, [initialFilters, setValue])
 
@@ -79,6 +88,10 @@ const FiltroPedidos: FC<{
         if (filters.zones) {
             const zones = Object.values(filters.zones).filter(z => !!z).join(',')
             if (zones !== "") { result.zone = zones }
+        }
+        if (filters.distrib) {
+            const dists = Object.values(filters.distrib).filter(z => !!z).join(',')
+            if (dists !== "") { result.distributorRedirectId = dists }
         }
 
         return result
@@ -187,6 +200,32 @@ const FiltroPedidos: FC<{
                                     className="text-sm"
                                 >
                                     {zone.name}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-2 mb-8">
+                    <label className="font-semibold text-blue_custom">Distribuidores</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        {distribuidores.map((dists, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-3"
+                            >
+                                <input
+                                    className="input-check accent-blue_custom"
+                                    type="checkbox"
+                                    {...register(`distrib.${dists._id}`)}
+                                    value={dists._id}
+                                    id={`distrib-${dists._id}`}
+                                />
+                                <label
+                                    htmlFor={`distrib-${dists._id}`}
+                                    className="text-sm"
+                                >
+                                    {dists.fullName || "Sin nombre"}
                                 </label>
                             </div>
                         ))}

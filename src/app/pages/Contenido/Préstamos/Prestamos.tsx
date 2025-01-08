@@ -5,24 +5,24 @@ import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./Prestamos.css";
 import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { PrestamosContext } from "./PrestamosContext";
-import Product from "../../../../type/Products/Products";
 import { Loans } from "../../../../type/Loans/Loans";
 import Modal from "../../EntryComponents/Modal";
 import { useGlobalContext } from "../../../SmartwaterContext";
 import { ILoansGetParams } from "../../../../api/types/loans";
-import { ClientsApiConector, LoansApiConector, ProductsApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, ItemsApiConector, LoansApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { QueryMetadata } from "../../../../api/types/common";
 import FiltroPrestamos from "./FiltroPrestamos/FiltroPrestamos";
 import { client } from "../Clientes/ClientesContext";
 import { Zone } from "../../../../type/City";
 import { User } from "../../../../type/User";
+import { Item } from "../../../../type/Item";
 
 const Prestamos: FC = () => {
   const { showFiltro, setShowFiltro, setShowModal, showModal, selectedClient, setSelectedClient } = useContext(PrestamosContext);
   const { setLoading } = useGlobalContext()
 
   const [currentData, setCurrentData] = useState<Loans[]>([]);
-  const [products, setProducts] = useState<Array<Product>>([]);
+  const [products, setProducts] = useState<Array<Item>>([]);
   const [zones, setZones] = useState<Array<Zone>>([]);
   const [distribuidores, setDistribuidores] = useState<Array<User>>([]);
 
@@ -93,7 +93,7 @@ const Prestamos: FC = () => {
 
   useEffect(() => {
     const fetchZones = async () => {
-      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+      setProducts((await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
       setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user" } }))?.data || []);
     }

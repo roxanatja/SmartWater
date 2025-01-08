@@ -112,7 +112,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
         </div>
       </div>
 
-      <div className="infoClientes-ventas">
+      <div className="infoClientes-ventas pb-4">
         <div className="input-container flex flex-col w-full">
           <div className="RegistrarVenta-opciones flex justify-center items-start w-full flex-col">
             <p className="text-md text-font-color">Seleccione una opción</p>
@@ -172,44 +172,6 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
           />
         </div>
       </div>
-
-      <div
-        className="flex justify-between items-center pb-2 border-b-2 my-4 cursor-pointer"
-        onClick={() => setActive(!active)}
-      >
-        <p className="font-semibold text-sm">Cobros</p>
-        <i className={`fa-solid fa-angle-up ${active && "rotate-180"}`}></i>
-      </div>
-
-      {!active && (
-        <div className="infoClientes-ventas">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-            {data.map((bill) => (
-              <div
-                key={bill._id}
-                className="p-4 border rounded shadow hover:shadow-lg transition"
-              >
-                <h3 className="font-bold truncate">Bill ID: {bill._id}</h3>
-                <p>
-                  <strong>Monto: </strong>
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  }).format(bill.amount)}{" "}
-                  Bs.
-                </p>
-                <p>
-                  <strong>Efectivo:</strong> {bill.cashPayment ? "Sí" : "No"}
-                </p>
-                <p>
-                  <strong>Registrada:</strong>{" "}
-                  {formatDateTime(bill.created, "numeric", "2-digit", "2-digit", true)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-main-background">
         <button

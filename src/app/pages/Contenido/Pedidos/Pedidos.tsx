@@ -12,10 +12,11 @@ import Product from "../../../../type/Products/Products";
 import { Zone } from "../../../../type/City";
 import { IOrdersGetParams } from "../../../../api/types/orders";
 import { QueryMetadata } from "../../../../api/types/common";
-import { ClientsApiConector, OrdersApiConector, ProductsApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, OrdersApiConector, ProductsApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { CuadroPedido } from "./CuadroPedidos/CuadroPedido";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
+import { User } from "../../../../type/User";
 
 const Pedidos: FC = () => {
   const params = useParams()
@@ -30,6 +31,7 @@ const Pedidos: FC = () => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
+  const [dists, setDists] = useState<User[]>([]);
 
   const itemsPerPage: number = 12;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -119,6 +121,7 @@ const Pedidos: FC = () => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+      setDists((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user" } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -228,7 +231,7 @@ const Pedidos: FC = () => {
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroPedidos isAttended={(!!section && section === "Atendidos")}
-          initialFilters={savedFilters} zones={zones}
+          initialFilters={savedFilters} zones={zones} distribuidores={dists}
           onChange={handleFilterChange} />
       </Modal>
     </>

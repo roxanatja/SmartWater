@@ -187,13 +187,13 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                   </div>
                 }
               </div>
-              <div className="absolute right-0 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
-                <button type="button" className="invert-0 dark:invert" onClick={handleOpen}>
-                  <img src="/Opciones-icon.svg" alt="" />
-                </button>
+              {
+                !order.attended &&
+                <div className="absolute right-0 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
+                  <button type="button" className="invert-0 dark:invert" onClick={handleOpen}>
+                    <img src="/Opciones-icon.svg" alt="" />
+                  </button>
 
-                {
-                  !order.attended &&
                   <div className="relative" ref={optionsRef}>
                     <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
                       <img src="/opcion-icon.svg" alt="" />
@@ -207,8 +207,8 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                       eliminarText="Cancelar"
                     />
                   </div>
-                }
-              </div>
+                </div>
+              }
             </div>
 
             {/* Productos del pedido */}

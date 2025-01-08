@@ -93,7 +93,6 @@ const AddUsuario = ({ isOpen, onCancel, schedules, isDeactivated = false }: Prop
         <>
             <form onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-6 justify-center items-center w-full p-6">
-                {JSON.stringify(isDeactivated)}
 
                 <Input
                     label="Nombre completo"
@@ -184,7 +183,7 @@ const AddUsuario = ({ isOpen, onCancel, schedules, isDeactivated = false }: Prop
 
                 <div className="w-full flex gap-4 flex-col">
                     <div className="AsignarPermisos-tituloinput bg-blue_custom">
-                        <span>Permisos</span>
+                        <span>Horarios de trabajo</span>
                         <button className="AsignarPermisos-tituloinput-btn">
                             <span className="material-symbols-outlined">
                                 expand_less

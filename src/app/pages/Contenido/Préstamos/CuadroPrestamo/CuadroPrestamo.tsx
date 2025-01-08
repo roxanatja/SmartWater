@@ -2,18 +2,18 @@ import { FC, useContext, useEffect, useRef, useState } from "react";
 import "./CuadroPrestamo.css";
 import { Option } from "../../../components/Option/Option";
 import { PrestamosContext } from "../PrestamosContext";
-import Product from "../../../../../type/Products/Products";
 import { Loans } from "../../../../../type/Loans/Loans";
 import { formatDateTime } from "../../../../../utils/helpers";
 import React from "react";
 import toast from "react-hot-toast";
 import { LoansApiConector } from "../../../../../api/classes";
 import { Client } from "../../../../../type/Cliente/Client";
+import { Item } from "../../../../../type/Item";
 
 type Prestamo = {
   estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null;
   loan: Loans;
-  productos: Array<Product>;
+  productos: Array<Item>;
   info?: boolean;
 };
 

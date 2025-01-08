@@ -10,12 +10,13 @@ import GoogleMapWithSelection from "./GoogleInputMap";
 import Input from "./Inputs";
 import { Client } from "../../../type/Cliente/Client";
 import { UserData } from "../../../type/UserData";
-import { OrdersApiConector, ProductsApiConector, ZonesApiConector } from "../../../api/classes";
+import { OrdersApiConector, ProductsApiConector, UsersApiConector, ZonesApiConector } from "../../../api/classes";
 import { District, Zone } from "../../../type/City";
 import { IOrderBody } from "../../../api/types/orders";
 import { AuthService } from "../../../api/services/AuthService";
 import { formatIncompletePhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
 import { useNavigate } from "react-router-dom";
+import { User } from "../../../type/User";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -40,12 +41,15 @@ const RegisterPedidoForm = ({
 
   const [city, setCity] = useState<Zone[]>([]);
   const [disti, setDisti] = useState<District[]>([]);
+  const [dist, setDist] = useState<User[]>([]);
 
   const datePickerref = useRef<DatePicker>(null);
 
   const getProduct = useCallback(async () => {
     const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     setProducts(res);
+
+    setDist((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user" } }))?.data || []);
   }, []);
 
   useEffect(() => {
@@ -87,8 +91,6 @@ const RegisterPedidoForm = ({
   useEffect(() => {
     if (isNoClient && selectedClient) {
       setValue('clientNotRegistered.address', selectedClient.address, { shouldValidate: true });
-      setValue('clientNotRegistered.district', selectedClient.district, { shouldValidate: true });
-      setValue('clientNotRegistered.zone', selectedClient.zone, { shouldValidate: true });
       setValue('clientNotRegistered.fullName', selectedClient.fullName, { shouldValidate: true });
       setValue('clientNotRegistered.location.longitude', selectedClient.location.longitude, { shouldValidate: true });
       setValue('clientNotRegistered.location.latitude', selectedClient.location.latitude, { shouldValidate: true });
@@ -222,6 +224,62 @@ const RegisterPedidoForm = ({
           </div>
 
           <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10">
+            {isNoClient &&
+              <>
+                <div className="flex flex-col md:flex-row gap-6 w-full">
+                  <Input
+                    label="Nombre completo"
+                    name="clientNotRegistered.fullName"
+                    icon={<i className={`fa-solid fa-user text-2xl ${errors?.clientNotRegistered?.fullName && "text-red-500"}`}></i>}
+                    register={register}
+                    errors={errors.clientNotRegistered?.fullName}
+                    required
+                  />
+                  <Input
+                    label="Teléfono"
+                    name="clientNotRegistered.phoneNumber"
+                    icon={<i className={`fa-solid fa-phone text-2xl ${errors?.clientNotRegistered?.phoneNumber && "text-red-500"}`}></i>}
+                    register={register}
+                    errors={errors.clientNotRegistered?.phoneNumber}
+                    required
+                    validateAmount={(value: string) => { if (value && !isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
+                  />
+                </div>
+
+                <Input
+                  label="Dirección"
+                  name="clientNotRegistered.address"
+                  icon={<i className={`fa-solid fa-location-dot text-2xl ${errors?.clientNotRegistered?.address && "text-red-500"}`}></i>}
+                  register={register}
+                  errors={errors.clientNotRegistered?.address}
+                />
+
+                <div className="w-full col-span-2 max-sm:col-span-1 relative">
+                  <h1 className="text-sm font-medium">
+                    Selecciona una ubicación en el mapa
+                  </h1>
+                  <GoogleMapWithSelection
+                    visible={isNoClient}
+                    disable={mapview}
+                    linkAddress={watch("linkAddress")}
+                    latitude={Number(watch("clientNotRegistered.location.latitude"))}
+                    longitude={Number(watch("clientNotRegistered.location.longitude"))}
+                    onChange={(coordinates: { lat: number; lng: number }) => {
+                      setValue("clientNotRegistered.location.latitude", `${coordinates.lat}`);
+                      setValue("clientNotRegistered.location.longitude", `${coordinates.lng}`);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMapview(!mapview)}
+                    className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-[10] right-14"
+                  >
+                    {mapview ? "Editar" : "Bloquear"}
+                  </button>
+                </div>
+              </>
+            }
+
             <div className="grid grid-cols-2 gap-10 w-full text-md font-medium text-center -mb-8">
               <p>Cantidad</p>
               <p>Producto</p>
@@ -312,123 +370,6 @@ const RegisterPedidoForm = ({
               </div>
             </div>
 
-            {
-              isNoClient && <div className="rounded-[20px] border border-font-color pt-6 pb-8 px-8 flex flex-col gap-6">
-                <div className="text-base font-bold">Datos del cliente</div>
-
-                <div className="flex flex-col md:flex-row gap-6">
-                  <Input
-                    label="Nombre completo"
-                    name="clientNotRegistered.fullName"
-                    icon={<i className={`fa-solid fa-user text-2xl ${errors?.clientNotRegistered?.fullName && "text-red-500"}`}></i>}
-                    register={register}
-                    errors={errors.clientNotRegistered?.fullName}
-                    required
-                  />
-                  <Input
-                    label="Teléfono"
-                    name="clientNotRegistered.phoneNumber"
-                    icon={<i className={`fa-solid fa-phone text-2xl ${errors?.clientNotRegistered?.phoneNumber && "text-red-500"}`}></i>}
-                    register={register}
-                    errors={errors.clientNotRegistered?.phoneNumber}
-                    required
-                    validateAmount={(value: string) => { if (value && !isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
-                  />
-                </div>
-                <Input
-                  label="Dirección"
-                  name="clientNotRegistered.address"
-                  icon={<i className={`fa-solid fa-location-dot text-2xl ${errors?.clientNotRegistered?.address && "text-red-500"}`}></i>}
-                  register={register}
-                  errors={errors.clientNotRegistered?.address}
-                  required
-                />
-                <div className="flex flex-col md:flex-row gap-6">
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full flex flex-col gap-2"
-                  >
-                    <label>Zona</label>
-                    <select
-                      {...register("clientNotRegistered.zone", {
-                        required: "se requiere una zona",
-                      })}
-                      className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
-                    >
-                      {city.length > 0 &&
-                        city.map((city, index) => (
-                          <option value={city._id} key={index}>
-                            {city.name}
-                          </option>
-                        ))}
-                    </select>
-                    {errors.clientNotRegistered?.zone && (
-                      <span className="text-red-500 font-normal text-sm font-pricedown">
-                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                        {errors.clientNotRegistered.zone.message}
-                      </span>
-                    )}
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full flex flex-col gap-2"
-                  >
-                    <label>Barrio</label>
-                    <select
-                      {...register("clientNotRegistered.district")}
-                      className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
-                    >
-                      {disti && disti.length > 0 ? (
-                        disti.map((row, index) => (
-                          <option value={row._id} key={index}>
-                            {row.name}
-                          </option>
-                        ))
-                      ) : (
-                        <option value={"null"}>Sin resultados</option>
-                      )}
-                    </select>
-                    {errors.clientNotRegistered?.district && (
-                      <span className="text-red-500 font-normal text-sm font-pricedown">
-                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                        {errors.clientNotRegistered.district.message}
-                      </span>
-                    )}
-                  </motion.div>
-                </div>
-
-                <div className="w-full col-span-2 max-sm:col-span-1 relative">
-                  <h1 className="text-sm font-medium">
-                    Selecciona una ubicación en el mapa
-                  </h1>
-                  <GoogleMapWithSelection
-                    visible={isNoClient}
-                    disable={mapview}
-                    linkAddress={watch("linkAddress")}
-                    latitude={Number(watch("clientNotRegistered.location.latitude"))}
-                    longitude={Number(watch("clientNotRegistered.location.longitude"))}
-                    onChange={(coordinates: { lat: number; lng: number }) => {
-                      setValue("clientNotRegistered.location.latitude", `${coordinates.lat}`);
-                      setValue("clientNotRegistered.location.longitude", `${coordinates.lng}`);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setMapview(!mapview)}
-                    className="absolute bg-blue-500 text-white py-2 px-8 top-7 rounded-md translate-y-0.5 z-[10] right-14"
-                  >
-                    {mapview ? "Editar" : "Bloquear"}
-                  </button>
-                </div>
-              </div>
-            }
-
             <div className="relative w-full flex items-start">
               <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
               <textarea
@@ -485,6 +426,39 @@ const RegisterPedidoForm = ({
                 readOnly
                 className="bg-transparent placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
               />
+            </div>
+
+            <div className="relative w-full flex items-start">
+              <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer bottom-2"></i>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.3 }}
+                className="w-full flex flex-col gap-2"
+              >
+                <label className="text-blue_custom font-semibold">Distribuidor</label>
+                <select
+                  {...register("distributorRedirectId", {
+                    required: "se requiere una zona",
+                  })}
+                  className="pl-8 py-2.5 rounded-none font-pricedown bg-main-background text-blue_custom font-medium outline-0 border-b-2 border-blue_custom focus:outline-0"
+                >
+                  <option className="text-font-color" value={"null"}>Seleccione un distribuidor</option>
+                  {dist.length > 0 &&
+                    dist.map((city, index) => (
+                      <option value={city._id} key={index} className="text-font-color">
+                        {city.fullName || "Sin nombre"}
+                      </option>
+                    ))}
+                </select>
+                {errors.distributorRedirectId && (
+                  <span className="text-red-500 font-normal text-sm font-pricedown">
+                    <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                    {errors.distributorRedirectId.message}
+                  </span>
+                )}
+              </motion.div>
             </div>
           </div>
 
