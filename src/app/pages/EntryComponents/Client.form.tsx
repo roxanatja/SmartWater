@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "./Inputs";
 import { motion } from "framer-motion";
@@ -6,7 +6,7 @@ import ImageUploadField from "./ImageUploadField";
 import GoogleMapWithSelection from "./GoogleInputMap";
 import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import * as Yup from 'yup'
-import { ZonesApiConector, ClientsApiConector } from "../../../api/classes";
+import { ClientsApiConector } from "../../../api/classes";
 import { District, Zone } from "../../../type/City";
 import { IClientForm } from "../../../api/types/clients";
 import { formatNumber, isValidPhoneNumber } from "libphonenumber-js";
@@ -16,16 +16,19 @@ import toast from "react-hot-toast";
 const ClientForm = ({
   isOpen,
   onCancel,
+  zones
 }: {
   onCancel?: () => void;
   isOpen: boolean;
+  zones: Zone[];
 }) => {
-  const [city, setCity] = useState<Zone[]>([]);
-  const [disti, setDisti] = useState<District[]>([]);
+  const user = AuthService.getUser()
+  const [isJeshua, setIsJeshua] = useState<boolean>(false)
+  const { selectedClient } = useContext(ClientesContext);
 
+  const [disti, setDisti] = useState<District[]>(selectedClient._id !== "" ? zones.find(z => z._id === selectedClient.zone)?.districts || [] : []);
   const [date, setDate] = useState(true);
 
-  const { selectedClient } = useContext(ClientesContext);
 
   const [uploading, setUploading] = useState(false);
   const [mapinteration, setMapinteration] = useState(false);
@@ -34,6 +37,7 @@ const ClientForm = ({
     {
       defaultValues: {
         ...selectedClient,
+        zone: selectedClient.zone, district: selectedClient.district,
         phoneLandLine: selectedClient.phoneLandLine ? formatNumber(selectedClient.phoneLandLine, "BO", "NATIONAL").replaceAll(" ", "") : undefined,
         phoneNumber: formatNumber(selectedClient.phoneNumber, "BO", "NATIONAL").replaceAll(" ", ""),
         address: selectedClient.address,
@@ -52,6 +56,12 @@ const ClientForm = ({
     defaultValues: d.defaultValues,
     mode: 'all'
   });
+
+  useEffect(() => {
+    if (user) {
+      setIsJeshua(user.organization.toLowerCase() === "jeshua")
+    }
+  }, [user])
 
 
   const onSubmit: SubmitHandler<IClientForm> = async (data) => {
@@ -118,34 +128,25 @@ const ClientForm = ({
     }
   };
 
-  const getCitys = useCallback(async () => {
-    const data = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } });
-    const zones = data?.data || []
-    setCity(zones);
-
-    if (selectedClient._id === "") {
-      if (zones.length > 0) {
-        setValue("zone", zones[0]._id);
-      }
-    } else {
-      setValue("zone", selectedClient.zone);
-      setMapinteration(true);
-    }
-  }, [setValue, selectedClient]);
-
   const selectedZone = watch('zone')
   useEffect(() => {
     if (selectedZone) {
-      const zon = city.find(z => z._id === selectedZone)
+      const zon = zones.find(z => z._id === selectedZone)
       const dists = zon?.districts || []
       setDisti(dists)
-      if (dists.length > 0) setValue('district', dists[0]._id)
+      // if (dists.length > 0) {
+      //   if (selectedClient._id === "") {
+      //     setValue('district', dists[0]._id, { shouldValidate: true })
+      //   } else {
+      //     // if (dists.some(d => d._id === selectedClient.district)) {
+      //     //   setValue('district', selectedClient.district, { shouldValidate: true })
+      //     // } else {
+      //     //   setValue('district', "null", { shouldValidate: true })
+      //     // }
+      //   }
+      // } else { setValue('district', "null", { shouldValidate: true }) }
     }
-  }, [selectedZone, city, setValue])
-
-  useEffect(() => {
-    getCitys();
-  }, [getCitys]);
+  }, [selectedZone, zones, setValue, selectedClient])
 
   const handleCheckboxChange = (type: "isClient" | "isAgency") => {
     if (type === "isClient") {
@@ -282,14 +283,14 @@ const ClientForm = ({
           name="fullName"
           register={register}
           errors={errors.fullName}
-          required
+          required={!isJeshua}
         />
         <Input
           label="Datos de Factura"
           name="billingInfo.name"
           register={register}
           errors={errors.billingInfo?.name}
-          required
+          required={!isJeshua}
         />
         <Input
           label="Numero de NIT"
@@ -297,7 +298,7 @@ const ClientForm = ({
           register={register}
           numericalOnly
           errors={errors.billingInfo?.NIT}
-          required
+          required={!isJeshua}
         />
         <Input
           label="Numero de Telefono Fijo"
@@ -319,8 +320,8 @@ const ClientForm = ({
               <p className="text-sm">(591)</p>
             </div>
           }
-          validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
-          required
+          validateAmount={(value: string) => { if (!isValidPhoneNumber(value, "BO") && !isJeshua) { return "Número de teléfono incorrecto" } return true }}
+          required={!isJeshua}
         />
         <Input
           label="Correo Electrónico"
@@ -393,12 +394,13 @@ const ClientForm = ({
           <label>Zona</label>
           <select
             {...register("zone", {
-              required: "se requiere una zona",
+              required: "La zona es requerida",
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
-            {city.length > 0 &&
-              city.map((city, index) => (
+            <option value={""}>Selecciona una zona</option>
+            {zones.length > 0 &&
+              zones.map((city, index) => (
                 <option value={city._id} key={index}>
                   {city.name}
                 </option>
@@ -420,17 +422,24 @@ const ClientForm = ({
         >
           <label>Barrio</label>
           <select
-            {...register("district")}
+            {...register("district", {
+              required: "El barrio es requerido"
+            })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
             {disti && disti.length > 0 ? (
-              disti.map((row, index) => (
-                <option value={row._id} key={index}>
-                  {row.name}
-                </option>
-              ))
+              <>
+                <option value={""}>Selecciona un barrio</option>
+                {
+                  disti.map((row, index) => (
+                    <option value={row._id} key={index}>
+                      {row.name}
+                    </option>
+                  ))
+                }
+              </>
             ) : (
-              <option value={"null"}>Sin resultados</option>
+              <option value={""}>Sin resultados</option>
             )}
           </select>
           {errors.district && (
@@ -471,30 +480,31 @@ const ClientForm = ({
           <label htmlFor="isAgency">Agencia</label>
         </motion.div>
         <ImageUploadField
-          watchField={watch}
+          value={watch('ciBackImage')}
           fieldName={"ciBackImage"}
           label={"Por favor, adjunta foto del carnet (trasero)"}
           register={register}
           setValue={setValue}
-          errors={errors}
+          errors={errors.ciBackImage}
           required={false}
         />
         <ImageUploadField
-          watchField={watch}
+          value={watch('ciFrontImage')}
           fieldName={"ciFrontImage"}
           label={"Por favor, adjunta foto del carnet (delantero)"}
           register={register}
           setValue={setValue}
-          errors={errors}
+          errors={errors.ciFrontImage}
           required={false}
         />
         <ImageUploadField
-          watchField={watch}
+          value={watch('storeImage')}
           fieldName={"storeImage"}
           label={"Por favor, adjunta foto de la tienda"}
           register={register}
           setValue={setValue}
-          errors={errors}
+          errors={errors.storeImage}
+          required={true}
         />
         <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">
@@ -574,6 +584,7 @@ const ClientForm = ({
                 <input
                   id="switch-component"
                   type="checkbox"
+                  readOnly
                   onClick={() => handleCheckboxChangeReno("dayrenew")}
                   checked={watch("dayrenew")}
                   className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
@@ -620,6 +631,7 @@ const ClientForm = ({
                   id="switch-component-2"
                   type="checkbox"
                   onClick={() => handleCheckboxChangeReno("hasOrder")}
+                  readOnly
                   checked={!watch("dayrenew")}
                   className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
                 />

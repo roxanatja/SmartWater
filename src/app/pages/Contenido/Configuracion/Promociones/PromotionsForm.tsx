@@ -51,12 +51,12 @@ const PromotionsForm = ({ isOpen, onCancel }: Props) => {
             <div className="w-full">
                 <label className="block mb-2">Imagen de la promoción</label>
                 <ImageUploadField
-                    watchField={watch}
+                    value={watch('imageUrl')}
                     fieldName={"imageUrl"}
                     label={"Por favor, adjunta imagen de la promoción"}
                     register={register}
                     setValue={setValue}
-                    errors={errors}
+                    errors={errors.imageUrl}
                     required={true}
                 />
             </div>

@@ -87,21 +87,28 @@ const BarChart = () => {
               display: false,
             },
             datalabels: {
+              font: { family: "Poppins" },
               anchor: 'center',
               align: 'top',
               formatter: (value: number) => `${value} Bs.`,
               color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+            },
+            tooltip: {
+              titleFont: { family: "Poppins" },
+              bodyFont: { family: "Poppins" }
             }
           },
           scales: {
             y: {
               ticks: {
+                font: { family: "Poppins" },
                 color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
                 stepSize: 500, // Establece el espaciado entre las etiquetas
               },
             },
             x: {
               ticks: {
+                font: { family: "Poppins" },
                 color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
               },
             },

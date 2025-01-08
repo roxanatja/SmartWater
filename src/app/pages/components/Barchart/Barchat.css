@@ -8,4 +8,10 @@
     padding-top: 30px;
     padding-bottom: 21px;
     padding-right: 27px;
+    font-family: "Poppins";
+}
+
+canvas {
+    min-height: 350px;
+    min-width: 300px;
 }

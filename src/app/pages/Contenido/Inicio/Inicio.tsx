@@ -8,6 +8,7 @@ import PedidosResumido from "../Pedidos/CuadroPedidos/PedidosResumido";
 import { ClientsApiConector, LoansApiConector, OrdersApiConector, SalesApiConector } from "../../../../api/classes";
 import "./Inicio.css";
 import moment from "moment";
+import millify from "millify";
 
 const Inicio: FC = () => {
   const [clientsCount, setClientsCount] = useState<number | undefined>(undefined);
@@ -147,7 +148,7 @@ const Inicio: FC = () => {
           <CuadroInformativo
             mostrar_ultimo_mes_text={false}
             titulo="Ingresos Totales"
-            numero={totalIncome.toString()}
+            numero={millify(totalIncome, { precision: 2, locales: "es-AR" })}
             letra="Bs"
             porcentaje={calculatePercentage(totalIncomeMonth, totalIncome)}
           />

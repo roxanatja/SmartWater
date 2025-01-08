@@ -126,12 +126,13 @@ const DatosEmpresa = () => {
                     <div className="w-full md:w-1/2">
                         <label className="block mb-2">Logo de la empresa</label>
                         <ImageUploadField
-                            watchField={watch}
+                            value={watch('imageUrl')}
                             fieldName={"imageUrl"}
                             label={"Logo de la empresa"}
                             register={register}
                             setValue={setValue}
-                            errors={errors}
+                            errors={errors.imageUrl}
+                            required={true}
                         />
                     </div>
                 </div>

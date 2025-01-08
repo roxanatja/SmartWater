@@ -4,6 +4,8 @@ import "./Sidebar.css";
 import { FC, useEffect, useRef, useState } from "react"; // Importar useState
 import { useNavigate } from "react-router-dom";
 import { AuthService } from "../../../../api/services/AuthService";
+import { OrdersApiConector } from "../../../../api/classes";
+import millify from "millify";
 
 const Sidebar: FC = () => {
   const navigate = useNavigate();
@@ -19,6 +21,13 @@ const Sidebar: FC = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const [pedidosEnCurso, setPedidosEnCurso] = useState<number>(0)
+  useEffect(() => {
+    OrdersApiConector.get({ pagination: { page: 1, pageSize: 1 }, filters: { attended: false } }).then(res => {
+      setPedidosEnCurso(res?.metadata.totalCount || 0)
+    })
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,7 +95,7 @@ const Sidebar: FC = () => {
               tituloItem="Pedidos"
               to="/Pedidos"
               icon="../../../Pedidos-icon.svg"
-              notificacion="1"
+              notificacion={pedidosEnCurso > 0 ? `${millify(pedidosEnCurso, { precision: 1, locales: "es-AR" })}` : undefined}
             />
             <AsideItem
               tituloItem="Préstamos"

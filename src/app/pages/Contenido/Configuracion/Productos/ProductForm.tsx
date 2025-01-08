@@ -156,12 +156,12 @@ const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
             </div>
 
             <ImageUploadField
-                watchField={watch}
+                value={watch('imageUrl')}
                 fieldName={"imageUrl"}
                 label={"Imagen de producto"}
                 register={register}
                 setValue={setValue}
-                errors={errors}
+                errors={errors.imageUrl}
                 required={selectedProduct._id === ""}
             />
 

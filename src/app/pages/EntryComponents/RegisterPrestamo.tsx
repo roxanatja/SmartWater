@@ -309,13 +309,13 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
           </div>
 
           <ImageUploadField
-            watchField={watch}
+            value={watch('contract.link')}
             fieldName={"contract.link"}
             label={"Porfavor, adjunta la imagen del contrato"}
             register={register}
             setValue={setValue}
-            errors={errors}
-            required={false}
+            errors={errors.contract?.link}
+            required={true}
           />
         </div>
 

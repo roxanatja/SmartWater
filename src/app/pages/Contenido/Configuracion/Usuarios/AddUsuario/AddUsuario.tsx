@@ -184,7 +184,7 @@ const AddUsuario = ({ isOpen, onCancel, schedules, isDeactivated = false }: Prop
                 <div className="w-full flex gap-4 flex-col">
                     <div className="AsignarPermisos-tituloinput bg-blue_custom">
                         <span>Horarios de trabajo</span>
-                        <button className="AsignarPermisos-tituloinput-btn">
+                        <button className="AsignarPermisos-tituloinput-btn" type="button">
                             <span className="material-symbols-outlined">
                                 expand_less
                             </span>

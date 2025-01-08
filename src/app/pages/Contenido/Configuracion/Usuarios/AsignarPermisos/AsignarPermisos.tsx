@@ -82,7 +82,7 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                 className="flex flex-col gap-6 justify-center items-center w-full">
                 <div className="AsignarPermisos-tituloinput bg-blue_custom">
                     <span>Zonas</span>
-                    <button className="AsignarPermisos-tituloinput-btn">
+                    <button className="AsignarPermisos-tituloinput-btn" type="button">
                         <span className="material-symbols-outlined">
                             expand_less
                         </span>
@@ -106,7 +106,7 @@ const AsignarPermisos = ({ onCancel, permisos, zonas }: Props) => {
                 </div>
                 <div className="AsignarPermisos-tituloinput bg-blue_custom">
                     <span>Permisos</span>
-                    <button className="AsignarPermisos-tituloinput-btn">
+                    <button className="AsignarPermisos-tituloinput-btn" type="button">
                         <span className="material-symbols-outlined">
                             expand_less
                         </span>
