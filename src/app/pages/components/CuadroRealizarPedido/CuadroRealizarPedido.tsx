@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { AuthService } from "../../../../api/services/AuthService";
 import { IOrderBody } from "../../../../api/types/orders";
+import { useForm } from "react-hook-form";
 
 /**
  * Componente `CuadroRealizarPedido` para realizar pedidos.
@@ -24,7 +25,6 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   const [searchTerm, setSearchTerm] = useState("");
   // Estado para el cliente seleccionado
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [selectedProduct, setSelectedproduct] = useState<Product | null>(null);
 
   const [selectedProducts, setSelectedproducts] = useState<IOrderBody['data']['detail']>([]);
   // Estado para mostrar u ocultar las opciones filtradas
@@ -32,6 +32,8 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   // Referencia para detectar clics fuera del componente
   const optionsRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const { watch, setValue, register } = useForm<IOrderBody['data']>()
 
   // Efecto para cargar los clientes y productos al montar el componente
   useEffect(() => {
@@ -96,25 +98,31 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   const [toEdit, setToEdit] = useState<{ product: string; quantity: number } | null>(null)
 
   const handleAddItem = () => {
-    if (!!selectedProduct && cantidad > 0) {
+    const prod = watch('detail.0.product')
+    const quant = watch('detail.0.quantity')
+
+    if (!!prod && quant > 0) {
 
       if (toEdit) {
-        setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: cantidad }))))
+        setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: quant }))))
         setToEdit(null)
       } else {
-        if (selectedProducts.some(p => p.product === selectedProduct._id)) {
-          setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: s.product === selectedProduct._id ? s.quantity + cantidad : s.quantity }))))
+        if (selectedProducts.some(p => p.product === prod)) {
+          setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: s.product === prod ? s.quantity + quant : s.quantity }))))
         } else {
-          setSelectedproducts((prev => [...prev, { product: selectedProduct._id, quantity: cantidad }]))
+          setSelectedproducts((prev => [...prev, { product: prod, quantity: quant }]))
         }
       }
 
-      setSelectedproduct(null)
+      setValue('detail.0.product', "", { shouldValidate: true })
+      setValue('detail.0.quantity', 1, { shouldValidate: true })
       setCantidad(0)
     }
   }
 
   const handleDeleteItem = (it: string) => {
+    setValue('detail.0.product', "", { shouldValidate: true })
+    setValue('detail.0.quantity', 1, { shouldValidate: true })
     setToEdit(null)
     setSelectedproducts((prev => prev.filter(p => p.product !== it)))
   }
@@ -127,9 +135,11 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   };
 
   const handleQuantityIcons = (mode: 'inc' | 'dec') => {
-    if (mode === 'dec' && cantidad > 0) {
+    if (mode === 'dec' && cantidad > 1) {
+      setValue('detail.0.quantity', cantidad - 1, { shouldValidate: true })
       setCantidad(cantidad - 1)
     } else if (mode === 'inc') {
+      setValue('detail.0.quantity', cantidad + 1, { shouldValidate: true })
       setCantidad(cantidad + 1)
     }
   };
@@ -154,9 +164,10 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   const resetForm = () => {
     if (!!formRef.current) {
       formRef.current.reset()
-      setCantidad(0);
+      setValue('detail.0.quantity', 1, { shouldValidate: true })
+      setValue('detail.0.product', "", { shouldValidate: true })
+      setCantidad(1);
       setSelectedClient(null)
-      setSelectedproduct(null)
     }
   }
 
@@ -220,17 +231,10 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
             ))}
           </select>
           <select
-            name="producto"
+            disabled={!!toEdit}
             id="producto"
             className="selec-pedido bg-blocks"
-            required
-            value={selectedProduct?._id || ""}
-            onChange={(e) => {
-              const selectedId = e.target.value;
-              const product =
-                productos.find((c) => c._id === selectedId) || null;
-              setSelectedproduct(product);
-            }}
+            {...register('detail.0.product')}
           >
             <option value="">Seleccione un producto</option>
             {productos.map((producto) => (
@@ -251,8 +255,11 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                     name="cantidad"
                     type="number"
                     min="1"
-                    value={cantidad}
-                    onChange={e => setCantidad(parseInt(e.target.value))}
+                    value={watch('detail.0.quantity')}
+                    onChange={e => {
+                      setValue('detail.0.quantity', parseInt(e.target.value), { shouldValidate: true })
+                      setCantidad(parseInt(e.target.value))
+                    }}
                     className="numero-solicitado bg-blocks text-inherit"
                     required
                   />
@@ -262,8 +269,8 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                 </button>
               </div>
             </div>
-            <button type="button" onClick={() => handleAddItem()} className="text-xs bg-blue_custom rounded-[20px] py-2 px-4 disabled:bg-gray-400" disabled={!selectedProduct || cantidad === 0}>
-              Agregar
+            <button type="button" onClick={() => handleAddItem()} className="text-xs bg-blue_custom rounded-[20px] py-2 px-4 disabled:bg-gray-400" disabled={!watch('detail.0.product') || watch('detail.0.quantity') === 0}>
+              {toEdit ? "Editar" : "Agregar"}
             </button>
           </div>
 
@@ -291,7 +298,12 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                     <button
                       type="button"
                       className="text-blue_custom hover:text-blue-600"
-                      onClick={() => setToEdit(product)}
+                      onClick={() => {
+                        setValue('detail.0.product', product.product, { shouldValidate: true })
+                        setValue('detail.0.quantity', product.quantity, { shouldValidate: true })
+                        setCantidad(product.quantity)
+                        setToEdit(product)
+                      }}
                     >
                       <i className="fa-solid fa-pen"></i>
                     </button>
@@ -315,7 +327,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
               justifyContent: "end",
             }}
           >
-            <button className="boton-realizar-pedido !outline-none !border-0 disabled:bg-gray-400" type="submit" disabled={!selectedProduct || !selectedClient || cantidad === 0}>
+            <button className="boton-realizar-pedido !outline-none !border-0 disabled:bg-gray-400" type="submit" disabled={!selectedClient || selectedProducts.length === 0}>
               Realizar Pedido
             </button>
           </div>
