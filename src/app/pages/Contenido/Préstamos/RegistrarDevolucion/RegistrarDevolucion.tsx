@@ -22,7 +22,7 @@ const RegistrarDevolucion: FC = () => {
 
     return (
         <>
-            <div className="px-10">
+            <div className="px-10 h-screen overflow-y-auto">
                 <PageTitle titulo="Préstamos / Registrar devolución" icon="/Prestamos-icon.svg" />
                 <div
                     className="RegistrarVenta-titulo flex items-start cursor-pointer"

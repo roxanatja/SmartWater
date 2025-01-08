@@ -129,7 +129,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                 className="w-8 h-8 rounded-full"
                 alt="storeImage"
               /> :
-              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
                 <div className="opacity-0">.</div>
                 <p className="absolute font-extrabold whitespace-nowrap">
                   {selectedClient.fullName?.[0] || "S"}
@@ -315,13 +315,12 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             register={register}
             setValue={setValue}
             errors={errors.contract?.link}
-            required={true}
           />
         </div>
 
         <button
           type="submit"
-          disabled={addedProducts.length === 0 || !watch('contract.validUntil') || !watch('contract.link')}
+          disabled={addedProducts.length === 0}
           className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {

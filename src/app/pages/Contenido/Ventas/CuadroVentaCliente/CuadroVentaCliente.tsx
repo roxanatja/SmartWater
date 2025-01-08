@@ -206,7 +206,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
             Total:
           </span>
           <span className="CuadroVentaCliente-text" style={{ fontWeight: "600", fontSize: "18px" }}>
-            {sale.detail.reduce((current, det) => current += (det.price * det.quantity), 0)}
+            {sale.detail.reduce((current, det) => current += (det.price * det.quantity), 0)} Bs
           </span>
         </div>
       </div>

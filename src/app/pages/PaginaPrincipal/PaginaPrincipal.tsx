@@ -43,7 +43,7 @@ const PaginaPrincipal: FC = () => {
       <Router>
         <div className="flex">
           <Sidebar />
-          <div className="Contenedor max-md:w-full relative bg-main-background overflow-hidden">
+          <div className="Contenedor max-md:w-full relative bg-main-background overflow-hidden  ">
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />

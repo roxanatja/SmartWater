@@ -124,7 +124,7 @@ const InfoClient = ({ client }: { client: Client }) => {
             </div>
 
             <a
-              href={`https://www.google.com/maps?q=${client.location.latitude},${client.location.longitude}`}
+              href={`https://www.google.com/maps?q=${client.location?.latitude},${client.location?.longitude}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full items-center flex gap-2"

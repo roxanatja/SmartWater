@@ -4,7 +4,9 @@ import { Client } from "../../../../type/Cliente/Client";
 import Product from "../../../../type/Products/Products";
 import { ClientsApiConector, OrdersApiConector, ProductsApiConector } from "../../../../api/classes";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import { AuthService } from "../../../../api/services/AuthService";
+import { IOrderBody } from "../../../../api/types/orders";
 
 /**
  * Componente `CuadroRealizarPedido` para realizar pedidos.
@@ -23,6 +25,8 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   // Estado para el cliente seleccionado
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedProduct, setSelectedproduct] = useState<Product | null>(null);
+
+  const [selectedProducts, setSelectedproducts] = useState<IOrderBody['data']['detail']>([]);
   // Estado para mostrar u ocultar las opciones filtradas
   const [showOptions, setShowOptions] = useState(false);
   // Referencia para detectar clics fuera del componente
@@ -63,13 +67,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   // Manejador para enviar el formulario de pedido
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const product = formData.get("producto") as string;
-    const quantity = formData.get("cantidad") as string;
-    const price = formData.get("precio") as string;
-
-    if (!selectedClient || !product || !quantity || !price) {
+    if (!selectedClient || selectedProducts.length === 0) {
       console.log("All fields are required");
       return;
     }
@@ -80,9 +78,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
         user: AuthService.getUser()?._id || "",
         client: selectedClient._id,
         comment: "",
-        detail: [{
-          product, quantity: Number(quantity)
-        }]
+        detail: selectedProducts
       }
     })
 
@@ -97,10 +93,36 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
     if (onClose) onClose()
   };
 
+  const [toEdit, setToEdit] = useState<{ product: string; quantity: number } | null>(null)
+
+  const handleAddItem = () => {
+    if (!!selectedProduct && cantidad > 0) {
+
+      if (toEdit) {
+        setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: cantidad }))))
+        setToEdit(null)
+      } else {
+        if (selectedProducts.some(p => p.product === selectedProduct._id)) {
+          setSelectedproducts((prev => prev.map(s => ({ ...s, quantity: s.product === selectedProduct._id ? s.quantity + cantidad : s.quantity }))))
+        } else {
+          setSelectedproducts((prev => [...prev, { product: selectedProduct._id, quantity: cantidad }]))
+        }
+      }
+
+      setSelectedproduct(null)
+      setCantidad(0)
+    }
+  }
+
+  const handleDeleteItem = (it: string) => {
+    setToEdit(null)
+    setSelectedproducts((prev => prev.filter(p => p.product !== it)))
+  }
+
   // Manejador para seleccionar un cliente de las opciones filtradas
   const handleOptionClick = (cliente: Client) => {
     setSelectedClient(cliente);
-    setSearchTerm(cliente.fullName);
+    setSearchTerm("");
     setShowOptions(false);
   };
 
@@ -240,30 +262,52 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
                 </button>
               </div>
             </div>
-            <div style={{ display: "flex" }}>
-              <input
-                name="precio"
-                type="number"
-                min="0"
-                value={(Number(selectedProduct?.price) || 0) * cantidad}
-                className="numero-input bg-blocks text-inherit"
-                required
-                readOnly
-              />
-              <div
-                className="letras-Bs bg-blocks text-inherit"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <span>Bs</span>
-                </div>
-              </div>
+            <button type="button" onClick={() => handleAddItem()} className="text-xs bg-blue_custom rounded-[20px] py-2 px-4 disabled:bg-gray-400" disabled={!selectedProduct || cantidad === 0}>
+              Agregar
+            </button>
+          </div>
+
+          <div className={`w-full mt-4`}>
+            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {selectedProducts.map((product, index) => (
+                <motion.div
+                  key={index}
+                  className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${product.product === toEdit?.product && "border-2 border-blue_custom"
+                    }`}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="flex flex-col gap-4 p-1">
+                    <p className="text-xs">
+                      {productos.find(p => p._id === product.product)?.name}
+                    </p>
+                    <div className="flex gap-4 items-center">
+                      <p className="text-xs">Cantidad: {product.quantity}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center flex-col pr-4 text-xs">
+                    <button
+                      type="button"
+                      className="text-blue_custom hover:text-blue-600"
+                      onClick={() => setToEdit(product)}
+                    >
+                      <i className="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-700 hover:text-red-500"
+                      onClick={() => handleDeleteItem(product.product)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
+
           <div
             style={{
               marginTop: "11px",
@@ -276,7 +320,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
             </button>
           </div>
         </div>
-      </form>
+      </form >
     </>
   );
 };

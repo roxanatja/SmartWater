@@ -147,7 +147,7 @@ const Ventas: FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
           searchPlaceholder="Buscar por nombre o teléfono de cliente"
           infoPedidos={true}
-          infoPedidosData={summary.filter(s => s.cant > 0).map(s => ({ text: `${s.cant} ${s.prod}`, value: `${millify(s.total, { precision: 2 })} Bs.` }))}
+          infoPedidosData={summary.filter(s => s.cant > 0).map(s => ({ text: `${s.cant} ${s.prod}`, value: `${millify(s.total, { precision: 2 })} Bs` }))}
         >
           {
             currentData.length > 0 &&

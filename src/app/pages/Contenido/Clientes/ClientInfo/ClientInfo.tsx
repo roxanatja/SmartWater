@@ -23,7 +23,7 @@ const ClientInfo: FC = () => {
 
   return (
     <>
-      <div className="px-10">
+      <div className="px-10 h-screen overflow-y-auto">
         <PageTitle titulo="Información Cliente" icon="../clientes-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer text-blue_custom"
