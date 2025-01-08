@@ -79,8 +79,8 @@ const FiltroPrestamos = ({
           setValue(`zones.${z}`, z, { shouldValidate: true })
         })
       }
-      if (initialFilters.distributor) {
-        initialFilters.distributor.split(",").forEach((z) => {
+      if (initialFilters.user) {
+        initialFilters.user.split(",").forEach((z) => {
           setValue(`distributor.${z}`, z, { shouldValidate: true })
         })
       }
@@ -117,7 +117,7 @@ const FiltroPrestamos = ({
 
     if (filters.distributor) {
       const dists = Object.values(filters.distributor).filter(z => !!z).join(',')
-      if (dists !== "") { result.distributor = dists }
+      if (dists !== "") { result.user = dists }
     }
 
     return result

@@ -103,7 +103,6 @@ const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
                 >
                     <label>Categoría</label>
                     <select
-                        disabled={selectedProduct._id !== ""}
                         {...register("category", {
                             required: "Debes seleccionar una categoría"
                         })}

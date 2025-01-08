@@ -38,7 +38,7 @@ const Usuarios: FC = () => {
     const fetchData = useCallback(async () => {
         setLoading(true)
 
-        const res = await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', ...savedFilters } })
+        const res = await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: savedFilters?.desactivated ? savedFilters?.desactivated : false, ...savedFilters } })
         const prods = res?.data || []
         console.log(res)
         setUsers(prods)

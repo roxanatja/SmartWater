@@ -60,8 +60,8 @@ const FiltroPedidos: FC<{
                     setValue(`zones.${z}`, z, { shouldValidate: true })
                 })
             }
-            if (initialFilters.distributorRedirectId) {
-                initialFilters.distributorRedirectId.split(",").forEach((z) => {
+            if (initialFilters.user) {
+                initialFilters.user.split(",").forEach((z) => {
                     setValue(`distrib.${z}`, z, { shouldValidate: true })
                 })
             }
@@ -91,7 +91,7 @@ const FiltroPedidos: FC<{
         }
         if (filters.distrib) {
             const dists = Object.values(filters.distrib).filter(z => !!z).join(',')
-            if (dists !== "") { result.distributorRedirectId = dists }
+            if (dists !== "") { result.user = dists }
         }
 
         return result

@@ -23,6 +23,7 @@ type Order = {
     };
     hasOrder: boolean;
     isClient: boolean;
+    from: "internal" | "customer"
   };
   created: string;
   updated: string;

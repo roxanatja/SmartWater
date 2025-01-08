@@ -10,7 +10,7 @@ export interface ILoansGetParams extends Search {
         renewedAgo?: number;
         renewedIn?: number;
         zone?: string;
-        distributor?: string;
+        user?: string;
         year?: number;
         month?: number;
     }

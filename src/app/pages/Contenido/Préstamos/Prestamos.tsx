@@ -101,7 +101,7 @@ const Prestamos: FC = () => {
     const fetchZones = async () => {
       setProducts((await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
       setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user" } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user", desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])

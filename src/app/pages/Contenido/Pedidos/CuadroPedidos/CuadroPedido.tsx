@@ -38,7 +38,8 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
               phoneNumber: res.phoneNumber,
               zone: res.zone,
               storeImage: res.storeImage,
-              _id: res._id
+              _id: res._id,
+              from: 'internal'
             })
           }
           else { setClient(null) }
@@ -138,8 +139,8 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
           {/* Datos del cliente */}
           <div className="first-container">
             <div className={`flex flex-col gap-3 pb-4 w-[calc(100%_-_30px)]`}>
-              <div className="flex items-center justify-between pr-4">
-                <div className="flex gap-12">
+              <div className="flex items-start gap-4 justify-between pr-4">
+                <div className="flex gap-x-12 gap-y-3 flex-wrap">
                   {
                     client &&
                     <>
@@ -181,9 +182,9 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                   </div>
                 </div>
                 {
-                  !client?.isClient &&
-                  <div className="flex gap-2 items-center">
-                    <span>Cliente no registrado</span>
+                  client && !client.isClient &&
+                  <div className="flex gap-2 items-start text-end justify-end">
+                    <span className="whitespace-nowrap">{client.from === "customer" ? "De SmartApp" : "Cliente no registrado"}</span>
                   </div>
                 }
               </div>
