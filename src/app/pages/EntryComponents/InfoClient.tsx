@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 import { Loans } from "../../../type/Loans/Loans";
 import { CuadroPrestamo } from "../Contenido/Préstamos/CuadroPrestamo/CuadroPrestamo";
 import Product from "../../../type/Products/Products";
@@ -9,12 +8,14 @@ import { formatDateTime } from "../../../utils/helpers";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, ZonesApiConector } from "../../../api/classes";
 import { Zone } from "../../../type/City";
 import { formatNumber } from "libphonenumber-js";
+import { Item } from "../../../type/Item";
 
 const InfoClient = ({ client }: { client: Client }) => {
   const [city, setCity] = useState<{
     zone: string | undefined;
     district: string | undefined;
     loans?: Loans[];
+    items?: Item[];
     product?: Product[];
     devolu?: Devolution[];
     item?: any;
@@ -26,6 +27,7 @@ const InfoClient = ({ client }: { client: Client }) => {
   const [activeinfo, setActiveinfo] = useState<boolean>(true);
   const [activepresta, setActivepresta] = useState<boolean>(false);
   const [activecarnet, setActivecarnet] = useState<boolean>(true);
+  const [activefacade, setActivedfacade] = useState<boolean>(true);
   const [activeContracts, setActiveContracts] = useState<boolean>(false);
   const [activeDevol, setActiveDevol] = useState<boolean>(false);
 
@@ -45,6 +47,7 @@ const InfoClient = ({ client }: { client: Client }) => {
         district: zoneData?.districts.find((x) => x._id === disc)?.name,
         loans: resload,
         product: (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
+        items: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
         devolu: devo,
         item: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
       });
@@ -80,14 +83,14 @@ const InfoClient = ({ client }: { client: Client }) => {
               className="infoClientes-imgStore w-8 h-8"
             />
           ) : (
-            <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center w-8 h-8">
+            <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center w-8 h-8 relative">
               <div className="opacity-0">.</div>
               <p className="absolute font-extrabold whitespace-nowrap">
                 {client.fullName?.[0] || "S"}
               </p>
             </div>
           )}
-          <p className="text-sm">{client.fullName || "N/A"}</p>
+          <p className="text-sm">{client.fullName || "Sin nombre"}</p>
         </div>
 
         <div
@@ -209,20 +212,50 @@ const InfoClient = ({ client }: { client: Client }) => {
           activecarnet &&
           <div className="flex gap-4 justify-between">
             <div className="flex flex-col gap-2 items-center">
-              <img
-                src={client.ciFrontImage || ''}
-                className="w-80 h-44 rounded-md flex-1"
-                alt={client.ciFrontImage}
-              />
+              {
+                client.ciFrontImage ?
+                  <img
+                    src={client.ciFrontImage || ''}
+                    className="w-80 h-44 rounded-md flex-1"
+                    alt={client.ciFrontImage}
+                  />
+                  : <span>Sin imagen</span>
+              }
               <small className="text-gray-500 w-fit">Frontal</small>
             </div>
             <div className="flex flex-col gap-2 items-center">
-              <img
-                src={client.ciBackImage || ''}
-                className="w-80 h-44 rounded-md flex-1"
-                alt={client.ciBackImage}
-              />
+              {
+                client.ciBackImage ?
+                  <img
+                    src={client.ciBackImage || ''}
+                    className="w-80 h-44 rounded-md flex-1"
+                    alt={client.ciBackImage}
+                  />
+                  : <span>Sin imagen</span>
+              }
               <small className="text-gray-500 w-fit">Reverso</small>
+            </div>
+          </div>
+        }
+
+        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActivedfacade(!activefacade)}>
+          <h4 className="text-sm font-semibold">Foto de fachada</h4>
+          <i className={`fa-solid fa-angle-down transition-all ${activefacade && "rotate-180"}`}></i>
+        </div>
+
+        {
+          activefacade &&
+          <div className="flex gap-4 justify-between">
+            <div className="flex flex-col gap-2 items-center">
+              {
+                client.storeImage ?
+                  <img
+                    src={client.storeImage || ''}
+                    className="w-80 h-44 rounded-md flex-1"
+                    alt={client.storeImage}
+                  />
+                  : <span>Sin imagen</span>
+              }
             </div>
           </div>
         }
@@ -256,7 +289,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                         key={index}
                         loan={loan}
                         info
-                        productos={city.product || []}
+                        productos={city.item || []}
                         estadoContrato={contratcEstate}
                       />
                     );
@@ -329,7 +362,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                         <span>Cantidad</span>
                       </div>
                       {devolution.detail.map((detail: any, index: number) => {
-                        let product = city.product?.find(
+                        let item = city.items?.find(
                           (product) => product._id === detail.item
                         );
 
@@ -338,14 +371,14 @@ const InfoClient = ({ client }: { client: Client }) => {
                             <div className="flex items-center gap-2 col-span-2">
                               <img
                                 src={
-                                  product?.imageUrl ||
+                                  item?.imageUrl ||
                                   "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
                                 }
                                 alt=""
                                 className="w-7 h-7 rounded-full"
                               />
                               <span className="CuadroVentaCliente-text">
-                                {product ? product.name : "Producto no encontrado"}
+                                {item ? item.name : "Producto no encontrado"}
                               </span>
                             </div>
                             <div className="CuadroVentaCliente-TextContainer font-semibold text-center">

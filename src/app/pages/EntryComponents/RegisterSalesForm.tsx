@@ -9,12 +9,14 @@ import { UserData } from "../../../type/UserData";
 import { ISaleBody } from "../../../api/types/sales";
 import { ProductsApiConector, SalesApiConector } from "../../../api/classes";
 import { AuthService } from "../../../api/services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [active, setActive] = useState(false);
 
   const [addedProducts, setAddedProducts] = useState<ISaleBody['data']['detail']>([]);
+  const navigate = useNavigate()
 
   const [editar, setEditar] = useState<{
     quantity: number;
@@ -57,9 +59,11 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     const res = await SalesApiConector.create({ data: values });
 
     if (res) {
-      toast.success("Venta registrada");
+      toast.success("Venta registrada", { position: 'bottom-center' });
       reset();
       setAddedProducts([]);
+
+      navigate("/Ventas", { replace: true })
     } else {
       toast.error("Upss error al registrar venta");
     }
@@ -117,7 +121,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                 </p>
               </div>
           }
-          <p className="text-sm">{selectedClient?.fullName || "N/A"}</p>
+          <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
         </div>
         <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4">
           <p className="text-md font-semibold">Agregar Productos</p>
@@ -302,6 +306,10 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
                   </div>
                 </motion.div>
               ))}
+            </div>
+
+            <div className="mt-2 flex justify-end gap-2 items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl py-2 px-6">
+              Total: <span className="text-blue_custom">{addedProducts.reduce((acc, p) => acc += (parseFloat(p.price) * p.quantity), 0)}</span>
             </div>
           </div>
 

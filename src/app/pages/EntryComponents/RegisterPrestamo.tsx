@@ -136,7 +136,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
                 </p>
               </div>
           }
-          <p className="text-sm">{selectedClient?.fullName || "N/A"}</p>
+          <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
         </div>
         <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4 cursor-pointer">
           <p className="text-md font-semibold">Agregar Productos</p>

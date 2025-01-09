@@ -193,7 +193,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
           </div>
         </div>
         <div className="infoClientes-body w-[calc(100%_-_30px)]">
-          <div className="infoClientes-ventasContainer">
+          <div className="infoClientes-ventasContainer justify-between w-full pr-10">
             <div className="infoClientes-ventas">
               <span>Última venta</span>
               <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
@@ -201,7 +201,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              <span className="text-blue_custom">Préstamos activos</span>
+              {client.hasLoan && <span className="text-blue_custom">Préstamos activos</span>}
               <div
                 className="infoClientes-moneda cursor-pointer bg-blue_custom"
                 onClick={() => setShowCobroPopUp(true)}

@@ -206,7 +206,7 @@ const RegisterPedidoForm = ({
                     </p>
                   </div>
               }
-              <span className="text-font-color">{selectedClient.fullName}</span>
+              <span className="text-font-color">{selectedClient.fullName || "Sin nombre"}</span>
             </div>
             <div
               className="RegistrarPedido-Nombre"
