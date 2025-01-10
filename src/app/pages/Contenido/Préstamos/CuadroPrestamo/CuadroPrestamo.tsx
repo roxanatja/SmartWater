@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useRef, useState } from "react";
+import { FC, useContext, useEffect, useMemo, useRef, useState } from "react";
 import "./CuadroPrestamo.css";
 import { Option } from "../../../components/Option/Option";
 import { PrestamosContext } from "../PrestamosContext";
@@ -97,6 +97,8 @@ const CuadroPrestamo: FC<Prestamo> = ({
     };
   }, []);
 
+  const detailsToShow = useMemo(() => loan.detail.filter(d => d.quantity > 0), [loan])
+
   return (
     <>
       <div className="CuadroPrestamo-container relative w-full bg-blocks dark:border-blocks shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] dark:shadow-slate-200/25">
@@ -110,9 +112,9 @@ const CuadroPrestamo: FC<Prestamo> = ({
           >
             <div className={`flex items-center justify-between ${info ? "w-full" : "w-[calc(100%_-_60px)]"}`}>
               <div className="CuadroVentaCliente-header flex gap-4 items-center">
-                {loan.client[0]?.storeImage ? (
+                {loan.client[0]?.clientImage ? (
                   <img
-                    src={loan.client[0]?.storeImage}
+                    src={loan.client[0]?.clientImage}
                     alt=""
                     className="infoClientes-imgStore"
                   />
@@ -171,47 +173,48 @@ const CuadroPrestamo: FC<Prestamo> = ({
         </div>
         <div className="flex flex-wrap CuadroVentaCliente-productos items-end justify-end">
           <div className="w-full min-h-28 max-h-28 overflow-y-auto">
-            {loan.detail.length > 0 ? (
-              <div className="grid grid-cols-3 gap-4">
-                <div className="font-bold text-left sticky top-0 col-span-2">
-                  <span>Productos</span>
-                </div>
-                <div className="font-bold sticky top-0 text-center">
-                  <span>Cantidad</span>
-                </div>
-                {loan.detail.map((detail: any, index: number) => {
-                  let product = productos.find(
-                    (product) => product._id === detail.item
-                  );
-                  return (
-                    <React.Fragment key={index}>
-                      <div className="flex items-center gap-2 col-span-2">
-                        <img
-                          src={
-                            product?.imageUrl ||
-                            "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
-                          }
-                          alt=""
-                          className="w-7 h-7 rounded-full"
-                        />
-                        <span className="CuadroVentaCliente-text">
-                          {product ? product.name : "Producto no encontrado"}
-                        </span>
-                      </div>
-                      <div className="flex w-full justify-center">
-                        <div className="CuadroVentaCliente-TextContainer font-semibold text-center !bg-transparent !border-blue_custom">
+            {
+              detailsToShow.length > 0 ? (
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="font-bold text-left sticky top-0 col-span-2">
+                    <span>Items</span>
+                  </div>
+                  <div className="font-bold sticky top-0 text-center">
+                    <span>Cantidad</span>
+                  </div>
+                  {detailsToShow.map((detail: any, index: number) => {
+                    let product = productos.find(
+                      (product) => product._id === detail.item
+                    );
+                    return (
+                      <React.Fragment key={index}>
+                        <div className="flex items-center gap-2 col-span-2">
+                          <img
+                            src={
+                              product?.imageUrl ||
+                              "https://imgs.search.brave.com/cGS0E8gPAr04hSRQFlmImRAbRRWldP32Qfu_0atMNyQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudmV4ZWxzLmNv/bS9tZWRpYS91c2Vy/cy8zLzE1NjkyOC9p/c29sYXRlZC9wcmV2/aWV3LzZjNjVjMTc3/ZTk0ZTc1NTRlMWZk/YjBhZjMwMzhhY2I3/LWljb25vLWN1YWRy/YWRvLWRlLXNpZ25v/LWRlLWludGVycm9n/YWNpb24ucG5n"
+                            }
+                            alt=""
+                            className="w-7 h-7 rounded-full"
+                          />
                           <span className="CuadroVentaCliente-text">
-                            {detail.quantity}
+                            {product ? product.name : "Producto no encontrado"}
                           </span>
                         </div>
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            ) : (
-              <p>No hay items para mostrar</p>
-            )}
+                        <div className="flex w-full justify-center">
+                          <div className="CuadroVentaCliente-TextContainer font-semibold text-center !bg-transparent !border-blue_custom">
+                            <span className="CuadroVentaCliente-text">
+                              {detail.quantity}
+                            </span>
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p>No hay items para mostrar</p>
+              )}
           </div>
 
           <div className="w-full flex items-end flex-col">

@@ -25,11 +25,11 @@ const InfoClient = ({ client }: { client: Client }) => {
   });
 
   const [activeinfo, setActiveinfo] = useState<boolean>(true);
-  const [activepresta, setActivepresta] = useState<boolean>(false);
+  const [activepresta, setActivepresta] = useState<boolean>(true);
   const [activecarnet, setActivecarnet] = useState<boolean>(true);
   const [activefacade, setActivedfacade] = useState<boolean>(true);
-  const [activeContracts, setActiveContracts] = useState<boolean>(false);
-  const [activeDevol, setActiveDevol] = useState<boolean>(false);
+  const [activeContracts, setActiveContracts] = useState<boolean>(true);
+  const [activeDevol, setActiveDevol] = useState<boolean>(true);
 
   const getZone = useCallback(
     async (zone: string, disc: string, client?: string) => {
@@ -76,9 +76,9 @@ const InfoClient = ({ client }: { client: Client }) => {
     <div className="pb-10">
       <div className="flex flex-col w-full justify-center items-start gap-4">
         <div className="flex gap-2 items-center">
-          {client.storeImage ? (
+          {client.clientImage ? (
             <img
-              src={client.storeImage}
+              src={client.clientImage}
               alt=""
               className="infoClientes-imgStore w-8 h-8"
             />
@@ -144,15 +144,15 @@ const InfoClient = ({ client }: { client: Client }) => {
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Datos de facturación:</p>
-                  <p>{client.billingInfo.name}</p>
+                  <p>{client.billingInfo?.name || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Nit:</p>
-                  <p>{client.billingInfo.NIT}</p>
+                  <p>{client.billingInfo?.NIT || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Correo electrónico:</p>
-                  <p>{client.email}</p>
+                  <p>{client.email || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Zona:</p>
@@ -164,7 +164,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Direción:</p>
-                  <p>{client.address}</p>
+                  <p>{client.address || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
                   <p className="font-medium">Referencia:</p>
@@ -203,6 +203,28 @@ const InfoClient = ({ client }: { client: Client }) => {
           </>
         )}
 
+        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActivedfacade(!activefacade)}>
+          <h4 className="text-sm font-semibold">Foto de fachada</h4>
+          <i className={`fa-solid fa-angle-down transition-all ${activefacade && "rotate-180"}`}></i>
+        </div>
+
+        {
+          activefacade &&
+          <div className="flex gap-4 justify-between">
+            <div className="flex flex-col gap-2 items-center">
+              {
+                client.storeImage ?
+                  <img
+                    src={client.storeImage || ''}
+                    className="w-80 h-44 rounded-md flex-1"
+                    alt={client.storeImage}
+                  />
+                  : <span>Sin imagen</span>
+              }
+            </div>
+          </div>
+        }
+
         <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActivecarnet(!activecarnet)}>
           <h4 className="text-sm font-semibold">Carnet</h4>
           <i className={`fa-solid fa-angle-down transition-all ${activecarnet && "rotate-180"}`}></i>
@@ -234,28 +256,6 @@ const InfoClient = ({ client }: { client: Client }) => {
                   : <span>Sin imagen</span>
               }
               <small className="text-gray-500 w-fit">Reverso</small>
-            </div>
-          </div>
-        }
-
-        <div className="w-full border-b-2 pb-4 flex justify-between cursor-pointer" onClick={() => setActivedfacade(!activefacade)}>
-          <h4 className="text-sm font-semibold">Foto de fachada</h4>
-          <i className={`fa-solid fa-angle-down transition-all ${activefacade && "rotate-180"}`}></i>
-        </div>
-
-        {
-          activefacade &&
-          <div className="flex gap-4 justify-between">
-            <div className="flex flex-col gap-2 items-center">
-              {
-                client.storeImage ?
-                  <img
-                    src={client.storeImage || ''}
-                    className="w-80 h-44 rounded-md flex-1"
-                    alt={client.storeImage}
-                  />
-                  : <span>Sin imagen</span>
-              }
             </div>
           </div>
         }

@@ -11,13 +11,12 @@ const ClientInfo: FC = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/Clientes");
     setSelectedClient(client);
   };
 
   useEffect(() => {
     if (selectedClient._id === "") {
-      navigate("/Clientes")
+      navigate(-1)
     }
   }, [selectedClient, navigate])
 

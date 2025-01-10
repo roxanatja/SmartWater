@@ -11,8 +11,9 @@ import { ClientsApiConector, ZonesApiConector } from "../../../../api/classes";
 import { Client } from "../../../../type/Cliente/Client";
 import { Zone } from "../../../../type/City";
 import { useGlobalContext } from "../../../SmartwaterContext";
-import { IClientGetParams } from "../../../../api/types/clients";
+import { IClientGetParams, ISearchGetParams } from "../../../../api/types/clients";
 import { QueryMetadata } from "../../../../api/types/common";
+import { useSearchParams } from "react-router-dom";
 
 const Clientes: FC = () => {
   const {
@@ -43,6 +44,33 @@ const Clientes: FC = () => {
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
 
+  const [query, setQuery] = useSearchParams()
+  const [queryData, setQueryData] = useState<IClientGetParams | ISearchGetParams | null>(null)
+
+  useEffect(() => {
+    if (query && query.has('filters')) {
+      const queryRes: IClientGetParams = JSON.parse(atob(query.get('filters')!))
+      setQueryData(queryRes)
+      console.log(queryRes)
+
+      if (queryRes.pagination) {
+        setCurrentPage(queryRes.pagination.page)
+        if (queryRes.pagination.sort) setSort(queryRes.pagination.sort)
+      }
+
+      if (queryRes.filters) {
+        if (queryRes.filters.hasOwnProperty('text')) {
+          filterRef.current?.setSearch((queryRes.filters as any).text)
+        } else {
+          filterRef.current?.clearSearch()
+          setSavedFilters(queryRes.filters)
+        }
+      }
+    } else {
+      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' } })) })
+    }
+  }, [query, setQuery])
+
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
@@ -53,19 +81,20 @@ const Clientes: FC = () => {
   const getClients = useCallback(async () => {
     setLoading(true)
 
-    let datClients: { data: Client[] } & QueryMetadata | null
-    if (searchParamDebounced && searchParamDebounced !== "") {
-      if (savedFilters && Object.keys(savedFilters).length > 0) { setSavedFilters({}) }
-      datClients = await ClientsApiConector.searchClients({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: { text: searchParamDebounced } });
-    } else {
-      datClients = await ClientsApiConector.getClients({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: savedFilters });
+    let datClients: { data: Client[] } & QueryMetadata | null = null
+    if (queryData) {
+      if (queryData?.filters?.hasOwnProperty('text')) {
+        datClients = await ClientsApiConector.searchClients(queryData as ISearchGetParams);
+      } else {
+        datClients = await ClientsApiConector.getClients(queryData as IClientGetParams);
+      }
     }
 
     setCurrentData(datClients?.data || []);
     setTotalPage(Math.ceil((datClients?.metadata.totalCount || 0) / itemsPerPage)); // Update total pages
     setTotal(datClients?.metadata.totalCount || 0)
     setLoading(false)
-  }, [currentPage, setLoading, savedFilters, sort, searchParamDebounced]);
+  }, [setLoading, queryData]);
 
   useEffect(() => {
     getClients();
@@ -73,20 +102,29 @@ const Clientes: FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page } })) })
   };
 
   const orderClients = (orden: string) => {
     if (orden === "new") {
       setSort('desc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'desc' } })) })
     } else if (orden === "older") {
       setSort('asc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'asc' } })) })
     }
   };
 
   useEffect(() => {
     const getData = setTimeout(() => {
-      setSearchParamDebounced(searchParam);
-      setCurrentPage(1);
+      if (searchParam && searchParam !== "") {
+        if (!(queryData?.filters as any).text || (queryData?.filters as any).text !== searchParam) {
+          setSavedFilters({})
+          setSearchParamDebounced(searchParam);
+          setCurrentPage(1);
+          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, page: 1 }, filters: { text: searchParam } })) })
+        }
+      }
     }, 800);
     return () => clearTimeout(getData)
   }, [searchParam])
@@ -99,6 +137,7 @@ const Clientes: FC = () => {
       console.log('calling clear search in Clientes')
       if (filterRef?.current) { filterRef.current.clearSearch() }
     }
+    setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, page: 1 }, filters })) })
     setSavedFilters(filters);
   };
 
@@ -123,6 +162,7 @@ const Clientes: FC = () => {
         onFilter={() => setShowFiltro(true)}
         hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         searchPlaceholder="Buscar clientes por nombre o teléfono"
+        sorted={sort === 'asc' ? "older" : "new"}
       >
         {
           currentData.length > 0 &&

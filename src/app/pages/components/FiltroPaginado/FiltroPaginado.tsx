@@ -42,10 +42,12 @@ type Componentes = {
   hasFilter?: boolean;
   filterInject?: ReactNode;
   otherResults?: { text: string; value: string; }[];
+  sorted?: "new" | "older"
 };
 
 export interface IFiltroPaginadoReference {
   clearSearch: () => void
+  setSearch: (val: string) => void
 }
 
 const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
@@ -79,12 +81,16 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   suggestions,
   hasFilter,
   filterInject,
-  otherResults
+  otherResults,
+  sorted
 }, ref) => {
   useImperativeHandle(ref, () => ({
     clearSearch() {
       setValue("search", "")
-    }
+    },
+    setSearch(val: string) {
+      setValue("search", val)
+    },
   }));
 
   const searchUser = (id: string, userList: any) => {
@@ -551,6 +557,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                       onChange={(event) =>
                         orderArray && orderArray(event.target.value)
                       }
+                      value={sorted}
                     >
                       <option value="new">Más reciente</option>
                       <option value="older">Más antiguos</option>
