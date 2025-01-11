@@ -50,12 +50,20 @@ const Ventas: FC = () => {
 
     const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
 
+    let filters: ISalesGetParams['filters'] = { ...savedFilters } || {}
+    if (!filters.initialDate) {
+      filters.initialDate = "2020-01-01"
+    }
+    if (!filters.finalDate) {
+      filters.finalDate = new Date().toISOString().split("T")[0]
+    }
+
     if (clientsFilter) {
       clientsFilter.forEach(cf =>
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf } }))
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...filters, client: cf } }))
       )
     } else {
-      promises.push(SalesApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: savedFilters }))
+      promises.push(SalesApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters }))
     }
 
     const responses = await Promise.all(promises)

@@ -10,7 +10,7 @@ type TituloPages = {
 const PageTitle: FC<TituloPages> = ({ titulo, icon }) => {
   return (
     <>
-      <div className="Pages sticky top-0 z-[100] py-5">
+      <div className="Pages sticky top-0 z-[49] py-5">
         <div className="Title-Pages">
           <img src={icon} alt="" className="invert dark:invert-0" />
           <div>
