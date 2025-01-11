@@ -113,7 +113,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
   return (
     <div className="CuadroVentaCliente-container relative bg-blocks dark:border-blocks w-full">
       <div className="p-4">
-        <div className="flex flex-col gap-3 pb-4 w-[calc(100%_-_30px)]">
+        <div className="flex flex-col gap-3 pb-2 w-[calc(100%_-_30px)]">
           <div className="flex items-center justify-between">
             <div className="CuadroVentaCliente-header">
               {client?.storeImage ? (
@@ -141,10 +141,10 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
             </div>
           </div>
           <div className="CuadroVentaCliente-text">
-            <span>
+            <span className="font-semibold">
               No. Cliente:{" "}
-              <span className="text-blue_custom">{client?.code}</span>
             </span>
+            <span className="text-blue_custom">{client?.code}</span>
           </div>
 
           <div className="absolute -right-2 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
@@ -167,11 +167,11 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
           </div>
         </div>
         <div className="CuadroVentaCliente-productos w-[calc(100%_-_30px)]">
-          <div className="w-full min-h-24 max-h-28 overflow-y-auto mt-4">
-            <div className="grid grid-cols-5 truncate mb-2">
-              <p className="col-span-3">Productos</p>
-              <p className="w-full text-center">Cantidad</p>
-              <p className="w-full text-end pr-3">Precio</p>
+          <div className="w-full min-h-24 max-h-28 overflow-y-auto mt-4 relative">
+            <div className="grid grid-cols-5 truncate mb-2 text-blue_custom sticky top-0 bg-blocks">
+              <p className="col-span-3 text-sm">Productos</p>
+              <p className="w-full text-center text-sm">Cantidad</p>
+              <p className="w-full text-end pr-1 text-sm">Precio</p>
             </div>
             <div className="flex w-full gap-2 justify-center items-center">
               <div className="flex flex-col justify-center items-start gap-4 w-full">
@@ -197,7 +197,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
         </div>
       </div>
       <div className="relative bottom-0">
-        <div className="mx-auto w-3/4 border-t-font-color/20 border"></div>
+        <div className="mx-auto w-3/4 border-t-blue_bright/30 border"></div>
         <div className="w-full text-end px-5 py-3">
           <span
             className="CuadroVentaCliente-text"
@@ -205,7 +205,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
           >
             Total:
           </span>
-          <span className="CuadroVentaCliente-text" style={{ fontWeight: "600", fontSize: "18px" }}>
+          <span className="CuadroVentaCliente-text text-blue_custom" style={{ fontWeight: "600", fontSize: "18px" }}>
             {sale.detail.reduce((current, det) => current += (det.price * det.quantity), 0)} Bs
           </span>
         </div>
@@ -245,7 +245,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, detail }) => {
       </div>
 
       <div>
-        <span className="CuadroVentaCliente-text flex justify-end" style={{ fontWeight: "600" }}>
+        <span className="CuadroVentaCliente-text flex justify-end text-sm" style={{ fontWeight: "600" }}>
           {detail.price} Bs
         </span>
       </div>

@@ -165,26 +165,40 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                       </div>
                     </>
                   }
-                  <a
-                    href={`https://wa.me/${client?.phoneNumber}`}
-                    className="btn-whatsapp PedidosCurso-datos flex gap-2 items-center"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <img src="/whap-icon.svg" alt="Icono de WhatsApp" className="w-[20px] h-[20px]" />
-                    <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client?.phoneNumber || "", "BO")}</span>
-                  </a>
-                  <div className="flex gap-2 items-center">
+
+                  <div className="flex gap-2 items-center text-sm">
+                    <img src="/whap-icon.svg" alt="Icono de WhatsApp" className="w-6 h-6" />
+                    {
+                      (!!client?.phoneNumber && client?.phoneNumber !== undefined
+                        && client?.phoneNumber.trim() !== "" && !client?.phoneNumber.includes("undefined") && client?.phoneNumber !== "+591") ?
+                        < a
+                          href={`https://wa.me/${client?.phoneNumber}`}
+                          className="btn-whatsapp flex items-center gap-1"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client.phoneNumber, "BO")}</span>
+                        </a> :
+                        <span>N/A</span>
+                    }
+                  </div>
+                  <div className="flex gap-2 items-center text-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
                       <path d="M10.8509 9.58464C10.2984 9.58464 9.76847 9.36514 9.37777 8.97444C8.98707 8.58374 8.76758 8.05384 8.76758 7.5013C8.76758 6.94877 8.98707 6.41886 9.37777 6.02816C9.76847 5.63746 10.2984 5.41797 10.8509 5.41797C11.4034 5.41797 11.9334 5.63746 12.3241 6.02816C12.7148 6.41886 12.9342 6.94877 12.9342 7.5013C12.9342 7.77489 12.8804 8.0458 12.7757 8.29856C12.671 8.55132 12.5175 8.78099 12.3241 8.97444C12.1306 9.1679 11.9009 9.32135 11.6482 9.42605C11.3954 9.53075 11.1245 9.58464 10.8509 9.58464ZM10.8509 1.66797C9.30382 1.66797 7.82008 2.28255 6.72612 3.37651C5.63216 4.47047 5.01758 5.95421 5.01758 7.5013C5.01758 11.8763 10.8509 18.3346 10.8509 18.3346C10.8509 18.3346 16.6842 11.8763 16.6842 7.5013C16.6842 5.95421 16.0697 4.47047 14.9757 3.37651C13.8817 2.28255 12.398 1.66797 10.8509 1.66797Z" fill="currentColor" />
                     </svg>
                     <span>{client?.zone ? zones.find(z => z._id === client.zone)?.name || "Sin zona" : "Sin zona"}</span>
                   </div>
+                  <div className="flex gap-2 items-center text-sm">
+                    <svg width="20" height="17" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 0L0 9H3V17H17V9H20L10 0ZM10 4.7C12.1 4.7 13.8 6.4 13.8 8.5C13.8 11.5 10 15 10 15C10 15 6.2 11.5 6.2 8.5C6.2 6.4 7.9 4.7 10 4.7ZM10 7C9.60218 7 9.22064 7.15804 8.93934 7.43934C8.65804 7.72064 8.5 8.10218 8.5 8.5C8.5 8.89782 8.65804 9.27936 8.93934 9.56066C9.22064 9.84196 9.60218 10 10 10C10.3978 10 10.7794 9.84196 11.0607 9.56066C11.342 9.27936 11.5 8.89782 11.5 8.5C11.5 8.10218 11.342 7.72064 11.0607 7.43934C10.7794 7.15804 10.3978 7 10 7Z" fill="black" />
+                    </svg>
+                    <span>{client?.address || "Sin dirección"}</span>
+                  </div>
                 </div>
                 {
                   client && !client.isClient &&
                   <div className="flex gap-2 items-start text-end justify-end">
-                    <span className="whitespace-nowrap">{client.from === "customer" ? "De SmartApp" : "Cliente no registrado"}</span>
+                    <span className="whitespace-nowrap text-sm">{client.from === "customer" ? "De SmartApp" : "Cliente no registrado"}</span>
                   </div>
                 }
               </div>
@@ -287,30 +301,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
 
             {/* Información adicional del pedido */}
             <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_custom pb-2 relative mt-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                className="text-blue_custom"
-              >
-                <g clipPath="url(#clip0_14_2925)">
-                  <path
-                    d="M2.5 0C1.11929 0 0 1.11929 0 2.5V17.5C0 18.8807 1.11929 20 2.5 20H17.5C18.8807 20 20 18.8807 20 17.5V7.5C20 6.84375 19.5938 6.40625 18.9375 6.1875L14.6875 4.6875C14.2188 4.53125 14 4.09375 14 3.75V2.5C14 1.11929 12.8807 0 11.5 0H2.5ZM18.5938 17.8125C18.5938 18.0563 18.3438 18.25 18.0625 18.25H1.875C1.61875 18.25 1.40625 18.0313 1.40625 17.8125V2.1875C1.40625 1.93125 1.61875 1.71875 1.875 1.71875H11.875V3.125C11.875 4.78125 13.1563 6.09375 14.6875 6.09375C15.3125 6.09375 15.8438 5.84375 16.2812 5.40625L18.5938 7.71875V17.8125ZM16.875 16.25H13.75V13.125C13.75 12.6438 13.4062 12.2812 12.9375 12.125C12.5312 12 11.9688 12.3125 11.9062 12.75L11.875 12.875V16.25H8.75V8.75H11.0938C11.3438 8.75 11.5625 8.53125 11.5625 8.28125V8.1875C11.5625 7.9375 11.3438 7.71875 11.0938 7.71875H8.75V5.3125C8.75 4.59375 9.34375 4 10.0625 4C10.7812 4 11.375 4.59375 11.375 5.3125V6.09375C11.375 6.34375 11.5938 6.5625 11.8438 6.5625H16.875C17.125 6.5625 17.3438 6.78125 17.3438 7.03125V16.2188L16.9062 16.25H16.875Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M14.3125 9.8125H5.625C5.375 9.8125 5.15625 9.59375 5.15625 9.34375V8.75C5.15625 8.5 5.375 8.28125 5.625 8.28125H14.3125C14.5625 8.28125 14.7812 8.5 14.7812 8.75V9.34375C14.7812 9.59375 14.5625 9.8125 14.3125 9.8125Z"
-                    fill="currentColor"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_14_2925">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
+              <i className="fa-solid fa-message text-xl text-blue_custom"></i>
 
               <div>
                 {order.comment || "Sin comentarios"}
@@ -323,7 +314,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
               rel="noreferrer"
               className="flex gap-1 items-center justify-center w-full mt-3"
             >
-              <svg className="text-blue_custom"
+              <svg className="text-blue_bright"
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
                 height="20"
@@ -335,7 +326,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
                   fill="currentColor"
                 />
               </svg>
-              <span className="whitespace-nowrap">Ver ubicación en el mapa</span>
+              <span className="whitespace-nowrap text-blue_bright">Ver ubicación en el mapa</span>
             </a>
           </div>
         </div>

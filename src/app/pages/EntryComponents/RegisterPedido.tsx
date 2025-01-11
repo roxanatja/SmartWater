@@ -177,8 +177,8 @@ const RegisterPedidoForm = ({
       toast.success("Pedido registrado");
       reset();
       setAddedProducts([]);
-      window.location.reload()
-      navigate(-1);
+
+      navigate("/Pedidos");
     } else {
       toast.error("Upss error al registrar pedido");
     }
@@ -193,9 +193,9 @@ const RegisterPedidoForm = ({
           <div className="RegistrarPedido-NombreCliente">
             <div className="RegistrarPedido-Nombre">
               {
-                selectedClient.storeImage ?
+                selectedClient.clientImage ?
                   <img
-                    src={selectedClient?.storeImage || ""}
+                    src={selectedClient?.clientImage || ""}
                     className="w-8 h-8 rounded-full"
                     alt="storeImage"
                   /> :
@@ -382,7 +382,7 @@ const RegisterPedidoForm = ({
             </div>
 
             <div className="relative w-full flex items-center">
-              <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer"></i>
+              <img className="absolute cursor-pointer w-6 h-6 top-1/2 -translate-y-1/2 left-0" src="/valid.svg" alt="" />
               <div className="absolute cursor-pointer"
                 onClick={() => {
                   if (datePickerref.current) {
@@ -429,7 +429,7 @@ const RegisterPedidoForm = ({
             </div>
 
             <div className="relative w-full flex items-start">
-              <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer bottom-2"></i>
+              <img className="absolute cursor-pointer w-6 h-6 top-2/3 -translate-y-1/2 left-0" src="/distribuidor.svg" alt="" />
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

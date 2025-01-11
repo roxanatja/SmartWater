@@ -9,6 +9,7 @@ body {
   --bg-sidebar: 26 61 125;
   --bg-main: 255 255 255;
   --blue-custom: 26 61 125;
+  --blue-bright: 37 99 235;
 
   --bg-blocks: 255 255 255;
   --font-color: 27 27 27;
@@ -20,6 +21,7 @@ body.dark {
   --bg-sidebar: 17 17 17;
   --bg-main: 34 34 34;
   --blue-custom: 54 125 253;
+  --blue-bright: 37 99 235;
 
   --bg-blocks: 51 51 51;
   --font-color: 254 254 254;
@@ -36,6 +38,7 @@ code {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Poppins";
 }
 
 ::-webkit-scrollbar {
@@ -116,11 +119,25 @@ code {
 
 .switch-option.selected {
   border-radius: 30px;
-  background: rgb(var(--blue-custom));
+  background: rgb(var(--blue-bright));
   box-shadow: 1px 0px 4px 0px rgba(0, 0, 0, 0.25);
   color: #FFF;
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
   font-weight: 600;
   height: calc(100% - 1.5px);
+}
+
+input[type="date"].full-selector::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+  outline: none;
 }

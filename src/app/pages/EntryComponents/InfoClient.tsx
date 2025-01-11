@@ -7,7 +7,7 @@ import { Client } from "../../../type/Cliente/Client";
 import { formatDateTime } from "../../../utils/helpers";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, ZonesApiConector } from "../../../api/classes";
 import { Zone } from "../../../type/City";
-import { formatNumber } from "libphonenumber-js";
+import { formatIncompletePhoneNumber, formatNumber } from "libphonenumber-js";
 import { Item } from "../../../type/Item";
 
 const InfoClient = ({ client }: { client: Client }) => {
@@ -107,23 +107,34 @@ const InfoClient = ({ client }: { client: Client }) => {
         {activeinfo && (
           <>
             <div className="w-full flex gap-2 items-center">
-              <a
-                href={`https://wa.me/${client.phoneNumber.replace(/\D/g, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="items-center flex gap-2"
-              >
-                <i className="fa-brands fa-whatsapp text-2xl text-green-500"></i>{" "}
-                {client.phoneNumber}
-              </a>
+              <img src="/whap-icon.svg" alt="Icono de WhatsApp" className="w-8 h-8" />
+              {
+                (!!client.phoneNumber && client.phoneNumber !== undefined
+                  && client.phoneNumber.trim() !== "" && !client.phoneNumber.includes("undefined") && client.phoneNumber !== "+591") ?
+                  <a
+                    href={`https://wa.me/${client.phoneNumber.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="items-center flex gap-2"
+                  >
+                    {formatIncompletePhoneNumber(client.phoneNumber)}
+                  </a>
+                  : <span></span>
+              }
 
-              <a
-                className="items-center flex gap-2 cursor-pointer"
-                href={formatNumber(client.phoneLandLine || "", "BO", "RFC3966") || "#"}
-              >
-                <i className="fa-solid fa-phone p-2 bg-blue_custom text-white rounded-full"></i>
-                {client.phoneLandLine || "N/A"}
-              </a>
+              <i className="fa-solid fa-phone p-2 bg-blue_custom text-white rounded-full"></i>
+
+              {
+                (!!client.phoneLandLine && client.phoneLandLine !== undefined
+                  && client.phoneLandLine.trim() !== "" && !client.phoneLandLine.includes("undefined") && client.phoneLandLine !== "+591") ?
+                  <a
+                    className="items-center flex gap-2 cursor-pointer"
+                    href={formatNumber(client.phoneLandLine || "", "BO", "RFC3966") || "#"}
+                  >
+                    {client.phoneLandLine}
+                  </a> :
+                  <span>N/A</span>
+              }
             </div>
 
             <a
@@ -133,57 +144,57 @@ const InfoClient = ({ client }: { client: Client }) => {
               className="w-full items-center flex gap-2"
             >
               <i className="fa-solid fa-location-dot text-2xl text-blue_custom"></i>
-              <p>Ubicación en Google Maps</p>
+              <p className="!text-sm">Ubicación en Google Maps</p>
             </a>
 
             <div className="w-full">
               <ul className="list-none flex flex-col gap-4">
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Codigo:</p>
+                  <p className="font-semibold">Codigo:</p>
                   <p>{client.code}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Datos de facturación:</p>
+                  <p className="font-semibold">Datos de facturación:</p>
                   <p>{client.billingInfo?.name || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Nit:</p>
+                  <p className="font-semibold">Nit:</p>
                   <p>{client.billingInfo?.NIT || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Correo electrónico:</p>
+                  <p className="font-semibold">Correo electrónico:</p>
                   <p>{client.email || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Zona:</p>
+                  <p className="font-semibold">Zona:</p>
                   <p>{city.zone || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Barrio:</p>
+                  <p className="font-semibold">Barrio:</p>
                   <p>{city.district || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Direción:</p>
+                  <p className="font-semibold">Direción:</p>
                   <p>{client.address || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Referencia:</p>
+                  <p className="font-semibold">Referencia:</p>
                   <p>{client.reference || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Fecha de Registro:</p>
+                  <p className="font-semibold">Fecha de Registro:</p>
                   <p>{client.created ? formatDateTime(client.created, 'numeric', '2-digit', '2-digit', true) : "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Período renovación:</p>
+                  <p className="font-semibold">Período renovación:</p>
                   <p>{client.renewInDays || "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Renovación promedio:</p>
+                  <p className="font-semibold">Renovación promedio:</p>
                   <p>{client.averageRenewal ? "Sí" : "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Próxima fecha de renovación:</p>
+                  <p className="font-semibold">Próxima fecha de renovación:</p>
                   <p>
                     {client.lastSale
                       ? formatDateTime(client.renewDate, 'numeric', '2-digit', '2-digit')
@@ -191,7 +202,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                   </p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-medium">Ultima venta:</p>
+                  <p className="font-semibold">Ultima venta:</p>
                   <p>
                     {client.lastSale
                       ? formatDateTime(client.lastSale, 'numeric', '2-digit', '2-digit', true)
@@ -278,22 +289,29 @@ const InfoClient = ({ client }: { client: Client }) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 w-full pt-4 ">
-                {city.loans &&
-                  city.loans.map((loan, index) => {
-                    const contratcEstate = getContractState(
-                      loan.hasContract,
-                      loan.hasExpiredContract
-                    );
-                    return (
-                      <CuadroPrestamo
-                        key={index}
-                        loan={loan}
-                        info
-                        productos={city.item || []}
-                        estadoContrato={contratcEstate}
-                      />
-                    );
-                  })}
+                {(city.loans && city.loans.length > 0) ?
+                  <>
+                    {
+                      city.loans.map((loan, index) => {
+                        const contratcEstate = getContractState(
+                          loan.hasContract,
+                          loan.hasExpiredContract
+                        );
+                        return (
+                          <CuadroPrestamo
+                            key={index}
+                            loan={loan}
+                            info
+                            productos={city.item || []}
+                            estadoContrato={contratcEstate}
+                          />
+                        );
+                      })
+                    }
+                  </> : <div className="text-md">
+                    <b>Actual: </b> Sin prestamos actuales
+                  </div>
+                }
               </div>
             )}
           </>
@@ -306,14 +324,14 @@ const InfoClient = ({ client }: { client: Client }) => {
         {
           activeContracts && <>
             {
-              !client.hasContract && (
+              (!client.hasContract && !client.hasExpiredContract) && (
                 <div className="text-md">
                   <b>Actual: </b> Sin contratos
                 </div>
               )
             }
             {
-              (client.hasContract) && (
+              (client.hasContract || client.hasExpiredContract) && (
                 <div className="flex flex-wrap gap-4">
                   {
                     client.contracts.map(cont => <>

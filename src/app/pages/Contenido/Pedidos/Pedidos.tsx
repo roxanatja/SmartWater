@@ -225,7 +225,9 @@ const Pedidos: FC = () => {
           <OpcionesPedidos onClose={() => {
             setShowModal(false);
             setSelectedClient(client);
-          }} />
+          }}
+            isNoRegisteredClient={!selectedClient.isClient}
+          />
         </div>
       </Modal >
 

@@ -110,7 +110,7 @@ const HorariosItem: FC<Props> = ({ schedule }) => {
             >
                 <div className="flex flex-col gap-4 p-1">
                     <p>
-                        <strong>Horario: </strong>{convertTo12HourIntl(schedule.startTime)} - {convertTo12HourIntl(schedule.endTime)}
+                        <strong>Horario: </strong>{schedule.startTime} - {schedule.endTime}
                     </p>
                     <div className="flex gap-4 items-center">
                         <p className="text-sm">{schedule.days.join(", ")}</p>

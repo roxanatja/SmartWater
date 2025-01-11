@@ -213,7 +213,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
                   })}
                 </div>
               ) : (
-                <p>No hay items para mostrar</p>
+                <p className="w-full flex justify-center items-center min-h-16">Todos los items han sido devueltos</p>
               )}
           </div>
 

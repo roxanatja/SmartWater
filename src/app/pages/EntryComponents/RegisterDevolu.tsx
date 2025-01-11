@@ -3,18 +3,18 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Loans } from "../../../type/Loans/Loans";
 import { Client } from "../../../type/Cliente/Client";
 import { UserData } from "../../../type/UserData";
 import { IDevolutionBody } from "../../../api/types/devolutions";
 import { AuthService } from "../../../api/services/AuthService";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector } from "../../../api/classes";
-import { Contador } from "../components/Contador/Contador";
 
 const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Loans['detail']>([]);
   const [active, setActive] = useState(false);
+  const navigate = useNavigate()
 
   const [loans, setLoans] = useState<Array<Loans>>([]);
   const [loan, setLoan] = useState<Loans | null>(null);
@@ -22,6 +22,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [addedProducts, setAddedProducts] = useState<IDevolutionBody['data']['detail']>([]);
 
   const { parcial } = useParams();
+  const { pathname } = useLocation();
 
   const [option, setOption] = useState(false);
 
@@ -31,9 +32,18 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     },
   });
 
+  const [editar, setEditar] = useState<{
+    quantity: number;
+    item: number;
+    index: number;
+  } | null>(null);
+
+
   useEffect(() => {
     if (parcial === "total") {
       setOption(true);
+    } else {
+      setOption(false);
     }
   }, [parcial]);
 
@@ -79,6 +89,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                     setLoan(null);
                     getProduct();
                     setAddedProducts([]);
+
+                    navigate('/Prestamos')
                   } else {
                     toast.error("Upss error al registrar devolucion");
                   }
@@ -139,6 +151,8 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         setLoan(null);
         getProduct();
         setAddedProducts([]);
+
+        navigate("/Prestamos")
       } else {
         toast.error("Upss error al registrar devolucion");
       }
@@ -153,24 +167,26 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
       const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
       const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
 
-      const loansWithProductNames = res.map((loan) => {
-        return {
-          ...loan,
-          detail: loan.detail.map((detailItem) => {
-            const product = products.find((x) => x._id === detailItem.item);
-            const item = items.find((x) => x._id === detailItem.item);
+      const loansWithProductNames = res
+        .filter(l => l.detail.reduce((cont, d) => cont += d.quantity, 0) > 0)
+        .map((loan) => {
+          return {
+            ...loan,
+            detail: loan.detail.map((detailItem) => {
+              const product = products.find((x) => x._id === detailItem.item);
+              const item = items.find((x) => x._id === detailItem.item);
 
-            return {
-              ...detailItem,
-              name: product
-                ? product.name
-                : item
-                  ? item.name
-                  : "Unknown product",
-            };
-          }),
-        };
-      });
+              return {
+                ...detailItem,
+                name: product
+                  ? product.name
+                  : item
+                    ? item.name
+                    : "Unknown product",
+              };
+            }),
+          };
+        });
 
       setLoans(loansWithProductNames);
     }
@@ -184,18 +200,25 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     const item = watch("detail")[0].item;
     const quantity = watch("detail")[0].quantity;
 
-    if (item && quantity) {
-      const idx = addedProducts.findIndex(a => a.item === item)
-      if (idx !== -1) {
-        setAddedProducts((prev => prev.map(a => {
-          if (a.item === item) {
-            return { ...a, quantity: a.quantity + quantity }
-          } else {
-            return a
-          }
-        })))
-      } else {
-        setAddedProducts([...addedProducts, { item, quantity }]);
+    if (editar !== null) {
+      const updatedProducts = [...addedProducts];
+      updatedProducts[editar.index] = { item, quantity };
+      setAddedProducts(updatedProducts);
+      setEditar(null);
+    } else {
+      if (item && quantity) {
+        const idx = addedProducts.findIndex(a => a.item === item)
+        if (idx !== -1) {
+          setAddedProducts((prev => prev.map(a => {
+            if (a.item === item) {
+              return { ...a, quantity: a.quantity + quantity }
+            } else {
+              return a
+            }
+          })))
+        } else {
+          setAddedProducts([...addedProducts, { item, quantity }]);
+        }
       }
 
       setValue("detail.0.quantity", 1);
@@ -221,36 +244,35 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
     setAddedProducts(addedProducts.filter((_, i) => i !== index));
   };
 
-  const onChangeAmount = (itemName: string, quantity: number) => {
-    if (itemName && quantity) {
-      const idx = addedProducts.findIndex(a => a.item === itemName)
-      if (idx !== -1) {
-        setAddedProducts((prev => prev.map(a => {
-          if (a.item === itemName) {
-            return { ...a, quantity: quantity }
-          } else {
-            return a
-          }
-        })))
-      }
-
-      setValue("detail.0.quantity", 1);
-    }
-  }
-
   const currentItem = watch("detail")[0]?.item
   const quantityOptions: string[] = useMemo(() => {
     if (addedProducts && products && products.length > 0 && currentItem) {
-      const currentProductTotal = products.filter(p => p.name === currentItem).reduce((sum, current) => { return sum += current.quantity }, 0) || 0
+      const currentItemObject = products.filter(p => p.name === currentItem)
+
+      const currentProductTotal = currentItemObject.reduce((sum, current) => { return sum += current.quantity }, 0) || 0
       const addedProductTotal = addedProducts.filter(p => p.item === currentItem).reduce((sum, current) => { return sum += current.quantity }, 0) || 0
 
-      const diff = currentProductTotal - addedProductTotal
+      let diff = 0
+      if (!!editar && currentItemObject.some(cio => cio.item === products[editar.item].item))
+        diff = currentProductTotal
+      else
+        diff = currentProductTotal - addedProductTotal
 
       return (new Array(diff).fill("1")).map((_, index) => `${index + 1}`)
     } else {
       return []
     }
-  }, [products, addedProducts, currentItem])
+  }, [products, addedProducts, currentItem, editar])
+
+  useEffect(() => {
+    if (editar) {
+      const currentItemObject = products.find(p => p.name === currentItem)
+
+      if (products[editar.item].item !== currentItemObject?.item) {
+        setEditar(null)
+      }
+    }
+  }, [currentItem, editar, products])
 
   return (
     <form
@@ -260,9 +282,9 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
       <div className="flex flex-col gap-6 justify-center items-center w-full px-6 pb-0 ">
         <div className="flex justify-start items-center w-full gap-2 pt-2">
           {
-            selectedClient.storeImage ?
+            selectedClient.clientImage ?
               <img
-                src={selectedClient?.storeImage || ""}
+                src={selectedClient?.clientImage || ""}
                 className="w-8 h-8 rounded-full"
                 alt="storeImage"
               /> :
@@ -278,7 +300,11 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         <div className="text-md rounded-full w-full grid grid-cols-2 gap-2 shadow-md border shadow-zinc-300/25">
           <button
             type="button"
-            onClick={() => setOption(!option)}
+            onClick={() => {
+              if (option) {
+                navigate(`${pathname.split("/").filter(p => p !== parcial).join("/")}/parcial`, { replace: true })
+              }
+            }}
             className={`${!option && "bg-blue-500 font-medium text-white outline-0"
               } p-2 rounded-l-full transition-all`}
           >
@@ -287,7 +313,9 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           <button
             type="button"
             onClick={() => {
-              setOption(!option);
+              if (!option) {
+                navigate(`${pathname.split("/").filter(p => p !== parcial).join("/")}/total`, { replace: true })
+              }
             }}
             className={`${option && "bg-blue-500 font-medium text-white"
               } p-2 rounded-r-full transition-all`}
@@ -345,103 +373,123 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           ))}
         </div>
 
-        {!option && (
+        {
+          loan &&
           <>
-            <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4 cursor-pointer outline-0"            >
-              <p className="text-md font-semibold">Agregar Productos</p>
-              <i className={`fa-solid fa-chevron-up transition-all`}></i>
-            </div>
-
-            <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10">
-              {/* Product Options */}
-              <div className="grid grid-cols-2 gap-10 w-full text-md font-medium text-center -mb-8">
-                <p>Cantidad</p>
-                <p>Producto</p>
-              </div>
-              <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
-                <OptionScrooll
-                  value={(watch('detail')[0]?.quantity || 0) - 1}
-                  options={quantityOptions}
-                  onOptionChange={(selectedOption) =>
-                    handleOptionChange(selectedOption, "quantity")
-                  }
-                />
-                <OptionScrooll
-                  value={products.findIndex(p => p.name === watch('detail')[0]?.item)}
-                  options={
-                    products ? products.map((product) => product.name) : []
-                  }
-                  onOptionChange={(selectedOption) =>
-                    handleOptionChange(selectedOption, "item")
-                  }
-                />
-              </div>
-              <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
-                <i
-                  className="fa-solid fa-plus rounded-full shadow-md shadow-zinc-400/25 px-3 py-2.5 bg-blue_custom text-white hover:rotate-90 transition-all cursor-pointer"
-                  onClick={handleAddProduct}
-                ></i>
-                <p className="text-base font-semibold"> Agregar Producto</p>
-              </div>
-
-              {/* Display Added Products */}
-              <div className={`w-full`}>
-                <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {addedProducts.map((product, index) => (
-                    <motion.div
-                      key={index}
-                      className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2`}
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="flex flex-col gap-4 p-1">
-                        <p>
-                          <strong>{product.item}</strong>
-                        </p>
-                        <div className="flex gap-4 items-center">
-                          <p className="text-sm">Cantidad:</p>
-                          <div className="flex-[3]">
-                            <Contador
-                              min={1}
-                              initialValue={product.quantity}
-                              max={products.filter(p => p.name === product.item).reduce((sum, current) => { return sum += current.quantity }, 0) || 0}
-                              onIncrementar={(count) => onChangeAmount(product.item, count)}
-                              onDecrementar={(count) => onChangeAmount(product.item, count)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 items-center flex-col pr-4">
-                        <button
-                          type="button"
-                          className="text-red-700 hover:text-red-500"
-                          onClick={() => handleDeleteProduct(index)}
-                        >
-                          <i className="fa-solid fa-trash"></i>
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
+            {!option && (
+              <>
+                <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4 cursor-pointer outline-0"            >
+                  <p className="text-md font-semibold">Agregar Productos</p>
+                  <i className={`fa-solid fa-chevron-up transition-all`}></i>
                 </div>
+
+                <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10">
+                  {/* Product Options */}
+                  <div className="grid grid-cols-2 gap-10 w-full text-md font-medium text-center -mb-8">
+                    <p>Cantidad</p>
+                    <p>Producto</p>
+                  </div>
+                  <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
+                    <OptionScrooll
+                      value={(watch('detail')[0]?.quantity || 0) - 1}
+                      options={quantityOptions}
+                      onOptionChange={(selectedOption) =>
+                        handleOptionChange(selectedOption, "quantity")
+                      }
+                    />
+                    <OptionScrooll
+                      value={products.findIndex(p => p.name === watch('detail')[0]?.item)}
+                      options={
+                        products ? products.map((product) => product.name) : []
+                      }
+                      onOptionChange={(selectedOption) =>
+                        handleOptionChange(selectedOption, "item")
+                      }
+                    />
+                  </div>
+                  <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
+                    <i
+                      className={`fa-solid  ${editar !== null
+                        ? "fa-pen py-3 hover:animate-pulse"
+                        : "fa-plus hover:rotate-90"
+                        } rounded-full shadow-md shadow-zinc-400/25 px-3 py-2.5 bg-blue_custom text-white transition-all cursor-pointer`}
+                      onClick={handleAddProduct}
+                    ></i>
+                    <p className="text-base font-semibold"> {editar !== null ? "Editar" : "Agregar"} Item</p>
+                  </div>
+
+                  {/* Display Added Products */}
+                  <div className={`w-full`}>
+                    <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {addedProducts.map((product, index) => (
+                        <motion.div
+                          key={index}
+                          className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"}`}
+                          initial={{ opacity: 0, y: -20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <div className="flex flex-col gap-4 p-1">
+                            <p>
+                              <strong>{product.item}</strong>
+                            </p>
+                            <div className="flex gap-4 items-center">
+                              <p className="text-sm">Cantidad: {product.quantity}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 items-center flex-col pr-4">
+                            <button
+                              type="button"
+                              className="text-blue_custom hover:text-blue-600"
+                              onClick={() => {
+                                setValue(`detail.0.item`, product.item);
+                                setValue(`detail.0.quantity`, product.quantity);
+                                const indepro = products
+                                  ? products.findIndex(
+                                    (x) => x.name === product.item
+                                  )
+                                  : 0;
+
+                                setEditar({
+                                  quantity: Number(product.quantity) - 1,
+                                  item: indepro,
+                                  index,
+                                });
+                              }}
+                            >
+                              <i className="fa-solid fa-pen"></i>
+                            </button>
+                            <button
+                              type="button"
+                              className="text-red-700 hover:text-red-500"
+                              onClick={() => handleDeleteProduct(index)}
+                            >
+                              <i className="fa-solid fa-trash"></i>
+                            </button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className={`${!option ? "w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10" : "w-full"}`}>
+              <div className="relative w-full flex items-start">
+                <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
+                <textarea
+                  rows={3}
+                  {...register("comment")}
+                  name="comment"
+                  placeholder="Agregar Comentario"
+                  className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
+                />
               </div>
             </div>
           </>
-        )}
-
-        <div className={`${!option ? "w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10" : "w-full"}`}>
-          <div className="relative w-full flex items-start">
-            <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
-            <textarea
-              rows={3}
-              {...register("comment")}
-              name="comment"
-              placeholder="Agregar Comentario"
-              className="placeholder:text-blue_custom outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8 bg-transparent"
-            />
-          </div>
-        </div>
+        }
 
         <button
           type="submit"

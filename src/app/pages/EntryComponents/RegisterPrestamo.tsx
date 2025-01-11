@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageUploadField from "./ImageUploadField";
 import { Client } from "../../../type/Cliente/Client";
@@ -12,10 +11,13 @@ import { ILoanBody } from "../../../api/types/loans";
 import { AuthService } from "../../../api/services/AuthService";
 import { ItemsApiConector, LoansApiConector } from "../../../api/classes";
 import { Item } from "../../../type/Item";
+import { useNavigate } from "react-router-dom";
+import Input from "./Inputs";
 
 const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Item[] | null>(null);
   const [active, setActive] = useState(false);
+  const navigate = useNavigate()
 
   const [addedProducts, setAddedProducts] = useState<ILoanBody['data']['detail']>([]);
   const [editar, setEditar] = useState<{
@@ -23,8 +25,6 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
     item: number;
     index: number;
   } | null>(null);
-
-  const datePickerref = useRef<DatePicker>(null);
 
   const {
     register,
@@ -41,6 +41,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
         validUntil: "",
       },
     },
+    mode: "all"
   });
 
   const onSubmit: SubmitHandler<ILoanBody['data']> = async (data) => {
@@ -67,6 +68,8 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
       toast.success("Prestamo registrado");
       reset();
       setAddedProducts([]);
+
+      navigate("/Prestamos", { replace: true })
     } else {
       toast.error("Upss error al registrar prestamo");
     }
@@ -123,9 +126,9 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
         {/* Client Information */}
         <div className="flex justify-start items-center w-full gap-2 pt-2">
           {
-            selectedClient.storeImage ?
+            selectedClient.clientImage ?
               <img
-                src={selectedClient?.storeImage || ""}
+                src={selectedClient?.clientImage || ""}
                 className="w-8 h-8 rounded-full"
                 alt="storeImage"
               /> :
@@ -241,61 +244,18 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             </div>
           </div>
 
-          <div className="relative w-full flex items-center">
-            <i className="fa-solid fa-calendar-days text-2xl text-blue_custom absolute cursor-pointer"></i>
-            <div className="absolute cursor-pointer" onClick={() => {
-              if (datePickerref.current) {
-                datePickerref.current.setOpen(true)
-              }
-            }}>
-              <DatePicker
-                ref={datePickerref}
-                minDate={new Date()}
-                id="FechaPedido"
-                selected={
-                  watch("contract.validUntil")
-                    ? new Date(watch("contract.validUntil") as string)
-                    : new Date()
-                }
-                className="opacity-0 w-2/12 cursor-pointer"
-                calendarClassName="bg-blocks dark:border-blocks"
-                popperClassName="bg-block"
-                onChange={(date: Date | null) => {
-                  if (date) {
-                    const today = new Date().setHours(0, 0, 0, 0);
-                    const selectedDate = new Date(date).setHours(0, 0, 0, 0);
-
-                    if (selectedDate === today) {
-                      toast.error("No puedes seleccionar la fecha de hoy");
-                      setValue("contract.validUntil", "");
-                      return;
-                    }
-
-                    const formattedDate = date
-                      .toISOString()
-                      .split("T")[0]
-                      .replace(/-/g, "-");
-                    setValue("contract.validUntil", formattedDate as string);
-                  }
-                }}
-                dateFormat={"yyyy-MM-dd"}
-                dropdownMode="select"
-              />
-            </div>
-            <input
-              onClick={() => {
-                if (datePickerref.current) {
-                  datePickerref.current.setOpen(true)
-                }
-              }}
-              {...register("contract.validUntil")}
-              name="deliverDate"
-              type={"text"}
-              placeholder="Valido hasta"
-              readOnly
-              className="placeholder:text-blue_custom bg-transparent text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
-            />
-          </div>
+          <Input
+            min={new Date().toISOString().split("T")[0]}
+            type="date"
+            label="Valido hasta"
+            labelClassName="text-blue_custom text-md font-semibold"
+            iconContainerClassName="!border-0 !ps-1"
+            name="contract.validUntil"
+            register={register}
+            errors={errors.contract?.validUntil}
+            className="full-selector bg-transparent text-blue_custom font-medium !outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 w-full"
+            icon={<img className="w-6 h-6" src="/valid.svg" alt="" />}
+          />
 
           <div className="relative w-full flex items-start">
             <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>
@@ -315,12 +275,13 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             register={register}
             setValue={setValue}
             errors={errors.contract?.link}
+            required={!!watch('contract.validUntil')}
           />
         </div>
 
         <button
           type="submit"
-          disabled={addedProducts.length === 0}
+          disabled={addedProducts.length === 0 || ((!!watch('contract.validUntil') && !watch('contract.link')))}
           className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {

@@ -51,7 +51,6 @@ const Clientes: FC = () => {
     if (query && query.has('filters')) {
       const queryRes: IClientGetParams = JSON.parse(atob(query.get('filters')!))
       setQueryData(queryRes)
-      console.log(queryRes)
 
       if (queryRes.pagination) {
         setCurrentPage(queryRes.pagination.page)
@@ -118,11 +117,17 @@ const Clientes: FC = () => {
   useEffect(() => {
     const getData = setTimeout(() => {
       if (searchParam && searchParam !== "") {
-        if (!(queryData?.filters as any).text || (queryData?.filters as any).text !== searchParam) {
+        if (!(queryData?.filters as any)?.text || (queryData?.filters as any)?.text !== searchParam) {
           setSavedFilters({})
           setSearchParamDebounced(searchParam);
           setCurrentPage(1);
-          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, page: 1 }, filters: { text: searchParam } })) })
+          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, filters: { text: searchParam } })) })
+        }
+      } else {
+        if ((!savedFilters || Object.keys(savedFilters).length === 0) && (!!(queryData?.filters as any)?.text)) {
+          setSearchParamDebounced("");
+          setCurrentPage(1);
+          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 } })) })
         }
       }
     }, 800);
@@ -134,7 +139,6 @@ const Clientes: FC = () => {
     if (searchParamDebounced !== "") {
       setSearchParamDebounced("")
       setSearchParam("")
-      console.log('calling clear search in Clientes')
       if (filterRef?.current) { filterRef.current.clearSearch() }
     }
     setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, page: 1 }, filters })) })

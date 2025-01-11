@@ -10,6 +10,8 @@ interface InputProps {
   isVisibleLable?: boolean;
   required?: boolean;
   className?: string;
+  labelClassName?: string;
+  iconContainerClassName?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   numericalOnly?: boolean;
   isText?: boolean;
@@ -39,6 +41,8 @@ const Input = memo<InputProps>(
     validateAmount,
     button,
     onClick,
+    iconContainerClassName,
+    labelClassName,
     ...rest
   }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +81,7 @@ const Input = memo<InputProps>(
       >
         {label && !isVisibleLable && (
           <label
-            className="font-normal text-md text-md font-openSans"
+            className={`font-normal text-md text-md font-openSans ${labelClassName}`}
             htmlFor={name}
           >
             {label}
@@ -99,7 +103,7 @@ const Input = memo<InputProps>(
         ) : (
           <div className="relative w-full flex items-center">
             {icon && (
-              <div className="absolute ps-4 py-1.5 text-xl border-r h-full border-black pr-4">
+              <div className={`absolute ps-4 py-1.5 text-xl border-r h-full border-black pr-4 ${iconContainerClassName}`}>
                 {icon}
               </div>
             )}

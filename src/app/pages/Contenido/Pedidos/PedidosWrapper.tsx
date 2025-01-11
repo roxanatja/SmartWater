@@ -11,7 +11,7 @@ const PedidosWrapper: FC = () => {
         <Routes>
           <Route path="/" element={<Navigate to={"/Pedidos/EnCurso"} replace- />} />
           <Route path="/:section/*" element={<Pedidos />} />
-          <Route path="/RegistrarPedido" element={<RegistrarVenta />} />
+          <Route path="/RegistrarVenta" element={<RegistrarVenta />} />
         </Routes>
       </PedidosProvider>
     </>

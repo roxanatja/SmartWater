@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         blue_custom: 'rgb(var(--blue-custom))',
+        blue_bright: 'rgb(var(--blue-bright))',
         customBlue: '#1DB4C5',
         customLightBlue: 'rgba(28, 178, 194, 0.75)',
         transparentLight: 'rgba(26, 175, 190, 0.00)',

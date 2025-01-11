@@ -59,7 +59,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
     const res = await SalesApiConector.create({ data: values });
 
     if (res) {
-      toast.success("Venta registrada", { position: 'bottom-center' });
+      toast.success("Venta registrada");
       reset();
       setAddedProducts([]);
 
@@ -108,9 +108,9 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
         {/* Client Information */}
         <div className="flex justify-start items-center w-full gap-2 pt-2">
           {
-            selectedClient.storeImage ?
+            selectedClient.clientImage ?
               <img
-                src={selectedClient?.storeImage || ""}
+                src={selectedClient?.clientImage || ""}
                 className="w-8 h-8 rounded-full"
                 alt="storeImage"
               /> :
@@ -251,67 +251,70 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
           </div>
 
           {/* Display Added Products */}
-          <div className={`w-full`}>
-            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {addedProducts.map((product, index) => (
-                <motion.div
-                  key={index}
-                  className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
-                    }`}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex flex-col gap-4 p-1">
-                    <p>
-                      <strong>{product.product}</strong>
-                    </p>
-                    <div className="flex gap-4 items-center">
-                      <p className="text-sm">Cantidad: {product.quantity}</p>
-                      <p className="text-sm">Precio: {product.price}</p>
+          {
+            addedProducts.length > 0 &&
+            <div className={`w-full`}>
+              <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {addedProducts.map((product, index) => (
+                  <motion.div
+                    key={index}
+                    className={`mb-2 flex justify-between items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl p-2 ${index === editar?.index && "border-2 border-blue_custom"
+                      }`}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex flex-col gap-4 p-1">
+                      <p>
+                        <strong>{product.product}</strong>
+                      </p>
+                      <div className="flex gap-4 items-center">
+                        <p className="text-sm">Cantidad: {product.quantity}</p>
+                        <p className="text-sm">Precio: {product.price}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 items-center flex-col pr-4">
-                    <button
-                      type="button"
-                      className="text-blue_custom hover:text-blue-600"
-                      onClick={() => {
-                        setValue(`detail.0.product`, product.product);
-                        setValue(`detail.0.price`, product.price);
-                        setValue(`detail.0.quantity`, product.quantity);
-                        const indepro = products
-                          ? products.findIndex(
-                            (x) => x.name === product.product
-                          )
-                          : 0;
+                    <div className="flex gap-2 items-center flex-col pr-4">
+                      <button
+                        type="button"
+                        className="text-blue_custom hover:text-blue-600"
+                        onClick={() => {
+                          setValue(`detail.0.product`, product.product);
+                          setValue(`detail.0.price`, product.price);
+                          setValue(`detail.0.quantity`, product.quantity);
+                          const indepro = products
+                            ? products.findIndex(
+                              (x) => x.name === product.product
+                            )
+                            : 0;
 
-                        console.log(indepro)
-                        setEditar({
-                          quantity: Number(product.quantity) - 1,
-                          item: indepro,
-                          index,
-                        });
-                      }}
-                    >
-                      <i className="fa-solid fa-pen"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="text-red-700 hover:text-red-500"
-                      onClick={() => handleDeleteProduct(index)}
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                          console.log(indepro)
+                          setEditar({
+                            quantity: Number(product.quantity) - 1,
+                            item: indepro,
+                            index,
+                          });
+                        }}
+                      >
+                        <i className="fa-solid fa-pen"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-700 hover:text-red-500"
+                        onClick={() => handleDeleteProduct(index)}
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-            <div className="mt-2 flex justify-end gap-2 items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl py-2 px-6">
-              Total: <span className="text-blue_custom">{addedProducts.reduce((acc, p) => acc += (parseFloat(p.price) * p.quantity), 0)}</span>
+              <div className="mt-2 flex justify-end gap-2 items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl py-2 px-6">
+                Total: <span className="text-blue_custom">{addedProducts.reduce((acc, p) => acc += (parseFloat(p.price) * p.quantity), 0)} Bs</span>
+              </div>
             </div>
-          </div>
+          }
 
           <div className="relative w-full flex items-start">
             <i className="fa-solid fa-message text-2xl text-blue_custom absolute pt-2"></i>

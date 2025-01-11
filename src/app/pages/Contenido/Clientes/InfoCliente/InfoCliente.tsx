@@ -137,9 +137,9 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
         <div className="infoClientes-header">
           <div className="flex justify-start gap-4 w-[calc(100%_-_30px)] flex-wrap">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
-              {client.storeImage ? (
+              {client.clientImage ? (
                 <img
-                  src={client.storeImage}
+                  src={client.clientImage}
                   alt=""
                   className="infoClientes-imgStore"
                 />
@@ -162,15 +162,21 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               <span className="whitespace-nowrap">{client.code}</span>
             </div>
             <div className="infoClientes-datos relative z-10">
-              <a
-                href={`https://wa.me/${client?.phoneNumber}`}
-                className="btn-whatsapp flex items-center gap-1"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
-                <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client.phoneNumber, "BO")}</span>
-              </a>
+              <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
+
+              {
+                (!!client.phoneNumber && client.phoneNumber !== undefined
+                  && client.phoneNumber.trim() !== "" && !client.phoneNumber.includes("undefined") && client.phoneNumber !== "+591") ?
+                  < a
+                    href={`https://wa.me/${client?.phoneNumber}`}
+                    className="btn-whatsapp flex items-center gap-1"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client.phoneNumber, "BO")}</span>
+                  </a> :
+                  <span>N/A</span>
+              }
             </div>
           </div>
           <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
@@ -201,7 +207,8 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              {client.hasLoan && <span className="text-blue_custom">Préstamos activos</span>}
+              <span className="text-blue_custom">
+                {client.hasLoan ? "Préstamos activos" : "Sin préstamos"}</span>
               <div
                 className="infoClientes-moneda cursor-pointer bg-blue_custom"
                 onClick={() => setShowCobroPopUp(true)}
@@ -223,7 +230,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
             Ver ubicación en el mapa
           </span>
         </a>
-      </div>
+      </div >
 
       <Modal
         isOpen={showCobroPopUp}
