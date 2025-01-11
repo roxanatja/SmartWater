@@ -3,6 +3,7 @@ import { SmartwaterProvider } from "./SmartwaterContext";
 import { PaginaPrincipal } from "./pages/PaginaPrincipal/PaginaPrincipal";
 import "../index.css";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import NotificacionesProvider from "./pages/components/Notificaciones/NotificacionesContext";
 
 const SmartwaterWrapper: FC = () => {
   const [theme, setTheme] = useLocalStorage<string>('theme', 'auto')
@@ -35,7 +36,9 @@ const SmartwaterWrapper: FC = () => {
   return (
     <>
       <SmartwaterProvider>
-        <PaginaPrincipal />
+        <NotificacionesProvider>
+          <PaginaPrincipal />
+        </NotificacionesProvider>
       </SmartwaterProvider>
     </>
   );
