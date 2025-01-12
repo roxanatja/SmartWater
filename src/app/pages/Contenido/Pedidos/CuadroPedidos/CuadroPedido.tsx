@@ -309,7 +309,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
 
             </div>
             <a
-              href={`https://www.google.com/maps?q=${client?.location.latitude},${client?.location.longitude}`}
+              href={`https://www.google.com/maps?q=${client?.location?.latitude},${client?.location?.longitude}`}
               target="_blank"
               rel="noreferrer"
               className="flex gap-1 items-center justify-center w-full mt-3"
