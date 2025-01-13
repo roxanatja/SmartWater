@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { Client } from "../../../../../type/Cliente/Client";
 import { Option } from "../../../components/Option/Option";
 import { formatDateTime } from "../../../../../utils/helpers";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   order: Order;
@@ -19,8 +20,9 @@ interface Props {
 
 const CuadroPedido = ({ order, products, zones }: Props) => {
   const [client, setClient] = useState<Order['clientNotRegistered'] & { storeImage?: string; _id?: string; } | null>(null); // Estado para almacenar los clientes
-  const { setShowModal, setSelectedClient } = useContext(PedidosContext);
+  const { setShowModal, setSelectedClient, setSelectedOrder } = useContext(PedidosContext);
 
+  const navigate = useNavigate()
   const optionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,6 +66,9 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
   };
 
   const Edit = () => {
+    setSelectedClient(client as unknown as Client);
+    setSelectedOrder(order)
+    navigate("/Pedidos/RegistrarPedido")
     setShowOptions(false);
   };
 

@@ -13,11 +13,14 @@ import { ItemsApiConector, LoansApiConector } from "../../../api/classes";
 import { Item } from "../../../type/Item";
 import { useNavigate } from "react-router-dom";
 import Input from "./Inputs";
+import { Loans } from "../../../type/Loans/Loans";
+import { useGlobalContext } from "../../SmartwaterContext";
 
-const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
+const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: Client; selectedLoan?: Loans }) => {
   const [products, setProducts] = useState<Item[] | null>(null);
   const [active, setActive] = useState(false);
   const navigate = useNavigate()
+  const { setLoading } = useGlobalContext()
 
   const [addedProducts, setAddedProducts] = useState<ILoanBody['data']['detail']>([]);
   const [editar, setEditar] = useState<{
@@ -62,14 +65,21 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
       client: selectedClient._id,
     };
 
-    const res = await LoansApiConector.create({ data: values });
+    let res = null
+
+    if (selectedLoan) {
+      res = await LoansApiConector.update({ data: values, loanId: selectedLoan._id });
+    } else {
+      res = await LoansApiConector.create({ data: values });
+    }
 
     if (res) {
-      toast.success("Prestamo registrado");
+      toast.success(`Prestamo ${selectedLoan ? "editado" : "registrado"}`);
       reset();
       setAddedProducts([]);
 
       navigate("/Prestamos", { replace: true })
+      window.location.reload()
     } else {
       toast.error("Upss error al registrar prestamo");
     }
@@ -116,6 +126,31 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
   const handleDeleteProduct = (index: number) => {
     setAddedProducts(addedProducts.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    if (selectedLoan) {
+      setLoading(true)
+    }
+  }, [selectedLoan, setLoading])
+
+  useEffect(() => {
+    if (selectedLoan && products) {
+      setAddedProducts(selectedLoan.detail.map(i => ({
+        item: products?.find((p) => p._id === i.item)?.name || "Item no encontrado",
+        quantity: i.quantity,
+      })))
+
+      if (selectedLoan.contract.link && selectedLoan.contract.validUntil) {
+        setValue('contract.link', selectedLoan.contract.link)
+        setValue('contract.validUntil', new Date(selectedLoan.contract.validUntil || "").toISOString().split("T")[0])
+      }
+
+      if (selectedLoan.comment) {
+        setValue('comment', selectedLoan.comment)
+      }
+      setLoading(false)
+    }
+  }, [selectedLoan, products, setValue, setLoading])
 
   return (
     <form
@@ -288,7 +323,7 @@ const RegisterPrestaForm = ({ selectedClient }: { selectedClient: Client }) => {
             active ? (
               <i className="fa-solid fa-spinner animate-spin" ></i>
             ) : (
-              "Registrar Prestamo"
+              <span>{selectedLoan ? "Editar" : "Registrar"} Prestamo</span>
             )}
         </button>
       </div >

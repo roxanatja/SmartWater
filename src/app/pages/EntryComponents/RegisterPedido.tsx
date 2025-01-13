@@ -1,9 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Product from "../../../type/Products/Products";
 import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-hot-toast";
 import GoogleMapWithSelection from "./GoogleInputMap";
@@ -12,18 +11,22 @@ import { Client } from "../../../type/Cliente/Client";
 import { UserData } from "../../../type/UserData";
 import { OrdersApiConector, ProductsApiConector, UsersApiConector, ZonesApiConector } from "../../../api/classes";
 import { District, Zone } from "../../../type/City";
-import { IOrderBody } from "../../../api/types/orders";
+import { IOrderBody, IUpdateOrderBody } from "../../../api/types/orders";
 import { AuthService } from "../../../api/services/AuthService";
 import { formatIncompletePhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../../type/User";
+import { Order } from "../../../type/Order/Order";
+import { useGlobalContext } from "../../SmartwaterContext";
 
 const RegisterPedidoForm = ({
   isNoClient,
   selectedClient,
+  selectedOrder
 }: {
   isNoClient?: boolean;
   selectedClient: Client;
+  selectedOrder?: Order;
 }) => {
   const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
@@ -36,14 +39,13 @@ const RegisterPedidoForm = ({
   } | null>(null);
 
   const navigate = useNavigate()
+  const { setLoading } = useGlobalContext()
 
   const [addedProducts, setAddedProducts] = useState<IOrderBody['data']['detail']>([]);
 
   const [city, setCity] = useState<Zone[]>([]);
   const [disti, setDisti] = useState<District[]>([]);
   const [dist, setDist] = useState<User[]>([]);
-
-  const datePickerref = useRef<DatePicker>(null);
 
   const getProduct = useCallback(async () => {
     const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
@@ -139,39 +141,73 @@ const RegisterPedidoForm = ({
     }
 
     setActive(true);
-    const userData: UserData | null = AuthService.getUser();
-    let values: IOrderBody['data']
+    let res = null
 
-    if (isNoClient) {
-      values = {
-        ...data,
-        detail: addedProducts.map((item) => ({
-          product: products?.find((p) => p.name === item.product)?._id || "",
-          quantity: item.quantity,
-        })),
-        user: userData?._id || "",
-        deliverDate: data.deliverDate.replace(/\//g, "-"),
-        clientNotRegistered: {
-          ...data.clientNotRegistered,
-          cityId: userData?.city.id || "",
-        },
-      };
+    if (!selectedOrder) {
+      const userData: UserData | null = AuthService.getUser();
+      let values: IOrderBody['data']
+
+      if (isNoClient) {
+        values = {
+          ...data,
+          detail: addedProducts.map((item) => ({
+            product: products?.find((p) => p.name === item.product)?._id || "",
+            quantity: item.quantity,
+          })),
+          user: userData?._id || "",
+          deliverDate: data.deliverDate.replace(/\//g, "-"),
+          clientNotRegistered: {
+            ...data.clientNotRegistered,
+            cityId: userData?.city.id || "",
+          },
+        };
+      } else {
+        values = {
+          ...data,
+          detail: addedProducts.map((item) => ({
+            product:
+              products?.find((p) => p.name === item.product)?._id || "",
+            quantity: item.quantity,
+          })),
+          user: userData?._id || "",
+          client: selectedClient._id,
+          deliverDate: data.deliverDate.replace(/\//g, "-")
+        };
+      }
+
+      res = await OrdersApiConector.create({ data: values })
     } else {
-      values = {
-        ...data,
-        detail: addedProducts.map((item) => ({
-          product:
-            products?.find((p) => p.name === item.product)?._id || "",
-          quantity: item.quantity,
-        })),
-        user: userData?._id || "",
-        client: selectedClient._id,
-        deliverDate: data.deliverDate.replace(/\//g, "-")
-      };
-    }
+      let values: IUpdateOrderBody['data']
 
-    // FIXME: Cuando se registra no se está asignando la zona. Esta se registra cuando se edita
-    const res = await OrdersApiConector.create({ data: values })
+      if (isNoClient) {
+        values = {
+          detail: addedProducts.map((item) => ({
+            product: products?.find((p) => p.name === item.product)?._id || "",
+            quantity: item.quantity,
+          })),
+          deliverDate: data.deliverDate.replace(/\//g, "-"),
+          clientNotRegistered: {
+            address: data.clientNotRegistered.address,
+            district: data.clientNotRegistered.district,
+            fullName: data.clientNotRegistered.fullName,
+            location: data.clientNotRegistered.location,
+            phoneNumber: data.clientNotRegistered.phoneNumber,
+          },
+        };
+      } else {
+        values = {
+          detail: addedProducts.map((item) => ({
+            product:
+              products?.find((p) => p.name === item.product)?._id || "",
+            quantity: item.quantity,
+          })),
+          deliverDate: data.deliverDate.replace(/\//g, "-")
+        };
+
+      }
+
+      res = await OrdersApiConector.update({ data: values, orderId: selectedOrder._id })
+    }
 
     if (res) {
       toast.success("Pedido registrado");
@@ -185,6 +221,36 @@ const RegisterPedidoForm = ({
 
     setActive(false);
   };
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setLoading(true)
+    }
+  }, [selectedOrder, setLoading])
+
+  useEffect(() => {
+    if (selectedOrder && products) {
+      setAddedProducts(selectedOrder.detail.map(i => ({
+        product: products?.find((p) => p._id === i.product)?.name || "Producto no encontrado",
+        quantity: i.quantity,
+      })))
+
+      if (selectedOrder.comment) {
+        setValue('comment', selectedOrder.comment)
+      }
+      if (selectedOrder.deliverDate) {
+        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0])
+      }
+      if (selectedOrder.deliverDate) {
+        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0])
+      }
+      if (selectedOrder.distributorRedirectId) {
+        setValue('distributorRedirectId', selectedOrder.distributorRedirectId)
+      }
+      setLoading(false)
+    }
+  }, [selectedOrder, products, setValue, setLoading])
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -381,52 +447,18 @@ const RegisterPedidoForm = ({
               />
             </div>
 
-            <div className="relative w-full flex items-center">
-              <img className="absolute cursor-pointer w-6 h-6 top-1/2 -translate-y-1/2 left-0" src="/valid.svg" alt="" />
-              <div className="absolute cursor-pointer"
-                onClick={() => {
-                  if (datePickerref.current) {
-                    datePickerref.current.setOpen(true)
-                  }
-                }}>
-                <DatePicker
-                  ref={datePickerref}
-                  minDate={new Date()}
-                  id="FechaPedido"
-                  selected={
-                    watch("deliverDate")
-                      ? new Date(watch("deliverDate") as string)
-                      : new Date()
-                  }
-                  className="opacity-0 w-2/12 cursor-pointer"
-                  onChange={(date: Date | null) => {
-                    if (date) {
-                      const formattedDate = date
-                        .toISOString()
-                        .split("T")[0]
-                        .replace(/-/g, "/");
-                      setValue("deliverDate", formattedDate as string);
-                    }
-                  }}
-                  calendarClassName="bg-blocks dark:border-blocks"
-                  dateFormat={"yyyy/MM/dd"}
-                  dropdownMode="select"
-                />
-              </div>
-              <input
-                onClick={() => {
-                  if (datePickerref.current) {
-                    datePickerref.current.setOpen(true)
-                  }
-                }}
-                {...register("deliverDate")}
-                name="deliverDate"
-                type={"text"}
-                placeholder="Fecha de entrega"
-                readOnly
-                className="bg-transparent placeholder:text-blue_custom text-blue_custom font-medium outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 placeholder:text-md placeholder:font-semibold w-full py-2 ps-8"
-              />
-            </div>
+            <Input
+              min={new Date().toISOString().split("T")[0]}
+              type="date"
+              label="Fecha de entrega"
+              labelClassName="text-blue_custom text-md font-semibold"
+              iconContainerClassName="!border-0 !ps-1"
+              name="deliverDate"
+              register={register}
+              errors={errors.deliverDate}
+              className="full-selector bg-transparent text-blue_custom font-medium !outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 w-full"
+              icon={<img className="w-6 h-6" src="/valid.svg" alt="" />}
+            />
 
             <div className="relative w-full flex items-start">
               <img className="absolute cursor-pointer w-6 h-6 top-2/3 -translate-y-1/2 left-0" src="/distribuidor.svg" alt="" />
@@ -439,9 +471,7 @@ const RegisterPedidoForm = ({
               >
                 <label className="text-blue_custom font-semibold">Distribuidor</label>
                 <select
-                  {...register("distributorRedirectId", {
-                    required: "se requiere una zona",
-                  })}
+                  {...register("distributorRedirectId")}
                   className="pl-8 py-2.5 rounded-none font-pricedown bg-main-background text-blue_custom font-medium outline-0 border-b-2 border-blue_custom focus:outline-0"
                 >
                   <option className="text-font-color" value={"null"}>Seleccione un distribuidor</option>

@@ -3,15 +3,16 @@ import "./RegistrarPrestamos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { client } from "../../Clientes/ClientesContext";
-import { PrestamosContext } from "../PrestamosContext";
+import { loan, PrestamosContext } from "../PrestamosContext";
 import RegisterPrestaForm from "../../../EntryComponents/RegisterPrestamo";
 
 const RegistrarPrestamos: FC = () => {
-    const { setSelectedClient, selectedClient } = useContext(PrestamosContext);
+    const { setSelectedClient, selectedClient, selectedLoan, setSelectedLoan } = useContext(PrestamosContext);
     const navigate = useNavigate();
 
     const handleClick = () => {
         setSelectedClient(client);
+        setSelectedLoan(loan);
     };
 
     useEffect(() => {
@@ -35,7 +36,7 @@ const RegistrarPrestamos: FC = () => {
                     </button>
                     <span className="text-blue_custom">Regresar</span>
                 </div>
-                <RegisterPrestaForm selectedClient={selectedClient} />
+                <RegisterPrestaForm selectedClient={selectedClient} selectedLoan={selectedLoan._id === "" ? undefined : selectedLoan} />
             </div>
         </>
     );

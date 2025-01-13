@@ -6,9 +6,10 @@ import { Loans } from "../../../../../type/Loans/Loans";
 import { formatDateTime } from "../../../../../utils/helpers";
 import React from "react";
 import toast from "react-hot-toast";
-import { LoansApiConector } from "../../../../../api/classes";
+import { DevolutionsApiConector, LoansApiConector } from "../../../../../api/classes";
 import { Client } from "../../../../../type/Cliente/Client";
 import { Item } from "../../../../../type/Item";
+import { useNavigate } from "react-router-dom";
 
 type Prestamo = {
   estadoContrato: "Contrato Vencido" | "Sin Contrato" | "Con Contrato" | null;
@@ -23,16 +24,25 @@ const CuadroPrestamo: FC<Prestamo> = ({
   estadoContrato,
   info,
 }) => {
-  const { setShowModal, setSelectedClient } = useContext(PrestamosContext);
+  const { setShowModal, setSelectedClient, setSelectedLoan } = useContext(PrestamosContext);
 
   const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [hasDevolution, setHasDevolutions] = useState<boolean>(true);
   const optionsRef = useRef<HTMLDivElement>(null);
 
   const Opciones = () => {
     setShowOptions(!showOptions);
   };
+  const navigate = useNavigate()
 
   const Edit = () => {
+    if (hasDevolution) {
+      toast.error("Este préstamo ya tiene devoluciones regsitradas. No es posible editarlo.")
+    } else {
+      setSelectedClient(loan.client[0] as unknown as Client);
+      setSelectedLoan(loan)
+      navigate("/Prestamos/RegistrarPrestamo")
+    }
     setShowOptions(false);
   };
 
@@ -98,6 +108,18 @@ const CuadroPrestamo: FC<Prestamo> = ({
   }, []);
 
   const detailsToShow = useMemo(() => loan.detail.filter(d => d.quantity > 0), [loan])
+
+  useEffect(() => {
+    if (loan) {
+      DevolutionsApiConector.get({ filters: { loan: loan._id }, pagination: { page: 1, pageSize: 1 } }).then(res => {
+        if (res && res.metadata.totalCount) {
+          setHasDevolutions(res.metadata.totalCount > 0)
+        } else {
+          setHasDevolutions(false)
+        }
+      })
+    }
+  }, [loan])
 
   return (
     <>

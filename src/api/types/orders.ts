@@ -57,7 +57,6 @@ export interface IUpdateOrderBody {
             phoneNumber: string;
             address: string;
             district: string;
-            zone: string;
             location: {
                 latitude: string;
                 longitude: string;
