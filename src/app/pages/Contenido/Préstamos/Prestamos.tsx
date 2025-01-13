@@ -17,6 +17,7 @@ import { Zone } from "../../../../type/City";
 import { User } from "../../../../type/User";
 import { Item } from "../../../../type/Item";
 import millify from "millify";
+import { useSearchParams } from "react-router-dom";
 
 const Prestamos: FC = () => {
   const { showFiltro, setShowFiltro, setShowModal, showModal, selectedClient, setSelectedClient } = useContext(PrestamosContext);
@@ -33,24 +34,55 @@ const Prestamos: FC = () => {
   const [totalPage, setTotalPage] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
 
-  const [clientsFilter, setClientsFilter] = useState<string[] | null>(null);
   const [searchParam, setSearchParam] = useState<string>('');
   const [sort, setSort] = useState<'asc' | 'desc'>('desc');
   const [savedFilters, setSavedFilters] = useState<ILoansGetParams['filters']>({});
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
+  const [query, setQuery] = useSearchParams()
+  const [queryData, setQueryData] = useState<ILoansGetParams & { text?: string, clients?: string[] } | null>(null)
+
+  useEffect(() => {
+    if (query && query.has('filters')) {
+      const queryRes: ILoansGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
+      setQueryData(queryRes)
+
+      if (queryRes.pagination) {
+        setCurrentPage(queryRes.pagination.page)
+        if (queryRes.pagination.sort) setSort(queryRes.pagination.sort)
+      }
+
+      if (queryRes.text) {
+        filterRef.current?.setSearch(queryRes.text)
+      } else {
+        filterRef.current?.clearSearch()
+      }
+
+      if (queryRes.filters) {
+        setSavedFilters(queryRes.filters)
+      }
+    } else {
+      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' } })) })
+    }
+  }, [query, setQuery])
 
   const getSales = useCallback(async () => {
     setLoading(true)
 
     const promises: Promise<{ data: Loans[] } & QueryMetadata | null>[] = []
 
-    if (clientsFilter) {
-      clientsFilter.forEach(cf =>
-        promises.push(LoansApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, client: cf } }))
-      )
-    } else {
-      promises.push(LoansApiConector.get({ pagination: { page: currentPage, pageSize: itemsPerPage, sort }, filters: savedFilters }))
+    let filters: ILoansGetParams['filters'] = {}
+
+    if (queryData) {
+      filters = { ...queryData.filters }
+
+      if (queryData.clients) {
+        queryData.clients.forEach(cf =>
+          promises.push(LoansApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+        )
+      } else {
+        promises.push(LoansApiConector.get({ pagination: queryData.pagination, filters: filters }))
+      }
     }
 
     const responses = await Promise.all(promises)
@@ -65,13 +97,15 @@ const Prestamos: FC = () => {
     setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
     setTotal(totalcount)
     setLoading(false)
-  }, [currentPage, setLoading, savedFilters, sort, clientsFilter]);
+  }, [queryData, setLoading]);
 
   const orderArray = (orden: string) => {
     if (orden === "new") {
       setSort('desc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'desc' } })) })
     } else if (orden === "older") {
       setSort('asc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'asc' } })) })
     }
   };
 
@@ -82,16 +116,20 @@ const Prestamos: FC = () => {
   useEffect(() => {
     const getData = setTimeout(async () => {
       if (searchParam && searchParam.trim() !== "") {
-        const clients = await ClientsApiConector.searchClients({ filters: { text: searchParam } })
-        const clientsData = clients?.data || []
-        if (clientsData.length > 0) {
-          setClientsFilter(clientsData.map(c => c._id))
-        } else {
-          setClientsFilter([])
+        if (!queryData?.text || queryData.text !== searchParam) {
+          const clients = await ClientsApiConector.searchClients({ filters: { text: searchParam } })
+          const clientsData = clients?.data || []
+          if (clientsData.length > 0) {
+            setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: clientsData.map(c => c._id), text: searchParam })) })
+          } else {
+            setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: [], text: searchParam })) })
+          }
+          setCurrentPage(1);
         }
-        setCurrentPage(1);
       } else {
-        setClientsFilter(null)
+        if (!!queryData?.text) {
+          setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: undefined, text: undefined })) })
+        }
       }
     }, 800);
     return () => clearTimeout(getData)
@@ -108,6 +146,7 @@ const Prestamos: FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page } })) })
   };
 
   useEffect(() => {
@@ -117,6 +156,7 @@ const Prestamos: FC = () => {
   const handleFilterChange = (filters: ILoansGetParams['filters']) => {
     setCurrentPage(1);
     setSavedFilters(filters);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, filters })) })
   };
 
   const getContractState = (
@@ -152,6 +192,7 @@ const Prestamos: FC = () => {
           searchPlaceholder="Buscar por nombre de cliente"
           infoPedidos
           infoPedidosData={summary.filter(s => s.quantity > 0).map(s => ({ text: s.itenName, value: s.quantity > 9999 ? millify(s.quantity, { precision: 2 }) : `${s.quantity}` }))}
+          sorted={sort === 'asc' ? "older" : "new"}
         >
           {
             currentData.length > 0 &&

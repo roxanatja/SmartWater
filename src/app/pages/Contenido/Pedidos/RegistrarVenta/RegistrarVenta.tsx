@@ -12,13 +12,12 @@ const RegistrarVenta: FC = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/Pedidos/EnCurso");
     setSelectedClient(client);
   };
 
   useEffect(() => {
     if (selectedClient._id === "") {
-      navigate("/Pedidos/EnCurso")
+      navigate(-1)
     }
   }, [selectedClient, navigate])
 

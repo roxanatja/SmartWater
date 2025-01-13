@@ -159,7 +159,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
               <Option
                 editAction={Edit}
                 visible={showOptions}
-                editar={true}
+                editar={false}
                 eliminar={true}
                 deleteAction={Delete}
               />

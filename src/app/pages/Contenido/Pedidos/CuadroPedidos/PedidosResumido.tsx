@@ -130,7 +130,7 @@ const PedidosResumido = () => {
                     className="pedidosResumido-productImage"
                   />
                 )}
-                <span className="whitespace-nowrap">
+                <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
                   {order.detail[0]?.quantity} {quantityText}
                 </span>
               </div>

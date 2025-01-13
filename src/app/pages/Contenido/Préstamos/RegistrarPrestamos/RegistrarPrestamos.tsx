@@ -11,13 +11,12 @@ const RegistrarPrestamos: FC = () => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/Prestamos");
         setSelectedClient(client);
     };
 
     useEffect(() => {
         if (selectedClient._id === "") {
-            navigate("/Prestamos")
+            navigate(-1)
         }
     }, [selectedClient, navigate])
 

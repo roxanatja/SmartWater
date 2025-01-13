@@ -10,13 +10,12 @@ const RegistrarPedido: FC = () => {
   const { selectedClient, setSelectedClient } = useContext(VentasContext);
 
   const handleClick = () => {
-    navigate("/Ventas");
     setSelectedClient(client)
   };
 
   useEffect(() => {
     if (selectedClient._id === "") {
-      navigate("/Ventas")
+      navigate(-1)
     }
   }, [selectedClient, navigate])
 

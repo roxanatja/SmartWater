@@ -10,13 +10,12 @@ const RegistrarPrestamo = () => {
   const { setSelectedClient, selectedClient } = useContext(VentasContext);
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate("/Ventas");
     setSelectedClient(client);
   };
 
   useEffect(() => {
     if (selectedClient._id === "") {
-      navigate("/Ventas")
+      navigate(-1)
     }
   }, [selectedClient, navigate])
 
