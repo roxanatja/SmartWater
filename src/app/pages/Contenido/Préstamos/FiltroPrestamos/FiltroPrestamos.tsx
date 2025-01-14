@@ -123,145 +123,163 @@ const FiltroPrestamos = ({
     return result
   };
 
+
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row mb-4">
-        <div className="flex-1">
-          <div className="FiltroClientes-Fechastitulo mb-2">
-            <span className="text-blue_custom font-semibold">Fechas</span>
-          </div>
-          <div className="flex gap-3 flex-wrap">
-            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border">
-              <span className="text-left text-sm">De</span>
-              <input
-                max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
-                type="date"
-                {...register("fromDate")}
-                className="border-0 rounded outline-none font-semibold w-full bg-transparent"
-              />
-            </div>
-            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border">
-              <span className="text-left text-sm">A</span>
-              <input
-                min={watch('fromDate')?.toString()}
-                max={new Date().toISOString().split("T")[0]}
-                type="date"
-                {...register("toDate")}
-                className="border-0  rounded outline-none font-semibold w-full bg-transparent"
-              />
-            </div>
-          </div>
+      <div className="flex-1 flex flex-col">
+        <div className="FiltroClientes-RenovaciónTitulo mb-2">
+          <span className="text-blue_custom font-semibold">Renovación</span>
         </div>
-        <div className="flex-1 flex flex-col">
-          <div className="FiltroClientes-RenovaciónTitulo mb-2">
-            <span className="text-blue_custom font-semibold">Renovación</span>
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex items-center gap-3 justify-between">
+            <span>Renovado hasta en</span>
+            <div>
+              <Contador
+                initialValue={watch('daysToRenew')}
+                min={0}
+                onIncrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
+                onDecrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
+                iconsClassname="text-blue_bright"
+                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums"
+              />
+            </div>
+            <input
+              type="hidden"
+              {...register("daysToRenew")}
+              defaultValue={0}
+            />
           </div>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <span className="flex-[2]">Por renovar hasta en</span>
-              <div className="flex-[3]">
-                <Contador
-                  initialValue={watch('daysToRenew')}
-                  min={0}
-                  onIncrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
-                  onDecrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
-                />
-              </div>
-              <input
-                type="hidden"
-                {...register("daysToRenew")}
-                defaultValue={0}
+          <div className="flex items-center gap-3 justify-between">
+            <span>Renovado hace más de</span>
+            <div>
+              <Contador
+                initialValue={watch('daysSinceRenewed')}
+                min={0}
+                onIncrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
+                onDecrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
+                iconsClassname="text-blue_bright"
+                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums"
               />
             </div>
-            <div className="flex items-center gap-3">
-              <span className="flex-[2]">Renovado hace más de</span>
-              <div className="flex-[3]">
-                <Contador
-                  initialValue={watch('daysSinceRenewed')}
-                  min={0}
-                  onIncrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
-                  onDecrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
-                />
-              </div>
-              <input
-                type="hidden"
-                {...register("daysSinceRenewed")}
-                defaultValue={0}
-              />
-            </div>
+            <input
+              type="hidden"
+              {...register("daysSinceRenewed")}
+              defaultValue={0}
+            />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-        {/* Contratos */}
-        <div className="">
-          <div className="FiltroClientes-RenovaciónTitulo mb-2">
-            <span className="text-blue_custom font-semibold">Contratos vigentes</span>
+      <div className="flex-1">
+        <div className="FiltroClientes-Fechastitulo mb-2">
+          <span className="text-blue_custom font-semibold">Fechas</span>
+        </div>
+        <div className="flex gap-3 w-full">
+          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+            <span className="text-left text-sm">De</span>
+            <input
+              max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
+              type="date"
+              {...register("fromDate")}
+              className="border-0 rounded outline-none font-semibold w-full bg-transparent"
+            />
           </div>
-          <div className="FiltroClientes-Cuentas flex flex-col">
-            <div className="flex flex-col gap-3 w-full">
-              <div className="flex flex-col w-full gap-2">
-                <div className="flex gap-3 items-center">
-                  <input
-                    className="input-check accent-blue_custom"
-                    type="checkbox"
-                    id="check7"
-                    {...register("withContract")}
-                  />
-                  <label htmlFor="check7" className="text-sm" >
-                    Con contratos vigentes
-                  </label>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <input
-                    className="input-check accent-blue_custom"
-                    type="checkbox"
-                    id="check8"
-                    {...register("withoutContract")}
-                  />
-                  <label htmlFor="check8" className="text-sm" >
-                    Sin contratos vigentes
-                  </label>
-                </div>
-              </div>
-            </div>
+          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+            <span className="text-left text-sm">A</span>
+            <input
+              min={watch('fromDate')?.toString()}
+              max={new Date().toISOString().split("T")[0]}
+              type="date"
+              {...register("toDate")}
+              className="border-0  rounded outline-none font-semibold w-full bg-transparent"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 ml-4">
+        <p className="font-semibold text-blue_custom -ml-4">Préstamos y Contratos</p>
+
+        <div className="flex gap-3 items-center">
+          <input
+            className="input-check accent-blue_custom"
+            type="checkbox"
+            id="check7"
+            checked={watch('withContract')}
+            onChange={() => {
+              const credit = watch("withContract")
+              setValue("withContract", !credit);
+              setValue("withoutContract", false);
+              setValue("withExpiredContract", false);
+              setValue("withoutExpiredContract", false);
+            }}
+          />
+          <img src="/ConContrato.svg" alt="" />
+          <label htmlFor="check7" className="text-sm" >
+            Con contratos
+          </label>
+        </div>
+
+        <div className="flex flex-col gap-3 ml-6">
+          <div className="flex gap-3 items-center">
+            <input
+              className="input-check accent-blue_custom"
+              type="checkbox"
+              id="check9"
+              checked={watch('withExpiredContract')}
+              onChange={() => {
+                const expired = watch("withExpiredContract")
+                setValue("withContract", true);
+                setValue("withoutContract", false);
+                setValue("withExpiredContract", !expired);
+                setValue("withoutExpiredContract", false);
+              }}
+            />
+            <img src="/ContratoVencido.svg" alt="" />
+            <label htmlFor="check9" className="text-sm" >
+              Vencidos
+            </label>
+          </div>
+          <div className="flex gap-3 items-center">
+            <input
+              className="input-check accent-blue_custom"
+              type="checkbox"
+              id="check10"
+              checked={watch('withoutExpiredContract')}
+              onChange={() => {
+                const expired = watch("withoutExpiredContract")
+                setValue("withContract", true);
+                setValue("withoutContract", false);
+                setValue("withoutExpiredContract", !expired);
+                setValue("withExpiredContract", false);
+              }}
+            />
+            <img src="/ConContrato.svg" alt="" />
+            <label htmlFor="check10" className="text-sm" >
+              Vigentes
+            </label>
           </div>
         </div>
 
-        {/* Contratos expirados */}
-        <div className="">
-          <div className="FiltroClientes-RenovaciónTitulo mb-2">
-            <span className="text-blue_custom font-semibold">Contratos vencidos</span>
-          </div>
-          <div className="FiltroClientes-Cuentas flex flex-col">
-            <div className="flex flex-col gap-3 w-full">
-              <div className="flex flex-col w-full gap-2">
-                <div className="flex gap-3 items-center">
-                  <input
-                    className="input-check accent-blue_custom"
-                    type="checkbox"
-                    id="check9"
-                    {...register("withExpiredContract")}
-                  />
-                  <label htmlFor="check9" className="text-sm" >
-                    Con contratos vencidos
-                  </label>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <input
-                    className="input-check accent-blue_custom"
-                    type="checkbox"
-                    id="check10"
-                    {...register("withoutExpiredContract")}
-                  />
-                  <label htmlFor="check10" className="text-sm" >
-                    Sin contratos vencidos
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex gap-3 items-center">
+          <input
+            className="input-check accent-blue_custom"
+            type="checkbox"
+            id="check8"
+            checked={watch('withoutContract')}
+            onChange={() => {
+              const credit = watch("withoutContract")
+              setValue("withoutContract", !credit);
+              setValue("withContract", false);
+              setValue("withoutExpiredContract", false);
+              setValue("withExpiredContract", false);
+            }}
+          />
+          <img src="/SinContrato.svg" alt="" />
+          <label htmlFor="check8" className="text-sm" >
+            Sin contratos
+          </label>
         </div>
       </div>
 

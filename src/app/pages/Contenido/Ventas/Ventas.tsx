@@ -10,13 +10,14 @@ import { Sale, SaleProduct } from "../../../../type/Sale/Sale";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
 import { useGlobalContext } from "../../../SmartwaterContext";
-import { ClientsApiConector, ProductsApiConector, SalesApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, ProductsApiConector, SalesApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { ISalesGetParams } from "../../../../api/types/sales";
 import Product from "../../../../type/Products/Products";
 import { Zone } from "../../../../type/City";
 import { QueryMetadata } from "../../../../api/types/common";
 import millify from "millify";
 import { useSearchParams } from "react-router-dom";
+import { User } from "../../../../type/User";
 
 const Ventas: FC = () => {
   const {
@@ -32,6 +33,7 @@ const Ventas: FC = () => {
   const [summary, setSumary] = useState<Array<SaleProduct>>([]);
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [distribuidores, setDistribuidores] = useState<User[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
 
   const itemsPerPage: number = 12;
@@ -152,6 +154,7 @@ const Ventas: FC = () => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
       setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
     }
     fetchZones()
@@ -238,6 +241,7 @@ const Ventas: FC = () => {
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroVenta
           zones={zones}
+          distribuidores={distribuidores}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />

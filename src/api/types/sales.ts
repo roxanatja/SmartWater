@@ -14,6 +14,8 @@ export interface ISalesGetParams extends Search {
         hasClientExpiredContracts?: boolean;
         year?: number;
         month?: number;
+        paymentMethodCash?: boolean;
+        paymentMethodCurrentAccount?: boolean;
     }
 }
 

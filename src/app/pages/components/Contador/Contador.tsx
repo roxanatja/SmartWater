@@ -6,12 +6,15 @@ type typeContadorProduct = {
   initialValue?: number;
   max?: number
   min?: number
+  numberClassname?: string;
+  iconsClassname?: string;
 };
 
 const Contador: FC<typeContadorProduct> = ({
   onDecrementar,
   onIncrementar,
-  initialValue, max, min
+  initialValue, max, min,
+  iconsClassname, numberClassname
 }) => {
   const [count, setCount] = useState(initialValue || 0);
 
@@ -57,16 +60,16 @@ const Contador: FC<typeContadorProduct> = ({
         <button
           type="button"
           disabled={!!min && count <= min}
-          className="FiltroClientes-Botonesbtn flex items-center disabled:opacity-30"
+          className={`FiltroClientes-Botonesbtn flex items-center disabled:opacity-30 ${iconsClassname}`}
           onClick={decrementar}
         >
           <span className="material-symbols-outlined">do_not_disturb_on</span>
         </button>
-        <span className="FiltroClientes-BotonesNumero">{count}</span>
+        <span className={`FiltroClientes-BotonesNumero ${numberClassname}`}>{count}</span>
         <button
           type="button"
           disabled={!!max && count >= max}
-          className="FiltroClientes-Botonesbtn flex items-center disabled:opacity-30"
+          className={`FiltroClientes-Botonesbtn flex items-center disabled:opacity-30 ${iconsClassname}`}
           onClick={incrementar}
         >
           <span className="material-symbols-outlined">add_circle</span>

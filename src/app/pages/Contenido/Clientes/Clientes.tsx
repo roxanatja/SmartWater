@@ -7,13 +7,14 @@ import { ClientesContext, client } from "./ClientesContext";
 import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
 import FiltroClientes from "./FiltroClientes/FiltroClientes";
-import { ClientsApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { Client } from "../../../../type/Cliente/Client";
 import { Zone } from "../../../../type/City";
 import { useGlobalContext } from "../../../SmartwaterContext";
 import { IClientGetParams, ISearchGetParams } from "../../../../api/types/clients";
 import { QueryMetadata } from "../../../../api/types/common";
 import { useSearchParams } from "react-router-dom";
+import { User } from "../../../../type/User";
 
 const Clientes: FC = () => {
   const {
@@ -31,6 +32,7 @@ const Clientes: FC = () => {
 
   const [currentData, setCurrentData] = useState<Client[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
+  const [distribuidores, setDistribuidores] = useState<User[]>([]);
 
   const itemsPerPage: number = 10;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -73,6 +75,7 @@ const Clientes: FC = () => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -227,8 +230,9 @@ const Clientes: FC = () => {
         </div>
       </Modal>
 
-      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)} className="lg:!w-1/2 md:!w-3/4 !w-full">
+      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroClientes
+          distribuidores={distribuidores}
           zones={zones}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
