@@ -17,6 +17,7 @@ import { CuadroPedido } from "./CuadroPedidos/CuadroPedido";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
 import { User } from "../../../../type/User";
+import RegistrarClientePedido from "./RegistrarCliente/RegistrarClientePedido";
 
 const Pedidos: FC = () => {
   const params = useParams()
@@ -24,7 +25,7 @@ const Pedidos: FC = () => {
 
   const { section } = params
 
-  const { showFiltro, setShowFiltro, showModal, setShowModal, setSelectedClient, selectedClient } = useContext(PedidosContext);
+  const { showFiltro, setShowFiltro, showModal, setShowModal, setSelectedClient, selectedClient, showMiniModal, setShowMiniModal } = useContext(PedidosContext);
   const { setLoading } = useGlobalContext();
 
   const [currentData, setCurrentData] = useState<Array<Order>>([]);
@@ -265,6 +266,28 @@ const Pedidos: FC = () => {
             setSelectedClient(client);
           }}
             isNoRegisteredClient={!selectedClient.isClient}
+          />
+        </div>
+      </Modal >
+
+      <Modal
+        isOpen={showMiniModal && selectedClient._id !== ""}
+        onClose={() => {
+          setSelectedClient(client);
+          setShowMiniModal(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+          Registrar Cliente
+        </h2>
+        <div className="p-6">
+          <RegistrarClientePedido onCancel={() => {
+            setShowMiniModal(false);
+            setSelectedClient(client);
+          }}
+            isOpen={showMiniModal && selectedClient._id !== ""}
+            zones={zones}
           />
         </div>
       </Modal >

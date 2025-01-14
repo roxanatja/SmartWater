@@ -121,10 +121,10 @@ const ClientForm = ({
     }
 
     if (res) {
-      toast.success(`Cliente ${selectedClient._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+      toast.success(`Cliente ${selectedClient._id === "" ? "registrado" : "editado"} correctamente`);
       window.location.reload();
     } else {
-      toast.error("Upps error al crear cliente", { position: "bottom-center" });
+      toast.error("Upps error al crear cliente");
     }
   };
 
@@ -504,7 +504,7 @@ const ClientForm = ({
           register={register}
           setValue={setValue}
           errors={errors.storeImage}
-          required={true}
+          required={!isJeshua}
         />
         <div className="w-full col-span-2 max-sm:col-span-1 relative">
           <h1 className="text-sm font-medium">

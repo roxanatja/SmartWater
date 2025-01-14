@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../../type/User";
 import { Order } from "../../../type/Order/Order";
 import { useGlobalContext } from "../../SmartwaterContext";
+import { spawn } from "child_process";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -181,6 +182,7 @@ const RegisterPedidoForm = ({
 
       if (isNoClient) {
         values = {
+          ...data,
           detail: addedProducts.map((item) => ({
             product: products?.find((p) => p.name === item.product)?._id || "",
             quantity: item.quantity,
@@ -196,6 +198,7 @@ const RegisterPedidoForm = ({
         };
       } else {
         values = {
+          ...data,
           detail: addedProducts.map((item) => ({
             product:
               products?.find((p) => p.name === item.product)?._id || "",
@@ -500,7 +503,7 @@ const RegisterPedidoForm = ({
             {active ? (
               <i className="fa-solid fa-spinner animate-spin"></i>
             ) : (
-              "Realizar Pedido"
+              <span>{selectedOrder ? "Editar" : "Realizar"} Pedido</span>
             )}
           </button>
         </div>

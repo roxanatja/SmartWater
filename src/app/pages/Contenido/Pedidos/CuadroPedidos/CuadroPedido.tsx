@@ -57,6 +57,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
   const handleOpen = async () => {
     setShowModal(true);
     setSelectedClient(client as unknown as Client);
+    setSelectedOrder(order)
   };
 
   const [showOptions, setShowOptions] = useState<boolean>(false);

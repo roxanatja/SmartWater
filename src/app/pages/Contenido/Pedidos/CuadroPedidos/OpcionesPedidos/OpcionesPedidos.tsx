@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import "./OpcionesPedidos.css";
+import { useContext } from "react";
+import { PedidosContext } from "../../PedidosContext";
 
 interface Props {
     isNoRegisteredClient?: boolean;
@@ -7,13 +9,15 @@ interface Props {
 }
 
 const OpcionesPedidos = ({ onClose, isNoRegisteredClient }: Props) => {
+    const { setShowModal, setShowMiniModal } = useContext(PedidosContext)
+
     return (
         <>
             {
                 isNoRegisteredClient &&
                 <button type="button" className="OpcionesPedidos-Item hover:bg-zinc-200 cursor-pointer w-full" onClick={() => {
-                    alert("registrar cliente");
-                    if (onClose) onClose()
+                    setShowModal(false)
+                    setShowMiniModal(true)
                 }}>
                     <div style={{ display: "flex", alignItems: "center" }}>
                         <img
