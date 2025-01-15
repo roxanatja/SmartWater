@@ -95,8 +95,8 @@ const RegisterPedidoForm = ({
     if (isNoClient && selectedClient) {
       setValue('clientNotRegistered.address', selectedClient.address, { shouldValidate: true });
       setValue('clientNotRegistered.fullName', selectedClient.fullName, { shouldValidate: true });
-      setValue('clientNotRegistered.location.longitude', selectedClient.location.longitude, { shouldValidate: true });
-      setValue('clientNotRegistered.location.latitude', selectedClient.location.latitude, { shouldValidate: true });
+      setValue('clientNotRegistered.location.longitude', selectedClient.location?.longitude, { shouldValidate: true });
+      setValue('clientNotRegistered.location.latitude', selectedClient.location?.latitude, { shouldValidate: true });
       setValue('clientNotRegistered.phoneNumber', selectedClient.phoneNumber, { shouldValidate: true });
     }
   }, [isNoClient, selectedClient, setValue])

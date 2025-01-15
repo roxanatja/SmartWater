@@ -107,9 +107,10 @@ const RegistrarVentasPedidosForm = () => {
         if (selectedOrder._id !== "" && products) {
             setAddedProducts(selectedOrder.detail.map(d => {
                 const prod = products?.find(p => p._id === d.product)
+                const price = prod?.price
 
                 return {
-                    price: prod?.price?.toFixed(0) || "0",
+                    price: price ? parseFloat(String(price)).toFixed(0) : "0",
                     product: prod?.name || "Producto no encontrado",
                     quantity: d.quantity
                 }
