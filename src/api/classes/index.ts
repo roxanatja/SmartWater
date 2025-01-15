@@ -20,6 +20,7 @@ import { SchedulesApiConector } from './schedules'
 import { UnitMeasureApiConector } from './unit-measure'
 import { UsersApiConector } from './users'
 import { ZonesApiConector } from './zones'
+import { NotificationsApiConector } from './notifications'
 
 export {
     AccountEntryApiConector,
@@ -43,5 +44,6 @@ export {
     SchedulesApiConector,
     UnitMeasureApiConector,
     UsersApiConector,
-    ZonesApiConector
+    ZonesApiConector,
+    NotificationsApiConector
 }

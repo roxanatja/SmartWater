@@ -1,19 +1,15 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { io } from 'socket.io-client'
 import { AuthService } from '../../../../api/services/AuthService'
+import { Notification } from '../../../../type/Notification'
+import { NotificationsApiConector } from '../../../../api/classes'
 
 const socket = io(process.env.REACT_APP_API_HEROKU)
-
-export interface Notification {
-    read: boolean;
-    loanId: string;
-    status: string;
-    reason: string;
-}
 
 type NotificationsContextType = {
     notifications: Notification[];
     markAllAsRead: () => void;
+    markOneAsRead: (id: string) => void;
     isOpenNotifications: boolean;
     openNotifications: () => void;
     closeNotifications: () => void;
@@ -22,6 +18,7 @@ type NotificationsContextType = {
 const NotificationsContext = createContext<NotificationsContextType>({
     notifications: [],
     markAllAsRead() { },
+    markOneAsRead(id: string) { },
     isOpenNotifications: false,
     openNotifications() { },
     closeNotifications() { },
@@ -31,11 +28,21 @@ export const useNotifications = () => {
     return useContext(NotificationsContext)
 }
 
+const eventsListen = ['loan claim', 'user_disconnected']
+
 const NotificacionesProvider = ({ children }: PropsWithChildren) => {
     const user = useMemo(() => AuthService.getUser(), [])
 
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [isOpenNotifications, setOpenNotifications] = useState<boolean>(false)
+
+    const loadNotifications = useCallback(async () => {
+        console.log("Cargando notificaciones...")
+        const nots = await NotificationsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: 'desc' } })
+        console.log(nots?.data)
+        setNotifications(nots?.data || [])
+        console.log("Notificaciones cargadas!")
+    }, [])
 
     useEffect(() => {
         if (user && user.organization) {
@@ -43,14 +50,17 @@ const NotificacionesProvider = ({ children }: PropsWithChildren) => {
             socket.on('connect', () => {
                 console.log("Conectado al servidor")
                 socket.emit('join organization', user.organization)
+                loadNotifications()
             })
 
-            socket.on('loan claim', (data) => {
-                const { loanId, status, reason } = data
-                console.log("Prestamo reclamado", { loanId, status, reason, organization: user.organization })
+            eventsListen.forEach(e => {
+                socket.on(e, (data) => {
+                    console.log("nueva notificacion de evento", e)
+                    loadNotifications()
+                })
             })
         }
-    }, [user])
+    }, [user, loadNotifications])
 
     return (
         <NotificationsContext.Provider
@@ -58,6 +68,9 @@ const NotificacionesProvider = ({ children }: PropsWithChildren) => {
                 notifications,
                 markAllAsRead() {
                     setNotifications((prev) => prev.map(p => ({ ...p, read: true })))
+                },
+                markOneAsRead(id: string) {
+                    setNotifications((prev) => prev.map(p => { return p._id === id ? { ...p, read: true } : p }))
                 },
                 isOpenNotifications,
                 openNotifications() { setOpenNotifications(true) },

@@ -1,11 +1,14 @@
 import React, { useEffect, useRef } from 'react'
 import { useNotifications } from './NotificacionesContext'
 import { motion } from 'framer-motion'
+import NotificationBlock from './NotificationBlock'
+import { NotificationsApiConector } from '../../../../api/classes'
 
 const NotificationsDropdown = () => {
-    const { closeNotifications, isOpenNotifications, notifications, openNotifications } = useNotifications()
+    const { closeNotifications, isOpenNotifications, notifications, openNotifications, markAllAsRead, markOneAsRead } = useNotifications()
 
     const ref = useRef<HTMLDivElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -23,6 +26,25 @@ const NotificationsDropdown = () => {
         };
     }, [closeNotifications]);
 
+    useEffect(() => {
+        if (isOpenNotifications && containerRef.current) {
+            containerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }, [isOpenNotifications])
+
+    const markAsRead = (id: string) => {
+        NotificationsApiConector.markAsRead({ notificationId: id }).then(res => {
+            markOneAsRead(id)
+        })
+    }
+
+    const markAllAsReadLocal = () => {
+        NotificationsApiConector.markAllAsRead().then(res => {
+            console.log(res)
+            markAllAsRead()
+        })
+    }
+
     return (
         <div ref={ref} className="bg-blue_custom text-xl text-white flex items-center justify-center px-4 rounded-full relative cursor-pointer hover:bg-blue-800 w-[45px] h-[45px]"
             onClick={() => {
@@ -36,6 +58,7 @@ const NotificationsDropdown = () => {
             }
 
             <motion.div
+                ref={containerRef}
                 onClick={(e) => { e.stopPropagation() }}
                 initial={false}
                 animate={{
@@ -45,16 +68,18 @@ const NotificationsDropdown = () => {
                     paddingBottom: isOpenNotifications ? '1rem' : 0,
                 }}
                 className={`notifications-container absolute top-full translate-y-3 right-0 min-w-[350px] z-[500] bg-blocks border dark:border-blocks shadow-md dark:shadow-slate-500 rounded-[20px] py-4 px-6 text-sm overflow-y-auto overflow-x-hidden`}>
-                <h3 className='text-font-color text-base font-semibold mb-3 px-1'>Notificaciones</h3>
+
+                <div className="flex items-center justify-between mb-3 px-1">
+                    <h3 className='text-font-color text-base font-semibold'>Notificaciones</h3>
+                    <i className={`fa-solid fa-envelope-open text-font-color text-base ${notifications.some(n => !n.read) ? "cursor-pointer" : "opacity-50 pointer-events-none cursor-not-allowed"}`} onClick={() => { markAllAsReadLocal() }}></i>
+                </div>
 
                 {
                     notifications.length > 0 ?
                         <div className="flex flex-col gap-3">
                             {
                                 notifications.map((not, index) =>
-                                    <div key={`notification_${index}`} className={`border rounded-[10px] text-font-color px-3 py-2 ${not.read ? "opacity-65 border-font-color/25" : "border-2 font-[500] border-font-color/60"}`}>
-                                        {not.reason}
-                                    </div>
+                                    <NotificationBlock key={`notification_${index}`} notification={not} markAsRead={markAsRead} />
                                 )
                             }
                         </div> :

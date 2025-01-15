@@ -15,7 +15,7 @@ export abstract class ApiConnector {
             if (authToken) { headers.setAuthorization(authToken) }
 
             this.axiosInstance = axios.create({
-                baseURL: process.env.REACT_APP_API_HEROKU,
+                baseURL: `${process.env.REACT_APP_API_HEROKU}/v1`,
                 headers
             });
         }
@@ -33,7 +33,7 @@ export abstract class ApiConnector {
         if (authToken) { headers.setAuthorization(authToken) }
 
         this.axiosInstance = axios.create({
-            baseURL: process.env.REACT_APP_API_HEROKU,
+            baseURL: `${process.env.REACT_APP_API_HEROKU}/v1`,
             headers
         });
     }
@@ -44,7 +44,7 @@ export abstract class ApiConnector {
         headers.setContentType("application/json")
 
         this.axiosInstance = axios.create({
-            baseURL: process.env.REACT_APP_API_HEROKU,
+            baseURL: `${process.env.REACT_APP_API_HEROKU}/v1`,
             headers
         });
     }
