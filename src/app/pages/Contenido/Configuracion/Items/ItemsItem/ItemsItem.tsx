@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { ItemsContext } from "../ItemsContext";
 import { ItemsApiConector } from "../../../../../../api/classes";
+import { CategoryProduct } from "../../../../../../type/Products/Category";
+import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
 
 interface Props {
     item: Item
@@ -105,14 +107,26 @@ const ItemsItem: FC<Props> = ({ item }) => {
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.3 }}
             >
-                <div className="flex flex-col gap-4 p-1">
+                <div className="flex flex-col gap-4 p-1 w-[calc(100%_-_30px)]">
                     <p>
                         <strong>{item.name}</strong>
                     </p>
-                    <div className="flex gap-4 items-center">
-                        <p className="text-sm">{item.description}</p>
+
+                    <div className="flex justify-between w-full gap-3">
+                        <strong>Categoría:</strong><span>{(item.category as CategoryProduct)?.name || "N/A"}</span>
                     </div>
-                </div>
+                    <div className="flex justify-between w-full gap-3">
+                        <strong>Unidad de medida:</strong><span>{(item.unitMeasure as UnitMeasure)?.name || "N/A"}</span>
+                    </div>
+                    <div className="flex flex-col w-full gap-3">
+                        {
+                            item.imageUrl && <>
+                                <strong>Imagen:</strong>
+                                <img src={item.imageUrl} alt="Product" className="w-[150px] h-auto object-cover mx-auto" />
+                            </>
+                        }
+                    </div>
+                </div >
                 <div className="flex gap-2 items-start flex-col pt-2 relative" ref={optionsRef}>
                     <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
                         <img src="/opcion-icon.svg" alt="" />
@@ -125,7 +139,7 @@ const ItemsItem: FC<Props> = ({ item }) => {
                         deleteAction={Delete}
                     />
                 </div>
-            </motion.div>
+            </motion.div >
         </>
     )
 }

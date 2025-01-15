@@ -11,6 +11,9 @@ export interface IItemBody {
     data: {
         name: string;
         description: string;
+        imageUrl: string;
+        category: string;
+        unitMeasure: string;
     }
 }
 
