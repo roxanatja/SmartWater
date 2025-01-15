@@ -87,6 +87,7 @@ const HorariosForm = ({ isOpen, onCancel }: Props) => {
                     register={register}
                     errors={errors.startTime}
                     required
+                    className="full-selector"
                 />
 
                 <Input
@@ -97,6 +98,7 @@ const HorariosForm = ({ isOpen, onCancel }: Props) => {
                     register={register}
                     errors={errors.endTime}
                     required
+                    className="full-selector"
                 />
             </div>
 

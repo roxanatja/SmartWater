@@ -128,6 +128,13 @@ code {
   height: calc(100% - 1.5px);
 }
 
+input[type="month"].full-selector,
+input[type="time"].full-selector,
+input[type="date"].full-selector {
+  position: relative;
+}
+input[type="month"].full-selector::-webkit-calendar-picker-indicator,
+input[type="time"].full-selector::-webkit-calendar-picker-indicator,
 input[type="date"].full-selector::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;

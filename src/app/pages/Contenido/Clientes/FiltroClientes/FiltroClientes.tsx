@@ -163,7 +163,7 @@ const FiltroClientes = ({
         </div>
         <div className="flex flex-col gap-3 w-full">
           <div className="flex items-center gap-3 justify-between">
-            <span>Renovado hasta en</span>
+            <span className="text-sm">Renovado hasta en</span>
             <div>
               <Contador
                 initialValue={watch('daysToRenew')}
@@ -171,7 +171,7 @@ const FiltroClientes = ({
                 onIncrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
                 onDecrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
                 iconsClassname="text-blue_bright"
-                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums"
+                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums text-sm"
               />
             </div>
             <input
@@ -181,7 +181,7 @@ const FiltroClientes = ({
             />
           </div>
           <div className="flex items-center gap-3 justify-between">
-            <span>Renovado hace más de</span>
+            <span className="text-sm">Renovado hace más de</span>
             <div>
               <Contador
                 initialValue={watch('daysSinceRenewed')}
@@ -189,7 +189,7 @@ const FiltroClientes = ({
                 onIncrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
                 onDecrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
                 iconsClassname="text-blue_bright"
-                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums"
+                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums text-sm"
               />
             </div>
             <input
@@ -206,23 +206,25 @@ const FiltroClientes = ({
           <span className="text-blue_custom font-semibold">Fechas</span>
         </div>
         <div className="flex gap-3 w-full">
-          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
             <span className="text-left text-sm">De</span>
+            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
               max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
               type="date"
               {...register("fromDate")}
-              className="border-0 rounded outline-none font-semibold w-full bg-transparent"
+              className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
             />
           </div>
-          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1">
+          <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
             <span className="text-left text-sm">A</span>
+            <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
               min={watch('fromDate')?.toString()}
               max={new Date().toISOString().split("T")[0]}
               type="date"
               {...register("toDate")}
-              className="border-0  rounded outline-none font-semibold w-full bg-transparent"
+              className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
             />
           </div>
         </div>

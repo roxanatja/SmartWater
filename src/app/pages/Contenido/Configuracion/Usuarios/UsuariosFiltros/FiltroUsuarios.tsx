@@ -74,6 +74,9 @@ const FiltroUsuarios = ({
                             lang="es-ES"
                             name="date"
                             register={register}
+                            iconContainerClassName="border-none flex items-center justify-center"
+                            icon={<img src="/hasta.svg" alt="" className="w-[20px] h-[20px] invert-0 dark:invert" />}
+                            className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector"
                         />
                     </div>
                 </div>
