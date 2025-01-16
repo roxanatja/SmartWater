@@ -141,6 +141,10 @@ const RegisterPedidoForm = ({
       return;
     }
 
+    if (data.distributorRedirectId && data.distributorRedirectId === "null") {
+      delete data.distributorRedirectId
+    }
+
     setActive(true);
     let res = null
 

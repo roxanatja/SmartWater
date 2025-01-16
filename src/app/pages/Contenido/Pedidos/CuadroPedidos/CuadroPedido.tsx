@@ -306,7 +306,7 @@ const CuadroPedido = ({ order, products, zones }: Props) => {
             </div>
 
             {/* Información adicional del pedido */}
-            <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_custom pb-2 relative mt-4">
+            <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_bright/30 pb-2 relative mt-4">
               <i className="fa-solid fa-message text-xl text-blue_custom"></i>
 
               <div>

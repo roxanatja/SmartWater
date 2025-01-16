@@ -196,8 +196,17 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
           </div>
         </div>
       </div>
+
+      <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_bright/30 pb-2 relative mx-2 mt-4 w-[calc(100%_-_1rem)]">
+        <i className="fa-solid fa-message text-xl text-blue_custom"></i>
+
+        <div>
+          {sale.comment || "Sin comentarios"}
+        </div> {/* Comentario del pedido */}
+
+      </div>
+
       <div className="relative bottom-0">
-        <div className="mx-auto w-3/4 border-t-blue_bright/30 border"></div>
         <div className="w-full text-end px-5 py-3">
           <span
             className="CuadroVentaCliente-text"

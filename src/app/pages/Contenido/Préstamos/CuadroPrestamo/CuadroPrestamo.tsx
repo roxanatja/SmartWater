@@ -239,8 +239,16 @@ const CuadroPrestamo: FC<Prestamo> = ({
               )}
           </div>
 
+          <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_bright/30 pb-2 relative mt-4 w-full">
+            <i className="fa-solid fa-message text-xl text-blue_custom"></i>
+
+            <div>
+              {loan.comment || "Sin comentarios"}
+            </div> {/* Comentario del pedido */}
+
+          </div>
           <div className="w-full flex items-end flex-col">
-            <div className="mx-auto w-3/4 border-t-font-color/20 border"></div>
+
             {estadoContrato === "Con Contrato" ? (
               <div className="flex items-center gap-2 mt-4">
                 <img

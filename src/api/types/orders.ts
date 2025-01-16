@@ -48,6 +48,7 @@ export interface IUpdateOrderBody {
     data: {
         comment?: string;
         deliverDate?: string;
+        distributorRedirectId?: string;
         detail?: {
             product: string;
             quantity: number;
