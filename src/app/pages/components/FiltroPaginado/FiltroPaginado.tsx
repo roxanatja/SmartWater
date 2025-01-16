@@ -363,15 +363,19 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
   };
 
-  const getSaleClientContract = (client: Client) => {
-    if (!client.hasLoan) {
-      return "SIN PRESTAMO"
-    } else {
-      if (client.hasExpiredContract) {
-        return "PRESTAMO CON CONTRATO VENCIDO"
+  const getSaleClientContract = (client: Client | null) => {
+    if(client) {
+      if (!client.hasLoan) {
+        return "SIN PRESTAMO"
       } else {
-        return client.hasContract ? "PRESTAMO CON CONTRATO" : "PRESTAMO SIN CONTRATO"
+        if (client.hasExpiredContract) {
+          return "PRESTAMO CON CONTRATO VENCIDO"
+        } else {
+          return client.hasContract ? "PRESTAMO CON CONTRATO" : "PRESTAMO SIN CONTRATO"
+        }
       }
+    } else {
+      return "SIN CLIENTE"
     }
   }
 
@@ -386,20 +390,16 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     for (const sale of data) {
       const client: Client | null = await ClientsApiConector.getClient({ clientId: sale.client?.[0]._id || '' });
 
-      if (!client || !client.fullName) {
-        throw new Error(`Cliente no encontrado para la venta ${sale._id}`);
-      }
-
       const zone = await searchZone(sale.zone, zones)
 
       const typeDataToExport = {
         FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit"),
         USUARIO: searchUser(sale.user, userList),
-        "CODIGO CLIENTE": client.code,
+        "CODIGO CLIENTE": client?.code || "N/A",
         ZONA: zone?.name || "Sin zona",
-        BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
-        DIRECCION: client.address,
-        NOMBRE: client.fullName,
+        BARRIO: zone ? (searchDistrict(client?.district || "", zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+        DIRECCION: client?.address || "N/A",
+        NOMBRE: client?.fullName || "N/A",
         COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
         PRODUCTOS: setDetailSale(sale.detail, products),
         SUBTOTAL: sale.detail.reduce((cont, prev) => cont += prev.price * prev.quantity, 0),
