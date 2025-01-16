@@ -170,6 +170,7 @@ const Clientes: FC = () => {
         hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         searchPlaceholder="Buscar clientes por nombre o teléfono"
         sorted={sort === 'asc' ? "older" : "new"}
+        activeFilters={queryData?.filters}
       >
         {
           currentData.length > 0 &&

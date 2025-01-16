@@ -10,6 +10,7 @@ import { ClientsApiConector, DevolutionsApiConector, ItemsApiConector, LoansApiC
 import { District, Zone } from "../../../../type/City";
 import { Sale } from "../../../../type/Sale/Sale";
 import moment from "moment";
+import { QueryMetadata } from "../../../../api/types/common";
 
 type Componentes = {
   order?: boolean;
@@ -35,6 +36,7 @@ type Componentes = {
   finanzas?: boolean;
   iconUbicacion?: boolean;
   filtro?: boolean;
+  activeFilters?: any;
   total?: number;
   totalRealOrders?: number;
   orderArray?: (order: string) => void;
@@ -43,7 +45,7 @@ type Componentes = {
   hasFilter?: boolean;
   filterInject?: ReactNode;
   otherResults?: { text: string; value: string; }[];
-  sorted?: "new" | "older"
+  sorted?: "new" | "older";
 };
 
 export interface IFiltroPaginadoReference {
@@ -83,7 +85,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   hasFilter,
   filterInject,
   otherResults,
-  sorted
+  sorted,
+  activeFilters
 }, ref) => {
   useImperativeHandle(ref, () => ({
     clearSearch() {
@@ -114,15 +117,6 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     //Busca el distrito del cliente
     const district = districts.find((district: any) => district._id === id);
     return district;
-  };
-
-  const setDetailSale = (details: Sale['detail'], products: any) => {
-    //Guarda los detalles de la venta
-    const detailsProduct: string = details.map((detail) => {
-      const product = products.find((product: any) => product._id === detail.product);
-      return `Producto: ${product.name}, Cantidad: ${detail.quantity}, Precio: ${detail.price} Bs.`;
-    }).join("; \n")
-    return detailsProduct;
   };
 
   const setDetailClient = (loans: Array<any>, products: Array<any>) => {
@@ -368,7 +362,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         if (client.hasExpiredContract) {
           return "PRESTAMO CON CONTRATO VENCIDO"
         } else {
-          return client.hasContract ? "PRESTAMO CON CONTRATO" : "PRESTAMO SIN CONTRATO"
+          return client.hasContract ? "PRESTAMO CON CONTRATO VIGENTE" : "PRESTAMO SIN CONTRATO"
         }
       }
     } else {
@@ -377,7 +371,31 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   }
 
   const getDataWithClientNames = async () => {
-    const data = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const filters = activeFilters ? { ...activeFilters } : {}
+
+    if (!filters.initialDate && !!filters.finalDate) {
+      filters.initialDate = moment(filters.finalDate).startOf("week").toDate().toISOString().split("T")[0]
+    }
+
+    if (!!filters.initialDate && !filters.finalDate) {
+      filters.finalDate = new Date().toISOString().split("T")[0]
+    }
+
+    const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
+    if (filters.clients) {
+      filters.clients.forEach((cf: string) =>
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
+      )
+    } else {
+      promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters }))
+    }
+
+    const responses = await Promise.all(promises)
+    const data: Sale[] = []
+    responses.forEach(r => {
+      data.push(...(r?.data || []))
+    })
+
     const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
@@ -385,35 +403,50 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     const dataWithClientNames: any[] = []
 
     for (const sale of data) {
-      const client: Client | null = await ClientsApiConector.getClient({ clientId: sale.client?.[0]._id || '' });
+      const client: Client | null = await ClientsApiConector.getClient({ clientId: sale.client?.[0]?._id || '' });
 
       const zone = await searchZone(sale.zone, zones)
 
-      const typeDataToExport = {
-        FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit"),
-        USUARIO: searchUser(sale.user, userList),
-        "CODIGO CLIENTE": client?.code || "N/A",
-        ZONA: zone?.name || "Sin zona",
-        BARRIO: zone ? (searchDistrict(client?.district || "", zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
-        DIRECCION: client?.address || "N/A",
-        NOMBRE: client?.fullName || "N/A",
-        COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
-        PRODUCTOS: setDetailSale(sale.detail, products),
-        SUBTOTAL: sale.detail.reduce((cont, prev) => cont += prev.price * prev.quantity, 0),
-        PAGO: sale.creditSale ? "Credito" : "Al contado",
-        "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
-        "DE CLIENTES": getSaleClientContract(client)
-      };
+      for (const det of sale.detail) {
+        const product = products.find((product: any) => product._id === det.product);
 
-      dataWithClientNames.push(typeDataToExport);
+        const typeDataToExport = {
+          FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit", false, true),
+          USUARIO: searchUser(sale.user, userList),
+          "CODIGO CLIENTE": client?.code || "N/A",
+          ZONA: zone?.name || "Sin zona",
+          BARRIO: zone ? (searchDistrict(client?.district || "", zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+          DIRECCION: client?.address || "N/A",
+          NOMBRE: client?.fullName || "N/A",
+          COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
+          PRODUCTOS: `Producto: ${product?.name || "Producto no encontrado"}, Cantidad: ${det.quantity}, Precio: ${det.price} Bs.`,
+          SUBTOTAL: det.price * det.quantity,
+          PAGO: sale.creditSale ? "Credito" : "Al contado",
+          "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
+          "DE CLIENTES": getSaleClientContract(client)
+        };
+
+        dataWithClientNames.push(typeDataToExport);
+      }
     }
 
     return dataWithClientNames;
   };
 
   const getDataClients = async () => {
+    const filters = activeFilters ? { ...activeFilters } : {}
+
+    let datClients: { data: Client[] } & QueryMetadata | null = null
+    if (filters) {
+      if (filters.hasOwnProperty('text')) {
+        datClients = await ClientsApiConector.searchClients({ pagination: { page: 1, pageSize: 3000 }, filters });
+      } else {
+        datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 }, filters });
+      }
+    }
+
     // Cargar datos
-    const data = (await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const data = datClients?.data || [];
     const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];

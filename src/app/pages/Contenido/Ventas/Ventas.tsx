@@ -18,6 +18,7 @@ import { QueryMetadata } from "../../../../api/types/common";
 import millify from "millify";
 import { useSearchParams } from "react-router-dom";
 import { User } from "../../../../type/User";
+import moment from "moment";
 
 const Ventas: FC = () => {
   const {
@@ -83,10 +84,11 @@ const Ventas: FC = () => {
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (!filters.initialDate) {
-        filters.initialDate = "2020-01-01"
+      if (!filters.initialDate && !!filters.finalDate) {
+        filters.initialDate = moment(filters.finalDate).startOf("week").toDate().toISOString().split("T")[0]
       }
-      if (!filters.finalDate) {
+
+      if (!!filters.initialDate && !filters.finalDate) {
         filters.finalDate = new Date().toISOString().split("T")[0]
       }
 
@@ -199,6 +201,7 @@ const Ventas: FC = () => {
           infoPedidos={true}
           infoPedidosData={summary.filter(s => s.cant > 0).map(s => ({ text: `${s.cant} ${s.prod}`, value: `${millify(s.total, { precision: 2 })} Bs` }))}
           sorted={sort === 'asc' ? "older" : "new"}
+          activeFilters={{ ...queryData?.filters, clients: queryData?.clients }}
         >
           {
             currentData.length > 0 &&
