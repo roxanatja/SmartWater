@@ -9,6 +9,7 @@ import { Client } from "../../../../type/Cliente/Client";
 import { ClientsApiConector, DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector, SalesApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { District, Zone } from "../../../../type/City";
 import { Sale } from "../../../../type/Sale/Sale";
+import moment from "moment";
 
 type Componentes = {
   order?: boolean;
@@ -446,8 +447,9 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
         ZONA: zone?.name || "Sin zona", // Buscar la zona
         BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
-        "TIEMPO DE RENOVACION": client.renewInDays || "", // Tiempo de renovación
+        "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
         "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
+        "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
         "FECHA DE REGISTRO": formatDateTime(
           client.created,
           "numeric",
