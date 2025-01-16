@@ -364,7 +364,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   };
 
   const getSaleClientContract = (client: Client | null) => {
-    if(client) {
+    if (client) {
       if (!client.hasLoan) {
         return "SIN PRESTAMO"
       } else {
@@ -432,11 +432,12 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
       const typeDataToExport = {
         NOMBRE: client.fullName || "Sin nombre",
-        "TIPO DE CLIENTE": client.isClient
-          ? "Cliente"
-          : client.isAgency
+        "TIPO DE CLIENTE":
+          client.isAgency
             ? "Agencia"
-            : "Desconocido", // Define el tipo de cliente
+            : client.isClient
+              ? "Cliente habitual"
+              : "Desconocido", // Define el tipo de cliente
         WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
         TELEFONO: client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
         CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
