@@ -436,7 +436,10 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
               ? "Cliente habitual"
               : "Desconocido", // Define el tipo de cliente
         WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
-        TELEFONO: client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
+        "TELEFONO FIJO": client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
+        "DATOS DE FACTURACION": client.billingInfo?.name ? client.billingInfo.name : "N/A",
+        "CORREO ELECTRONICO": client.email ? client.email : "N/A",
+        NIT: client.billingInfo?.NIT ? client.billingInfo.NIT : "N/A", // Código del cliente
         CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
         DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
         REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
@@ -450,15 +453,21 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           client.created,
           "numeric",
           "numeric",
-          "2-digit"
+          "2-digit", false, true
         ), // Formatear la fecha de registro
         CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
         PRESTAMOS: setLoans(client._id, filteredLoans, devolutions, items) || "SIN MOVIMIENTO", // Detalles de préstamos
         DEVOLUCIONES: setDevolutions(client._id, devolutions, items) || "SIN MOVIMIENTO", // Detalles de devoluciones
         SALDOS: setDetailClient(filteredLoans, items) || "SIN SALDOS", // Detalles de saldos
         "FECHA DE ULTIMA VENTA": client.lastSale
-          ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit")
+          ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit", false, true)
           : "Sin ventas", // Fecha de la última venta
+        "ULTIMA FECHA POSPUESTO": client.lastPostponed
+          ? formatDateTime(client.lastPostponed, "numeric", "numeric", "2-digit", false, true)
+          : "N/A", // Fecha de la última venta
+        "PROXIMA FECHA DE RENOVACION": client.renewDate
+          ? formatDateTime(client.renewDate, "numeric", "numeric", "2-digit", false, true)
+          : "N/A", // Fecha de la última venta
         "SALDOS POR COBRAR BS": client.credit || 0,
       };
 

@@ -9,6 +9,7 @@ import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApi
 import { Zone } from "../../../type/City";
 import { formatIncompletePhoneNumber, formatNumber } from "libphonenumber-js";
 import { Item } from "../../../type/Item";
+import moment from "moment";
 
 const InfoClient = ({ client }: { client: Client }) => {
   const [city, setCity] = useState<{
@@ -194,18 +195,32 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <p>{client.averageRenewal ? "Sí" : "N/A"}</p>
                 </li>
                 <li className="flex gap-2 text-base">
+                  <p className="font-semibold">Días de renovación promedio:</p>
+                  <p>
+                    {(client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "N/A"}
+                  </p>
+                </li>
+                <li className="flex gap-2 text-base">
                   <p className="font-semibold">Próxima fecha de renovación:</p>
                   <p>
                     {client.lastSale
                       ? formatDateTime(client.renewDate, 'numeric', '2-digit', '2-digit')
+                      : "N/A"}
+                  </p>
+                </li>
+                <li className="flex gap-2 text-base">
+                  <p className="font-semibold">Fecha última venta:</p>
+                  <p>
+                    {client.lastSale
+                      ? formatDateTime(client.lastSale, 'numeric', '2-digit', '2-digit', true, true)
                       : "Sin venta"}
                   </p>
                 </li>
                 <li className="flex gap-2 text-base">
-                  <p className="font-semibold">Ultima venta:</p>
+                  <p className="font-semibold">Fecha última pospuesto:</p>
                   <p>
-                    {client.lastSale
-                      ? formatDateTime(client.lastSale, 'numeric', '2-digit', '2-digit', true)
+                    {client.lastPostponed
+                      ? formatDateTime(client.lastPostponed, 'numeric', '2-digit', '2-digit', true, true)
                       : "Sin venta"}
                   </p>
                 </li>

@@ -41,6 +41,7 @@ export interface Client {
   lastSale: string;
   hasExpiredContract: boolean;
   credit: number;
+  lastPostponed?: string;
 }
 
 export interface ReportClient {
