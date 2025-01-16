@@ -386,6 +386,9 @@ const InfoClient = ({ client }: { client: Client }) => {
                       <b>Fecha de creación:</b>{" "}
                       {new Date(devolution.created).toLocaleDateString()}
                     </p>
+                    <p>
+                      <b>Comentario:</b> {devolution.comment && devolution.comment !== "" ? devolution.comment : "Sin comentario"}
+                    </p>
                     {/* <p className="font-semibold">Detalles:</p> */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="font-bold text-left sticky top-0 col-span-2">
