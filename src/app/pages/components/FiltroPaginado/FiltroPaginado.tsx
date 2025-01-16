@@ -419,7 +419,9 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           DIRECCION: client?.address || "N/A",
           NOMBRE: client?.fullName || "N/A",
           COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
-          PRODUCTOS: `Producto: ${product?.name || "Producto no encontrado"}, Cantidad: ${det.quantity}, Precio: ${det.price} Bs.`,
+          PRODUCTOS: product?.name || "Producto no encontrado",
+          CANTIDAD: det.quantity,
+          PRECIO: det.price,
           SUBTOTAL: det.price * det.quantity,
           PAGO: sale.creditSale ? "Credito" : "Al contado",
           "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
@@ -677,7 +679,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                       </button>
                     </div>
                     <div className="flex items-center">
-                      <span className="text-paginado">{`${currentPage} de ${totalPage}`}</span>
+                      <span className="text-paginado">{`${currentPage} de ${totalPage} `}</span>
                     </div>
                     <div>
                       <button
@@ -826,7 +828,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         )}
         <div
           className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[140px]"
-            }`}
+            } `}
         >
           {children}
         </div>
@@ -875,7 +877,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                     </button>
                   </div>
                   <div style={{ display: "flex", alignItems: "center" }}>
-                    <span className="text-paginado">{`${currentPage} de ${totalPage}`}</span>
+                    <span className="text-paginado">{`${currentPage} de ${totalPage} `}</span>
                   </div>
                   <div>
                     <button
