@@ -56,7 +56,7 @@ const Contador: FC<typeContadorProduct> = ({
 
   return (
     <>
-      <div className="FiltroClientes-Botones flex items-center gap-3">
+      <div className="FiltroClientes-Botones flex items-center gap-3 w-fit">
         <button
           type="button"
           disabled={!!min && count <= min}
@@ -65,7 +65,30 @@ const Contador: FC<typeContadorProduct> = ({
         >
           <span className="material-symbols-outlined">do_not_disturb_on</span>
         </button>
-        <span className={`FiltroClientes-BotonesNumero ${numberClassname}`}>{count}</span>
+        <input className={`FiltroClientes-BotonesNumero outline-none max-w-[50px] text-center ${numberClassname}`} value={count}
+          min={min || 0}
+          max={max || undefined}
+          onChange={(e) => {
+            const val = parseInt(e.target.value)
+            console.log(val)
+            if (isNaN(val) || val <= 0) {
+              setCount(0); onIncrementar(0)
+            } else {
+              if ((max && val <= max)) {
+                onIncrementar(val);
+                setCount(val);
+                return
+              }
+              if (min && val > min) {
+                onIncrementar(val);
+                setCount(val);
+                return
+              }
+
+              setCount(val); onIncrementar(val)
+            }
+          }}
+          type="number" step={1} />
         <button
           type="button"
           disabled={!!max && count >= max}

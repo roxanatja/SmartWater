@@ -19,7 +19,6 @@ const InfoClient = ({ client }: { client: Client }) => {
     items?: Item[];
     product?: Product[];
     devolu?: Devolution[];
-    item?: any;
   }>({
     zone: "",
     district: "",
@@ -49,8 +48,7 @@ const InfoClient = ({ client }: { client: Client }) => {
         loans: resload,
         product: (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
         items: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
-        devolu: devo,
-        item: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
+        devolu: devo
       });
     },
     []
@@ -317,7 +315,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                             key={index}
                             loan={loan}
                             info
-                            productos={city.item || []}
+                            productos={city.items || []}
                             estadoContrato={contratcEstate}
                           />
                         );
@@ -378,7 +376,7 @@ const InfoClient = ({ client }: { client: Client }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 w-full pt-4 ">
                 {city.devolu.map((devolution, index) => (
                   <div key={devolution._id} className="flex-shrink-0 rounded-[20px] border border-[#f0f4fd] dark:border-blocks bg-blocks shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] dark:shadow-slate-200/25 p-[15px] flex flex-col gap-2 text-sm">
-                    <p className="font-semibold">Devolución #{index + 1}</p>
+                    <p className="font-semibold">Devolución #{city.devolu!.length - index}</p>
                     <p>
                       <b>ID de Préstamo:</b> {devolution.loan}
                     </p>

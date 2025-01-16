@@ -133,7 +133,7 @@ const FiltroPrestamos = ({
         </div>
         <div className="flex flex-col gap-3 w-full">
           <div className="flex items-center gap-3 justify-between">
-            <span className="text-sm">Renovado hasta en</span>
+            <span className="text-sm">Se renovarán hasta en</span>
             <div>
               <Contador
                 initialValue={watch('daysToRenew')}
