@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import "./FiltroPedidos.css";
 import { PedidosContext } from "../PedidosContext";
 import { Zone } from "../../../../../type/City";
@@ -38,6 +38,8 @@ const FiltroPedidos: FC<{
         defaultValues: initialState || {},
     });
 
+    const [selectedDists, setSelectedDists] = useState<User[]>([])
+
     useEffect(() => {
         if (initialFilters) {
             if (initialFilters.initialDate) {
@@ -61,12 +63,10 @@ const FiltroPedidos: FC<{
                 })
             }
             if (initialFilters.user) {
-                initialFilters.user.split(",").forEach((z) => {
-                    setValue(`distrib.${z}`, z, { shouldValidate: true })
-                })
+                setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
             }
         }
-    }, [initialFilters, setValue])
+    }, [initialFilters, setValue, distribuidores])
 
     const { setShowFiltro } = useContext(PedidosContext);
 
@@ -89,8 +89,8 @@ const FiltroPedidos: FC<{
             const zones = Object.values(filters.zones).filter(z => !!z).join(',')
             if (zones !== "") { result.zone = zones }
         }
-        if (filters.distrib) {
-            const dists = Object.values(filters.distrib).filter(z => !!z).join(',')
+        if (selectedDists.length > 0) {
+            const dists = selectedDists.map(z => z._id).join(',')
             if (dists !== "") { result.user = dists }
         }
 
@@ -186,32 +186,6 @@ const FiltroPedidos: FC<{
                 }
 
                 <div className="w-full flex flex-col gap-2 mb-8">
-                    <label className="font-semibold text-blue_custom">Zonas</label>
-                    <div className="flex flex-wrap gap-x-6 gap-y-4">
-                        {zones.map((zone, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-3"
-                            >
-                                <input
-                                    className="input-check accent-blue_custom"
-                                    type="checkbox"
-                                    {...register(`zones.${zone._id}`)}
-                                    value={zone._id}
-                                    id={`zone-${zone._id}`}
-                                />
-                                <label
-                                    htmlFor={`zone-${zone._id}`}
-                                    className="text-sm"
-                                >
-                                    {zone.name}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="w-full flex flex-col gap-2 mb-8">
                     <label className="font-semibold text-blue_custom">Distribuidores</label>
                     <div className="flex flex-wrap gap-x-6 gap-y-4">
                         {distribuidores.map((dists, index) => (
@@ -222,8 +196,16 @@ const FiltroPedidos: FC<{
                                 <input
                                     className="input-check accent-blue_custom"
                                     type="checkbox"
-                                    {...register(`distrib.${dists._id}`)}
-                                    value={dists._id}
+                                    onChange={() => {
+                                        if (selectedDists.some(s => s._id === dists._id)) {
+                                            setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
+                                        } else {
+                                            setSelectedDists(prev => [...prev, dists])
+                                        }
+
+                                        zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
+                                    }}
+                                    checked={selectedDists.some(sd => sd._id === dists._id)}
                                     id={`distrib-${dists._id}`}
                                 />
                                 <label
@@ -234,6 +216,34 @@ const FiltroPedidos: FC<{
                                 </label>
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-2 mb-8">
+                    <label className="font-semibold text-blue_custom">Zonas</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        {zones
+                            .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
+                            .map((zone, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-3"
+                                >
+                                    <input
+                                        className="input-check accent-blue_custom"
+                                        type="checkbox"
+                                        {...register(`zones.${zone._id}`)}
+                                        value={zone._id}
+                                        id={`zone-${zone._id}`}
+                                    />
+                                    <label
+                                        htmlFor={`zone-${zone._id}`}
+                                        className="text-sm"
+                                    >
+                                        {zone.name}
+                                    </label>
+                                </div>
+                            ))}
                     </div>
                 </div>
 

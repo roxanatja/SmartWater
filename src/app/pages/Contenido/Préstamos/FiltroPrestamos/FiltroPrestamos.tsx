@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import "./FiltroPrestamos.css";
 import { PrestamosContext } from "../PrestamosContext";
@@ -51,6 +51,8 @@ const FiltroPrestamos = ({
     defaultValues: initialState || {},
   });
 
+  const [selectedDists, setSelectedDists] = useState<User[]>([])
+
   useEffect(() => {
     if (initialFilters) {
       if (initialFilters.hasOwnProperty('hasContract')) {
@@ -80,12 +82,10 @@ const FiltroPrestamos = ({
         })
       }
       if (initialFilters.user) {
-        initialFilters.user.split(",").forEach((z) => {
-          setValue(`distributor.${z}`, z, { shouldValidate: true })
-        })
+        setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
       }
     }
-  }, [initialFilters, setValue])
+  }, [initialFilters, setValue, distribuidores])
 
   const onSubmit = (data: ILoanFilters) => {
     const filters = filterClients(data);
@@ -115,8 +115,8 @@ const FiltroPrestamos = ({
       if (zones !== "") { result.zone = zones }
     }
 
-    if (filters.distributor) {
-      const dists = Object.values(filters.distributor).filter(z => !!z).join(',')
+    if (selectedDists.length > 0) {
+      const dists = selectedDists.map(z => z._id).join(',')
       if (dists !== "") { result.user = dists }
     }
 
@@ -288,7 +288,7 @@ const FiltroPrestamos = ({
       <div className="w-full flex flex-col gap-2 mb-8">
         <label className="font-semibold text-blue_custom">Distribuidores</label>
         <div className="flex flex-wrap gap-x-6 gap-y-4">
-          {distribuidores.map((dist, index) => (
+          {distribuidores.map((dists, index) => (
             <div
               key={index}
               className="flex items-center gap-3"
@@ -296,15 +296,23 @@ const FiltroPrestamos = ({
               <input
                 className="input-check accent-blue_custom"
                 type="checkbox"
-                {...register(`distributor.${dist._id}`)}
-                value={dist._id}
-                id={`dist-${dist._id}`}
+                onChange={() => {
+                  if (selectedDists.some(s => s._id === dists._id)) {
+                    setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
+                  } else {
+                    setSelectedDists(prev => [...prev, dists])
+                  }
+
+                  zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
+                }}
+                checked={selectedDists.some(sd => sd._id === dists._id)}
+                id={`distrib-${dists._id}`}
               />
               <label
-                htmlFor={`dist-${dist._id}`}
+                htmlFor={`distrib-${dists._id}`}
                 className="text-sm"
               >
-                {dist.fullName || "Sin nombre"}
+                {dists.fullName || "Sin nombre"}
               </label>
             </div>
           ))}
@@ -314,26 +322,28 @@ const FiltroPrestamos = ({
       <div className="w-full flex flex-col gap-2 mb-8">
         <label className="font-semibold text-blue_custom">Zonas</label>
         <div className="flex flex-wrap gap-x-6 gap-y-4">
-          {zones.map((zone, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3"
-            >
-              <input
-                className="input-check accent-blue_custom"
-                type="checkbox"
-                {...register(`zones.${zone._id}`)}
-                value={zone._id}
-                id={`zone-${zone._id}`}
-              />
-              <label
-                htmlFor={`zone-${zone._id}`}
-                className="text-sm"
+          {zones
+            .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
+            .map((zone, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3"
               >
-                {zone.name}
-              </label>
-            </div>
-          ))}
+                <input
+                  className="input-check accent-blue_custom"
+                  type="checkbox"
+                  {...register(`zones.${zone._id}`)}
+                  value={zone._id}
+                  id={`zone-${zone._id}`}
+                />
+                <label
+                  htmlFor={`zone-${zone._id}`}
+                  className="text-sm"
+                >
+                  {zone.name}
+                </label>
+              </div>
+            ))}
         </div>
       </div>
 
