@@ -148,3 +148,11 @@ input[type="date"].full-selector::-webkit-calendar-picker-indicator {
   width: auto;
   outline: none;
 }
+
+input[type=number].no-spinner::-webkit-inner-spin-button, 
+input[type=number].no-spinner::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number].no-spinner { -moz-appearance:textfield; }

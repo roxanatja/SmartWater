@@ -11,6 +11,10 @@ import { District, Zone } from "../../../../type/City";
 import { Sale } from "../../../../type/Sale/Sale";
 import moment from "moment";
 import { QueryMetadata } from "../../../../api/types/common";
+import { Item } from "../../../../type/Item";
+import { Devolution } from "../../../../type/Devolution/devolution";
+import { Loans } from "../../../../type/Loans/Loans";
+import { useGlobalContext } from "../../../SmartwaterContext";
 
 type Componentes = {
   order?: boolean;
@@ -97,6 +101,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     },
   }));
 
+  const { setLoading } = useGlobalContext()
+
   const searchUser = (id: string, userList: any) => {
     //Busca el nombre del usuario
     const user = userList.find((user: any) => user._id === id);
@@ -119,12 +125,11 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     return district;
   };
 
-  const setDetailClient = (loans: Array<any>, products: Array<any>) => {
+  const setDetailClient = (loans: Array<Loans>, products: Array<Item>): { itemId: string; itemName: string; quantity: number }[] => {
     //Guarda los detalles del cliente
     if (loans.length > 0) {
       const prod: Array<string> = [];
-      const dataToSend: Array<{ itemName: string; quantity: number }> = [];
-      let detailsProduct: string = "";
+      const dataToSend: { itemId: string; itemName: string; quantity: number }[] = [];
       loans.forEach((loan: any) => {
         loan.detail.forEach((detail: any) => {
           const product = products.find(
@@ -142,6 +147,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
               dataToSend.push({
                 itemName: product.name,
                 quantity: detail.quantity,
+                itemId: product._id
               });
             }
           } else {
@@ -149,17 +155,15 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             dataToSend.push({
               itemName: product.name,
               quantity: detail.quantity,
+              itemId: product._id
             });
           }
         })
       });
 
-      detailsProduct = dataToSend
-        .map((item) => `${item.quantity} ${item.itemName}`)
-        .join(", \n");
-      return detailsProduct;
+      return dataToSend;
     } else {
-      return "SIN MOVIMIENTO";
+      return [];
     }
   };
 
@@ -178,18 +182,17 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
   const setDevolutions = (
     id: string,
-    devolutions: Array<any>,
-    products: Array<any>
-  ) => {
+    devolutions: Array<Devolution>,
+    products: Array<Item>
+  ): { itemId: string; itemName: string; quantity: number }[] => {
     //Guarda los detalles de las devoluciones
     const devolution = devolutions.filter(
-      (devolution: any) => devolution.client === id
+      (devolution) => devolution.client === id
     );
 
     if (devolution.length > 0) {
       const prod: Array<string> = [];
-      const dataToSend: Array<{ itemName: string; quantity: number }> = [];
-      let devolutionDetails: string = "";
+      const dataToSend: { itemId: string; itemName: string; quantity: number }[] = [];
 
       devolution.forEach(async (devolution: any) => {
         devolution.detail.forEach((detail: any) => {
@@ -208,6 +211,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
               dataToSend.push({
                 itemName: product.name,
                 quantity: detail.quantity,
+                itemId: product._id
               });
             }
           } else {
@@ -215,33 +219,30 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             dataToSend.push({
               itemName: product.name,
               quantity: detail.quantity,
+              itemId: product._id
             });
           }
         });
       })
 
-      devolutionDetails = dataToSend
-        .map((item) => `${item.quantity} ${item.itemName}`)
-        .join(", \n");
-      return devolutionDetails;
+      return dataToSend;
     } else {
-      return "SIN MOVIMIENTO";
+      return [];
     }
   };
 
   const setLoans = (
     id: string,
-    loans: Array<any>,
-    devolutions: Array<any>,
-    products: Array<any>
-  ) => {
+    loans: Array<Loans>,
+    devolutions: Array<Devolution>,
+    products: Array<Item>
+  ): { itemId: string; itemName: string; quantity: number }[] => {
     //Guarda los detalles de los prestamos
     let devolution = devolutions.filter(
       (devolution: any) => devolution.client === id
     );
-    let loansDetails: string = "";
     const prod: Array<string> = [];
-    const dataToSend: Array<{ itemName: string; quantity: number }> = [];
+    const dataToSend: Array<{ itemId: string; itemName: string; quantity: number }> = [];
 
     if (loans.length > 0 || devolution.length > 0) {
       if (loans.length > 0) {
@@ -255,7 +256,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
           loan.detail.forEach((detail: any) => {
             const product = products.find(
-              (product: any) => product._id === detail.item
+              (product) => product._id === detail.item
             );
 
             if (product) {
@@ -269,6 +270,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                   dataToSend.push({
                     itemName: product.name,
                     quantity: detail.quantity,
+                    itemId: product._id
                   });
                 }
               } else {
@@ -276,6 +278,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 dataToSend.push({
                   itemName: product.name,
                   quantity: detail.quantity,
+                  itemId: product._id
                 });
               }
             }
@@ -283,7 +286,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             devolutionFiltered.forEach((devolution: any) => {
               devolution.detail.forEach((devolutionDetail: any) => {
                 const item = products.find(
-                  (product: any) => product._id === devolutionDetail.item
+                  (product) => product._id === devolutionDetail.item
                 );
 
                 if (item) {
@@ -297,6 +300,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                       dataToSend.push({
                         itemName: item.name,
                         quantity: devolutionDetail.quantity,
+                        itemId: item._id
                       });
                     }
                   } else {
@@ -304,6 +308,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                     dataToSend.push({
                       itemName: item.name,
                       quantity: devolutionDetail.quantity,
+                      itemId: item._id
                     });
                   }
                 }
@@ -331,6 +336,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                   dataToSend.push({
                     itemName: item.name,
                     quantity: devolutionDetail.quantity,
+                    itemId: item._id
                   });
                 }
               } else {
@@ -338,6 +344,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                 dataToSend.push({
                   itemName: item.name,
                   quantity: devolutionDetail.quantity,
+                  itemId: item._id
                 });
               }
             }
@@ -345,12 +352,9 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         });
       }
 
-      loansDetails = dataToSend
-        .map((item) => `${item.quantity} ${item.itemName}`)
-        .join(", \n");
-      return loansDetails;
+      return dataToSend;
     } else {
-      return "SIN MOVIMIENTO";
+      return [];
     }
   };
 
@@ -403,11 +407,11 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     const dataWithClientNames: any[] = []
 
     for (const sale of data) {
-      const client: Client | null = await ClientsApiConector.getClient({ clientId: sale.client?.[0]?._id || '' });
+      const client: Client | null = sale.client?.[0]
 
       const zone = await searchZone(sale.zone, zones)
 
-      for (const det of sale.detail) {
+      sale.detail.forEach((det, index) => {
         const product = products.find((product: any) => product._id === det.product);
 
         const typeDataToExport = {
@@ -428,8 +432,17 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           "DE CLIENTES": getSaleClientContract(client)
         };
 
-        dataWithClientNames.push(typeDataToExport);
-      }
+        if (index === 0) {
+          dataWithClientNames.push(typeDataToExport);
+        } else {
+          dataWithClientNames.push({
+            PRODUCTOS: product?.name || "Producto no encontrado",
+            CANTIDAD: det.quantity,
+            PRECIO: det.price,
+            SUBTOTAL: det.price * det.quantity
+          });
+        }
+      })
     }
 
     return dataWithClientNames;
@@ -462,51 +475,123 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       const filteredLoans = loans.filter(l => l.client.some(c => c._id === client._id))
       const zone = await searchZone(client.zone, zones)
 
-      const typeDataToExport = {
-        NOMBRE: client.fullName || "Sin nombre",
-        "TIPO DE CLIENTE":
-          client.isAgency
-            ? "Agencia"
-            : client.isClient
-              ? "Cliente habitual"
-              : "Desconocido", // Define el tipo de cliente
-        WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
-        "TELEFONO FIJO": client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
-        "DATOS DE FACTURACION": client.billingInfo?.name ? client.billingInfo.name : "N/A",
-        "CORREO ELECTRONICO": client.email ? client.email : "N/A",
-        NIT: client.billingInfo?.NIT ? client.billingInfo.NIT : "N/A", // Código del cliente
-        CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
-        DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
-        REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
-        USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
-        ZONA: zone?.name || "Sin zona", // Buscar la zona
-        BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
-        "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
-        "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
-        "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
-        "FECHA DE REGISTRO": formatDateTime(
-          client.created,
-          "numeric",
-          "numeric",
-          "2-digit", false, true
-        ), // Formatear la fecha de registro
-        CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
-        PRESTAMOS: setLoans(client._id, filteredLoans, devolutions, items) || "SIN MOVIMIENTO", // Detalles de préstamos
-        DEVOLUCIONES: setDevolutions(client._id, devolutions, items) || "SIN MOVIMIENTO", // Detalles de devoluciones
-        SALDOS: setDetailClient(filteredLoans, items) || "SIN SALDOS", // Detalles de saldos
-        "FECHA DE ULTIMA VENTA": client.lastSale
-          ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit", false, true)
-          : "Sin ventas", // Fecha de la última venta
-        "ULTIMA FECHA POSPUESTO": client.lastPostponed
-          ? formatDateTime(client.lastPostponed, "numeric", "numeric", "2-digit", false, true)
-          : "N/A", // Fecha de la última venta
-        "PROXIMA FECHA DE RENOVACION": client.renewDate
-          ? formatDateTime(client.renewDate, "numeric", "numeric", "2-digit", false, true)
-          : "N/A", // Fecha de la última venta
-        "SALDOS POR COBRAR BS": client.credit || 0,
-      };
+      const loadsStr = setLoans(client._id, filteredLoans, devolutions, items)
+      const devolStr = setDevolutions(client._id, devolutions, items)
+      const saldosStr = setDetailClient(filteredLoans, items)
 
-      dataClientToExport.push(typeDataToExport)
+      const filteredItems = items.filter(i =>
+        loadsStr.some(l => l.itemId === i._id)
+        || devolStr.some(l => l.itemId === i._id)
+        || saldosStr.some(l => l.itemId === i._id)
+      )
+
+      if (filteredItems.length > 0) {
+        filteredItems.forEach((item, index) => {
+          const loan = loadsStr.find(l => l.itemId === item._id)
+          const devol = devolStr.find(l => l.itemId === item._id)
+          const saldo = saldosStr.find(l => l.itemId === item._id)
+
+          const typeDataToExport = {
+            NOMBRE: client.fullName || "Sin nombre",
+            "TIPO DE CLIENTE":
+              client.isAgency
+                ? "Agencia"
+                : client.isClient
+                  ? "Cliente habitual"
+                  : "Desconocido", // Define el tipo de cliente
+            WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
+            "TELEFONO FIJO": client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
+            "DATOS DE FACTURACION": client.billingInfo?.name ? client.billingInfo.name : "N/A",
+            "CORREO ELECTRONICO": client.email ? client.email : "N/A",
+            NIT: client.billingInfo?.NIT ? client.billingInfo.NIT : "N/A", // Código del cliente
+            CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
+            DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
+            REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
+            USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
+            ZONA: zone?.name || "Sin zona", // Buscar la zona
+            BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+            "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
+            "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
+            "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
+            "FECHA DE REGISTRO": formatDateTime(
+              client.created,
+              "numeric",
+              "numeric",
+              "2-digit", false, true
+            ), // Formatear la fecha de registro
+            CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
+            PRESTAMOS: loan ? `${loan.quantity} ${loan.itemName}` : "SIN MOVIMIENTO", // Detalles de préstamos
+            DEVOLUCIONES: devol ? `${devol.quantity} ${devol.itemName}` : "SIN MOVIMIENTO", // Detalles de devoluciones
+            SALDOS: saldo ? `${saldo.quantity} ${saldo.itemName}` : "SIN SALDOS", // Detalles de saldos
+            "FECHA DE ULTIMA VENTA": client.lastSale
+              ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit", false, true)
+              : "Sin ventas", // Fecha de la última venta
+            "ULTIMA FECHA POSPUESTO": client.lastPostponed
+              ? formatDateTime(client.lastPostponed, "numeric", "numeric", "2-digit", false, true)
+              : "N/A", // Fecha de la última venta
+            "PROXIMA FECHA DE RENOVACION": client.renewDate
+              ? formatDateTime(client.renewDate, "numeric", "numeric", "2-digit", false, true)
+              : "N/A", // Fecha de la última venta
+            "SALDOS POR COBRAR BS": client.credit || 0,
+          };
+
+          if (index === 0) {
+            dataClientToExport.push(typeDataToExport)
+          } else {
+            dataClientToExport.push({
+              PRESTAMOS: loan ? `${loan.quantity} ${loan.itemName}` : "SIN MOVIMIENTO", // Detalles de préstamos
+              DEVOLUCIONES: devol ? `${devol.quantity} ${devol.itemName}` : "SIN MOVIMIENTO", // Detalles de devoluciones
+              SALDOS: saldo ? `${saldo.quantity} ${saldo.itemName}` : "SIN SALDOS", // Detalles de saldos
+            })
+          }
+        })
+      } else {
+        const typeDataToExport = {
+          NOMBRE: client.fullName || "Sin nombre",
+          "TIPO DE CLIENTE":
+            client.isAgency
+              ? "Agencia"
+              : client.isClient
+                ? "Cliente habitual"
+                : "Desconocido", // Define el tipo de cliente
+          WHATSAPP: client.phoneNumber ?? "S/Numero", // Si tiene número de WhatsApp
+          "TELEFONO FIJO": client.phoneLandLine ? client.phoneLandLine : "S/Numero", // Número de teléfono
+          "DATOS DE FACTURACION": client.billingInfo?.name ? client.billingInfo.name : "N/A",
+          "CORREO ELECTRONICO": client.email ? client.email : "N/A",
+          NIT: client.billingInfo?.NIT ? client.billingInfo.NIT : "N/A", // Código del cliente
+          CODIGO: client.code ? client.code : "Sin codigo", // Código del cliente
+          DIRECCION: client.address ? client.address : "Sin direccion", // Dirección
+          REFERENCIA: client.comment || "Sin referencia", // Comentario o referencia
+          USUARIO: searchUser(client.user, userList), // Buscar usuario asociado
+          ZONA: zone?.name || "Sin zona", // Buscar la zona
+          BARRIO: zone ? (searchDistrict(client.district, zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
+          "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
+          "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
+          "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
+          "FECHA DE REGISTRO": formatDateTime(
+            client.created,
+            "numeric",
+            "numeric",
+            "2-digit", false, true
+          ), // Formatear la fecha de registro
+          CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
+          PRESTAMOS: "SIN MOVIMIENTO", // Detalles de préstamos
+          DEVOLUCIONES: "SIN MOVIMIENTO", // Detalles de devoluciones
+          SALDOS: "SIN SALDOS", // Detalles de saldos
+          "FECHA DE ULTIMA VENTA": client.lastSale
+            ? formatDateTime(client.lastSale, "numeric", "numeric", "2-digit", false, true)
+            : "Sin ventas", // Fecha de la última venta
+          "ULTIMA FECHA POSPUESTO": client.lastPostponed
+            ? formatDateTime(client.lastPostponed, "numeric", "numeric", "2-digit", false, true)
+            : "N/A", // Fecha de la última venta
+          "PROXIMA FECHA DE RENOVACION": client.renewDate
+            ? formatDateTime(client.renewDate, "numeric", "numeric", "2-digit", false, true)
+            : "N/A", // Fecha de la última venta
+          "SALDOS POR COBRAR BS": client.credit || 0,
+        };
+
+        dataClientToExport.push(typeDataToExport)
+      }
     }
 
     return dataClientToExport;
@@ -521,6 +606,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   };
 
   const exportToExcel = async () => {
+    setLoading(true)
     if (typeDataToExport === "sales") {
       const fileName = "ReporteVenta.xlsx";
       const data = await getDataWithClientNames();
@@ -530,6 +616,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       const data = await getDataClients();
       exportData(fileName, data);
     }
+    setLoading(false)
   };
 
   const { register, setValue } = useForm();
