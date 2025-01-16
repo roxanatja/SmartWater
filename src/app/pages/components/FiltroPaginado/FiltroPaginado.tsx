@@ -175,11 +175,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       if (client.hasExpiredContract) {
         return "CONTRATO VENCIDO";
       } else {
-        if (client.hasLoan) {
-          return "PRESTAMO CON CONTRATO";
-        } else {
-          return "CONTRATO VIGENTE";
-        }
+        return "CONTRATO VIGENTE";
       }
     } else {
       return "SIN CONTRATO";
