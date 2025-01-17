@@ -70,7 +70,6 @@ const Contador: FC<typeContadorProduct> = ({
           max={max || undefined}
           onChange={(e) => {
             const val = parseInt(e.target.value)
-            console.log(val)
             if (isNaN(val) || val <= 0) {
               setCount(0); onIncrementar(0)
             } else {

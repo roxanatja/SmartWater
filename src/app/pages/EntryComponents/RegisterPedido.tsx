@@ -19,6 +19,7 @@ import { User } from "../../../type/User";
 import { Order } from "../../../type/Order/Order";
 import { useGlobalContext } from "../../SmartwaterContext";
 import { spawn } from "child_process";
+import moment from "moment";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -236,7 +237,7 @@ const RegisterPedidoForm = ({
   }, [selectedOrder, setLoading])
 
   useEffect(() => {
-    if (selectedOrder && products) {
+    if (selectedOrder && products && dist) {
       setAddedProducts(selectedOrder.detail.map(i => ({
         product: products?.find((p) => p._id === i.product)?.name || "Producto no encontrado",
         quantity: i.quantity,
@@ -246,17 +247,17 @@ const RegisterPedidoForm = ({
         setValue('comment', selectedOrder.comment)
       }
       if (selectedOrder.deliverDate) {
-        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0])
+        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0], { shouldValidate: true })
       }
       if (selectedOrder.deliverDate) {
-        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0])
+        setValue('deliverDate', new Date(selectedOrder.deliverDate).toISOString().split("T")[0], { shouldValidate: true })
       }
       if (selectedOrder.distributorRedirectId) {
-        setValue('distributorRedirectId', selectedOrder.distributorRedirectId)
+        setValue('distributorRedirectId', selectedOrder.distributorRedirectId, { shouldValidate: true })
       }
       setLoading(false)
     }
-  }, [selectedOrder, products, setValue, setLoading])
+  }, [selectedOrder, products, dist, setValue, setLoading])
 
 
   return (
@@ -455,7 +456,7 @@ const RegisterPedidoForm = ({
             </div>
 
             <Input
-              min={new Date().toISOString().split("T")[0]}
+              min={new Date(new Date().toLocaleDateString()).toISOString().split("T")[0]}
               type="date"
               label="Fecha de entrega"
               labelClassName="text-blue_custom text-md font-semibold"
