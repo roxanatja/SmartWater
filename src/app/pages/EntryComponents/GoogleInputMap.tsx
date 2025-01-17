@@ -97,7 +97,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
           mapTypeId: google.maps.MapTypeId.HYBRID,
           fullscreenControl: false,
           disableDefaultUI: true,
-          
+
         });
 
         setMap(mapInstance);
@@ -110,16 +110,13 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         });
         setMarker(centerMarker);
 
-        mapInstance.addListener("center_changed", () => {
-          const center = mapInstance.getCenter();
-          if (center) {
-            const newPosition = {
-              lat: center.lat(),
-              lng: center.lng(),
-            };
-            centerMarker.setPosition(center);
-            onChange(newPosition);
-          }
+        mapInstance.addListener("click", (e: any) => {
+          const newPosition = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          };
+          centerMarker.setPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+          onChange(newPosition);
         });
 
         const locationButton = document.createElement("button");
@@ -140,6 +137,31 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
             updateMarkerPosition(
               new google.maps.LatLng(currentPosition.lat, currentPosition.lng)
             );
+          } catch (error) {
+            console.error("Error al obtener ubicación:", error);
+          }
+        });
+
+        const findMarkerButton = document.createElement("button");
+        findMarkerButton.classList.add("custom-map-control-button");
+        findMarkerButton.classList.add("!rounded-full");
+        findMarkerButton.classList.add("!left-0");
+        findMarkerButton.classList.add("!bottom-4");
+        findMarkerButton.setAttribute("type", "button");
+        findMarkerButton.style.cursor = "pointer";
+        findMarkerButton.innerHTML =
+          '<i class="fa fa-map-marker"></i>';
+
+        mapInstance.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(
+          findMarkerButton
+        );
+
+        findMarkerButton.addEventListener("click", async () => {
+          try {
+            const currentPosition = centerMarker.getPosition();
+            if (currentPosition) {
+              mapInstance.setCenter({ lat: currentPosition.lat(), lng: currentPosition.lng() });
+            }
           } catch (error) {
             console.error("Error al obtener ubicación:", error);
           }
