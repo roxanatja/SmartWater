@@ -110,6 +110,14 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         });
         setMarker(centerMarker);
 
+        if (latitude && !isNaN(latitude) && longitude && !isNaN(longitude)) {
+          console.log(latitude, longitude)
+          centerMarker.setPosition({ lat: latitude, lng: longitude })
+        } else {
+          console.log(initialPosition)
+          centerMarker.setPosition({ lat: initialPosition.lat, lng: initialPosition.lng })
+        }
+
         mapInstance.addListener("click", (e: any) => {
           const newPosition = {
             lat: e.latLng.lat(),
@@ -175,7 +183,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
 
     if (visible && map) {
       google.maps.event.trigger(map, "resize");
-      if (latitude !== undefined && longitude !== undefined) {
+      if (latitude !== undefined && !isNaN(latitude) && longitude !== undefined && !isNaN(longitude)) {
         map.setCenter({ lat: latitude, lng: longitude });
       }
     }
@@ -183,7 +191,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   }, [apiKey, getCurrentLocation, map, updateMarkerPosition, visible]);
 
   useEffect(() => {
-    if (map && latitude !== undefined && longitude !== undefined) {
+    if (map && latitude !== undefined && !isNaN(latitude) && longitude !== undefined && !isNaN(longitude)) {
       const position = { lat: latitude, lng: longitude };
       centerMap(position);
       updateMarkerPosition(new google.maps.LatLng(latitude, longitude));
