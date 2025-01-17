@@ -10,6 +10,7 @@ import { Zone } from "../../../type/City";
 import { formatIncompletePhoneNumber, formatNumber } from "libphonenumber-js";
 import { Item } from "../../../type/Item";
 import moment from "moment";
+import { useGlobalContext } from "../../SmartwaterContext";
 
 const InfoClient = ({ client }: { client: Client }) => {
   const [city, setCity] = useState<{
@@ -23,6 +24,8 @@ const InfoClient = ({ client }: { client: Client }) => {
     zone: "",
     district: "",
   });
+
+  const { setImageFullsreen } = useGlobalContext()
 
   const [activeinfo, setActiveinfo] = useState<boolean>(true);
   const [activepresta, setActivepresta] = useState<boolean>(true);
@@ -238,9 +241,9 @@ const InfoClient = ({ client }: { client: Client }) => {
             <div className="flex flex-col gap-2 items-center">
               {
                 client.storeImage ?
-                  <img
+                  <img onClick={() => setImageFullsreen(client.storeImage)}
                     src={client.storeImage || ''}
-                    className="w-80 h-44 rounded-md flex-1"
+                    className="w-80 h-44 rounded-md flex-1 cursor-pointer"
                     alt={client.storeImage}
                   />
                   : <span>Sin imagen</span>
@@ -261,8 +264,9 @@ const InfoClient = ({ client }: { client: Client }) => {
               {
                 client.ciFrontImage ?
                   <img
+                    onClick={() => setImageFullsreen(client.ciFrontImage)}
                     src={client.ciFrontImage || ''}
-                    className="w-80 h-44 rounded-md flex-1"
+                    className="w-80 h-44 rounded-md flex-1 cursor-pointer"
                     alt={client.ciFrontImage}
                   />
                   : <span>Sin imagen</span>
@@ -273,8 +277,9 @@ const InfoClient = ({ client }: { client: Client }) => {
               {
                 client.ciBackImage ?
                   <img
+                    onClick={() => setImageFullsreen(client.ciBackImage)}
                     src={client.ciBackImage || ''}
-                    className="w-80 h-44 rounded-md flex-1"
+                    className="w-80 h-44 rounded-md flex-1 cursor-pointer"
                     alt={client.ciBackImage}
                   />
                   : <span>Sin imagen</span>
@@ -350,8 +355,9 @@ const InfoClient = ({ client }: { client: Client }) => {
                     client.contracts.map(cont => <>
                       <div className="flex flex-col gap-2 items-center">
                         <img
+                          onClick={() => { if (cont.link) setImageFullsreen(cont.link) }}
                           src={cont.link || ''}
-                          className="w-80 h-44 rounded-md flex-1"
+                          className="w-80 h-44 rounded-md flex-1 cursor-pointer "
                           alt={client.ciFrontImage}
                         />
                         <small className="text-gray-500 w-fit">Válido hasta: {formatDateTime(cont.validUntil, 'numeric', '2-digit', '2-digit')}</small>

@@ -8,6 +8,7 @@ import { ItemsContext } from "../ItemsContext";
 import { ItemsApiConector } from "../../../../../../api/classes";
 import { CategoryProduct } from "../../../../../../type/Products/Category";
 import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
 
 interface Props {
     item: Item
@@ -16,6 +17,7 @@ interface Props {
 const ItemsItem: FC<Props> = ({ item }) => {
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const { setSelectedItem } = useContext(ItemsContext);
+    const { setImageFullsreen } = useGlobalContext()
 
     const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -122,7 +124,7 @@ const ItemsItem: FC<Props> = ({ item }) => {
                         {
                             item.imageUrl && <>
                                 <strong>Imagen:</strong>
-                                <img src={item.imageUrl} alt="Product" className="w-[150px] h-auto object-cover mx-auto" />
+                                <img src={item.imageUrl} alt="Product" className="w-[150px] h-auto object-cover mx-auto cursor-pointer" onClick={() => setImageFullsreen(item.imageUrl!)} />
                             </>
                         }
                     </div>

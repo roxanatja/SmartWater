@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { ProductsApiConector } from "../../../../../../api/classes";
 import { CategoryProduct } from "../../../../../../type/Products/Category";
 import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
 
 interface Props {
     product: Product;
@@ -17,6 +18,7 @@ const ProductosItem: FC<Props> = ({ product }) => {
 
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const { setSelectedProduct } = useContext(ProductosContext);
+    const { setImageFullsreen } = useGlobalContext()
 
     const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -127,7 +129,7 @@ const ProductosItem: FC<Props> = ({ product }) => {
                     </div>
                     <div className="flex flex-col w-full gap-3">
                         <strong>Imagen:</strong>
-                        <img src={product.imageUrl} alt="Product" className="w-[150px] h-auto object-cover mx-auto" />
+                        <img src={product.imageUrl} alt="Product" className="w-[150px] h-auto object-cover mx-auto cursor-pointer" onClick={() => setImageFullsreen(product.imageUrl)} />
                     </div>
                 </div>
                 <div className="flex gap-2 items-start flex-col pt-2 relative" ref={optionsRef}>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { PromocionesContext } from "../PromocionesContext";
 import { PromotionApiConector } from "../../../../../../api/classes";
 import { Promotion } from "../../../../../../type/Promotion";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
 
 interface Props {
     promotion: Promotion
@@ -14,6 +15,7 @@ interface Props {
 const PromotionsItem: FC<Props> = ({ promotion }) => {
     const [showOptions, setShowOptions] = useState<boolean>(false);
     const { setSelectedItem } = useContext(PromocionesContext);
+    const { setImageFullsreen } = useGlobalContext();
 
     const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -102,8 +104,9 @@ const PromotionsItem: FC<Props> = ({ promotion }) => {
             >
                 <div className="max-w-[calc(100%_-_30px)] mx-auto h-auto max-h-48 ">
                     <img
+                        onClick={() => { if (promotion.imageUrl) setImageFullsreen(promotion.imageUrl) }}
                         src={promotion.imageUrl || ''}
-                        className="w-full h-full object-contain rounded-xl flex-1"
+                        className="w-full h-full object-contain rounded-xl flex-1 cursor-pointer"
                         alt={promotion.imageUrl}
                     />
                 </div>
