@@ -280,7 +280,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
           </div>
 
           <Input
-            min={new Date(new Date().toLocaleDateString()).toISOString().split("T")[0]}
+            min={new Date().toISOString().split("T")[0]}
             type="date"
             label="Valido hasta"
             labelClassName="text-blue_custom text-md font-semibold"

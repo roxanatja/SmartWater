@@ -210,7 +210,7 @@ const FiltroClientes = ({
             <span className="text-left text-sm">De</span>
             <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
-              max={watch('toDate')?.toString() || new Date(new Date().toLocaleDateString()).toISOString().split("T")[0]}
+              max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
               type="date"
               {...register("fromDate")}
               className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
@@ -221,7 +221,7 @@ const FiltroClientes = ({
             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
               min={watch('fromDate')?.toString()}
-              max={new Date(new Date().toLocaleDateString()).toISOString().split("T")[0]}
+              max={new Date().toISOString().split("T")[0]}
               type="date"
               {...register("toDate")}
               className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
