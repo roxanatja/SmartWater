@@ -65,7 +65,7 @@ const Contador: FC<typeContadorProduct> = ({
         >
           <span className="material-symbols-outlined">do_not_disturb_on</span>
         </button>
-        <input className={`FiltroClientes-BotonesNumero outline-none max-w-[50px] no-spinner text-center ${numberClassname}`} value={count}
+        <input className={`FiltroClientes-BotonesNumero outline-none max-w-[50px] no-spinner text-center ${numberClassname}`} value={count.toFixed(0)}
           min={min || 0}
           max={max || undefined}
           onChange={(e) => {
