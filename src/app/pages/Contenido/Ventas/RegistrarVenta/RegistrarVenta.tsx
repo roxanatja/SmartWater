@@ -7,7 +7,7 @@ import { VentasContext } from "../VentasContext";
 import { client } from "../../Clientes/ClientesContext";
 
 const RegistrarVenta: FC = () => {
-  const { setSelectedClient, selectedClient } = useContext(VentasContext);
+  const { setSelectedClient, selectedClient, selectedSale } = useContext(VentasContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -35,7 +35,7 @@ const RegistrarVenta: FC = () => {
           </button>
           <span className="text-blue_custom">Regresar</span>
         </div>
-        <RegisterSalesForm selectedClient={selectedClient} />
+        <RegisterSalesForm selectedClient={selectedClient} selectedSale={selectedSale._id === "" ? undefined : selectedSale} />
       </div>
     </>
   );

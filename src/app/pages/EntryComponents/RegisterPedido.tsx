@@ -18,8 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../../type/User";
 import { Order } from "../../../type/Order/Order";
 import { useGlobalContext } from "../../SmartwaterContext";
-import { spawn } from "child_process";
-import moment from "moment";
 
 const RegisterPedidoForm = ({
   isNoClient,

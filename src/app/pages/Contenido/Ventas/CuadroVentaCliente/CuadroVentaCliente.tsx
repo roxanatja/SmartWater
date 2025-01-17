@@ -8,6 +8,7 @@ import Product from "../../../../../type/Products/Products";
 import { formatDateTime } from "../../../../../utils/helpers";
 import { toast } from "react-hot-toast";
 import { SalesApiConector } from "../../../../../api/classes";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   sale: Sale;
@@ -20,6 +21,8 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
   const [client, setClient] = useState<Client>();
   const [date, setDate] = useState<string>();
   const optionsRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (sale) {
@@ -37,12 +40,13 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const Opciones = () => {
     setShowOptions(!showOptions);
-    setSelectedClient(client as unknown as Client);
   };
 
   const Edit = () => {
-    setShowOptions(false);
+    setSelectedClient(client as unknown as Client);
     setSelectedSale(sale);
+    navigate("/Ventas/RegistrarVenta")
+    setShowOptions(false);
   };
 
   const Delete = async () => {
@@ -159,7 +163,7 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
               <Option
                 editAction={Edit}
                 visible={showOptions}
-                editar={false}
+                editar={true}
                 eliminar={true}
                 deleteAction={Delete}
               />

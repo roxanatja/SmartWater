@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Sale } from "../../../../type/Sale/Sale";
 import { Client } from "../../../../type/Cliente/Client";
 import { client } from "../Clientes/ClientesContext";
@@ -33,6 +33,12 @@ export const VentasProvider = ({ children }: any) => {
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
   const [selectedSale, setSelectedSale] = useState<Sale>(sale);
   const [selectedClient, setSelectedClient] = useState<Client>(client);
+
+  useEffect(() => {
+    if (selectedClient._id === "" && selectedSale._id !== "") {
+      setSelectedSale(sale)
+    }
+  }, [selectedClient, selectedSale])
 
   return (
     <VentasContext.Provider

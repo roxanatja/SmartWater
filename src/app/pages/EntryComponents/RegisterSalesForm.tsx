@@ -10,13 +10,19 @@ import { ISaleBody } from "../../../api/types/sales";
 import { ProductsApiConector, SalesApiConector } from "../../../api/classes";
 import { AuthService } from "../../../api/services/AuthService";
 import { useNavigate } from "react-router-dom";
+import { Sale } from "../../../type/Sale/Sale";
+import { useGlobalContext } from "../../SmartwaterContext";
 
-const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
+const RegisterSalesForm = ({ selectedClient, selectedSale }: {
+  selectedClient: Client;
+  selectedSale?: Sale;
+}) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [active, setActive] = useState(false);
 
   const [addedProducts, setAddedProducts] = useState<ISaleBody['data']['detail']>([]);
   const navigate = useNavigate()
+  const { setLoading } = useGlobalContext()
 
   const [editar, setEditar] = useState<{
     quantity: number;
@@ -55,15 +61,21 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
       zone: selectedClient.zone,
       client: selectedClient._id,
     };
+    let res = null
 
-    const res = await SalesApiConector.create({ data: values });
+    if (selectedSale) {
+      res = await SalesApiConector.update({ data: values, saleId: selectedSale._id });
+    } else {
+      res = await SalesApiConector.create({ data: values });
+    }
 
     if (res) {
-      toast.success("Venta registrada");
+      toast.success(`Venta ${selectedSale ? "editada" : "registrada"}`);
       reset();
       setAddedProducts([]);
 
       navigate("/Ventas", { replace: true })
+      window.location.reload()
     } else {
       toast.error("Upss error al registrar venta");
     }
@@ -98,6 +110,39 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
   const handleDeleteProduct = (index: number) => {
     setAddedProducts(addedProducts.filter((_, i) => i !== index));
   };
+
+  useEffect(() => {
+    if (selectedSale) {
+      setLoading(true)
+    }
+  }, [selectedSale, setLoading])
+
+  useEffect(() => {
+    if (selectedSale && products) {
+      setAddedProducts(selectedSale.detail.map(i => {
+        const prod = products?.find((p) => p._id === i.product)
+        return {
+          product: prod?.name || "Producto no encontrado",
+          quantity: i.quantity,
+          price: prod?.price ? String(prod.price) : "0"
+        }
+      }))
+
+      if (selectedSale.comment) {
+        setValue('comment', selectedSale.comment)
+      }
+      if (selectedSale.hasInvoice) {
+        setValue('hasInvoice', selectedSale.hasInvoice, { shouldValidate: true })
+      }
+      if ('creditSale' in selectedSale) {
+        setValue('creditSale', selectedSale.creditSale, { shouldValidate: true })
+      }
+      if ('paymentMethodCurrentAccount' in selectedSale) {
+        setValue('paymentMethodCurrentAccount', !!selectedSale.paymentMethodCurrentAccount, { shouldValidate: true })
+      }
+      setLoading(false)
+    }
+  }, [selectedSale, products, setLoading, setValue])
 
   return (
     <form
@@ -336,7 +381,7 @@ const RegisterSalesForm = ({ selectedClient }: { selectedClient: Client }) => {
           {active ? (
             <i className="fa-solid fa-spinner animate-spin"></i>
           ) : (
-            "Vender"
+            <span>{selectedSale ? "Editar venta" : "Vender"}</span>
           )}
         </button>
       </div>
