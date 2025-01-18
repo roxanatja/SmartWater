@@ -6,6 +6,7 @@ import { Contador } from "../../../components/Contador/Contador";
 import { ILoansGetParams } from "../../../../../api/types/loans";
 import { Zone } from "../../../../../type/City";
 import { User } from "../../../../../type/User";
+import moment from "moment";
 
 interface ILoanFilters {
   withContract: boolean;
@@ -180,7 +181,7 @@ const FiltroPrestamos = ({
             <span className="text-left text-sm">De</span>
             <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
-              max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
+              max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
               type="date"
               {...register("fromDate")}
               className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
@@ -191,7 +192,7 @@ const FiltroPrestamos = ({
             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
             <input
               min={watch('fromDate')?.toString()}
-              max={new Date().toISOString().split("T")[0]}
+              max={moment().format("YYYY-MM-DD")}
               type="date"
               {...register("toDate")}
               className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"

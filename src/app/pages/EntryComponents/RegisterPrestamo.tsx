@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "./Inputs";
 import { Loans } from "../../../type/Loans/Loans";
 import { useGlobalContext } from "../../SmartwaterContext";
+import moment from "moment";
 
 const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: Client; selectedLoan?: Loans }) => {
   const [products, setProducts] = useState<Item[] | null>(null);
@@ -280,7 +281,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
           </div>
 
           <Input
-            min={new Date().toISOString().split("T")[0]}
+            min={moment().format("YYYY-MM-DD")}
             type="date"
             label="Valido hasta"
             labelClassName="text-blue_custom text-md font-semibold"

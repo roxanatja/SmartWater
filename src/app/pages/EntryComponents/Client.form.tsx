@@ -87,7 +87,9 @@ const ClientForm = ({
           zone: data.zone,
           email: data.email,
           averageRenewal: !data.dayrenew,
-          phoneLandLine: data.phoneLandLine ? formatNumber(data.phoneLandLine, "BO", "E.164") : null
+          phoneLandLine: data.phoneLandLine ? formatNumber(data.phoneLandLine, "BO", "E.164") : null,
+          isAgency: data.isAgency,
+          isClient: data.isClient,
         }
       })
     } else {
@@ -458,7 +460,6 @@ const ClientForm = ({
         >
           <input
             type="checkbox"
-            disabled={selectedClient._id !== ""}
             {...register("isClient", {
               onChange: (e) => handleCheckboxChange("isClient"),
             })}
@@ -470,7 +471,6 @@ const ClientForm = ({
           </label>
           <input
             type="checkbox"
-            disabled={selectedClient._id !== ""}
             {...register("isAgency", {
               onChange: (e) => handleCheckboxChange("isAgency"),
             })}

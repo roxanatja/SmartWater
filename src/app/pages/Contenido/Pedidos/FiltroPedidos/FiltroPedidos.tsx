@@ -5,6 +5,7 @@ import { Zone } from "../../../../../type/City";
 import { IOrdersGetParams } from "../../../../../api/types/orders";
 import { useForm } from "react-hook-form";
 import { User } from "../../../../../type/User";
+import moment from "moment";
 
 interface IOrderFilters {
     fromDate: string | null;
@@ -62,11 +63,18 @@ const FiltroPedidos: FC<{
                     setValue(`zones.${z}`, z, { shouldValidate: true })
                 })
             }
-            if (initialFilters.user) {
-                setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
+
+            if (isAttended) {
+                if (initialFilters.distributorAttendedId) {
+                    setSelectedDists(distribuidores.filter(d => initialFilters.distributorAttendedId!.includes(d._id)))
+                }
+            } else {
+                if (initialFilters.distributorRedirectId) {
+                    setSelectedDists(distribuidores.filter(d => initialFilters.distributorRedirectId!.includes(d._id)))
+                }
             }
         }
-    }, [initialFilters, setValue, distribuidores])
+    }, [initialFilters, setValue, distribuidores, isAttended])
 
     const { setShowFiltro } = useContext(PedidosContext);
 
@@ -91,7 +99,13 @@ const FiltroPedidos: FC<{
         }
         if (selectedDists.length > 0) {
             const dists = selectedDists.map(z => z._id).join(',')
-            if (dists !== "") { result.user = dists }
+            if (dists !== "") {
+                if (isAttended) {
+                    result.distributorAttendedId = dists
+                } else {
+                    result.distributorRedirectId = dists
+                }
+            }
         }
 
         return result
@@ -110,7 +124,7 @@ const FiltroPedidos: FC<{
                                 <span className="text-left text-sm">De</span>
                                 <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                                 <input
-                                    max={watch('toDate')?.toString() || new Date().toISOString().split("T")[0]}
+                                    max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
                                     type="date"
                                     {...register("fromDate")}
                                     className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
@@ -121,7 +135,7 @@ const FiltroPedidos: FC<{
                                 <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                                 <input
                                     min={watch('fromDate')?.toString()}
-                                    max={new Date().toISOString().split("T")[0]}
+                                    max={moment().format("YYYY-MM-DD")}
                                     type="date"
                                     {...register("toDate")}
                                     className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
@@ -174,7 +188,7 @@ const FiltroPedidos: FC<{
                                     <span className="text-left text-sm">El</span>
                                     <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                                     <input
-                                        max={new Date().toISOString().split("T")[0]}
+                                        max={moment().format("YYYY-MM-DD")}
                                         type="date"
                                         {...register("attendedDate")}
                                         className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"

@@ -33,7 +33,7 @@ const Inicio: FC = () => {
           ClientsApiConector.getClients({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
           LoansApiConector.get({ pagination: { page: 1, pageSize: 1 } }),
           LoansApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
-          SalesApiConector.get({ pagination: { page: 1, pageSize: 1 }, filters: { initialDate: "2020-01-01", finalDate: (new Date()).toISOString().split("T")[0] } }),
+          SalesApiConector.get({ pagination: { page: 1, pageSize: 1 }, filters: { initialDate: "2020-01-01", finalDate: moment().format("YYYY-MM-DD") } }),
           SalesApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
           OrdersApiConector.get({ filters: { attended: false }, pagination: { page: 1, pageSize: 1 } }),
           OrdersApiConector.get({ filters: { attended: false, month, year }, pagination: { page: 1, pageSize: 1 } })

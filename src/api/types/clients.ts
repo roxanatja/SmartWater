@@ -96,28 +96,30 @@ export interface IPosponeRenovation {
 export interface IClientUpdateParams {
     clientId: string;
     data: {
-        storeImage: string;
-        billingInfo: {
-            NIT: string;
-            name: string;
+        storeImage?: string;
+        billingInfo?: {
+            NIT?: string;
+            name?: string;
         };
-        fullName: string;
-        phoneNumber: string;
+        fullName?: string;
+        phoneNumber?: string;
         email?: string;
         address?: string;
         reference?: string;
         comment: string;
-        zone: string;
+        zone?: string;
         district: string;
         clientImage?: string;
         ciFrontImage?: string;
         ciBackImage?: string;
-        location: {
-            latitude: string;
-            longitude: string;
+        location?: {
+            latitude?: string;
+            longitude?: string;
         };
-        renewInDays: number | null;
-        averageRenewal: boolean;
+        renewInDays?: number | null;
+        averageRenewal?: boolean;
+        isAgency?: boolean;
+        isClient?: boolean;
         phoneLandLine?: string | null;
     };
 }

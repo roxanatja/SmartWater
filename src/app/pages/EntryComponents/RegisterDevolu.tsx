@@ -91,6 +91,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                     setAddedProducts([]);
 
                     navigate('/Prestamos')
+                    window.location.reload()
                   } else {
                     toast.error("Upss error al registrar devolucion");
                   }
@@ -153,6 +154,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
         setAddedProducts([]);
 
         navigate("/Prestamos")
+        window.location.reload()
       } else {
         toast.error("Upss error al registrar devolucion");
       }

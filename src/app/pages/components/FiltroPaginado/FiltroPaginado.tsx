@@ -382,7 +382,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     }
 
     if (!!filters.initialDate && !filters.finalDate) {
-      filters.finalDate = new Date().toISOString().split("T")[0]
+      filters.finalDate = moment().format("YYYY-MM-DD")
     }
 
     const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []

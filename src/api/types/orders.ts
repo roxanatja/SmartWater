@@ -5,6 +5,7 @@ export interface IOrdersGetParams extends Search {
         user?: string;
         client?: string;
         distributorRedirectId?: string;
+        distributorAttendedId?: string;
         zone?: string;
         district?: string;
         attended?: boolean;

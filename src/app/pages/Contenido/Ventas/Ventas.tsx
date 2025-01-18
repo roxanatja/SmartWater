@@ -89,7 +89,7 @@ const Ventas: FC = () => {
       }
 
       if (!!filters.initialDate && !filters.finalDate) {
-        filters.finalDate = new Date().toISOString().split("T")[0]
+        filters.finalDate = moment().format("YYYY-MM-DD")
       }
 
       if (queryData.clients) {
@@ -116,7 +116,7 @@ const Ventas: FC = () => {
   }, [setLoading, queryData]);
 
   useEffect(() => {
-    SalesApiConector.getSalesProducts({ filters: { initialDate: "2020-01-01", finalDate: (new Date()).toISOString() } }).then(res => {
+    SalesApiConector.getSalesProducts({ filters: { initialDate: "2020-01-01", finalDate: moment().format("YYYY-MM-DD") } }).then(res => {
       setSumary(res || [])
     })
   }, [])

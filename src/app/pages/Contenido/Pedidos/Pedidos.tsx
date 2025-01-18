@@ -18,6 +18,7 @@ import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
 import { User } from "../../../../type/User";
 import RegistrarClientePedido from "./RegistrarCliente/RegistrarClientePedido";
+import moment from "moment";
 
 const Pedidos: FC = () => {
   const params = useParams()
@@ -84,7 +85,8 @@ const Pedidos: FC = () => {
 
         if (section === "Atendidos") {
           if (!filters.attendedDate) {
-            filters.attendedDate = (new Date()).toISOString()
+            filters.attendedDate = moment().format("YYYY-MM-DD")
+            console.log(moment().format("YYYY-MM-DD"))
           }
           if (filters.hasOwnProperty('attended')) {
             delete filters.attended

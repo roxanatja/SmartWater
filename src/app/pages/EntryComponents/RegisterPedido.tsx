@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../../type/User";
 import { Order } from "../../../type/Order/Order";
 import { useGlobalContext } from "../../SmartwaterContext";
+import moment from "moment";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -454,7 +455,7 @@ const RegisterPedidoForm = ({
             </div>
 
             <Input
-              min={new Date().toISOString().split("T")[0]}
+              min={moment().format("YYYY-MM-DD")}
               type="date"
               label="Fecha de entrega"
               labelClassName="text-blue_custom text-md font-semibold"
