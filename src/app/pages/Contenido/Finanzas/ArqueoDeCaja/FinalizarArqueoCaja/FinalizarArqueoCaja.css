@@ -1,4 +1,4 @@
-.FinalizarArqueoCaja-hora{
+.FinalizarArqueoCaja-hora {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -9,10 +9,9 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-    margin-bottom: 55px;
 }
 
-.FinalizarArqueoCaja-titulos{
+.FinalizarArqueoCaja-titulos {
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -22,7 +21,7 @@
     text-align: left;
 }
 
-.FinalizarArqueoCaja-body{
+.FinalizarArqueoCaja-body {
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -32,7 +31,7 @@
     text-align: left;
 }
 
-.FinalizarArqueoCaja-FormTitle{
+.FinalizarArqueoCaja-FormTitle {
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
@@ -41,16 +40,17 @@
     line-height: normal;
 }
 
-.FinalizarArqueoCaja-item{
+.FinalizarArqueoCaja-item {
     color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-style: normal;
     font-weight: 600;
-    line-height: 16px; /* 114.286% */
+    line-height: 16px;
+    /* 114.286% */
 }
 
-.FinalizarArqueoCaja-imput{
+.FinalizarArqueoCaja-imput {
     display: flex;
     padding: 12px 15px;
     justify-content: center;
@@ -64,16 +64,17 @@
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
-    line-height: 16px; /* 133.333% */
+    line-height: 16px;
+    /* 133.333% */
 }
 
-.FinalizarArqueoCaja-textarea{
+.FinalizarArqueoCaja-textarea {
     width: 730px;
     border-radius: 8px;
     border: 1px solid #000;
 }
 
-.FinalizarArqueoCaja-btn{
+.FinalizarArqueoCaja-btn {
     padding: 11px 24px;
     gap: 10px;
     align-self: stretch;
@@ -92,7 +93,7 @@
     line-height: normal;
 }
 
-.FinalizarArqueoCaja-btn:hover{
+.FinalizarArqueoCaja-btn:hover {
     border: 1px solid #234fa0;
     background: var(--Azul, #234fa0);
 }

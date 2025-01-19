@@ -130,11 +130,13 @@ code {
 
 input[type="month"].full-selector,
 input[type="time"].full-selector,
+input[type="datetime-local"].full-selector,
 input[type="date"].full-selector {
   position: relative;
 }
 input[type="month"].full-selector::-webkit-calendar-picker-indicator,
 input[type="time"].full-selector::-webkit-calendar-picker-indicator,
+input[type="datetime-local"].full-selector::-webkit-calendar-picker-indicator,
 input[type="date"].full-selector::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;

@@ -1,33 +1,31 @@
-import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import ApiMethodCash from "../../../../../../Class/api.cash";
-import AuthenticationService from "../../../../../../services/AuthenService";
 import { Transaction, CashClose } from "../../../../../../type/Cash";
-import { UserData } from "../../../../../../type/UserData";
 import Input from "../../../../EntryComponents/Inputs";
 import "./FinalizarArqueoCaja.css";
+import { User } from "../../../../../../type/User";
+import { CashRegisterApiConector } from "../../../../../../api/classes";
 
 const FinalizarArqueoCaja = ({
   cash,
   handleOnSubmit,
+  distrib
 }: {
   cash?: Transaction;
+  distrib: User[]
   handleOnSubmit?: () => void;
 }) => {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (cash?.state) {
-      setIsChecked(cash?.state);
-    }
-  }, [cash?.state]);
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<CashClose>();
+    formState: { errors, isValid },
+  } = useForm<CashClose>({
+    defaultValues: {
+      cash: 0,
+      currentAccount: 0,
+      user: cash?.user
+    }
+  });
 
   const getFormattedDate = (): string => {
     const now = new Date();
@@ -37,26 +35,26 @@ const FinalizarArqueoCaja = ({
   };
 
   const onSubmit: SubmitHandler<CashClose> = async (data) => {
-    const api = new ApiMethodCash();
-    const user: UserData = AuthenticationService.getUser();
-    try {
-      await api.closeCash({
+    const res = await CashRegisterApiConector.closeReport({
+      data: {
         ...data,
-        user: user._id,
+        user: cash?.user || "",
         endDate: getFormattedDate(),
-      });
+      }
+    });
+
+    if (res) {
       toast.success("Caja Cerrada");
       if (handleOnSubmit) handleOnSubmit();
-    } catch (error) {
+    } else {
       toast.error("Upps error al cerrar caja");
-      console.log(error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="text-sm">
       <div className="w-full p-6">
-        <div className="FinalizarArqueoCaja-hora">
+        <div className="FinalizarArqueoCaja-hora mb-6">
           <span>Hora de apertura</span>
           <span className="font-medium">
             {cash?.startDate
@@ -64,175 +62,180 @@ const FinalizarArqueoCaja = ({
               : "N/A"}
           </span>
         </div>
-        <div>
-          <table style={{ width: "25%" }}>
-            <thead>
-              <tr className="FinalizarArqueoCaja-titulos">
-                <th>
-                  <span>Distribuidor 1</span>
-                </th>
-                <th>
-                  <span>Abierto</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="FinalizarArqueoCaja-body">
-                <td>
-                  <div style={{ marginTop: "16px" }}>
-                    <span>Alberto</span>
-                  </div>
-                </td>
-                <td>
-                  <div style={{ marginTop: "16px" }}>
-                    <label className="switch-container">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => setIsChecked(!isChecked)}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="w-full sm:w-1/2 md:w-1/4">
+          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2">Distribuidor</div>
+              <div className="whitespace-normal md:whitespace-nowrap">{distrib.find(d => d._id === cash?.user)?.fullName || "Distribuidor desconocido"}</div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2">Abierto</div>
+              <div className="relative inline-block w-11 h-5">
+                <input
+                  id="switch-component"
+                  type="checkbox"
+                  readOnly
+                  checked={!!cash?.state}
+                  className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
+                />
+                <label
+                  htmlFor="switch-component"
+                  className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
+                ></label>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div className="flex flex-col gap-6 pt-10">
           <div className="FinalizarArqueoCaja-FormTitle">
             <span>Saldos según sistema</span>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="flex gap-2 items-center w-3/12">
-              <label className="FinalizarArqueoCaja-item pl-4">Monto</label>
+            <div className="grid grid-cols-3 gap-2 items-center w-full md:w-4/12">
+              <label className="FinalizarArqueoCaja-item">Monto</label>
               <input
-                className="FinalizarArqueoCaja-imput text-right"
+                readOnly
+                className="FinalizarArqueoCaja-imput text-right col-span-2"
                 type="number"
                 value={cash?.initialAmount}
               />
             </div>
-            <div className="flex gap-2 items-center w-3/12">
+
+            <div className="grid grid-cols-3 gap-2 items-center w-full md:w-4/12 mt-6">
               <label className="FinalizarArqueoCaja-item">Ingresos</label>
-              <input
-                className="FinalizarArqueoCaja-imput text-right"
-                type="number"
-                value={cash?.incomeCurrentAccountTotal}
+              <Input
+                readOnly
+                name="asdsa"
+                register={register}
+                containerClassName="col-span-2"
+                className="text-right"
+                value={cash?.incomeCashTotal}
               />
             </div>
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Efectivos</h2>
+
+            <div className="flex w-full flex-wrap gap-4">
+              <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                <div className="w-full flex justify-between items-center">
+                  <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                    <i className="fa-solid fa-angle-right"></i>
+                    <h2 className="font-bold">Efectivos</h2>
+                  </div>
+                  <Input
+                    readOnly
+                    name="asdsa"
+                    register={register}
+                    className="w-2/12 text-right"
+                    value={cash?.incomeCashTotal}
+                  />
                 </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.incomeCashTotal}
-                />
+                <div className="flex justify-between items-center">
+                  <p className="pl-4">Ventas efectivo</p>
+                  <p>{cash?.cashSales.toLocaleString()}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4">Cobro ventas. Crédito</p>
+                  <p>{cash?.creditBillsSales.toLocaleString()}</p>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Cobro ventas. Crédito</p>
-                <p>{cash?.cashSales.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Ventas por cobrar</p>
-                <p>{cash?.creditBillsSales.toLocaleString()}</p>
+
+              <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                <div className="w-full flex justify-between items-center">
+                  <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                    <i className="fa-solid fa-angle-right"></i>
+                    <h2 className="font-bold">Cuenta Corriente</h2>
+                  </div>
+                  <Input readOnly
+                    name="asdsa"
+                    register={register}
+                    className="w-2/12 text-right"
+                    value={cash?.incomeCurrentAccountTotal}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Ventas efectivo</p>
+                  <p>{cash?.cashCurrentAccount.toLocaleString()}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Cobro ventas. Crédito</p>
+                  <p>{cash?.creditBillsSalesCurrentAccount.toLocaleString()}</p>
+                </div>
               </div>
             </div>
+            <strong className="text-gray-500">Ventas por cobrar: 0</strong>
 
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Cuenta Corriente</h2>
-                </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.incomeCurrentAccountTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Cobro ventas. Crédito</p>
-                <p>{cash?.cashCurrentAccount.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Ventas por cobrar</p>
-                <p>{cash?.creditBillsSalesCurrentAccount.toLocaleString()}</p>
-              </div>
+            <div className="grid grid-cols-3 gap-2 items-center w-full md:w-4/12 mt-6">
+              <label className="FinalizarArqueoCaja-item w-full">
+                Egresos
+              </label>
+              <Input
+                readOnly
+                name="asdsa"
+                register={register}
+                containerClassName="col-span-2"
+                className="text-right"
+                value={cash?.expenseCashTotal}
+              />
             </div>
 
-            <div className="w-5/12">
-              <div className="flex gap-2 items-center justify-between w-full">
-                <label className="FinalizarArqueoCaja-item w-full">
-                  Egresos
-                </label>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-36 text-right"
-                  value={cash?.expenseCashTotal}
-                />
-              </div>
-            </div>
-
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Efectivos</h2>
+            <div className="flex w-full flex-wrap gap-4">
+              <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                <div className="w-full flex justify-between items-center">
+                  <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                    <i className="fa-solid fa-angle-right"></i>
+                    <h2 className="font-bold">Efectivos</h2>
+                  </div>
+                  <Input
+                    readOnly
+                    name="asdsa"
+                    register={register}
+                    className="w-2/12 text-right"
+                    value={cash?.expenseCashTotal}
+                  />
                 </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.expenseCashTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Gastos</p>
-                <p>{cash?.expenseCashTotal.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Pago de obligaciones</p>
-                <p>{cash?.expensePayObligations.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Cuenta Corriente</h2>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Gastos</p>
+                  <p>{cash?.expenseCashTotal.toLocaleString()}</p>
                 </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.expenseCurrentAccountTotal}
-                />
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Pago de obligaciones</p>
+                  <p>{cash?.expensePayObligations.toLocaleString()}</p>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Gastos</p>
-                <p>{cash?.expensePayCurrentAccount.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Pago de obligaciones</p>
-                <p>{cash?.expenseCurrentPayObligations.toLocaleString()}</p>
+
+              <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                <div className="w-full flex justify-between items-center">
+                  <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                    <i className="fa-solid fa-angle-right"></i>
+                    <h2 className="font-bold">Cuenta Corriente</h2>
+                  </div>
+                  <Input
+                    readOnly
+                    name="asdsa"
+                    register={register}
+                    className="w-2/12 text-right"
+                    value={cash?.expenseCurrentAccountTotal}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Gastos</p>
+                  <p>{cash?.expensePayCurrentAccount.toLocaleString()}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="pl-4"> Pago de obligaciones</p>
+                  <p>{cash?.expenseCurrentPayObligations.toLocaleString()}</p>
+                </div>
               </div>
             </div>
           </div>
+          <strong className="text-gray-500">Gastos por pagar: 0</strong>
 
-          <div className="FinalizarArqueoCaja-FormTitle">
+          <div className="FinalizarArqueoCaja-FormTitle mt-6">
             <span>Saldos según usuario</span>
           </div>
-          <div className="flex flex-col gap-4 w-4/12">
+          <div className="flex flex-col gap-4 w-full md:w-4/12">
             <div className="flex justify-between items-center">
-              <p className="pl-4 font-bold"> Total ingresos</p>
+              <p className="pl-4 font-semibold"> Total ingresos</p>
               <p>{cash?.incomeCashTotal.toLocaleString()}</p>
             </div>
 
@@ -245,7 +248,7 @@ const FinalizarArqueoCaja = ({
                 register={register}
                 label="Efetivo"
                 isVisibleLable
-                className="w-2/12 text-right"
+                className="w-2/12 text-right no-spinner"
                 type="number"
                 errors={errors.cash}
                 required
@@ -262,7 +265,7 @@ const FinalizarArqueoCaja = ({
                 label="Cuenta Corriente"
                 isVisibleLable
                 type="number"
-                className="w-2/12 text-right"
+                className="w-2/12 text-right no-spinner"
                 errors={errors.currentAccount}
                 required
               />
@@ -276,13 +279,14 @@ const FinalizarArqueoCaja = ({
                 name="asdsa"
                 register={register}
                 className="w-24 text-right"
+                readOnly
                 value={cash?.difference.toLocaleString()}
               />
             </div>
           </div>
 
-          <div className="flex justify-center items-end">
-            <button type="submit" className="btn FinalizarArqueoCaja-btn">
+          <div className="flex w-full sm:w-1/2 justify-center sm:justify-end items-center mt-6">
+            <button type="submit" className="btn FinalizarArqueoCaja-btn disabled:bg-gray-400 disabled:border-none" disabled={!isValid}>
               Finalizar arqueo
             </button>
           </div>

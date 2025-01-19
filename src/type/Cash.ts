@@ -2,7 +2,7 @@ export type CashOpen = {
   startDate: string;
   initialMount: number;
   user: string;
-  startTime?: string;
+  startTime: string;
 };
 
 export type CashClose = {

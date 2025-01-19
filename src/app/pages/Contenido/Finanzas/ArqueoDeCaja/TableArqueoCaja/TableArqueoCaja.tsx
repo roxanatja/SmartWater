@@ -1,29 +1,34 @@
 import { Transaction } from "../../../../../../type/Cash";
+import { User } from "../../../../../../type/User";
+import { formatDateTime } from "../../../../../../utils/helpers";
 import "./TableArqueoCaja.css";
 
-const TableArqueoCaja = ({ cash }: { cash?: Transaction[] }) => {
+const TableArqueoCaja = ({ cash, distrib }: {
+  cash?: Transaction[];
+  distrib: User[]
+}) => {
   return (
     <>
       <div>
-        <table style={{ width: "65%" }}>
+        <table style={{ width: "80%" }}>
           <thead>
             <tr className="TableArqueoCaja-titulos">
-              <th>
+              <th className="px-2">
                 <span>Hora de apertura</span>
               </th>
-              <th>
+              <th className="px-2">
                 <span>Hora de cierre</span>
               </th>
-              <th>
+              <th className="px-2">
                 <span>Distribuidor </span>
               </th>
-              <th>
+              <th className="px-2">
                 <span>Sistema</span>
               </th>
-              <th>
+              <th className="px-2">
                 <span>Diferencia</span>
               </th>
-              <th>
+              <th className="px-2">
                 <span>Estado</span>
               </th>
             </tr>
@@ -32,42 +37,42 @@ const TableArqueoCaja = ({ cash }: { cash?: Transaction[] }) => {
             {cash &&
               cash.map((row, index) => (
                 <tr className="TableArqueoCaja-body" key={index}>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
-                      <span>
+                      <span className="whitespace-nowrap">
                         {row?.startDate
-                          ? new Date(row?.startDate).toLocaleString()
+                          ? formatDateTime(row?.startDate, 'numeric', '2-digit', '2-digit', true, true)
                           : "N/A"}
                       </span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
-                      <span>
+                      <span className="whitespace-nowrap">
                         {row?.endDate
-                          ? new Date(row?.endDate).toLocaleString()
+                          ? formatDateTime(row?.endDate, 'numeric', '2-digit', '2-digit', true, true)
                           : "N/A"}
                       </span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
-                      <span>Alberto</span>
+                      <span>{distrib.find(d => d._id === row.user)?.fullName || "Distribuidor desconocido"}</span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
                       <span>
                         {row?.initialAmount.toLocaleString() || "N/A"}
                       </span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
                       <span>{row?.difference.toLocaleString() || "N/A"}</span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-2">
                     <div style={{ marginTop: "16px" }}>
                       <span>{row?.state ? "Abierto" : "Cerrado" || "N/A"}</span>
                     </div>

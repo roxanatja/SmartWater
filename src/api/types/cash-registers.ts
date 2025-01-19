@@ -26,7 +26,6 @@ export interface IRegistersOpenBody {
         startDate: string;
         initialMount: number;
         user: string;
-        startTime?: string;
     }
 }
 
