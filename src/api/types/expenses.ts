@@ -6,6 +6,9 @@ export interface IExpensesGetParams extends Search {
         provider?: string;
         accountEntry?: string;
         creditBuy?: boolean;
+        initialDate?: string;
+        finalDate?: string;
+        zone?: string;
         documentNumber?: string;
         amount?: number;
         paymentMethodCurrentAccount?: boolean;
@@ -17,11 +20,11 @@ export interface IExpensesGetParams extends Search {
 
 export interface IExpenseBody {
     data: {
-        amount: string;
+        amount: number;
         accountEntry: string;
         user: string;
         provider: string;
-        creditbuy: boolean;
+        creditBuy: boolean;
         paymentMethodCurrentAccount: boolean;
         hasInVoice: boolean;
         documentNumber: string;

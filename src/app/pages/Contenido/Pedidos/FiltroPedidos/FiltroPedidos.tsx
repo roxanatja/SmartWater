@@ -14,8 +14,8 @@ interface IOrderFilters {
     fromDateDeliver: string | null;
     toDateDeliver: string | null;
 
-    distrib: { [key: string]: string };
-    zones: { [key: string]: string };
+    distrib: Record<string, string>;
+    zones: Record<string, string>;
 }
 
 const initialState: IOrderFilters = {

@@ -8,22 +8,24 @@ import { Account } from '../../../../../../type/AccountEntry'
 import { Providers } from '../../../../../../type/providers'
 import { IExpensesGetParams } from '../../../../../../api/types/expenses'
 import { QueryMetadata } from '../../../../../../api/types/common'
-import { AccountEntryApiConector, ExpensesApiConector, ProvidersApiConector, UsersApiConector } from '../../../../../../api/classes'
-import { EgresosGastosContext } from '../EgresosGastosContext'
+import { AccountEntryApiConector, ExpensesApiConector, ProvidersApiConector, UsersApiConector, ZonesApiConector } from '../../../../../../api/classes'
+import { EgresosGastosContext, expense } from '../EgresosGastosContext'
 import "./RegistrosEyG.css"
 import { CuadroRegistrarEyG } from './CuadroRegistrarEyG'
 import Modal from '../../../../EntryComponents/Modal'
 import { FiltroEgresosGastos } from '../FiltroEgresosGastos/FiltroEgresosGastos'
 import millify from 'millify'
+import { Zone } from '../../../../../../type/City'
+import AddEgresosGastos from '../AddEgresosGastos/AddEgresosGastos'
 
 const RegistroEyG = () => {
     const navigate = useNavigate()
 
     const {
-        showModal,
-        setShowModal,
         setShowFiltro,
         showFiltro,
+        showModal,
+        setShowModal,
         selectedExpense,
         setSelectedExpense
     } = useContext(EgresosGastosContext);
@@ -31,9 +33,9 @@ const RegistroEyG = () => {
     const { setLoading } = useGlobalContext()
 
     const [users, setUsers] = useState<User[]>([]);
+    const [zones, setZones] = useState<Zone[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [providers, setProviders] = useState<Providers[]>([]);
-
 
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -55,9 +57,7 @@ const RegistroEyG = () => {
         const promises: Promise<{ data: Expense[] } & QueryMetadata | null>[] = []
 
         if (usersFilter) {
-            usersFilter.forEach(cf =>
-                promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, user: cf } }))
-            )
+            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, user: usersFilter.join(",") } }))
         } else {
             promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: savedFilters }))
         }
@@ -109,8 +109,9 @@ const RegistroEyG = () => {
 
     useEffect(() => {
         const fetchZones = async () => {
-            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user' } }))?.data || []);
             setAccounts((await AccountEntryApiConector.get()) || []);
+            setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
             setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
         }
         fetchZones()
@@ -148,7 +149,7 @@ const RegistroEyG = () => {
             <FiltroPaginado
                 ref={filterRef}
                 add={true}
-                onAdd={() => { alert("Add") }}
+                onAdd={() => setShowModal(true)}
                 paginacion={totalPages > 1}
                 totalPage={totalPages}
                 currentPage={page}
@@ -172,6 +173,7 @@ const RegistroEyG = () => {
                             }
                         ))
                 }
+                infoPedidosClass='mb-0'
                 otherResults={[{ text: "Total de egresos", value: `${items.reduce((cont, curr) => cont += curr.amount, 0).toLocaleString()} Bs.` }]}
             >
                 <div className="w-full pb-6 sticky top-0 bg-main-background z-[20]">
@@ -193,26 +195,6 @@ const RegistroEyG = () => {
                     </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                    {/* {
-                        (grouppedData && Object.keys(grouppedData).length > 0) &&
-                        <div className=" sticky top-16 bg-main-background pb-4 z-[20]">
-                            <div className="RegistrosEyG-Cuadro1 bg-blocks dark:border-blocks max-h-32 overflow-auto">
-                                {
-                                    Object.keys(grouppedData)
-                                        .sort((a, b) => a > b ? 1 : a === b ? 0 : -1)
-                                        .map(row => (
-                                            <div className="flex justify-between items-center gap-4 w-full" key={row}>
-                                                <span>
-                                                    {accounts?.find((x) => x._id === row)?.name || "Cuenta no Reconociada"}
-                                                </span>
-                                                <span className='whitespace-nowrap'>{grouppedData[row].toLocaleString()} Bs.</span>
-                                            </div>
-                                        ))
-                                }
-                            </div>
-                        </div>
-                    } */}
-
                     <div className="w-full pb-10">
                         {
 
@@ -235,12 +217,32 @@ const RegistroEyG = () => {
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
                 <FiltroEgresosGastos
+                    distribuidores={users}
+                    zones={zones}
                     accounts={accounts}
                     providers={providers}
                     onChange={handleFilterChange}
                     initialFilters={savedFilters}
                 />
             </Modal>
+
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Registro de egresos y gastos
+                </h2>
+                <AddEgresosGastos onCancel={() => setShowModal(false)} accounts={accounts} provider={providers} />
+            </Modal>
+
+            <Modal
+                isOpen={selectedExpense._id !== ""}
+                onClose={() => { setSelectedExpense(expense); setShowModal(false) }}
+            >
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Editar egresos y gastos
+                </h2>
+                <AddEgresosGastos accounts={accounts} provider={providers}
+                    onCancel={() => { setSelectedExpense(expense); setShowModal(false) }} />
+            </Modal> F
         </>
     )
 }

@@ -20,8 +20,8 @@ interface ISaleFilters {
   withoutLoan: boolean;
   fromDate: string | null;
   toDate: string | null;
-  zones: { [key: string]: string };
-  distributor: { [key: string]: string };
+  zones: Record<string, string>;
+  distributor: Record<string, string>;
 }
 
 const initialState: ISaleFilters = {

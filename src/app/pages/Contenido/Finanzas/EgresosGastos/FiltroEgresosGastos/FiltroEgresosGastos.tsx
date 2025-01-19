@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./FiltroEgresosGastos.css";
 import { EgresosGastosContext } from "../EgresosGastosContext";
 import { Providers } from "../../../../../../type/providers";
@@ -6,9 +6,12 @@ import { Account } from "../../../../../../type/AccountEntry";
 import { IExpensesGetParams } from "../../../../../../api/types/expenses";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import Input from "../../../../EntryComponents/Inputs";
+import moment from "moment";
+import { User } from "../../../../../../type/User";
+import { Zone } from "../../../../../../type/City";
 
 interface IExpenseFilter {
+    cash: boolean;
     credit: boolean;
     currentAccount: boolean;
 
@@ -18,37 +21,62 @@ interface IExpenseFilter {
     provider: string | null;
     accountEntry: string | null;
 
-    date: string | null;
+    fromDate: string | null;
+    toDate: string | null;
+
+    zones: Record<string, string>;
+    distributor: Record<string, string>;
 }
 
 const initialState: IExpenseFilter = {
+    cash: false,
     credit: false,
     currentAccount: false,
     withInvoice: false,
     withoutInvoice: false,
     accountEntry: null,
     provider: null,
-    date: null
+    fromDate: null,
+    toDate: null,
+    zones: {},
+    distributor: {}
 }
 
 const FiltroEgresosGastos = ({
     onChange,
     initialFilters,
-    accounts, providers
+    accounts, providers,
+    distribuidores,
+    zones
 }: {
     providers: Providers[];
     accounts: Account[];
+    distribuidores: User[];
+    zones: Zone[];
     onChange: (filters: IExpensesGetParams['filters']) => void;
     initialFilters: IExpensesGetParams['filters'];
 }) => {
-    const { register, handleSubmit, setValue } = useForm<IExpenseFilter>({
+    const { register, handleSubmit, setValue, watch } = useForm<IExpenseFilter>({
         defaultValues: initialState || {},
     });
+    const [selectedDists, setSelectedDists] = useState<User[]>([])
 
     useEffect(() => {
         if (initialFilters) {
-            if (initialFilters.hasOwnProperty('creditBuy')) {
-                setValue('credit', !!initialFilters.creditBuy, { shouldValidate: true })
+            if (initialFilters.hasOwnProperty('paymentMethodCurrentAccount') && initialFilters.hasOwnProperty('creditBuy')) {
+                const credit = initialFilters.creditBuy
+                const cta = initialFilters.paymentMethodCurrentAccount
+
+                let is: "credit" | 'cta' | 'cash' | 'none' = 'none'
+
+                if (!credit && !cta) { is = 'cash' }
+                else if (!!credit && !cta) { is = 'credit' }
+                else if (!credit && !!cta) { is = 'cta' }
+                else { is = 'none' }
+
+                setValue('credit', is === 'credit', { shouldValidate: true })
+                setValue('currentAccount', is === 'cta', { shouldValidate: true })
+                setValue('cash', is === 'cash', { shouldValidate: true })
             }
             if (initialFilters.hasOwnProperty('paymentMethodCurrentAccount')) {
                 setValue('currentAccount', !!initialFilters.paymentMethodCurrentAccount, { shouldValidate: true })
@@ -71,11 +99,22 @@ const FiltroEgresosGastos = ({
                 setValue('accountEntry', "", { shouldValidate: true })
             }
 
-            if (initialFilters.year && initialFilters.month) {
-                setValue('date', `${initialFilters.year}-${String(initialFilters.month).padStart(2, "0")}`, { shouldValidate: true })
+            if (initialFilters.initialDate) {
+                setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
+            }
+            if (initialFilters.finalDate) {
+                setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
+            }
+            if (initialFilters.zone) {
+                initialFilters.zone.split(",").forEach((z) => {
+                    setValue(`zones.${z}`, z, { shouldValidate: true })
+                })
+            }
+            if (initialFilters.user) {
+                setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
             }
         }
-    }, [initialFilters, setValue])
+    }, [initialFilters, setValue, distribuidores])
 
     const { setShowFiltro } = useContext(EgresosGastosContext);
 
@@ -91,19 +130,25 @@ const FiltroEgresosGastos = ({
         if (filters.provider && filters.provider !== "") { result.provider = filters.provider }
         if (filters.accountEntry && filters.accountEntry !== "") { result.accountEntry = filters.accountEntry }
 
-        if (!((!!filters.credit && !!filters.currentAccount) || (!filters.credit && !filters.currentAccount))) {
-            result.creditBuy = filters.credit
-            result.paymentMethodCurrentAccount = filters.currentAccount
-        }
+        if (filters.credit) { result.paymentMethodCurrentAccount = false; result.creditBuy = true }
+        if (filters.currentAccount) { result.paymentMethodCurrentAccount = true; result.creditBuy = false }
+        if (filters.cash) { result.paymentMethodCurrentAccount = false; result.creditBuy = false }
 
         if (!((!!filters.withInvoice && !!filters.withoutInvoice) || (!filters.withInvoice && !filters.withoutInvoice))) {
             result.hasInVoice = filters.withInvoice
         }
 
-        if (filters.date) {
-            const splitted = filters.date.split("-")
-            result.year = Number(splitted[0])
-            result.month = Number(splitted[1])
+        if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
+        if (filters.toDate) { result.finalDate = filters.toDate.toString() }
+
+        if (filters.zones) {
+            const zones = Object.values(filters.zones).filter(z => !!z).join(',')
+            if (zones !== "") { result.zone = zones }
+        }
+
+        if (selectedDists.length > 0) {
+            const dists = selectedDists.map(z => z._id).join(',')
+            if (dists !== "") { result.user = dists }
         }
 
         return result
@@ -111,30 +156,45 @@ const FiltroEgresosGastos = ({
 
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-8">
-                <div className="flex-1">
-                    <div className="FiltroClientes-Fechastitulo mb-2">
-                        <span className="text-blue_custom font-semibold">Fechas</span>
-                    </div>
-                    <div className="flex gap-3 flex-wrap">
-                        <Input
-                            max={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}`}
-                            type="month"
-                            label="Mes"
-                            lang="es-ES"
-                            name="date"
-                            register={register}
-                        />
+            <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row mb-4">
+                    <div className="flex-1">
+                        <div className="FiltroClientes-Fechastitulo mb-2">
+                            <span className="text-blue_custom font-semibold">Fechas</span>
+                        </div>
+                        <div className="flex gap-3 flex-wrap">
+                            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                                <span className="text-left text-sm">De</span>
+                                <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                                <input
+                                    max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
+                                    type="date"
+                                    {...register("fromDate")}
+                                    className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
+                                />
+                            </div>
+                            <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                                <span className="text-left text-sm">A</span>
+                                <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                                <input
+                                    min={watch('fromDate')?.toString()}
+                                    max={moment().format("YYYY-MM-DD")}
+                                    type="date"
+                                    {...register("toDate")}
+                                    className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row mb-4 gap-8">
+                <div className="flex flex-col sm:flex-row mb-4 gap-3">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="w-full flex flex-col gap-2"
+                        className="w-full sm:w-1/2 flex flex-col gap-2"
                     >
                         <label>Proveedor</label>
                         <select
@@ -154,7 +214,7 @@ const FiltroEgresosGastos = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="w-full flex flex-col gap-2"
+                        className="w-full sm:w-1/2 flex flex-col gap-2"
                     >
                         <label>Cuenta contable</label>
                         <select
@@ -171,75 +231,168 @@ const FiltroEgresosGastos = ({
                     </motion.div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                    {/* Credit */}
-                    <div className="">
-                        <div className="FiltroClientes-RenovaciónTitulo mb-2">
-                            <span className="text-blue_custom font-semibold">Medio de pago</span>
-                        </div>
-                        <div className="FiltroClientes-Cuentas flex flex-col">
-                            <div className="flex flex-col gap-3 w-full">
-                                <div className="flex flex-col w-full gap-2">
-                                    <div className="flex gap-3 items-center">
-                                        <input
-                                            className="input-check accent-blue_custom"
-                                            type="checkbox"
-                                            id="check3"
-                                            {...register("credit")}
-                                        />
-                                        <label htmlFor="check3" className="text-sm" >
-                                            A crédito
-                                        </label>
-                                    </div>
-                                    <div className="flex gap-3 items-center">
-                                        <input
-                                            className="input-check accent-blue_custom"
-                                            type="checkbox"
-                                            id="check4"
-                                            {...register("currentAccount")}
-                                        />
-                                        <label htmlFor="check4" className="text-sm" >
-                                            Cuenta corriente
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div className="flex flex-col mb-4">
+                    <div className="FiltroClientes-RenovaciónTitulo mb-2">
+                        <span className="text-blue_custom font-semibold">Medio de pago</span>
                     </div>
 
-                    {/* Factura */}
-                    <div className="">
-                        <div className="FiltroClientes-RenovaciónTitulo mb-2">
-                            <span className="text-blue_custom font-semibold">Factura</span>
+                    <div className="flex flex-wrap gap-4">
+                        <div className="flex gap-3 items-center">
+                            <input
+                                className="input-check accent-blue_custom"
+                                type="checkbox"
+                                id="check4"
+                                checked={watch('credit')}
+                                onChange={() => {
+                                    const credit = watch("credit")
+                                    setValue("credit", !credit);
+                                    setValue("currentAccount", false);
+                                    setValue("cash", false);
+                                }}
+                            />
+                            <label htmlFor="check4" className="text-sm" >
+                                A crédito
+                            </label>
                         </div>
-                        <div className="FiltroClientes-Cuentas flex flex-col">
-                            <div className="flex flex-col gap-3 w-full">
-                                <div className="flex flex-col w-full gap-2">
-                                    <div className="flex gap-3 items-center">
-                                        <input
-                                            className="input-check accent-blue_custom"
-                                            type="checkbox"
-                                            id="check5"
-                                            {...register("withInvoice")}
-                                        />
-                                        <label htmlFor="check5" className="text-sm" >
-                                            Con factura
-                                        </label>
-                                    </div>
-                                    <div className="flex gap-3 items-center">
-                                        <input
-                                            className="input-check accent-blue_custom"
-                                            type="checkbox"
-                                            id="check6"
-                                            {...register("withoutInvoice")}
-                                        />
-                                        <label htmlFor="check6" className="text-sm" >
-                                            Sin factura
-                                        </label>
-                                    </div>
-                                </div>
+                        <div className="flex gap-3 items-center">
+                            <input
+                                className="input-check accent-blue_custom"
+                                type="checkbox"
+                                id="check19"
+                                checked={watch('currentAccount')}
+                                onChange={() => {
+                                    const credit = watch("currentAccount")
+                                    setValue("currentAccount", !credit);
+                                    setValue("credit", false);
+                                    setValue("cash", false);
+                                }}
+                            />
+                            <label htmlFor="check19" className="text-sm" >
+                                Cta. Cte.
+                            </label>
+                        </div>
+                        <div className="flex gap-3 items-center">
+                            <input
+                                className="input-check accent-blue_custom"
+                                type="checkbox"
+                                id="check20"
+                                checked={watch('cash')}
+                                onChange={() => {
+                                    const credit = watch("cash")
+                                    setValue("cash", !credit);
+                                    setValue("currentAccount", false);
+                                    setValue("credit", false);
+                                }}
+                            />
+                            <label htmlFor="check20" className="text-sm" >
+                                Efectivo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col mb-4">
+                    <div className="FiltroClientes-RenovaciónTitulo mb-2">
+                        <span className="text-blue_custom font-semibold">Factura</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-4">
+                        <div className="flex gap-3 items-center">
+                            <input
+                                className="input-check accent-blue_custom"
+                                type="checkbox"
+                                id="check5"
+                                checked={watch('withInvoice')}
+                                onChange={() => {
+                                    const credit = watch("withInvoice")
+                                    setValue("withInvoice", !credit);
+                                    setValue("withoutInvoice", false);
+                                }}
+                            />
+                            <img src="/ConFactura.svg" alt="" />
+                            <label htmlFor="check5" className="text-sm" >
+                                Con factura
+                            </label>
+                        </div>
+                        <div className="flex gap-3 items-center">
+                            <input
+                                className="input-check accent-blue_custom"
+                                type="checkbox"
+                                id="check6"
+                                checked={watch('withoutInvoice')}
+                                onChange={() => {
+                                    const credit = watch("withoutInvoice")
+                                    setValue("withoutInvoice", !credit);
+                                    setValue("withInvoice", false);
+                                }}
+                            />
+                            <img src="/nofactura.svg" alt="" />
+                            <label htmlFor="check6" className="text-sm" >
+                                Sin factura
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-2 mb-8">
+                    <label className="font-semibold text-blue_custom">Distribuidores</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        {distribuidores.map((dists, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-3"
+                            >
+                                <input
+                                    className="input-check accent-blue_custom"
+                                    type="checkbox"
+                                    onChange={() => {
+                                        if (selectedDists.some(s => s._id === dists._id)) {
+                                            setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
+                                        } else {
+                                            setSelectedDists(prev => [...prev, dists])
+                                        }
+
+                                        zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
+                                    }}
+                                    checked={selectedDists.some(sd => sd._id === dists._id)}
+                                    id={`distrib-${dists._id}`}
+                                />
+                                <label
+                                    htmlFor={`distrib-${dists._id}`}
+                                    className="text-sm"
+                                >
+                                    {dists.fullName || "Sin nombre"}
+                                </label>
                             </div>
-                        </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-2 mb-8">
+                    <label className="font-semibold text-blue_custom">Zonas</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        {zones
+                            .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
+                            .map((zone, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-3"
+                                >
+                                    <input
+                                        className="input-check accent-blue_custom"
+                                        type="checkbox"
+                                        {...register(`zones.${zone._id}`)}
+                                        value={zone._id}
+                                        id={`zone-${zone._id}`}
+                                    />
+                                    <label
+                                        htmlFor={`zone-${zone._id}`}
+                                        className="text-sm"
+                                    >
+                                        {zone.name}
+                                    </label>
+                                </div>
+                            ))}
                     </div>
                 </div>
 

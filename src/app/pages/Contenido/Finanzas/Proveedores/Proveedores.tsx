@@ -1,7 +1,7 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import "./Proveedores.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
-import { FiltroPaginado } from "../../../components/FiltroPaginado/FiltroPaginado";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../../components/FiltroPaginado/FiltroPaginado";
 import { AgregarProveedor } from "./AgregarProveedor/AgregarProveedor";
 import { CuadroProveedor } from "./CuadroProveedor/CuadroProveedor";
 import { ProveedoresContext, providerBlank } from "./ProveedoresContext";
@@ -9,10 +9,12 @@ import Modal from "../../../EntryComponents/Modal";
 import { Providers } from "../../../../../type/providers";
 import { useGlobalContext } from "../../../../SmartwaterContext";
 import { ProvidersApiConector } from "../../../../../api/classes";
+import { IProvidersGetParams } from "../../../../../api/types/providers";
+import { FiltroProveedores } from "./FiltroProveedores/FiltroProveedores";
 
 const Proveedores: FC = () => {
   const { setLoading } = useGlobalContext()
-  const { showModal, setShowModal, provider, setProvider } = useContext(ProveedoresContext);
+  const { showModal, setShowModal, provider, setProvider, setShowFiltro, showFiltro } = useContext(ProveedoresContext);
 
   const itemsPerPage: number = 12;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -21,6 +23,9 @@ const Proveedores: FC = () => {
 
   const [searchParam, setSearchParam] = useState<string>('');
   const [sort, setSort] = useState<'asc' | 'desc'>('desc');
+  const [savedFilters, setSavedFilters] = useState<IProvidersGetParams['filters']>({});
+
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
 
   const [usersToShow, setUsersToShow] = useState<Providers[]>([])
   const [filteredUsers, setFilteredUsers] = useState<Providers[]>([])
@@ -29,13 +34,13 @@ const Proveedores: FC = () => {
   const getData = useCallback(async () => {
     setLoading(true)
 
-    let datProvs = await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort } });
+    let datProvs = await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters } });
     const provs = datProvs?.data || []
     setUsers(provs);
     setTotalPage(Math.ceil((provs.length || 0) / itemsPerPage)); // Update total pages
 
     setLoading(false)
-  }, [setLoading, sort]);
+  }, [setLoading, sort, savedFilters]);
 
   useEffect(() => {
     getData();
@@ -43,7 +48,10 @@ const Proveedores: FC = () => {
 
   useEffect(() => {
     if (users) {
-      const itms = users.filter(d => d.fullName.toLowerCase().includes(searchParam.toLowerCase()) || (!!d.phoneNumber && d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase())))
+      const itms = users.filter(d =>
+        d.fullName.toLowerCase().includes(searchParam.toLowerCase())
+        || (!!d.phoneNumber && d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase()))
+        || (!!d.NIT && d.NIT.toLowerCase().includes(searchParam.toLowerCase())))
       setFilteredUsers(itms);
       setTotalPage(Math.ceil(itms.length / ITEMS_PER_PAGE))
       setCurrentPage(1);
@@ -68,11 +76,17 @@ const Proveedores: FC = () => {
     setCurrentPage(page);
   };
 
+  const handleFilterChange = (filters: IProvidersGetParams['filters']) => {
+    setCurrentPage(1);
+    setSavedFilters(filters);
+  };
+
   return (
     <>
       <div className="px-10">
         <PageTitle titulo="Proveedores" icon="../../Finanzas-icon.svg" />
         <FiltroPaginado
+          ref={filterRef}
           add
           onAdd={() => setShowModal(true)}
           paginacion
@@ -80,11 +94,13 @@ const Proveedores: FC = () => {
           currentPage={currentPage}
           handlePageChange={handlePageChange}
           resultados
-          filtro={false}
+          filtro={true}
+          onFilter={() => setShowFiltro(true)}
+          hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
           total={filteredUsers.length}
           search={setSearchParam}
           orderArray={orderArray}
-          searchPlaceholder="Buscar por nombre o teléfono"
+          searchPlaceholder="Buscar por texto"
         >
           {
             usersToShow.length > 0 &&
@@ -131,6 +147,13 @@ const Proveedores: FC = () => {
             setProvider(providerBlank)
             setShowModal(false);
           }}
+        />
+      </Modal>
+
+      <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
+        <FiltroProveedores
+          onChange={handleFilterChange}
+          initialFilters={savedFilters}
         />
       </Modal>
     </>

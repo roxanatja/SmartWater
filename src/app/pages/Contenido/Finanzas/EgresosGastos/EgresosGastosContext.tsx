@@ -33,7 +33,7 @@ export const expense: Expense = {
     documentNumber: "",
     hasInVoice: false,
     paymentMethodCurrentAccount: false,
-    provider: "",
+    provider: undefined,
     updated: "",
     user: ""
 }

@@ -18,8 +18,8 @@ interface ILoanFilters {
   daysToRenew: number;
   daysSinceRenewed: number;
 
-  distributor: { [key: string]: string };
-  zones: { [key: string]: string };
+  distributor: Record<string, string>;
+  zones: Record<string, string>;
 }
 
 const initialState: ILoanFilters = {

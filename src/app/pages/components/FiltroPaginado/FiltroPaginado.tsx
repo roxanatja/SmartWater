@@ -29,6 +29,7 @@ type Componentes = {
   handlePageChange?: (page: number) => void;
   infoPedidos?: boolean;
   infoPedidosData?: { text: string; value: string; }[];
+  infoPedidosClass?: string;
   resultados?: boolean;
   resultadosPrestamo?: boolean;
   children?: ReactNode;
@@ -72,6 +73,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   onAdd,
   infoPedidos,
   infoPedidosData,
+  infoPedidosClass,
   resultados,
   swith,
   opcionesSwitch1,
@@ -786,7 +788,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             </div>
           </div>
           {infoPedidos && (
-            <div className="ml-6 mb-8 infoPedidos-filtro bg-blocks dark:border-blocks overflow-auto text-xs">
+            <div className={`ml-6 infoPedidos-filtro bg-blocks dark:border-blocks overflow-auto text-xs ${infoPedidosClass ?? "mb-8"}`}>
               {
                 (infoPedidosData && infoPedidosData.length > 0) ?
                   <>

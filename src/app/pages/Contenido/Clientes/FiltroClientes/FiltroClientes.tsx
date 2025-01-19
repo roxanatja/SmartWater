@@ -20,10 +20,10 @@ interface IClientFilters {
   withoutCredit: boolean;
   daysToRenew: number;
   daysSinceRenewed: number;
-  zones: { [key: string]: string };
+  zones: Record<string, string>;
   fromDate: string | null;
   toDate: string | null;
-  distributor: { [key: string]: string };
+  distributor: Record<string, string>;
 }
 
 const initialState: IClientFilters = {

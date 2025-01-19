@@ -10,6 +10,7 @@ interface InputProps {
   isVisibleLable?: boolean;
   required?: boolean;
   className?: string;
+  containerClassName?: string;
   labelClassName?: string;
   iconContainerClassName?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -32,6 +33,7 @@ const Input = memo<InputProps>(
     textarea,
     required,
     className,
+    containerClassName,
     onChange,
     numericalOnly,
     icon,
@@ -77,7 +79,7 @@ const Input = memo<InputProps>(
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ delay: 0.3 }}
-        className="flex flex-col gap-2 w-full"
+        className={`flex flex-col gap-2 w-full ${containerClassName}`}
       >
         {label && !isVisibleLable && (
           <label
