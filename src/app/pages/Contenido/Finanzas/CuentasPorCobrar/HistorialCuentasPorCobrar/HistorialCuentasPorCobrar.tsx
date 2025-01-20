@@ -57,7 +57,7 @@ const HistorialCuentasPorCobrar: FC = () => {
 
   return (
     <>
-      <div>
+      <div className="px-10">
         <div>
           <button className="btn" onClick={handleClick}>
             <span className="material-symbols-outlined">arrow_back</span>
@@ -74,9 +74,8 @@ const HistorialCuentasPorCobrar: FC = () => {
           onFilter={Onfilter}
         >
           <div
-            className={`grid grid-cols-2 max-sm:grid-cols-1 gap-4 py-2 transition-all ${
-              !selectedOption ? "" : "scale-0 -z-10 fixed"
-            }`}
+            className={`grid grid-cols-2 max-sm:grid-cols-1 gap-4 py-2 transition-all ${!selectedOption ? "" : "scale-0 -z-10 fixed"
+              }`}
           >
             {data?.sales &&
               data.sales.map((row, index) => (
@@ -88,7 +87,7 @@ const HistorialCuentasPorCobrar: FC = () => {
                 />
               ))}
           </div>
-          <div
+          {/* <div
             className={`grid grid-cols-4 gap-4 py-2 transition-all md:grid-cols-3 ${
               selectedOption ? "" : "scale-0 -z-10 fixed"
             }`}
@@ -102,7 +101,7 @@ const HistorialCuentasPorCobrar: FC = () => {
                   onSendBill={() => getData()}
                 />
               ))}
-          </div>
+          </div> */}
         </FiltroPaginado>
       </div>
       {showFiltro && <FiltroHistorialCuentasPorCobrar />}

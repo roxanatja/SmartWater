@@ -1,15 +1,13 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import "./CashRegister.css";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Bills } from "../../../../type/Bills";
 import Input from "../../EntryComponents/Inputs";
 import { toast } from "react-hot-toast";
 import { UserData } from "../../../../type/UserData";
 import { BillsApiConector } from "../../../../api/classes";
 import { IBillByClientBody } from "../../../../api/types/bills";
 import { AuthService } from "../../../../api/services/AuthService";
-import { formatDateTime } from "../../../../utils/helpers";
 
 interface CobroMiniModalProps {
   client: Client;
@@ -17,9 +15,6 @@ interface CobroMiniModalProps {
 }
 
 const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
-  const [data, setData] = useState<Bills[]>([]);
-  const [active, setActive] = useState(false);
-
   const {
     register,
     handleSubmit,
@@ -35,15 +30,6 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
     },
     mode: 'all'
   });
-
-  const getBillsInformation = useCallback(async () => {
-    const billsData = (await BillsApiConector.get({ filters: { client: client._id }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    setData(billsData);
-  }, [client._id]);
-
-  useEffect(() => {
-    getBillsInformation();
-  }, [getBillsInformation]);
 
   const onSubmit: SubmitHandler<IBillByClientBody['data']> = async (data) => {
     const userData: UserData | null = AuthService.getUser();
@@ -62,7 +48,6 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       reset();
       onClose();
       window.location.reload();
-      getBillsInformation();
     } else {
       toast.error("Uppss error al registrar el Cobro");
     }

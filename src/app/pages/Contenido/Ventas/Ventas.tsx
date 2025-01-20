@@ -85,7 +85,7 @@ const Ventas: FC = () => {
       filters = { ...queryData.filters }
 
       if (!filters.initialDate && !!filters.finalDate) {
-        filters.initialDate = moment(filters.finalDate).startOf("week").toDate().toISOString().split("T")[0]
+        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
       }
 
       if (!!filters.initialDate && !filters.finalDate) {

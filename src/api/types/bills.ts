@@ -5,10 +5,15 @@ export interface IBillsGetParams extends Search {
         client?: string;
         zone?: string;
         user?: string;
+        initialDate?: string;
+        finalDate?: string;
         hasClientLoan?: boolean;
         hasClientContract?: boolean;
+        hasClientExpiredContracts?: boolean;
         hasClientCredit?: boolean;
         cashPayment?: boolean;
+        paymentMethodCurrentAccount?: boolean;
+        hasBalance?: boolean;
         renewedAgo?: number;
         renewedIn?: number;
         year?: number;

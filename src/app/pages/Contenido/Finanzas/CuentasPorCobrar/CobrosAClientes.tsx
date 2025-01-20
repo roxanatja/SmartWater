@@ -2,30 +2,32 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import "./CuentasPorCobrar.css";
 import { FiltroPaginado, IFiltroPaginadoReference } from "../../../components/FiltroPaginado/FiltroPaginado";
 import { useGlobalContext } from "../../../../SmartwaterContext";
-import { CuadroCuentasPorCobrar } from "./CuadroCuentasPorCobrar/CuadroCuentasPorCobrar";
-import { OpcionesCuentasCobrar } from "./OpcionesCuentasCobrar/OpcionesCuentasCobrar";
 import { CuentasPorCobrarContext } from "./CuentasPorCobrarContext";
-import { Sale, SaleProduct } from "../../../../../type/Sale/Sale";
-import Modal from "../../../EntryComponents/Modal";
+import { Sale } from "../../../../../type/Sale/Sale";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import moment from "moment";
-import { SalesApiConector, ClientsApiConector, ZonesApiConector, UsersApiConector } from "../../../../../api/classes";
-import { QueryMetadata } from "../../../../../api/types/common";
-import { ISalesGetParams } from "../../../../../api/types/sales";
-import { User } from "../../../../../type/User";
+import { BillsApiConector, ClientsApiConector, UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
+import { IBillsGetParams } from "../../../../../api/types/bills";
 import { Zone } from "../../../../../type/City";
-import FiltroCuentasPorCobrar from "./FiltroCuentasPorCobrar/FiltroCuentasPorCobrar";
+import { User } from "../../../../../type/User";
+import { QueryMetadata } from "../../../../../api/types/common";
+import moment from "moment";
+import { Bills } from "../../../../../type/Bills";
+import { CobrosClientes } from "./CuadroCuentasPorCobrar/CobrosClientes";
+import { Client } from "../../../../../type/Cliente/Client";
 import { client } from "../../Clientes/ClientesContext";
+import Modal from "../../../EntryComponents/Modal";
+import FiltroCobros from "./FiltroCuentasPorCobrar/FiltroCobros";
 
-const CuentasPorCobrar = () => {
+const CobrosAClientes = () => {
   const navigate = useNavigate()
 
   const { showMiniModal, showFiltro, setShowFiltro, setShowMiniModal, clientselect, setClientSelect } = useContext(CuentasPorCobrarContext);
 
   const { setLoading } = useGlobalContext()
-  const [currentData, setCurrentData] = useState<Array<Sale>>([]);
-  const [summary, setSumary] = useState<Array<Sale>>([]);
+  const [currentData, setCurrentData] = useState<Array<Bills>>([]);
+  const [summary, setSumary] = useState<Array<Bills>>([]);
 
+  const [clients, setClients] = useState<Client[]>([]);
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
 
@@ -36,16 +38,16 @@ const CuentasPorCobrar = () => {
 
   const [searchParam, setSearchParam] = useState<string>('');
   const [sort, setSort] = useState<'asc' | 'desc'>('desc');
-  const [savedFilters, setSavedFilters] = useState<ISalesGetParams['filters']>({});
+  const [savedFilters, setSavedFilters] = useState<IBillsGetParams['filters']>({});
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
 
   const [query, setQuery] = useSearchParams()
-  const [queryData, setQueryData] = useState<ISalesGetParams & { text?: string, clients?: string[] } | null>(null)
+  const [queryData, setQueryData] = useState<IBillsGetParams & { text?: string, clients?: string[] } | null>(null)
 
   useEffect(() => {
     if (query && query.has('filters')) {
-      const queryRes: ISalesGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
+      const queryRes: IBillsGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
       setQueryData(queryRes)
 
       if (queryRes.pagination) {
@@ -70,31 +72,23 @@ const CuentasPorCobrar = () => {
   const getSales = useCallback(async () => {
     setLoading(true)
 
-    const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
-    let filters: ISalesGetParams['filters'] = {}
+    const promises: Promise<{ data: Bills[] } & QueryMetadata | null>[] = []
+    let filters: IBillsGetParams['filters'] = {}
 
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (!filters.initialDate && !!filters.finalDate) {
-        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
-      }
-
-      if (!!filters.initialDate && !filters.finalDate) {
-        filters.finalDate = moment().format("YYYY-MM-DD")
-      }
-
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true } }))
+          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true } }))
+        promises.push(BillsApiConector.get({ pagination: queryData.pagination, filters: { ...filters } }))
       }
     }
 
     const responses = await Promise.all(promises)
-    const datSales: Sale[] = []
+    const datSales: Bills[] = []
     let totalcount: number = 0
     responses.forEach(r => {
       datSales.push(...(r?.data || []))
@@ -142,6 +136,7 @@ const CuentasPorCobrar = () => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
+      setClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
     }
     fetchZones()
@@ -156,42 +151,33 @@ const CuentasPorCobrar = () => {
     getSales();
   }, [getSales]);
 
-  const handleFilterChange = (filters: ISalesGetParams['filters']) => {
+  const handleFilterChange = (filters: IBillsGetParams['filters']) => {
     setCurrentPage(1);
     setSavedFilters(filters);
     setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, filters })) })
   };
 
   useEffect(() => {
-    const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
-    let filters: ISalesGetParams['filters'] = {}
+    const promises: Promise<{ data: Bills[] } & QueryMetadata | null>[] = []
+    let filters: IBillsGetParams['filters'] = {}
 
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (!filters.initialDate && !!filters.finalDate) {
-        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
-      }
-
-      if (!!filters.initialDate && !filters.finalDate) {
-        filters.finalDate = moment().format("YYYY-MM-DD")
-      }
-
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true } }))
+          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true } }))
+        promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters } }))
       }
     }
 
     Promise.all(promises).then(responses => {
-      const datSales: Sale[] = []
+      const datSales: Bills[] = []
       responses.forEach(r => {
         datSales.push(...(r?.data || []))
       })
-
       setSumary(datSales)
     })
   }, [queryData])
@@ -217,20 +203,20 @@ const CuentasPorCobrar = () => {
         activeFilters={{ ...queryData?.filters, clients: queryData?.clients }}
         otherResults={[{
           text: "Total:",
-          value: `${summary.reduce((cont, sale) => cont += sale.total, 0).toLocaleString()} Bs`
+          value: `${summary.reduce((cont, bill) => cont += bill.amount, 0).toLocaleString()} Bs`
         }]}
       >
         <div className="w-full pb-10 sticky top-0 bg-main-background z-[20]">
           <div className="w-full sm:w-1/2">
             <div className="switch-contenido">
               <div
-                className={`switch-option selected`}
+                className={`switch-option`}
                 onClick={() => navigate("/Finanzas/CuentasPorCobrarCobros/Cuentas")}
               >
                 Cuentas por cobrar
               </div>
               <div
-                className={`switch-option`}
+                className={`switch-option selected`}
                 onClick={() => navigate("/Finanzas/CuentasPorCobrarCobros/Cobros")}
               >
                 Cobros a clientes
@@ -242,8 +228,8 @@ const CuentasPorCobrar = () => {
         {
           currentData.length > 0 &&
           <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
-            {currentData.map((sale: Sale) => (
-              <CuadroCuentasPorCobrar sale={sale} key={sale._id} onSendBill={() => { }} />
+            {currentData.map((bill: Bills) => (
+              <CobrosClientes bill={bill} client={clients.find(c => c._id === bill.client)} />
             ))}
           </div>
         }
@@ -255,37 +241,17 @@ const CuentasPorCobrar = () => {
         }
       </FiltroPaginado>
 
+
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-        <FiltroCuentasPorCobrar
+        <FiltroCobros
           zones={zones}
           distribuidores={distribuidores}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
       </Modal>
-
-      <Modal
-        isOpen={showMiniModal && clientselect._id !== ""}
-        onClose={() => {
-          setClientSelect(client);
-          setShowMiniModal(false);
-        }}
-        className="w-3/12"
-      >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
-          Opciones Cuentas
-        </h2>
-        <div className="p-6">
-          <OpcionesCuentasCobrar
-            onClose={() => {
-              setClientSelect(client);
-              setShowMiniModal(false);
-            }}
-          />
-        </div>
-      </Modal >
     </>
   );
 };
 
-export { CuentasPorCobrar };
+export { CobrosAClientes };

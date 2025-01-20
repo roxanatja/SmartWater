@@ -6,7 +6,6 @@
 }
 
 .ArqueoCaja-tituloform {
-    color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
     font-style: normal;
@@ -24,7 +23,6 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-style: normal;
@@ -41,7 +39,6 @@
     gap: 10px;
     align-self: stretch;
     border-radius: 5px;
-    border: 1px solid #000;
 }
 
 .ArqueoCaja-btn {

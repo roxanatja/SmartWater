@@ -9,7 +9,7 @@ const TableArqueoCaja = ({ cash, distrib }: {
 }) => {
   return (
     <>
-      <div>
+      <div className="text-font-color">
         <table style={{ width: "80%" }}>
           <thead>
             <tr className="TableArqueoCaja-titulos">

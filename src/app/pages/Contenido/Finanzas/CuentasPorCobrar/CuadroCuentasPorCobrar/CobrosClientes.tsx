@@ -1,32 +1,36 @@
-import { Client } from "../../../../../../Class/types.data";
 import { Bills } from "../../../../../../type/Bills";
-import { User } from "../../../../../../type/User";
+import { Client } from "../../../../../../type/Cliente/Client";
+import { formatDateTime } from "../../../../../../utils/helpers";
 import "./CuadroCuentasPorCobrar.css";
 
 const CobrosClientes = ({
-  sale,
   bill,
-  user,
-  onSendBill,
+  client
 }: {
-  sale?: Client;
-  bill?: Bills;
-  onSendBill: () => void;
-  user?: User[];
+  client?: Client;
+  bill: Bills;
 }) => {
   return (
     <>
       <div className="CuadroCuentasPorCobrar-container">
         <div className="flex justify-between items-center">
           <div className="CuadroVentaCliente-header">
-            <img
-              src={sale?.storeImage || "../../Cliente2.svg"}
-              alt=""
-              className="w-8 h-8 rounded-full"
-            />
+            {client?.clientImage ? (
+              <img
+                src={client?.clientImage}
+                alt=""
+                className="infoClientes-imgStore"
+              />
+            ) : (
+              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
+                <div className="opacity-0">.</div>
+                <p className="absolute font-extrabold whitespace-nowrap">
+                  {client?.fullName?.[0] || "S"}
+                </p>
+              </div>
+            )}
             <span>
-              {sale?.fullName ||
-                user?.find((x) => x._id === bill?.user)?.fullName}
+              {client?.fullName || "Sin nombre"}
             </span>
           </div>
         </div>
@@ -34,16 +38,14 @@ const CobrosClientes = ({
           <div className="CuadroVentaCliente-text">
             <span>
               Fecha:{" "}
-              <span style={{ color: "#1A3D7D" }}>
-                {new Date(
-                  sale?.created || bill?.created || ""
-                ).toLocaleString()}
+              <span className="text-blue_custom">
+                {formatDateTime(bill.created, 'numeric', '2-digit', '2-digit', true)}
               </span>
             </span>
           </div>
-          <div className="CobrosClientes-pago">
+          <div className="CobrosClientes-pago text-blue_custom">
             <span>
-              {sale?.credit.toLocaleString() || bill?.amount.toLocaleString()}{" "}
+              {bill?.amount.toLocaleString()}{" "}
               <span className="font-normal">Bs.</span>
             </span>
           </div>
