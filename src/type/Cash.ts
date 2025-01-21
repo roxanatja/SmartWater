@@ -1,15 +1,13 @@
 export type CashOpen = {
   startDate: string;
-  initialMount: number;
+  endDate?: string;
+  initialAmount: number;
   user: string;
-  startTime: string;
 };
 
 export type CashClose = {
   user: string;
   endDate: string;
-  cash: number;
-  currentAccount: number;
 };
 
 export type Transaction = {

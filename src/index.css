@@ -158,3 +158,21 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 }
 
 input[type=number].no-spinner { -moz-appearance:textfield; }
+
+/* React data table */
+.rdt_TableHeadRow,
+.rdt_TableRow,
+.sc-gBoluC {
+  background-color: rgb(var(--bg-main)) !important;
+  color: rgb(var(--font-color)) !important;
+}
+
+.rdt_TableHeadRow,
+.rdt_TableRow:not(:last-of-type) {
+  border-bottom-color: rgb(var(--font-color)) !important;
+}
+
+.no-border .rdt_TableHeadRow,
+.no-border .rdt_TableRow:not(:last-of-type) {
+  border: none !important;
+}

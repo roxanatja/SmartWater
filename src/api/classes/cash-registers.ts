@@ -1,5 +1,5 @@
 import { Transaction, CashReport } from "../../type/Cash";
-import { IRegistersCloseBody, IRegistersGetParams, IRegistersOpenBody } from "../types/cash-registers";
+import { IRegistersCloseBody, IRegistersGetParams, IRegistersOpenBody, IRegistersOpenCloseBody } from "../types/cash-registers";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
 
@@ -31,6 +31,15 @@ export abstract class CashRegisterApiConector {
     static async open(params: IRegistersOpenBody): Promise<{ id: string } | null> {
         try {
             const res = await ApiConnector.getInstance().post(`${this.root_path}/create`, params.data)
+            return res.data
+        } catch (error) {
+            return null
+        }
+    }
+
+    static async openClose(params: IRegistersOpenCloseBody): Promise<{ id: string } | null> {
+        try {
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/open-close`, params.data)
             return res.data
         } catch (error) {
             return null

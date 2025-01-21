@@ -24,7 +24,16 @@ export interface IRegistersReportGetParams extends FilteredSearch {
 export interface IRegistersOpenBody {
     data: {
         startDate: string;
-        initialMount: number;
+        initialAmount: number;
+        user: string;
+    }
+}
+
+export interface IRegistersOpenCloseBody {
+    data: {
+        startDate: string;
+        endDate: string;
+        initialAmount: number;
         user: string;
     }
 }
@@ -33,7 +42,5 @@ export interface IRegistersCloseBody {
     data: {
         user: string;
         endDate: string;
-        cash: number;
-        currentAccount: number;
     }
 }
