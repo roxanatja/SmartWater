@@ -86,10 +86,10 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: true } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true } }))
+        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true, pendingBalance: true } }))
       }
     }
 
@@ -179,10 +179,10 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: true } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true } }))
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, pendingBalance: true } }))
       }
     }
 
