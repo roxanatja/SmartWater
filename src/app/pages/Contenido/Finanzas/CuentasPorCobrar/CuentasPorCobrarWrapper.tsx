@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { CuentasPorCobrarProvider } from "./CuentasPorCobrarContext";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { HistorialCuentasPorCobrar } from "./HistorialCuentasPorCobrar/HistorialCuentasPorCobrar";
 import CobrarRoot from "./CobrarRoot";
+import HistorialRoot from "./HistorialCuentasPorCobrar/HistorialRoot";
 
 
 
@@ -12,8 +12,9 @@ const CuentasPorCobrarWrapper: FC = () => {
             <CuentasPorCobrarProvider>
                 <Routes>
                     <Route path="/" element={<Navigate to={"/Finanzas/CuentasPorCobrarCobros/Cuentas"} replace />} />
+                    <Route path='/Historial/:client' element={<HistorialRoot />} />
+                    <Route path='/Historial/:client/:section' element={<HistorialRoot />} />
                     <Route path='/:section' element={<CobrarRoot />} />
-                    <Route path='/Historial' element={<HistorialCuentasPorCobrar />} />
                 </Routes>
             </CuentasPorCobrarProvider>
         </>

@@ -10,6 +10,7 @@ import { IBillsBody } from "../../../../../../api/types/bills";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { BillsApiConector } from "../../../../../../api/classes";
 import Input from "../../../../EntryComponents/Inputs";
+import { formatDateTime } from "../../../../../../utils/helpers";
 
 const CuadroCuentasPorCobrar = ({
   sale,
@@ -109,7 +110,7 @@ const CuadroCuentasPorCobrar = ({
                 <img src="/Opciones-icon.svg" alt="" className="invert-0 dark:invert" />
               </button>
             </div>
-            <div className="CuadroCuentasPorCobrar-header text-blue_custom">
+            <div className="CuadroCuentasPorCobrar-header text-blue_custom text-end">
               <span>{!!sale?.client?.[0]?.hasLoan ? "Prestamos activos" : "Sin prestamos activos"}</span>
             </div>
           </div>
@@ -129,6 +130,16 @@ const CuadroCuentasPorCobrar = ({
                   {sale.total.toLocaleString()} Bs.
                 </span>
               </div>
+            </div>
+          </div>
+          <div className="flex justify-between items-start -mt-4">
+            <div className="CuadroVentaCliente-text">
+              <span>
+                Fecha:{" "}
+                <span className="text-blue_custom">
+                  {formatDateTime(sale.created, 'numeric', '2-digit', '2-digit', true, true) || "N/A"}
+                </span>
+              </span>
             </div>
           </div>
         </div>

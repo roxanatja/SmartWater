@@ -76,11 +76,11 @@ const CuentasPorCobrar = () => {
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (!filters.initialDate && !!filters.finalDate) {
-        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
+      if (!filters.initialDate) {
+        filters.initialDate = "2020-01-01"
       }
 
-      if (!!filters.initialDate && !filters.finalDate) {
+      if (!filters.finalDate) {
         filters.finalDate = moment().format("YYYY-MM-DD")
       }
 
@@ -169,11 +169,11 @@ const CuentasPorCobrar = () => {
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (!filters.initialDate && !!filters.finalDate) {
-        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
+      if (!filters.initialDate) {
+        filters.initialDate = "2020-01-01"
       }
 
-      if (!!filters.initialDate && !filters.finalDate) {
+      if (!filters.finalDate) {
         filters.finalDate = moment().format("YYYY-MM-DD")
       }
 

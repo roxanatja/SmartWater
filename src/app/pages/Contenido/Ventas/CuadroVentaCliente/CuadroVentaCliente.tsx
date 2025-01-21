@@ -12,10 +12,11 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   sale: Sale;
-  products: Product[]
+  products: Product[];
+  isCobro?: boolean
 }
 
-const CuadroVentaCliente = ({ products, sale }: Props) => {
+const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
   const { setShowModal, setSelectedSale, setSelectedClient } = useContext(VentasContext);
 
   const [client, setClient] = useState<Client>();
@@ -117,12 +118,12 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
   return (
     <div className="CuadroVentaCliente-container relative bg-blocks dark:border-blocks w-full">
       <div className="p-4">
-        <div className="flex flex-col gap-3 pb-2 w-[calc(100%_-_30px)]">
+        <div className={`flex flex-col gap-3 pb-2 ${!isCobro && "w-[calc(100%_-_30px)]"}`}>
           <div className="flex items-center justify-between">
             <div className="CuadroVentaCliente-header">
-              {client?.storeImage ? (
+              {client?.clientImage ? (
                 <img
-                  src={client?.storeImage}
+                  src={client?.clientImage}
                   alt=""
                   className="infoClientes-imgStore"
                 />
@@ -151,24 +152,27 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
             <span className="text-blue_custom">{client?.code}</span>
           </div>
 
-          <div className="absolute -right-2 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
-            <button type="button" className="invert-0 dark:invert" onClick={handleOpen}>
-              <img src="./Opciones-icon.svg" alt="" />
-            </button>
-
-            <div className="relative" ref={optionsRef}>
-              <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
-                <img src="./opcion-icon.svg" alt="" />
+          {
+            !isCobro &&
+            <div className="absolute -right-2 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
+              <button type="button" className="invert-0 dark:invert" onClick={handleOpen}>
+                <img src="./Opciones-icon.svg" alt="" />
               </button>
-              <Option
-                editAction={Edit}
-                visible={showOptions}
-                editar={true}
-                eliminar={true}
-                deleteAction={Delete}
-              />
+
+              <div className="relative" ref={optionsRef}>
+                <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
+                  <img src="./opcion-icon.svg" alt="" />
+                </button>
+                <Option
+                  editAction={Edit}
+                  visible={showOptions}
+                  editar={true}
+                  eliminar={true}
+                  deleteAction={Delete}
+                />
+              </div>
             </div>
-          </div>
+          }
         </div>
         <div className="CuadroVentaCliente-productos w-[calc(100%_-_30px)]">
           <div className="w-full min-h-24 max-h-28 overflow-y-auto mt-4 relative">
@@ -219,7 +223,15 @@ const CuadroVentaCliente = ({ products, sale }: Props) => {
             Total:
           </span>
           <span className="CuadroVentaCliente-text text-blue_custom" style={{ fontWeight: "600", fontSize: "18px" }}>
-            {sale.detail.reduce((current, det) => current += (det.price * det.quantity), 0)} Bs
+            {
+              isCobro ?
+                <span>
+                  {sale.total}
+                </span> :
+                <span>
+                  {sale.detail.reduce((current, det) => current += (det.price * det.quantity), 0)} Bs
+                </span>
+            }
           </span>
         </div>
       </div>

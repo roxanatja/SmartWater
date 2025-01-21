@@ -18,10 +18,14 @@ import { client } from "../../Clientes/ClientesContext";
 import Modal from "../../../EntryComponents/Modal";
 import FiltroCobros from "./FiltroCuentasPorCobrar/FiltroCobros";
 
-const CobrosAClientes = () => {
+interface Props {
+  client?: string
+}
+
+const CobrosAClientes = ({ client }: Props) => {
   const navigate = useNavigate()
 
-  const { showMiniModal, showFiltro, setShowFiltro, setShowMiniModal, clientselect, setClientSelect } = useContext(CuentasPorCobrarContext);
+  const { showFiltro, setShowFiltro } = useContext(CuentasPorCobrarContext);
 
   const { setLoading } = useGlobalContext()
   const [currentData, setCurrentData] = useState<Array<Bills>>([]);
@@ -78,12 +82,16 @@ const CobrosAClientes = () => {
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (queryData.clients) {
-        queryData.clients.forEach(cf =>
-          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
-        )
+      if (client) {
+        promises.push(BillsApiConector.get({ pagination: queryData.pagination, filters: { ...filters, client } }))
       } else {
-        promises.push(BillsApiConector.get({ pagination: queryData.pagination, filters: { ...filters } }))
+        if (queryData.clients) {
+          queryData.clients.forEach(cf =>
+            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+          )
+        } else {
+          promises.push(BillsApiConector.get({ pagination: queryData.pagination, filters: { ...filters } }))
+        }
       }
     }
 
@@ -99,7 +107,7 @@ const CobrosAClientes = () => {
     setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
     setTotal(totalcount)
     setLoading(false)
-  }, [setLoading, queryData]);
+  }, [setLoading, queryData, client]);
 
   const orderArray = (orden: string) => {
     if (orden === "new") {
@@ -164,12 +172,16 @@ const CobrosAClientes = () => {
     if (queryData) {
       filters = { ...queryData.filters }
 
-      if (queryData.clients) {
-        queryData.clients.forEach(cf =>
-          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
-        )
+      if (client) {
+        promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client } }))
       } else {
-        promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters } }))
+        if (queryData.clients) {
+          queryData.clients.forEach(cf =>
+            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
+          )
+        } else {
+          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters } }))
+        }
       }
     }
 
@@ -180,7 +192,7 @@ const CobrosAClientes = () => {
       })
       setSumary(datSales)
     })
-  }, [queryData])
+  }, [queryData, client])
 
   return (
     <>
@@ -193,6 +205,7 @@ const CobrosAClientes = () => {
         handlePageChange={handlePageChange}
         resultados={true}
         filtro
+        hasSearch={!client}
         total={total}
         search={setSearchParam}
         orderArray={orderArray}
@@ -211,15 +224,27 @@ const CobrosAClientes = () => {
             <div className="switch-contenido">
               <div
                 className={`switch-option`}
-                onClick={() => navigate("/Finanzas/CuentasPorCobrarCobros/Cuentas")}
+                onClick={() => {
+                  if (!!client) {
+                    navigate(`/Finanzas/CuentasPorCobrarCobros/Historial/${client}/VentaCredito`)
+                  } else {
+                    navigate("/Finanzas/CuentasPorCobrarCobros/Cuentas")
+                  }
+                }}
               >
-                Cuentas por cobrar
+                {!!client ? "Ventas al crédito" : "Cuentas por cobrar"}
               </div>
               <div
                 className={`switch-option selected`}
-                onClick={() => navigate("/Finanzas/CuentasPorCobrarCobros/Cobros")}
+                onClick={() => {
+                  if (!!client) {
+                    navigate(`/Finanzas/CuentasPorCobrarCobros/Historial/${client}/Cobros`)
+                  } else {
+                    navigate("/Finanzas/CuentasPorCobrarCobros/Cobros")
+                  }
+                }}
               >
-                Cobros a clientes
+                {!!client ? "Cobros" : "Cobros a clientes"}
               </div>
             </div>
           </div>

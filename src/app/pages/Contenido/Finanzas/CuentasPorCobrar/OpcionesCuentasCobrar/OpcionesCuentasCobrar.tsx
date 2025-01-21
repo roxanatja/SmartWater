@@ -1,16 +1,24 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./OpcionesCuentasCobrar.css";
 import { CuentasPorCobrarContext } from "../CuentasPorCobrarContext";
+import { useSessionStorage } from "@uidotdev/usehooks";
+import React from "react";
 
 const OpcionesCuentasCobrar = ({ onClose }: { onClose: () => void }) => {
-  const { setShowMiniModal } = useContext(CuentasPorCobrarContext);
+  const { setShowMiniModal, clientselect } = useContext(CuentasPorCobrarContext);
+  const location = useLocation()
+  const [returnUrl, setReturnUrl] = useSessionStorage("returnUrl", "")
 
   return (
     <>
       <Link
-        to={`/Finanzas/CuentasPorCobrarCobros/Historial`}
+        to={`/Finanzas/CuentasPorCobrarCobros/Historial/${clientselect._id}`}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
+        onClick={() => {
+          setReturnUrl(`${location.pathname}${location.search}`)
+          onClose();
+        }}
       >
         <div className="flex gap-2 items-center">
           <i className="fa-regular fa-clock text-xl text-blue_custom"></i>
