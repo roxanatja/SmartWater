@@ -1,34 +1,33 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import "./CuentasPorPagar.css";
-import { FiltroPaginado, IFiltroPaginadoReference } from "../../../components/FiltroPaginado/FiltroPaginado";
-import { CuadroCuentasPorPagar } from "./CuadroCuentasPorPagar/CuadroCuentasPorPagar";
-import { useGlobalContext } from "../../../../SmartwaterContext";
-import { CuentasPorPagarContext } from "./CuentasPorPagarContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Expense } from "../../../../../type/Expenses";
-import { Zone } from "../../../../../type/City";
-import { User } from "../../../../../type/User";
-import { IExpensesGetParams } from "../../../../../api/types/expenses";
-import { QueryMetadata } from "../../../../../api/types/common";
-import moment from "moment";
-import { ExpensesApiConector, ProvidersApiConector, UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
-import { Providers } from "../../../../../type/providers";
-import Modal from "../../../EntryComponents/Modal";
-import { providerBlank } from "../Proveedores/ProveedoresContext";
-import { FiltroCuentasPorPagar } from "./FiltroCuentasPorPagar/FiltroCuentasPorPagar";
-import OpcionesCuentasPorPagar from "./OpcionesCuentasPorPagar";
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CuentasPorPagarContext } from './CuentasPorPagarContext';
+import { useGlobalContext } from '../../../../SmartwaterContext';
+import { InvoceExpense } from '../../../../../type/InvoceExpense';
+import { Providers } from '../../../../../type/providers';
+import { User } from '../../../../../type/User';
+import { Zone } from '../../../../../type/City';
+import { IInvExpensesGetParams } from '../../../../../api/types/invoice-expenses';
+import { FiltroPaginado, IFiltroPaginadoReference } from '../../../components/FiltroPaginado/FiltroPaginado';
+import { PaginatedSearch, QueryMetadata } from '../../../../../api/types/common';
+import { InvoiceExpensesApiConector, ProvidersApiConector, UsersApiConector, ZonesApiConector } from '../../../../../api/classes';
+import { CuadroPagosProveedor } from './CuadroPagosProveedor/CuadroPagosProveedor';
+import Modal from '../../../EntryComponents/Modal';
 
-const CuentasPorPagar = () => {
+interface Props {
+    proveedor?: string
+}
+
+const PagosAProveedores = ({ proveedor }: Props) => {
     const navigate = useNavigate()
 
-    const { showMiniModal, showFiltro, setShowFiltro, setShowMiniModal, providerSelect, setProviderSelected } = useContext(CuentasPorPagarContext);
+    const { showFiltro, setShowFiltro } = useContext(CuentasPorPagarContext);
 
     const { setLoading } = useGlobalContext()
-    const [currentData, setCurrentData] = useState<Array<Expense>>([]);
-    const [summary, setSumary] = useState<Array<Expense>>([]);
+    const [currentData, setCurrentData] = useState<Array<InvoceExpense>>([]);
+    const [summary, setSumary] = useState<Array<InvoceExpense>>([]);
 
-    const [distribuidores, setDistribuidores] = useState<User[]>([]);
     const [providers, setProviders] = useState<Providers[]>([]);
+    const [distribuidores, setDistribuidores] = useState<User[]>([]);
     const [zones, setZones] = useState<Zone[]>([]);
 
     const itemsPerPage: number = 12;
@@ -38,16 +37,16 @@ const CuentasPorPagar = () => {
 
     const [searchParam, setSearchParam] = useState<string>('');
     const [sort, setSort] = useState<'asc' | 'desc'>('desc');
-    const [savedFilters, setSavedFilters] = useState<IExpensesGetParams['filters']>({});
+    const [savedFilters, setSavedFilters] = useState<IInvExpensesGetParams['filters']>({});
 
     const filterRef = useRef<IFiltroPaginadoReference>(null)
 
     const [query, setQuery] = useSearchParams()
-    const [queryData, setQueryData] = useState<IExpensesGetParams & { text?: string, clients?: string[] } | null>(null)
+    const [queryData, setQueryData] = useState<IInvExpensesGetParams & { text?: string, clients?: string[] } & PaginatedSearch | null>(null)
 
     useEffect(() => {
         if (query && query.has('filters')) {
-            const queryRes: IExpensesGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
+            const queryRes: IInvExpensesGetParams & { text?: string, clients?: string[] } & PaginatedSearch = JSON.parse(atob(query.get('filters')!))
             setQueryData(queryRes)
 
             if (queryRes.pagination) {
@@ -72,42 +71,38 @@ const CuentasPorPagar = () => {
     const getSales = useCallback(async () => {
         setLoading(true)
 
-        const promises: Promise<{ data: Expense[] } & QueryMetadata | null>[] = []
-        let filters: IExpensesGetParams['filters'] = {}
+        const promises: Promise<{ data: InvoceExpense[] } & QueryMetadata | null>[] = []
+        let filters: IInvExpensesGetParams['filters'] = {}
 
         if (queryData) {
             filters = { ...queryData.filters }
 
-            if (!filters.initialDate && !!filters.finalDate) {
-                filters.initialDate = "2020-01-01"
-            }
-
-            if (!filters.finalDate && !!filters.initialDate) {
-                filters.finalDate = moment().format("YYYY-MM-DD")
-            }
-
-            if (queryData.clients) {
-                queryData.clients.forEach(cf =>
-                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true } }))
-                )
+            if (proveedor) {
+                promises.push(InvoiceExpensesApiConector.get({ filters: { ...filters, provider: proveedor, sort: queryData.pagination?.sort } }))
             } else {
-                promises.push(ExpensesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditBuy: true } }))
+                if (queryData.clients) {
+                    queryData.clients.forEach(cf =>
+                        promises.push(InvoiceExpensesApiConector.get({ filters: { ...filters, provider: cf, sort: queryData.pagination?.sort } }))
+                    )
+                } else {
+                    promises.push(InvoiceExpensesApiConector.get({ filters: { ...filters, sort: queryData.pagination?.sort } }))
+                }
             }
         }
 
         const responses = await Promise.all(promises)
-        const datSales: Expense[] = []
+        const datSales: InvoceExpense[] = []
         let totalcount: number = 0
         responses.forEach(r => {
             datSales.push(...(r?.data || []))
             totalcount += r?.metadata.totalCount || 0
         })
 
-        setCurrentData(datSales);
+        setSumary(datSales);
         setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
         setTotal(totalcount)
         setLoading(false)
-    }, [setLoading, queryData]);
+    }, [setLoading, queryData, proveedor]);
 
     const orderArray = (orden: string) => {
         if (orden === "new") {
@@ -118,6 +113,12 @@ const CuentasPorPagar = () => {
             setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'asc' } })) })
         }
     };
+
+    useEffect(() => {
+        if (queryData && summary) {
+            setCurrentData(summary.slice(((queryData.pagination?.page || 1) - 1) * itemsPerPage, ((queryData.pagination?.page || 1)) * itemsPerPage))
+        }
+    }, [queryData, summary])
 
     useEffect(() => {
         const getData = setTimeout(async () => {
@@ -143,8 +144,8 @@ const CuentasPorPagar = () => {
     useEffect(() => {
         const fetchZones = async () => {
             setZones((await ZonesApiConector.get({}))?.data || []);
-            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
             setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
         }
         fetchZones()
     }, [])
@@ -158,45 +159,11 @@ const CuentasPorPagar = () => {
         getSales();
     }, [getSales]);
 
-    const handleFilterChange = (filters: IExpensesGetParams['filters']) => {
+    const handleFilterChange = (filters: IInvExpensesGetParams['filters']) => {
         setCurrentPage(1);
         setSavedFilters(filters);
         setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, filters })) })
     };
-
-    useEffect(() => {
-        const promises: Promise<{ data: Expense[] } & QueryMetadata | null>[] = []
-        let filters: IExpensesGetParams['filters'] = {}
-
-        if (queryData) {
-            filters = { ...queryData.filters }
-
-            if (!filters.initialDate && !!filters.finalDate) {
-                filters.initialDate = "2020-01-01"
-            }
-
-            if (!filters.finalDate && !!filters.initialDate) {
-                filters.finalDate = moment().format("YYYY-MM-DD")
-            }
-
-            if (queryData.clients) {
-                queryData.clients.forEach(cf =>
-                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true } }))
-                )
-            } else {
-                promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, creditBuy: true } }))
-            }
-        }
-
-        Promise.all(promises).then(responses => {
-            const datSales: Expense[] = []
-            responses.forEach(r => {
-                datSales.push(...(r?.data || []))
-            })
-
-            setSumary(datSales)
-        })
-    }, [queryData])
 
     return (
         <>
@@ -209,6 +176,7 @@ const CuentasPorPagar = () => {
                 handlePageChange={handlePageChange}
                 resultados={true}
                 filtro
+                hasSearch={!proveedor}
                 total={total}
                 search={setSearchParam}
                 orderArray={orderArray}
@@ -219,23 +187,35 @@ const CuentasPorPagar = () => {
                 activeFilters={{ ...queryData?.filters, clients: queryData?.clients }}
                 otherResults={[{
                     text: "Total:",
-                    value: `${summary.reduce((cont, sale) => cont += sale.amount, 0).toLocaleString()} Bs`
+                    value: `${summary.reduce((cont, bill) => cont += bill.amount, 0).toLocaleString()} Bs`
                 }]}
             >
                 <div className="w-full pb-10 sticky top-0 bg-main-background z-[20]">
                     <div className="w-full sm:w-1/2">
                         <div className="switch-contenido">
                             <div
-                                className={`switch-option selected`}
-                                onClick={() => navigate("/Finanzas/CuentasPorPagar/Cuentas")}
+                                className={`switch-option`}
+                                onClick={() => {
+                                    if (!!proveedor) {
+                                        navigate(`/Finanzas/CuentasPorPagar/Historial/${proveedor}/Cuentas`)
+                                    } else {
+                                        navigate("/Finanzas/CuentasPorPagar/Cuentas")
+                                    }
+                                }}
                             >
                                 Cuentas por pagar
                             </div>
                             <div
-                                className={`switch-option`}
-                                onClick={() => navigate("/Finanzas/CuentasPorPagar/Pagos")}
+                                className={`switch-option selected`}
+                                onClick={() => {
+                                    if (!!proveedor) {
+                                        navigate(`/Finanzas/CuentasPorPagar/Historial/${proveedor}/Pagos`)
+                                    } else {
+                                        navigate("/Finanzas/CuentasPorCobrarCobros/Pagos")
+                                    }
+                                }}
                             >
-                                Pagos a proveedores
+                                {!!proveedor ? "Pagos" : "Cobros a proveedores"}
                             </div>
                         </div>
                     </div>
@@ -244,8 +224,8 @@ const CuentasPorPagar = () => {
                 {
                     currentData.length > 0 &&
                     <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
-                        {currentData.map((sale: Expense) => (
-                            <CuadroCuentasPorPagar expense={sale} key={sale._id} />
+                        {currentData.map((bill: InvoceExpense) => (
+                            <CuadroPagosProveedor key={bill._id} invoice={bill} providers={providers} />
                         ))}
                     </div>
                 }
@@ -257,37 +237,18 @@ const CuentasPorPagar = () => {
                 }
             </FiltroPaginado>
 
+
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-                <FiltroCuentasPorPagar
+                {/* <FiltroCobros
                     zones={zones}
                     distribuidores={distribuidores}
                     onChange={handleFilterChange}
                     initialFilters={savedFilters}
-                />
+                /> */}
+                Filtros
             </Modal>
-
-            <Modal
-                isOpen={showMiniModal && providerSelect._id !== ""}
-                onClose={() => {
-                    setProviderSelected(providerBlank);
-                    setShowMiniModal(false);
-                }}
-                className="w-3/12"
-            >
-                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
-                    Opciones Cuentas
-                </h2>
-                <div className="p-6">
-                    <OpcionesCuentasPorPagar
-                        onClose={() => {
-                            setProviderSelected(providerBlank);
-                            setShowMiniModal(false);
-                        }}
-                    />
-                </div>
-            </Modal >
         </>
     );
 }
 
-export { CuentasPorPagar }
+export default PagosAProveedores

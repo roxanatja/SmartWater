@@ -3,18 +3,15 @@ import "./CuentasPorCobrar.css";
 import { FiltroPaginado, IFiltroPaginadoReference } from "../../../components/FiltroPaginado/FiltroPaginado";
 import { useGlobalContext } from "../../../../SmartwaterContext";
 import { CuentasPorCobrarContext } from "./CuentasPorCobrarContext";
-import { Sale } from "../../../../../type/Sale/Sale";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BillsApiConector, ClientsApiConector, UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
 import { IBillsGetParams } from "../../../../../api/types/bills";
 import { Zone } from "../../../../../type/City";
 import { User } from "../../../../../type/User";
 import { QueryMetadata } from "../../../../../api/types/common";
-import moment from "moment";
 import { Bills } from "../../../../../type/Bills";
 import { CobrosClientes } from "./CuadroCuentasPorCobrar/CobrosClientes";
 import { Client } from "../../../../../type/Cliente/Client";
-import { client } from "../../Clientes/ClientesContext";
 import Modal from "../../../EntryComponents/Modal";
 import FiltroCobros from "./FiltroCuentasPorCobrar/FiltroCobros";
 

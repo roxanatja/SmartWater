@@ -3,7 +3,15 @@ import { FilteredSearch } from "./common";
 export interface IInvExpensesGetParams extends FilteredSearch {
     filters?: {
         user?: string;
+        name?: string;
+        initialDate?: string;
+        finalDate?: string;
+        zone?: string;
         provider?: string;
+        hasBalance?: boolean;
+        cashPayment?: boolean;
+        paymentMethodCurrentAccount?: boolean;
+        sort?: 'asc' | 'desc';
     }
 }
 

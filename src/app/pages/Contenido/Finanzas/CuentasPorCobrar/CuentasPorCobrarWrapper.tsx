@@ -19,7 +19,6 @@ const CuentasPorCobrarWrapper: FC = () => {
             </CuentasPorCobrarProvider>
         </>
     )
-
 }
 
 export { CuentasPorCobrarWrapper }

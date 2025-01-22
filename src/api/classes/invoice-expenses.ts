@@ -1,4 +1,5 @@
 import { InvoceExpense } from "../../type/InvoceExpense";
+import { QueryMetadata } from "../types/common";
 import { IInvExpensesBody, IInvExpensesFilter, IInvExpensesGetParams, IInvExpensesUpdateBody } from "../types/invoice-expenses";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
@@ -6,7 +7,7 @@ import { ApiConnector } from "./api-conector";
 export abstract class InvoiceExpensesApiConector {
     private static root_path = "/invoice-expenses"
 
-    static async get(params: IInvExpensesGetParams): Promise<InvoceExpense[] | null> {
+    static async get(params: IInvExpensesGetParams): Promise<{ data: InvoceExpense[] } & QueryMetadata | null> {
         const query = generateQueryString(params)
 
         try {

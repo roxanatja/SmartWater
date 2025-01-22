@@ -1,9 +1,7 @@
-.CuadroCuentasPorPagar-container{
-    width: 564px;
+.CuadroCuentasPorPagar-container {
     flex-shrink: 0;
     border-radius: 20px;
     border: 1px solid #D6D5D5;
-    background: #FFF;
     display: flex;
     flex-direction: column;
     gap: 15px;

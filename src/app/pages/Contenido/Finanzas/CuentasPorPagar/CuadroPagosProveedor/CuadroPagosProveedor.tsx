@@ -1,32 +1,45 @@
-import { FC } from "react";
 import "./CuadroPagosProveedor.css";
+import { InvoceExpense } from "../../../../../../type/InvoceExpense";
+import { Providers } from "../../../../../../type/providers";
+import { formatDateTime } from "../../../../../../utils/helpers";
 
-const CuadroPagosProveedor: FC = () => {
-    return(
+const CuadroPagosProveedor = ({
+    invoice,
+    providers
+}: {
+    providers: Providers[]
+    invoice: InvoceExpense
+}) => {
+    return (
         <>
-        <div className="CuadroCuentasPorCobrar-container">
-            <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-                <div className="CuadroVentaCliente-header">
-                    <img src="../../Cliente2.svg" alt="" />
-                    <span>Rubén González</span>
+            <div className="CuadroCuentasPorCobrar-container">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div className="CuadroVentaCliente-header">
+                        <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
+                            <div className="opacity-0">.</div>
+                            <p className="absolute font-extrabold whitespace-nowrap">
+                                {providers.find(p => p._id === invoice.provider)?.fullName?.[0] || "S"}
+                            </p>
+                        </div>
+                        <span>{providers.find(p => p._id === invoice.provider)?.fullName || "Proveedor desconocido"}</span>
+                    </div>
+                </div>
+                <div style={{ display: "flex", gap: "120px" }}>
+                    <div className="CuadroVentaCliente-text">
+                        <span>Pago {invoice.cashPayment ? "efectivo" : invoice.paymentMethodCurrentAccount ? "cuenta corriente" : "al contado"}</span>
+                    </div>
+                    <div className="CobrosClientes-pago">
+                        <span>{invoice.amount.toLocaleString()} <span style={{ color: "#000", fontWeight: "400" }}>Bs.</span></span>
+                    </div>
+                </div>
+                <div>
+                    <div className="CuadroVentaCliente-text">
+                        <span>Fecha: <span className="text-blue_custom">{formatDateTime(invoice.date, 'numeric', '2-digit', '2-digit')}</span></span>
+                    </div>
                 </div>
             </div>
-            <div style={{display: "flex", gap: "120px"}}>
-                <div className="CuadroVentaCliente-text">
-                    <span>Pago efectivo</span>
-                </div>
-                <div className="CobrosClientes-pago">
-                    <span>150 <span style={{color: "#000", fontWeight: "400"}}>Bs.</span></span>
-                </div>
-            </div>
-            <div>
-                <div className="CuadroVentaCliente-text">
-                    <span>Fecha: <span style={{color: "#1A3D7D"}}>18/ 04/ 2023</span></span>
-                </div>
-            </div>
-        </div>
         </>
     )
 }
 
-export{CuadroPagosProveedor}
+export { CuadroPagosProveedor }
