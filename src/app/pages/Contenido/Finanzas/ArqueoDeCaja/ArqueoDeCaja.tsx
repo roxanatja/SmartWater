@@ -107,7 +107,7 @@ const ArqueoDeCaja: FC = () => {
       <div className="px-10 h-screen overflow-y-auto pb-10">
         <PageTitle titulo="Arqueo De Cajas" icon="../Finanzas-icon.svg" />
         <div className="w-full p-6">
-          <TableArqueoCaja cash={data} distrib={dist} />
+          <TableArqueoCaja cash={data} />
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="ArqueoCaja-containerform w-full lg:w-1/2 mt-10">

@@ -42,5 +42,11 @@ export interface IRegistersCloseBody {
     data: {
         user: string;
         endDate: string;
+        currentAccount: number;
+        cash: number;
     }
+}
+
+export interface IRegistersFilter {
+    registryId: string;
 }

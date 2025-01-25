@@ -1,3 +1,5 @@
+import { User } from "./User";
+
 export type CashOpen = {
   startDate: string;
   endDate?: string;
@@ -8,6 +10,8 @@ export type CashOpen = {
 export type CashClose = {
   user: string;
   endDate: string;
+  cash: number;
+  currentAccount: number;
 };
 
 export type Transaction = {
@@ -34,6 +38,7 @@ export type Transaction = {
   currentAccountRendered: number;
   created: string;
   updated: string;
+  userDetails: User
 };
 
 export type CashReport = {

@@ -7,11 +7,11 @@ import DataTable, { TableColumn } from 'react-data-table-component';
 import toast from "react-hot-toast";
 import Modal from "../../../../EntryComponents/Modal";
 import { FinalizarArqueoCaja } from "../FinalizarArqueoCaja/FinalizarArqueoCaja";
+import { CashRegisterApiConector } from "../../../../../../api/classes";
 
 
-const TableArqueoCaja = ({ cash, distrib }: {
+const TableArqueoCaja = ({ cash }: {
   cash: Transaction[];
-  distrib: User[]
 }) => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>(undefined)
 
@@ -33,27 +33,26 @@ const TableArqueoCaja = ({ cash, distrib }: {
               className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
               onClick={async () => {
                 toast.dismiss(t.id);
-                toast.error("No implementado")
-                // const response = await ItemsApiConector.delete({ productId: item?._id || '' }) as any;
-                // if (!!response) {
-                //   if (response.mensaje) {
-                //     toast.success(response.mensaje, {
-                //       position: "top-center",
-                //       duration: 2000
-                //     });
-                //     window.location.reload();
-                //   } else if (response.error) {
-                //     toast.error(response.error, {
-                //       position: "top-center",
-                //       duration: 2000
-                //     });
-                //   }
-                // } else {
-                //   toast.error("Error al eliminar cliente", {
-                //     position: "top-center",
-                //     duration: 2000
-                //   });
-                // }
+                const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
+                if (!!response) {
+                  if (response.mensaje) {
+                    toast.success(response.mensaje, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                    window.location.reload();
+                  } else if (response.error) {
+                    toast.error(response.error, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                  }
+                } else {
+                  toast.error("Error al eliminar cliente", {
+                    position: "top-center",
+                    duration: 2000
+                  });
+                }
               }}
             >
               Proceder
@@ -81,7 +80,7 @@ const TableArqueoCaja = ({ cash, distrib }: {
     },
     {
       name: "Distibuidor",
-      selector: row => distrib.find(d => d._id === row.user)?.fullName || "Distribuidor desconocido"
+      selector: row => row.userDetails?.fullName || "Distribuidor desconocido"
     },
     {
       name: "Sistema",
@@ -107,7 +106,7 @@ const TableArqueoCaja = ({ cash, distrib }: {
           </button>
         </div>
     }
-  ], [distrib, deleteRegistry])
+  ], [deleteRegistry])
 
   const [onlyOpen, setOnlyOpen] = useState<boolean>(false)
 
@@ -161,7 +160,7 @@ const TableArqueoCaja = ({ cash, distrib }: {
         </h2>
 
         <div className="px-6">
-          <FinalizarArqueoCaja cash={selectedTransaction} distrib={distrib} handleOnSubmit={() => { setSelectedTransaction(undefined); window.location.reload() }} />
+          <FinalizarArqueoCaja cash={selectedTransaction} handleOnSubmit={() => { setSelectedTransaction(undefined); window.location.reload() }} />
         </div>
       </Modal>
     </>

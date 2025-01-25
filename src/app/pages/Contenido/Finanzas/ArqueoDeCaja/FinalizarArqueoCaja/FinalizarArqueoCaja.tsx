@@ -9,7 +9,7 @@ import moment from "moment-timezone";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import { useGlobalContext } from "../../../../../SmartwaterContext";
 import { generate } from "@pdfme/generator";
-import { text } from "@pdfme/schemas";
+import { text, rectangle } from "@pdfme/schemas";
 import { pdfTemplate } from "./pdftemplate";
 import { Buffer } from 'buffer'
 import { useRef } from "react";
@@ -17,11 +17,9 @@ import { useReactToPrint } from "react-to-print";
 
 const FinalizarArqueoCaja = ({
   cash,
-  handleOnSubmit,
-  distrib
+  handleOnSubmit
 }: {
-  cash?: Transaction;
-  distrib: User[]
+  cash?: Transaction
   handleOnSubmit?: () => void;
 }) => {
   const {
@@ -37,6 +35,8 @@ const FinalizarArqueoCaja = ({
       data: {
         user: cash?.user || "",
         endDate: moment.tz("America/La_Paz").format(),
+        cash: data.cash,
+        currentAccount: data.currentAccount
       }
     });
 
@@ -57,7 +57,7 @@ const FinalizarArqueoCaja = ({
           "date": cash?.startDate
             ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
             : "N/A",
-          "distribuidor": distrib.find(d => d._id === cash?.user)?.fullName || "Distribuidor desconocido",
+          "distribuidor": cash?.userDetails?.fullName || "Distribuidor desconocido",
           "estado": !!cash?.state ? "Abierto" : "Cerrado",
           "monto": (cash?.initialAmount || 0).toLocaleString(),
           "ingresos": (cash?.incomeCashTotal || 0).toLocaleString(),
@@ -66,9 +66,6 @@ const FinalizarArqueoCaja = ({
           "egresos": (cash?.expenseCashTotal || 0).toLocaleString(),
           "egresos_efectivo": (cash?.expenseCashTotal || 0).toLocaleString(),
           "egresos_cuenta": (cash?.expenseCurrentAccountTotal || 0).toLocaleString(),
-          "usuario_efectivo": (cash?.cashRendered || 0).toLocaleString(),
-          "usuario_cuenta": (cash?.currentAccountRendered || 0).toLocaleString(),
-          "diferencia": (cash?.difference || 0).toLocaleString(),
           "ingreso_efectivo_efectivo": (cash?.cashSales || 0).toLocaleString(),
           "ingreso_efectivo_credito": (cash?.creditBillsSales || 0).toLocaleString(),
           "ingreso_cuenta_efectivo": (cash?.cashCurrentAccount || 0).toLocaleString(),
@@ -80,11 +77,11 @@ const FinalizarArqueoCaja = ({
           "ventas_egresos_cuentapor_cobrar": "0",
           "gastos_por_pagar": "0",
           "saldo_en_caja": "0",
-          "total_ingresos": (cash?.incomeCashTotal || 0).toLocaleString()
+          "diferencia": (cash?.difference || 0).toLocaleString(),
         }
       ]
 
-      const pdf = await generate({ template: pdfTemplate, inputs, plugins: { Text: text } })
+      const pdf = await generate({ template: pdfTemplate, inputs, plugins: { Text: text, Rectangle: rectangle } })
       const pdfBuffer = Buffer.from(pdf)
 
       const blob = new Blob([pdfBuffer])
@@ -143,22 +140,27 @@ const FinalizarArqueoCaja = ({
               <div className="flex flex-col gap-3">
                 <div className="grid grid-cols-3 gap-2">
                   <div className="col-span-2">Distribuidor</div>
-                  <div className="whitespace-normal md:whitespace-nowrap">{distrib.find(d => d._id === cash?.user)?.fullName || "Distribuidor desconocido"}</div>
+                  <div className="whitespace-normal md:whitespace-nowrap">{cash?.userDetails?.fullName || "Distribuidor desconocido"}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="col-span-2">Abierto</div>
-                  <div className="relative inline-block w-11 h-5">
-                    <input
-                      id="switch-component"
-                      type="checkbox"
-                      readOnly
-                      checked={!!cash?.state}
-                      className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
-                    />
-                    <label
-                      htmlFor="switch-component"
-                      className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
-                    ></label>
+                  <div className="col-span-2">Estado</div>
+                  <div className="flex gap-2 utems-center">
+                    <div className="relative inline-block w-11 h-5">
+                      <input
+                        id="switch-component"
+                        type="checkbox"
+                        readOnly
+                        checked={!!cash?.state}
+                        className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
+                      />
+                      <label
+                        htmlFor="switch-component"
+                        className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
+                      ></label>
+                    </div>
+                    <span className="ml-6">
+                      {cash?.state ? "Abierto" : "Cerrado"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -308,61 +310,64 @@ const FinalizarArqueoCaja = ({
               <strong className="text-gray-500">Gastos por pagar: 0</strong>
               <strong className="text-gray-500">Saldo en caja: 0</strong>
 
-              <div className="FinalizarArqueoCaja-FormTitle mt-6">
-                <span>Saldos según usuario</span>
-              </div>
-              <div className="flex flex-col gap-4 w-full md:w-1/2">
-                <div className="flex justify-between items-center">
-                  <p className="pl-4 font-semibold"> Total ingresos</p>
-                  <p>{(cash?.incomeCashTotal || 0).toLocaleString()}</p>
-                </div>
-
-                <div className="w-full flex justify-between items-center pl-4">
-                  <div className="flex gap-2 items-center w-full">
-                    <h2>Efetivo</h2>
+              {
+                cash?.state &&
+                <>
+                  <div className="FinalizarArqueoCaja-FormTitle mt-6 print:hidden">
+                    <span>Saldos según usuario</span>
                   </div>
-                  <Input
-                    value={(cash?.cashRendered || 0).toLocaleString()}
-                    name="cash"
-                    register={register}
-                    label="Efetivo"
-                    isVisibleLable
-                    className="w-2/12 text-right no-spinner"
-                    type="number"
-                    required
-                    readOnly
-                  />
-                </div>
+                  <div className="flex flex-col gap-4 w-full md:w-1/2 print:hidden">
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4 font-semibold"> Total ingresos</p>
+                      <p>{(cash?.incomeCashTotal || 0).toLocaleString()}</p>
+                    </div>
 
-                <div className="w-full flex justify-between items-center pl-4">
-                  <div className="flex gap-2 items-center w-full">
-                    <h2>Cuenta Corriente</h2>
-                  </div>
-                  <Input
-                    value={(cash?.currentAccountRendered || 0).toLocaleString()}
-                    name="currentAccount"
-                    register={register}
-                    label="Cuenta Corriente"
-                    isVisibleLable
-                    type="number"
-                    className="w-2/12 text-right no-spinner"
-                    required
-                    readOnly
-                  />
-                </div>
+                    <div className="w-full flex justify-between items-center pl-4">
+                      <div className="flex gap-2 items-center w-full">
+                        <h2>Efetivo</h2>
+                      </div>
+                      <Input
+                        name="cash"
+                        register={register}
+                        label="Efetivo"
+                        isVisibleLable
+                        className="w-2/12 text-right no-spinner"
+                        type="number"
+                        required
+                      />
+                    </div>
 
-                <div className="flex justify-between items-center pl-4">
-                  <div className="flex gap-2 items-center font-bold w-full">
-                    <h2>Diferencia</h2>
+                    <div className="w-full flex justify-between items-center pl-4">
+                      <div className="flex gap-2 items-center w-full">
+                        <h2>Cuenta Corriente</h2>
+                      </div>
+                      <Input
+                        name="currentAccount"
+                        register={register}
+                        label="Cuenta Corriente"
+                        isVisibleLable
+                        type="number"
+                        className="w-2/12 text-right no-spinner"
+                        required
+                      />
+                    </div>
+
                   </div>
-                  <Input
-                    name="seven"
-                    register={register}
-                    className="w-2/12 text-right no-spinner"
-                    readOnly
-                    value={(cash?.difference || 0).toLocaleString()}
-                  />
+                </>
+              }
+            </div>
+            <div className="flex flex-col gap-4 w-full md:w-1/2 mt-4">
+              <div className="flex justify-between items-center pl-4">
+                <div className="flex gap-2 items-center font-bold w-full">
+                  <h2>Diferencia</h2>
                 </div>
+                <Input
+                  name="seven"
+                  register={register}
+                  className="w-2/12 text-right no-spinner"
+                  readOnly
+                  value={(cash?.difference || 0).toLocaleString()}
+                />
               </div>
             </div>
           </div>
