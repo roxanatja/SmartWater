@@ -84,12 +84,16 @@ const Pedidos: FC = () => {
         filters = { ...queryData.filters }
 
         if (section === "Atendidos") {
-          if (!filters.attendedDate) {
+          if (!filters.attendedDate && (!filters.initialDate && !filters.finalDate && !filters.distributorAttendedId)) {
             filters.attendedDate = moment().format("YYYY-MM-DD")
-            console.log(moment().format("YYYY-MM-DD"))
           }
-          if (filters.hasOwnProperty('attended')) {
-            delete filters.attended
+          filters.attended = true
+
+          if (!filters.initialDate) {
+            filters.initialDate = "2020-01-01"
+          }
+          if (!filters.finalDate) {
+            filters.finalDate = moment().format("YYYY-MM-DD")
           }
         } else {
           filters.attended = false

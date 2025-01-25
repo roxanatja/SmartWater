@@ -2,6 +2,7 @@ import { Search } from "./common";
 
 export interface IProvidersGetParams extends Search {
     filters?: {
+        provider?: string;
         initialDate?: string;
         finalDate?: string;
         fullName?: string;

@@ -259,6 +259,7 @@ const CuentasPorPagar = () => {
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
                 <FiltroCuentasPorPagar
+                    providers={providers}
                     zones={zones}
                     distribuidores={distribuidores}
                     onChange={handleFilterChange}

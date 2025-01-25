@@ -165,23 +165,6 @@ const FiltroCobros = ({
                         <input
                             className="input-check accent-blue_custom"
                             type="checkbox"
-                            id="check19"
-                            checked={watch('currentAccount')}
-                            onChange={() => {
-                                const credit = watch("currentAccount")
-                                setValue("currentAccount", !credit);
-                                setValue("contado", false);
-                                setValue("cash", false);
-                            }}
-                        />
-                        <label htmlFor="check19" className="text-sm" >
-                            Cta. Cte.
-                        </label>
-                    </div>
-                    <div className="flex gap-3 items-center">
-                        <input
-                            className="input-check accent-blue_custom"
-                            type="checkbox"
                             id="check20"
                             checked={watch('cash')}
                             onChange={() => {
@@ -199,17 +182,17 @@ const FiltroCobros = ({
                         <input
                             className="input-check accent-blue_custom"
                             type="checkbox"
-                            id="check4"
-                            checked={watch('contado')}
+                            id="check19"
+                            checked={watch('currentAccount')}
                             onChange={() => {
-                                const credit = watch("contado")
-                                setValue("contado", !credit);
-                                setValue("currentAccount", false);
+                                const credit = watch("currentAccount")
+                                setValue("currentAccount", !credit);
+                                setValue("contado", false);
                                 setValue("cash", false);
                             }}
                         />
-                        <label htmlFor="check4" className="text-sm" >
-                            Al contado
+                        <label htmlFor="check19" className="text-sm" >
+                            Cta. Cte.
                         </label>
                     </div>
                 </div>

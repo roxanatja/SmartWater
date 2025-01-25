@@ -5,33 +5,32 @@ import { CuentasPorCobrarContext } from "../CuentasPorCobrarContext";
 import { Zone } from "../../../../../../type/City";
 import { User } from "../../../../../../type/User";
 import { ISalesGetParams } from "../../../../../../api/types/sales";
+import { Contador } from "../../../../components/Contador/Contador";
 
 interface ISaleFilters {
-    withInvoice: boolean;
-    withoutInvoice: boolean;
     withContract: boolean;
     withoutContract: boolean;
     withExpiredContract: boolean;
     withoutExpiredContract: boolean;
     withLoan: boolean;
     withoutLoan: boolean;
-    fromDate: string | null;
     toDate: string | null;
     zones: Record<string, string>;
     distributor: Record<string, string>;
+    daysToRenew: number;
+    daysSinceRenewed: number;
 }
 
 const initialState: ISaleFilters = {
-    withInvoice: false,
-    withoutInvoice: false,
     withContract: false,
     withoutContract: false,
     withExpiredContract: false,
     withoutExpiredContract: false,
     withLoan: false,
     withoutLoan: false,
-    fromDate: null,
     toDate: null,
+    daysToRenew: 0,
+    daysSinceRenewed: 0,
     zones: {},
     distributor: {}
 }
@@ -55,10 +54,6 @@ const FiltroCuentasPorCobrar = ({
 
     useEffect(() => {
         if (initialFilters) {
-            if (initialFilters.hasOwnProperty('hasInvoice')) {
-                setValue('withInvoice', !!initialFilters.hasInvoice, { shouldValidate: true })
-                setValue('withoutInvoice', !initialFilters.hasInvoice, { shouldValidate: true })
-            }
             if (initialFilters.hasOwnProperty('hasClientContract')) {
                 setValue('withContract', !!initialFilters.hasClientContract, { shouldValidate: true })
                 setValue('withoutContract', !initialFilters.hasClientContract, { shouldValidate: true })
@@ -67,12 +62,15 @@ const FiltroCuentasPorCobrar = ({
                 setValue('withLoan', !!initialFilters.hasClientLoan, { shouldValidate: true })
                 setValue('withoutLoan', !initialFilters.hasClientLoan, { shouldValidate: true })
             }
+            if (initialFilters.renewedIn) {
+                setValue('daysToRenew', initialFilters.renewedIn, { shouldValidate: true })
+            }
+            if (initialFilters.renewedAgo) {
+                setValue('daysSinceRenewed', initialFilters.renewedAgo, { shouldValidate: true })
+            }
             if (initialFilters.hasOwnProperty('hasClientExpiredContracts')) {
                 setValue('withExpiredContract', !!initialFilters.hasClientExpiredContracts, { shouldValidate: true })
                 setValue('withoutExpiredContract', !initialFilters.hasClientExpiredContracts, { shouldValidate: true })
-            }
-            if (initialFilters.initialDate) {
-                setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
             }
             if (initialFilters.finalDate) {
                 setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
@@ -99,7 +97,8 @@ const FiltroCuentasPorCobrar = ({
     const filterClients = (filters: ISaleFilters): ISalesGetParams['filters'] => {
         const result: ISalesGetParams['filters'] = {}
 
-        if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
+        if (filters.daysSinceRenewed > 0) { result.renewedAgo = filters.daysSinceRenewed }
+        if (filters.daysToRenew > 0) { result.renewedIn = filters.daysToRenew }
         if (filters.toDate) { result.finalDate = filters.toDate.toString() }
 
         if (filters.zones) {
@@ -119,10 +118,6 @@ const FiltroCuentasPorCobrar = ({
             result.hasClientLoan = filters.withLoan
         }
 
-        if (!((!!filters.withInvoice && !!filters.withoutInvoice) || (!filters.withInvoice && !filters.withoutInvoice))) {
-            result.hasInvoice = filters.withInvoice
-        }
-
         if (selectedDists.length > 0) {
             const dists = selectedDists.map(z => z._id).join(',')
             if (dists !== "") { result.user = dists }
@@ -133,6 +128,50 @@ const FiltroCuentasPorCobrar = ({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-2">
+            <div className="flex-1 flex flex-col">
+                <div className="FiltroClientes-RenovaciónTitulo mb-2">
+                    <span className="text-blue_custom font-semibold">Renovación</span>
+                </div>
+                <div className="flex flex-col gap-3 w-full">
+                    <div className="flex items-center gap-3 justify-between">
+                        <span className="text-sm">Se renovarán hasta en</span>
+                        <div>
+                            <Contador
+                                initialValue={watch('daysToRenew')}
+                                min={0}
+                                onIncrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
+                                onDecrementar={(count) => setValue("daysToRenew", count, { shouldValidate: true })}
+                                iconsClassname="text-blue_bright"
+                                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums text-sm"
+                            />
+                        </div>
+                        <input
+                            type="hidden"
+                            {...register("daysToRenew")}
+                            defaultValue={0}
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 justify-between">
+                        <span className="text-sm">Renovado hace más de</span>
+                        <div>
+                            <Contador
+                                initialValue={watch('daysSinceRenewed')}
+                                min={0}
+                                onIncrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
+                                onDecrementar={(count) => setValue("daysSinceRenewed", count, { shouldValidate: true })}
+                                iconsClassname="text-blue_bright"
+                                numberClassname="border border-blue_bright px-4 rounded-md tabular-nums text-sm"
+                            />
+                        </div>
+                        <input
+                            type="hidden"
+                            {...register("daysSinceRenewed")}
+                            defaultValue={0}
+                        />
+                    </div>
+                </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row mb-4">
                 <div className="flex-1">
                     <div className="FiltroClientes-Fechastitulo mb-2">
@@ -140,69 +179,15 @@ const FiltroCuentasPorCobrar = ({
                     </div>
                     <div className="flex gap-3 flex-wrap">
                         <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                            <span className="text-left text-sm">De</span>
-                            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                            <input
-                                max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
-                                type="date"
-                                {...register("fromDate")}
-                                className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
-                            />
-                        </div>
-                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
                             <span className="text-left text-sm">A</span>
                             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                             <input
-                                min={watch('fromDate')?.toString()}
                                 max={moment().format("YYYY-MM-DD")}
                                 type="date"
                                 {...register("toDate")}
                                 className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
                             />
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col mb-4">
-                <div className="FiltroClientes-RenovaciónTitulo mb-2">
-                    <span className="text-blue_custom font-semibold">Factura</span>
-                </div>
-
-                <div className="flex flex-wrap gap-4">
-                    <div className="flex gap-3 items-center">
-                        <input
-                            className="input-check accent-blue_custom"
-                            type="checkbox"
-                            id="check5"
-                            checked={watch('withInvoice')}
-                            onChange={() => {
-                                const credit = watch("withInvoice")
-                                setValue("withInvoice", !credit);
-                                setValue("withoutInvoice", false);
-                            }}
-                        />
-                        <img src="/ConFactura.svg" alt="" />
-                        <label htmlFor="check5" className="text-sm" >
-                            Con factura
-                        </label>
-                    </div>
-                    <div className="flex gap-3 items-center">
-                        <input
-                            className="input-check accent-blue_custom"
-                            type="checkbox"
-                            id="check6"
-                            checked={watch('withoutInvoice')}
-                            onChange={() => {
-                                const credit = watch("withoutInvoice")
-                                setValue("withoutInvoice", !credit);
-                                setValue("withInvoice", false);
-                            }}
-                        />
-                        <img src="/nofactura.svg" alt="" />
-                        <label htmlFor="check6" className="text-sm" >
-                            Sin factura
-                        </label>
                     </div>
                 </div>
             </div>

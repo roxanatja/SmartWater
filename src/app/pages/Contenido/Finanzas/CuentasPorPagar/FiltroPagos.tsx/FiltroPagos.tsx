@@ -3,37 +3,51 @@ import "./FiltroCuentasPorPagar.css";
 import { CuentasPorPagarContext } from "../CuentasPorPagarContext";
 import { Zone } from "../../../../../../type/City";
 import { User } from "../../../../../../type/User";
-import { IExpensesGetParams } from "../../../../../../api/types/expenses";
 import { useForm } from "react-hook-form";
 import moment from "moment";
-import { motion } from "framer-motion";
 import { Providers } from "../../../../../../type/providers";
+import { IInvExpensesGetParams } from "../../../../../../api/types/invoice-expenses";
+import { motion } from 'framer-motion'
 
 interface IExpenseFilters {
+    fromDate: string | null;
     toDate: string | null;
+    provider: string | null;
     zones: Record<string, string>;
     distributor: Record<string, string>;
-    provider: string | null;
+
+    cash: boolean;
+    contado: boolean;
+    currentAccount: boolean;
+    withBalance: boolean;
+    withoutBalance: boolean;
 }
 
 const initialState: IExpenseFilters = {
+    cash: false,
+    contado: false,
+    currentAccount: false,
+    withBalance: false,
+    withoutBalance: false,
+
+    fromDate: null,
     toDate: null,
     zones: {},
     distributor: {},
     provider: null
 }
-const FiltroCuentasPorPagar = ({
+const FiltroPagos = ({
     onChange,
     initialFilters,
     zones,
-    distribuidores,
-    providers
+    providers,
+    distribuidores
 }: {
-    providers: Providers[];
     zones: Zone[];
     distribuidores: User[];
-    onChange: (filters: IExpensesGetParams['filters']) => void;
-    initialFilters: IExpensesGetParams['filters'];
+    providers: Providers[];
+    onChange: (filters: IInvExpensesGetParams['filters']) => void;
+    initialFilters: IInvExpensesGetParams['filters'];
 }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IExpenseFilters>({
         defaultValues: initialState || {},
@@ -43,9 +57,35 @@ const FiltroCuentasPorPagar = ({
 
     useEffect(() => {
         if (initialFilters) {
+            if (initialFilters.initialDate) {
+                setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
+            }
+
             if (initialFilters.finalDate) {
                 setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
             }
+
+            if (initialFilters.hasOwnProperty('hasBalance')) {
+                setValue('withBalance', !!initialFilters.hasBalance, { shouldValidate: true })
+                setValue('withoutBalance', !initialFilters.hasBalance, { shouldValidate: true })
+            }
+
+            if (initialFilters.hasOwnProperty('paymentMethodCurrentAccount') && initialFilters.hasOwnProperty('cashPayment')) {
+                const cash = initialFilters.cashPayment
+                const cta = initialFilters.paymentMethodCurrentAccount
+
+                let is: "contado" | 'cta' | 'cash' | 'none' = 'none'
+
+                if (!cash && !cta) { is = 'contado' }
+                else if (!!cash && !cta) { is = 'cash' }
+                else if (!cash && !!cta) { is = 'cta' }
+                else { is = 'none' }
+
+                setValue('contado', is === 'contado', { shouldValidate: true })
+                setValue('currentAccount', is === 'cta', { shouldValidate: true })
+                setValue('cash', is === 'cash', { shouldValidate: true })
+            }
+
             if (initialFilters.zone) {
                 initialFilters.zone.split(",").forEach((z) => {
                     setValue(`zones.${z}`, z, { shouldValidate: true })
@@ -68,16 +108,25 @@ const FiltroCuentasPorPagar = ({
         setShowFiltro(false);
     };
 
-    const filterClients = (filters: IExpenseFilters): IExpensesGetParams['filters'] => {
-        const result: IExpensesGetParams['filters'] = {}
+    const filterClients = (filters: IExpenseFilters): IInvExpensesGetParams['filters'] => {
+        const result: IInvExpensesGetParams['filters'] = {}
 
-        if (filters.provider) { result.provider = filters.provider }
+        if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
         if (filters.toDate) { result.finalDate = filters.toDate.toString() }
+        if (filters.provider) { result.provider = filters.provider }
 
         if (filters.zones) {
             const zones = Object.values(filters.zones).filter(z => !!z).join(',')
             if (zones !== "") { result.zone = zones }
         }
+
+        if (!((!!filters.withBalance && !!filters.withoutBalance) || (!filters.withBalance && !filters.withoutBalance))) {
+            result.hasBalance = filters.withBalance
+        }
+
+        if (filters.cash) { result.paymentMethodCurrentAccount = false; result.cashPayment = true }
+        if (filters.currentAccount) { result.paymentMethodCurrentAccount = true; result.cashPayment = false }
+        if (filters.contado) { result.paymentMethodCurrentAccount = false; result.cashPayment = false }
 
         if (selectedDists.length > 0) {
             const dists = selectedDists.map(z => z._id).join(',')
@@ -96,10 +145,20 @@ const FiltroCuentasPorPagar = ({
                     </div>
                     <div className="flex gap-3 flex-wrap">
                         <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                            <span className="text-left text-sm">De</span>
+                            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                            <input
+                                max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
+                                type="date"
+                                {...register("fromDate")}
+                                className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
+                            />
+                        </div>
+                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
                             <span className="text-left text-sm">A</span>
                             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                             <input
-                                min={watch('toDate')?.toString()}
+                                min={watch('fromDate')?.toString()}
                                 max={moment().format("YYYY-MM-DD")}
                                 type="date"
                                 {...register("toDate")}
@@ -115,7 +174,7 @@ const FiltroCuentasPorPagar = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.3 }}
-                className="w-full sm:w-1/2 flex flex-col gap-2 my-4"
+                className="w-full sm:w-1/2 flex flex-col gap-2"
             >
                 <label>Proveedor o beneficiario</label>
                 <select {...register("provider")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
@@ -129,6 +188,93 @@ const FiltroCuentasPorPagar = ({
                     }
                 </select>
             </motion.div>
+
+
+            <div className="flex flex-col mb-4">
+                <div className="FiltroClientes-RenovaciónTitulo mb-2">
+                    <span className="text-blue_custom font-semibold">Pagos</span>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                    <div className="flex gap-3 items-center">
+                        <input
+                            className="input-check accent-blue_custom"
+                            type="checkbox"
+                            id="check20"
+                            checked={watch('cash')}
+                            onChange={() => {
+                                const credit = watch("cash")
+                                setValue("cash", !credit);
+                                setValue("currentAccount", false);
+                                setValue("contado", false);
+                            }}
+                        />
+                        <label htmlFor="check20" className="text-sm" >
+                            Efectivo
+                        </label>
+                    </div>
+                    <div className="flex gap-3 items-center">
+                        <input
+                            className="input-check accent-blue_custom"
+                            type="checkbox"
+                            id="check19"
+                            checked={watch('currentAccount')}
+                            onChange={() => {
+                                const credit = watch("currentAccount")
+                                setValue("currentAccount", !credit);
+                                setValue("contado", false);
+                                setValue("cash", false);
+                            }}
+                        />
+                        <label htmlFor="check19" className="text-sm" >
+                            Cta. Cte.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-col mb-4">
+                <div className="FiltroClientes-RenovaciónTitulo mb-2">
+                    <span className="text-blue_custom font-semibold">Cuentas por cobrar</span>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                    <div className="flex gap-3 items-center">
+                        <input
+                            className="input-check accent-blue_custom"
+                            type="checkbox"
+                            id="check5"
+                            checked={watch('withBalance')}
+                            onChange={() => {
+                                const credit = watch("withBalance")
+                                setValue("withBalance", !credit);
+                                setValue("withoutBalance", false);
+                            }}
+                        />
+                        <img src="/Moneda-icon-blue.svg" alt="" />
+                        <label htmlFor="check5" className="text-sm" >
+                            Con saldos
+                        </label>
+                    </div>
+                    <div className="flex gap-3 items-center">
+                        <input
+                            className="input-check accent-blue_custom"
+                            type="checkbox"
+                            id="check6"
+                            checked={watch('withoutBalance')}
+                            onChange={() => {
+                                const credit = watch("withoutBalance")
+                                setValue("withoutBalance", !credit);
+                                setValue("withBalance", false);
+                            }}
+                        />
+                        <img src="/nosaldo.svg" alt="" />
+                        <label htmlFor="check6" className="text-sm" >
+                            Sin saldos
+                        </label>
+                    </div>
+                </div>
+            </div>
 
             <div className="w-full flex flex-col gap-2 mb-8">
                 <label className="font-semibold text-blue_custom">Distribuidores</label>
@@ -214,4 +360,4 @@ const FiltroCuentasPorPagar = ({
     );
 }
 
-export { FiltroCuentasPorPagar }
+export { FiltroPagos }

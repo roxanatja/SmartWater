@@ -4,6 +4,8 @@ export interface ISalesGetParams extends Search {
     filters?: {
         user?: string;
         client?: string;
+        renewedAgo?: number;
+        renewedIn?: number;
         zone?: string;
         initialDate?: string;
         finalDate?: string;

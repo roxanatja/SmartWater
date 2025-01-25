@@ -12,6 +12,7 @@ import { PaginatedSearch, QueryMetadata } from '../../../../../api/types/common'
 import { InvoiceExpensesApiConector, ProvidersApiConector, UsersApiConector, ZonesApiConector } from '../../../../../api/classes';
 import { CuadroPagosProveedor } from './CuadroPagosProveedor/CuadroPagosProveedor';
 import Modal from '../../../EntryComponents/Modal';
+import { FiltroPagos } from './FiltroPagos.tsx/FiltroPagos';
 
 interface Props {
     proveedor?: string
@@ -215,7 +216,7 @@ const PagosAProveedores = ({ proveedor }: Props) => {
                                     }
                                 }}
                             >
-                                {!!proveedor ? "Pagos" : "Cobros a proveedores"}
+                                {!!proveedor ? "Pagos" : "Pagos a proveedores"}
                             </div>
                         </div>
                     </div>
@@ -239,13 +240,13 @@ const PagosAProveedores = ({ proveedor }: Props) => {
 
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-                {/* <FiltroCobros
+                <FiltroPagos
+                    providers={providers}
                     zones={zones}
                     distribuidores={distribuidores}
                     onChange={handleFilterChange}
                     initialFilters={savedFilters}
-                /> */}
-                Filtros
+                />
             </Modal>
         </>
     );

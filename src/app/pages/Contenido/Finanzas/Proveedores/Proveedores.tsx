@@ -31,6 +31,8 @@ const Proveedores: FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<Providers[]>([])
   const [users, setUsers] = useState<Providers[]>([])
 
+  const [allProviders, setAllProviders] = useState<Providers[]>([])
+
   const getData = useCallback(async () => {
     setLoading(true)
 
@@ -43,6 +45,10 @@ const Proveedores: FC = () => {
   }, [setLoading, sort, savedFilters]);
 
   useEffect(() => {
+    ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setAllProviders(res?.data || []))
+  }, [])
+
+  useEffect(() => {
     getData();
   }, [getData]);
 
@@ -50,8 +56,7 @@ const Proveedores: FC = () => {
     if (users) {
       const itms = users.filter(d =>
         d.fullName.toLowerCase().includes(searchParam.toLowerCase())
-        || (!!d.phoneNumber && d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase()))
-        || (!!d.NIT && d.NIT.toLowerCase().includes(searchParam.toLowerCase())))
+        || (!!d.phoneNumber && d.phoneNumber.toLowerCase().includes(searchParam.toLowerCase())))
       setFilteredUsers(itms);
       setTotalPage(Math.ceil(itms.length / ITEMS_PER_PAGE))
       setCurrentPage(1);
@@ -152,6 +157,7 @@ const Proveedores: FC = () => {
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroProveedores
+          providers={allProviders}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />

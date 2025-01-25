@@ -1,26 +1,34 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import "./FiltroProveedores.css";
 import { ProveedoresContext } from "../ProveedoresContext";
 import { IProvidersGetParams } from "../../../../../../api/types/providers";
 import { useForm } from "react-hook-form";
 import moment from "moment";
+import { motion } from "framer-motion";
+import { Providers } from "../../../../../../type/providers";
 
 interface IProviderFilter {
     fromDate: string | null;
     toDate: string | null;
+    provider: string | null;
+    nit: string | null;
 }
 
 const initialState: IProviderFilter = {
     fromDate: null,
     toDate: null,
+    provider: null,
+    nit: null
 }
 
 const FiltroProveedores = ({
     onChange,
-    initialFilters
+    initialFilters,
+    providers
 }: {
     onChange: (filters: IProvidersGetParams['filters']) => void;
     initialFilters: IProvidersGetParams['filters'];
+    providers: Providers[]
 }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IProviderFilter>({
         defaultValues: initialState || {},
@@ -33,6 +41,12 @@ const FiltroProveedores = ({
             }
             if (initialFilters.finalDate) {
                 setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
+            }
+            if (initialFilters.provider) {
+                setValue('provider', initialFilters.provider, { shouldValidate: true })
+            }
+            if (initialFilters.NIT) {
+                setValue('nit', initialFilters.NIT, { shouldValidate: true })
             }
         }
     }, [initialFilters, setValue])
@@ -50,9 +64,16 @@ const FiltroProveedores = ({
 
         if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
         if (filters.toDate) { result.finalDate = filters.toDate.toString() }
+        if (filters.provider) { result.provider = filters.provider }
+        if (filters.nit) { result.NIT = filters.nit }
 
         return result
     };
+
+    const NITS = useMemo(() => {
+        const nits = providers.map(p => p.NIT)
+        return nits.filter((item, index) => nits.indexOf(item) === index)
+    }, [providers])
 
     return (
         <>
@@ -87,6 +108,46 @@ const FiltroProveedores = ({
                         </div>
                     </div>
                 </div>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full sm:w-1/2 flex flex-col gap-2"
+                >
+                    <label>Proveedor o beneficiario</label>
+                    <select {...register("provider")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
+                        <option value="">Seleccione un proveedor</option>
+                        {
+                            providers.map((row, index) => (
+                                <option value={row._id} key={index}>
+                                    {row.fullName || "Sin nombre"}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="w-full sm:w-1/2 flex flex-col gap-2"
+                >
+                    <label>NIT</label>
+                    <select {...register("nit")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
+                        <option value="">Seleccione un NIT</option>
+                        {
+                            NITS.map((row, index) => (
+                                <option value={row} key={index}>
+                                    {row}
+                                </option>
+                            ))
+                        }
+                    </select>
+                </motion.div>
 
                 <div className="flex justify-between w-full items-center gap-3 px-4">
                     <button
