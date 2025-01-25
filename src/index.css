@@ -162,6 +162,7 @@ input[type=number].no-spinner { -moz-appearance:textfield; }
 /* React data table */
 .rdt_TableHeadRow,
 .rdt_TableRow,
+.rdt_TableHeader,
 .sc-gBoluC {
   background-color: rgb(var(--bg-main)) !important;
   color: rgb(var(--font-color)) !important;

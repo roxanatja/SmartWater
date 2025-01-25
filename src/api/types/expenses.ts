@@ -6,6 +6,7 @@ export interface IExpensesGetParams extends Search {
         provider?: string;
         accountEntry?: string;
         creditBuy?: boolean;
+        pendingBalance?: boolean;
         initialDate?: string;
         finalDate?: string;
         zone?: string;

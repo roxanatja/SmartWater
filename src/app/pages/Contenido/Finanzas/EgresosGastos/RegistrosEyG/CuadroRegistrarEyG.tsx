@@ -8,6 +8,7 @@ import { EgresosGastosContext } from "../EgresosGastosContext";
 import toast from "react-hot-toast";
 import { ExpensesApiConector } from "../../../../../../api/classes";
 import { Option } from "../../../../components/Option/Option";
+import { formatDateTime } from "../../../../../../utils/helpers";
 
 const CuadroRegistrarEyG = ({
   expense,
@@ -109,15 +110,23 @@ const CuadroRegistrarEyG = ({
     <>
       <div className="CuadroRegistrarEyG-container relative w-full bg-blocks dark:border-blocks">
         <div className="CuadroVentaCliente-header relative w-full">
-          <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative z-0">
-            <div className="opacity-0">.</div>
-            <p className="absolute font-extrabold whitespace-nowrap">
-              {expense.provider?.fullName?.[0] || "S"}
-            </p>
-          </div>
-          <span>{expense.provider?.fullName || "Proveedor desconocido"}</span>
+          <div className="flex justify-between w-[calc(100%_-_30px)] items-center">
+            <div className="flex gap-3 items-center">
+              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative z-0">
+                <div className="opacity-0">.</div>
+                <p className="absolute font-extrabold whitespace-nowrap">
+                  {expense.provider?.fullName?.[0] || "S"}
+                </p>
+              </div>
+              <span>{expense.provider?.fullName || "Proveedor desconocido"}</span>
+            </div>
 
-          <div className="absolute -right-2 rounded-full top-2 flex flex-col gap-6">
+            <div className="border border-blue_custom rounded-md text-blue_custom px-3 py-1">
+              {formatDateTime(expense.created, 'numeric', '2-digit', '2-digit')}
+            </div>
+          </div>
+
+          <div className="absolute -right-2 rounded-full top-1 flex flex-col gap-6">
             <div className="relative" ref={optionsRef}>
               <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
                 <img src="/opcion-icon.svg" alt="" />

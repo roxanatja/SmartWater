@@ -24,12 +24,12 @@ const CuadroPagosProveedor = ({
                         <span>{providers.find(p => p._id === invoice.provider)?.fullName || "Proveedor desconocido"}</span>
                     </div>
                 </div>
-                <div style={{ display: "flex", gap: "120px" }}>
+                <div className="flex justify-between">
                     <div className="CuadroVentaCliente-text">
                         <span>Pago {invoice.cashPayment ? "efectivo" : invoice.paymentMethodCurrentAccount ? "cuenta corriente" : "al contado"}</span>
                     </div>
                     <div className="CobrosClientes-pago">
-                        <span>{invoice.amount.toLocaleString()} <span style={{ color: "#000", fontWeight: "400" }}>Bs.</span></span>
+                        <span className="text-blue_custom whitespace-nowrap text-end">{invoice.amount.toLocaleString()} <span>Bs.</span></span>
                     </div>
                 </div>
                 <div>
