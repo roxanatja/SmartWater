@@ -1,21 +1,19 @@
 import "./CuadroClientes.css";
 import { useEffect, useState } from "react";
-import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
-import { OpcionesClientes } from "../../Contenido/Clientes/OpcionesClientes/OpcionesClientes";
-import Modal from "../../EntryComponents/Modal";
+import { ClientsApiConector } from "../../../../api/classes";
+import { formatDateTime } from "../../../../utils/helpers";
 
 const CuadroClientes = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [showMiniModal, setShowMiniModal] = useState(false);
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const clientsData = await loadClients();
+        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 4 } });
+
         if (clientsData && clientsData.data) {
           const validClients = clientsData.data
-            .slice(0, 4) // Mostrar solo los primeros 4 clientes
             .map((client: Client) => ({
               ...client,
               credit:
@@ -33,61 +31,44 @@ const CuadroClientes = () => {
     fetchClients();
   }, []);
 
-  const handleOpcionesClick = () => {
-    setShowMiniModal(!showMiniModal);
-  };
-
   return (
     <>
-      <div className="cuadroClientes">
+      <div className="cuadroClientes !bg-blocks dark:!border-blocks">
         <div className="titulo-cliente">
           <div>
             <span className="Cliente-title">
               Clientes <span className="Cliente-title2">vista rapida</span>{" "}
             </span>
           </div>
-          <div className="opciones-svg" onClick={handleOpcionesClick}>
-            <img src="./Opciones-icon.svg" alt="" />
-
-            <Modal
-              isOpen={showMiniModal}
-              onClose={() => {
-                setShowMiniModal(false);
-              }}
-              className="w-3/12"
-            >
-              <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
-                Opciones Cliente
-              </h2>
-              <div className="p-6">
-                <OpcionesClientes
-                  onClose={() => {
-                    setShowMiniModal(false);
-                  }}
-                />
-              </div>
-            </Modal>
-          </div>
         </div>
-        <div className="todos-clientes">
+        <div className="todos-clientes w-full">
           {clients.map((item) => {
             return (
-              <div className="cliente" key={item._id}>
-                <div className="perfil-cliente">
-                  <img src={item.storeImage} className="img-cliente" alt="" />
+              <div className="grid grid-cols-4 w-full" key={item._id}>
+                <div className="perfil-cliente flex-1 col-span-2 overflow-hidden">
+                  {
+                    item.storeImage ?
+                      <img src={item.storeImage || 'clientes-icon-blue.svg'} className="img-cliente" alt="Cliente" /> :
+                      (
+                        <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                          <div className="opacity-0">.</div>
+                          <p className="absolute font-extrabold ">
+                            {item.fullName?.[0] || "S"}
+                          </p>
+                        </div>
+                      )
+                  }
                   <div>
-                    <span>{item.fullName}</span>
+                    <span>{(!item.fullName || item.fullName.trim() === "") ? "Sin nombre" : item.fullName}</span>
                   </div>
                 </div>
-                <div className="fecha-pago">
-                  <div className="fecha-cliente">
-                    <span>{new Date(item.created).toLocaleDateString()}</span>
-                  </div>
-                  <div className="moneda-cliente">
-                    <img src="./Moneda-icon.svg" alt="" />
-                    <div>
-                      <span>{item.credit.toPrecision()} Bs.</span>
-                    </div>
+                <div className="fecha-cliente border-blue_custom text-blue_custom">
+                  <span>{formatDateTime(item.created, 'numeric', '2-digit', '2-digit', false, true)}</span>
+                </div>
+                <div className="moneda-cliente bg-blue_custom w-full">
+                  <img src="./Moneda-icon.svg" alt="" />
+                  <div>
+                    <span>{item.credit.toPrecision()} Bs.</span>
                   </div>
                 </div>
               </div>

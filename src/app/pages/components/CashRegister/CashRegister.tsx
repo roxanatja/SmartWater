@@ -1,15 +1,13 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import "./CashRegister.css";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BillBody, Bills } from "../../../../type/Bills";
-import ApiMethodBills from "../../../../Class/api.bills";
 import Input from "../../EntryComponents/Inputs";
 import { toast } from "react-hot-toast";
-import AuthenticationService from "../../../../services/AuthenService";
 import { UserData } from "../../../../type/UserData";
-import ApiMethodSales from "../../../../Class/api.sales";
-import { Sale } from "../../../../type/Sale/Sale";
+import { BillsApiConector } from "../../../../api/classes";
+import { IBillByClientBody } from "../../../../api/types/bills";
+import { AuthService } from "../../../../api/services/AuthService";
 
 interface CobroMiniModalProps {
   client: Client;
@@ -17,88 +15,52 @@ interface CobroMiniModalProps {
 }
 
 const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
-  const [data, setData] = useState<{ bills: Bills[]; sales: Sale[] } | null>(
-    null
-  );
-  const [credict, setCredict] = useState<number | null>(null);
-  const [active, setActive] = useState(true);
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors },
-  } = useForm<BillBody>({
+    formState: { errors, isValid },
+  } = useForm<IBillByClientBody['data']>({
     defaultValues: {
-      amount: "0",
-      cashPayment: true,
+      amount: 0,
+      cashPayment: false,
       paymentMethodCurrentAccount: false,
     },
+    mode: 'all'
   });
 
-  const getBillsInformation = useCallback(async () => {
-    const apibill = new ApiMethodBills();
-    const apisale = new ApiMethodSales();
-    const billsData = await apibill.GetBills({ client: client._id });
-    const salesData = await apisale.GetSales({ client: client._id });
-    const products = await apisale.GetProducts();
-    const loansWithProductNames = salesData.map((loan) => {
-      return {
-        ...loan,
-        detail: loan.detail.map((detailItem) => {
-          const product = products.find((x) => x._id === detailItem.product);
-          return {
-            ...detailItem,
-            product: product ? product.name : "Unknown product",
-          };
-        }),
-      };
-    });
-    setData({
-      bills: billsData,
-      sales: loansWithProductNames.filter(
-        (x) => x.creditSale === true && x.total > 0
-      ),
-    });
-  }, [client._id]);
+  const onSubmit: SubmitHandler<IBillByClientBody['data']> = async (data) => {
+    const userData: UserData | null = AuthService.getUser();
 
-  useEffect(() => {
-    getBillsInformation();
-  }, [getBillsInformation]);
-
-  const onSubmit: SubmitHandler<BillBody> = async (data) => {
-    const api = new ApiMethodBills();
-    const auth = AuthenticationService;
-    const userData: UserData = auth.getUser();
-    try {
-      await api.registerBill({
+    const response = await BillsApiConector.createByClient({
+      data: {
         ...data,
-        user: userData._id,
+        client: client._id,
+        user: userData?._id || "",
         zone: client.zone,
-      });
+      }
+    });
+
+    if (response) {
       toast.success("Cobro registrado");
       reset();
       onClose();
       window.location.reload();
-      getBillsInformation();
-    } catch (error) {
-      console.error(error);
+    } else {
       toast.error("Uppss error al registrar el Cobro");
     }
   };
-  const credi = credict ? client.credit : client.credit;
+
   const validateAmount = (value: number) => {
     if (value <= 0) {
       return "El monto no puede ser menor que 0";
     }
-    if (value > credi) {
-      return `El monto no puede exceder el saldo de ${credi} Bs.`;
+    if (value > client.credit) {
+      return `El monto no puede exceder el saldo de ${client.credit} Bs.`;
     }
 
-    if (!watch("sale")) {
-      return "Tiene que selecionar una venta";
-    }
     return true;
   };
 
@@ -107,115 +69,73 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
       <div className="modal-datos">
         <div className="flex justify-between gap-4 w-full">
           <div className="flex justify gap-2 items-center">
-            {client.storeImage && client.storeImage.length > 1 ? (
-              <img
-                src={client.storeImage}
-                alt=""
-                className="modalInfoClients-imgStore h-8 rounded-full w-8"
-              />
-            ) : (
-              <div className="cobro-mini-modal-image-placeholder"></div>
-            )}
+            {
+              client.storeImage ?
+                <img
+                  src={client?.storeImage || ""}
+                  className="w-8 h-8 rounded-full"
+                  alt="storeImage"
+                /> :
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                  <div className="opacity-0">.</div>
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {client.fullName?.[0] || "S"}
+                  </p>
+                </div>
+            }
             <span className="text-sm">{client.fullName}</span>
           </div>
           <div className="flex justify-start items-center gap-2">
             <div className="infoClientes-saldo">
-              <span style={{ color: "#1A3D7D" }}>Saldo a cobrar:</span>
+              <span className="text-blue_custom">Saldo a cobrar:</span>
             </div>
-            <div className="infoClientes-moneda">
+            <div className="infoClientes-moneda bg-blue_custom">
               <img src="./Moneda-icon.svg" alt="" />
               <div>{client.credit} Bs.</div>
             </div>
           </div>
         </div>
       </div>
-      <div
-        className="flex justify-between items-center pb-2 border-b-2 mb-2 cursor-pointer"
-        onClick={() => setActive(!active)}
-      >
-        <p className="font-semibold text-sm">Ventas</p>
-        <i className={`fa-solid fa-angle-up ${!active && "rotate-180"}`}></i>
-      </div>
 
-      {active && (
-        <>
-          <div className="infoClientes-ventas">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-              {data?.sales.map((bill) => (
-                <div
-                  key={bill._id}
-                  className={`p-4 border rounded shadow hover:shadow-lg transition cursor-pointer ${
-                    watch("sale") === bill._id && "border-2 border-blue_custom"
-                  } ${
-                    errors.amount && !watch("sale") && "border-2 border-red-500"
-                  }`}
-                  onClick={() => {
-                    setValue("sale", bill._id);
-                    setCredict(bill.total);
-                  }}
-                >
-                  <h3 className="font-bold truncate">Venta ID: {bill._id}</h3>
-                  <p>
-                    <strong>Monto:</strong>{" "}
-                    {new Intl.NumberFormat("en-US", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    }).format(bill.total)}{" "}
-                    Bs.
-                  </p>
-                  <p>
-                    <strong>Credito:</strong> {bill.creditSale ? "Yes" : "No"}
-                  </p>
-                  <p>
-                    <strong>Registrada:</strong>{" "}
-                    {new Date(bill.created).toLocaleString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-      <div className="infoClientes-ventas">
+      <div className="infoClientes-ventas pb-4">
         <div className="input-container flex flex-col w-full">
           <div className="RegistrarVenta-opciones flex justify-center items-start w-full flex-col">
-            <p className="text-md">Seleccione una opción</p>
+            <p className="text-md text-font-color">Seleccione una opción</p>
             <div className="RegistrarVenta-grupo-checbox">
               <div className="RegistrarVenta-grupo-check">
                 <input
-                  className="input-check cursor-pointer"
+                  className="input-check cursor-pointer accent-blue-600"
                   type="checkbox"
                   id="checkbox1"
                   checked={watch("cashPayment")}
                   onChange={() => {
-                    setValue("cashPayment", !watch("cashPayment"));
+                    const val = watch("cashPayment")
+                    setValue("cashPayment", !val);
                     setValue("paymentMethodCurrentAccount", false);
                   }}
                 />
                 <label
                   htmlFor="checkbox1"
-                  className="text-check cursor-pointer text-md"
+                  className="text-check cursor-pointer text-md text-font-color"
                 >
                   Efectivo
                 </label>
               </div>
               <div className="RegistrarVenta-grupo-check">
                 <input
-                  className="input-check cursor-pointer"
+                  className="input-check cursor-pointer accent-blue-600"
                   type="checkbox"
                   id="checkbox2"
                   checked={watch("paymentMethodCurrentAccount")}
                   onChange={() => {
-                    setValue(
-                      "paymentMethodCurrentAccount",
-                      !watch("paymentMethodCurrentAccount")
-                    );
+                    const val = watch("paymentMethodCurrentAccount")
                     setValue("cashPayment", false);
+                    setValue("paymentMethodCurrentAccount", !val);
                   }}
                 />
                 <label
                   htmlFor="checkbox2"
-                  className="text-check cursor-pointer text-md"
+                  className="text-check cursor-pointer text-md text-font-color"
                 >
                   Cta. Cte
                 </label>
@@ -230,6 +150,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
             type="number"
             placeholder="Monto a cobrar"
             min="0"
+            max={client.credit}
             step="0.01"
             errors={errors.amount}
             button={<span className="text-lg">Bs</span>}
@@ -237,43 +158,11 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
         </div>
       </div>
 
-      <div
-        className="flex justify-between items-center pb-2 border-b-2 my-4 cursor-pointer"
-        onClick={() => setActive(!active)}
-      >
-        <p className="font-semibold text-sm">Cobros</p>
-        <i className={`fa-solid fa-angle-up ${active && "rotate-180"}`}></i>
-      </div>
-
-      {!active && (
-        <div className="infoClientes-ventas">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-            {data?.bills.map((bill) => (
-              <div
-                key={bill._id}
-                className="p-4 border rounded shadow hover:shadow-lg transition"
-              >
-                <h3 className="font-bold truncate">Bill ID: {bill._id}</h3>
-                <p>
-                  <strong>Monto:</strong> {bill.amount} Bs.
-                </p>
-                <p>
-                  <strong>Efectivo:</strong> {bill.cashPayment ? "Yes" : "No"}
-                </p>
-                <p>
-                  <strong>Registrada:</strong>{" "}
-                  {new Date(bill.created).toLocaleString()}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-white">
+      <div className="w-full flex justify-center items-center sticky bottom-0 py-2 bg-main-background">
         <button
           type="submit"
-          className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-6 rounded-full text-base"
+          disabled={client.credit <= 0 || !isValid}
+          className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-6 rounded-full text-base disabled:bg-gray-400"
         >
           Registrar cobro
         </button>

@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
-import { Client } from "../../../../../Class/types.data";
+import { Client } from "../../../../../type/Cliente/Client";
+import { client } from "../../Clientes/ClientesContext";
 
 type CuentasPorCobrarContextType = {
   showModal: boolean;
@@ -10,8 +11,8 @@ type CuentasPorCobrarContextType = {
   setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
   showFiltro: boolean;
   setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
-  setClientSelect: React.Dispatch<React.SetStateAction<Client | undefined>>;
-  clientselect: Client | undefined;
+  clientselect: Client;
+  setClientSelect: React.Dispatch<React.SetStateAction<Client>>;
 };
 
 export const CuentasPorCobrarContext =
@@ -22,7 +23,7 @@ export const CuentasPorCobrarProvider = ({ children }: any) => {
   const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<boolean>(false);
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
-  const [clientselect, setClientSelect] = useState<Client>();
+  const [clientselect, setClientSelect] = useState<Client>(client);
 
   return (
     <CuentasPorCobrarContext.Provider

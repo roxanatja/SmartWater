@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { memo, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 interface ImageUploadFieldProps {
-  watchField: any;
   fieldName: string;
   label: string;
   register: any;
   setValue: any;
+  value?: any;
   errors: any;
   required?: boolean;
 }
@@ -30,9 +30,11 @@ const saveImage = async (file: File) => {
 };
 
 const ImageUploadField = memo<ImageUploadFieldProps>(
-  ({ watchField, fieldName, label, setValue, errors, required }) => {
-    const [active, setActive] = useState(false);
+  ({ fieldName, label, setValue, errors, required, register, value }) => {
+    const [active, setActive] = useState(!!value);
     const [uploading, setUploading] = useState(false);
+
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -43,7 +45,7 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
           const uploadResponse = await saveImage(file);
           const downloadURL = uploadResponse.secure_url;
 
-          setValue(fieldName, downloadURL);
+          setValue(fieldName, downloadURL, { shouldValidate: true });
           setActive(true);
         } catch (error) {
           console.error("Error uploading to Cloudinary:", error);
@@ -52,6 +54,20 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
         }
       }
     };
+
+    useEffect(() => {
+      if (value && typeof value === "string" && value !== "") {
+        setActive(true)
+      } else {
+        setValue(fieldName, null)
+      }
+    }, [value, setValue, fieldName])
+
+    const clear = () => {
+      if (inputRef.current) { inputRef.current.value = "" }
+      setValue(fieldName, null, { shouldValidate: true })
+      setActive(false);
+    }
 
     return (
       <motion.div
@@ -65,33 +81,38 @@ const ImageUploadField = memo<ImageUploadFieldProps>(
           type="button"
           className="max-sm:w-full max-sm:h-56 w-full h-72 relative cursor-pointer group flex justify-center items-center"
         >
+          {
+            (value && typeof value === "string" && value !== "") &&
+            <div className="absolute top-3 right-6 z-[31]" onClick={clear}><i className="fa fa-trash text-red-600"></i></div>
+          }
           <img
-            src={watchField(fieldName) || ""}
+            src={value || ""}
             alt=""
-            className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] shadow-md bg-zinc-300"
+            className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] shadow-md bg-zinc-300 object-contain"
           />
           <div className="max-sm:w-full max-sm:h-56 w-full h-72 rounded-[3rem] bg-zinc-800/50 absolute top-0 z-10 scale-0 group-hover:scale-100" />
-          {!active && !uploading && !watchField(fieldName) && (
+          {!active && !uploading && (
             <div className="absolute flex flex-col gap-4">
               <i className="fas fa-image text-9xl max-sm:text-8xl z-10 text-zinc-600"></i>
               <p className="text-sm tracking-wider max-sm:text-xs">{label}</p>
             </div>
           )}
+          <input type="text" className="hidden" {...register(fieldName,
+            required ?
+              { required: required && `${fieldName} es requerido`, } :
+              { required: false })} />
           <label className="cursor-pointer">
             <input
-              name={fieldName}
+              ref={inputRef}
               className="absolute top-0 h-full w-full left-0 z-30 opacity-0 cursor-pointer"
               type="file"
-              accept="image/jpeg,image/jpg"
               onChange={handleFileChange}
-              required={
-                required !== undefined ? required : !watchField(fieldName)
-              }
+              accept="image/jpeg,image/jpg"
             />
           </label>
         </button>
-        {errors[fieldName] && (
-          <div className="text-green_custom top-0 font-normal text-sm w-full my-1">
+        {errors && (
+          <div className="text-red-500 top-0 font-normal text-sm w-full">
             <i className="fa-solid fa-triangle-exclamation"></i> Una imagen es
             requerida aquí
           </div>

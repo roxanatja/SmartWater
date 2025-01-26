@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import AuthenticationService from "../../../services/AuthenService";
+import { AuthService } from "../../../api/services/AuthService";
 
 interface ProtectedRouteProps {
   redirectPath?: string;
@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: FC<ProtectedRouteProps> = ({
   redirectPath = "/users/login",
 }) => {
-  const isAuthenticated = AuthenticationService.isLoggedIn();
+  const isAuthenticated = AuthService.isLoggedIn();
 
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} />;

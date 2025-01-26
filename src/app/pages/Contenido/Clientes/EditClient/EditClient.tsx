@@ -41,7 +41,7 @@ const ClientEdit = () => {
     useState<string | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isChecked2, setIsChecked2] = useState<boolean>(false);
-  const api: string = "AIzaSyApnMcPn7E_7oPoQzelrTZX0OjDwrNbsco";
+  const api: string = process.env.REACT_APP_API_GOOGLE!;
   const [showMap, setShowMap] = useState<boolean>(false);
   const [latitude, setLatitude] = useState<string>("");
   const [longitude, setLongitude] = useState<string>("");

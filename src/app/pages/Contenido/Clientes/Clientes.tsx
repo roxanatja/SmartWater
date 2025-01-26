@@ -1,6 +1,5 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
-import moment from "moment";
-import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { InfoCliente } from "./InfoCliente/InfoCliente";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { OpcionesClientes } from "./OpcionesClientes/OpcionesClientes";
@@ -8,9 +7,14 @@ import { ClientesContext, client } from "./ClientesContext";
 import Modal from "../../EntryComponents/Modal";
 import ClientForm from "../../EntryComponents/Client.form";
 import FiltroClientes from "./FiltroClientes/FiltroClientes";
+import { ClientsApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { Client } from "../../../../type/Cliente/Client";
-import ApiMethodClient from "../../../../Class/api.client";
-import { Zone } from "../../../../Class/types.data";
+import { Zone } from "../../../../type/City";
+import { useGlobalContext } from "../../../SmartwaterContext";
+import { IClientGetParams, ISearchGetParams } from "../../../../api/types/clients";
+import { QueryMetadata } from "../../../../api/types/common";
+import { useSearchParams } from "react-router-dom";
+import { User } from "../../../../type/User";
 
 const Clientes: FC = () => {
   const {
@@ -24,26 +28,75 @@ const Clientes: FC = () => {
     setSelectedClient,
   } = useContext(ClientesContext);
 
-  const [clients, setClients] = useState<Client[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
+  const { setLoading } = useGlobalContext()
+
   const [currentData, setCurrentData] = useState<Client[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [distribuidores, setDistribuidores] = useState<User[]>([]);
+
   const itemsPerPage: number = 10;
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(10);
-  const [savedFilters, setSavedFilters] = useState({});
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+
+  const [searchParamDebounced, setSearchParamDebounced] = useState<string>('');
+  const [searchParam, setSearchParam] = useState<string>('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
+  const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters']>({});
+
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
+
+  const [query, setQuery] = useSearchParams()
+  const [queryData, setQueryData] = useState<IClientGetParams | ISearchGetParams | null>(null)
+
+  useEffect(() => {
+    if (query && query.has('filters')) {
+      const queryRes: IClientGetParams = JSON.parse(atob(query.get('filters')!))
+      setQueryData(queryRes)
+
+      if (queryRes.pagination) {
+        setCurrentPage(queryRes.pagination.page)
+        if (queryRes.pagination.sort) setSort(queryRes.pagination.sort)
+      }
+
+      if (queryRes.filters) {
+        if (queryRes.filters.hasOwnProperty('text')) {
+          filterRef.current?.setSearch((queryRes.filters as any).text)
+        } else {
+          filterRef.current?.clearSearch()
+          setSavedFilters(queryRes.filters)
+        }
+      }
+    } else {
+      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' } })) })
+    }
+  }, [query, setQuery])
+
+  useEffect(() => {
+    const fetchZones = async () => {
+      setZones((await ZonesApiConector.get({}))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+    }
+    fetchZones()
+  }, [])
 
   const getClients = useCallback(async () => {
-    const api = new ApiMethodClient();
-    const datClien = await api.loadClients();
-    setZones(await api.getZone());
-    const sortedClients = datClien.sort(
-      (a: any, b: any) =>
-        moment(b.lastSale).valueOf() - moment(a.lastSale).valueOf()
-    );
-    setClients(sortedClients as unknown as Client[]);
-    setCurrentData(sortedClients.slice(0, itemsPerPage) as unknown as Client[]); // Set initial currentData
-    setTotalPage(Math.ceil(sortedClients.length / itemsPerPage)); // Update total pages
-  }, []);
+    setLoading(true)
+
+    let datClients: { data: Client[] } & QueryMetadata | null = null
+    if (queryData) {
+      if (queryData?.filters?.hasOwnProperty('text')) {
+        datClients = await ClientsApiConector.searchClients(queryData as ISearchGetParams);
+      } else {
+        datClients = await ClientsApiConector.getClients(queryData as IClientGetParams);
+      }
+    }
+
+    setCurrentData(datClients?.data || []);
+    setTotalPage(Math.ceil((datClients?.metadata.totalCount || 0) / itemsPerPage)); // Update total pages
+    setTotal(datClients?.metadata.totalCount || 0)
+    setLoading(false)
+  }, [setLoading, queryData]);
 
   useEffect(() => {
     getClients();
@@ -51,94 +104,105 @@ const Clientes: FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    const startIndex: number = (page - 1) * itemsPerPage;
-    const endIndex: number = startIndex + itemsPerPage;
-    setCurrentData(clients.slice(startIndex, endIndex)); // Update based on current clients
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page } })) })
   };
 
   const orderClients = (orden: string) => {
-    let clientesOrdenados: Client[] = [...currentData];
-
     if (orden === "new") {
-      clientesOrdenados.sort(
-        (a: Client, b: Client) =>
-          moment(b.created).valueOf() - moment(a.created).valueOf()
-      );
+      setSort('desc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'desc' } })) })
     } else if (orden === "older") {
-      clientesOrdenados.sort(
-        (a: Client, b: Client) =>
-          moment(a.created).valueOf() - moment(b.created).valueOf()
-      );
+      setSort('asc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'asc' } })) })
     }
-
-    setCurrentPage(1);
-    setCurrentData(clientesOrdenados.slice(0, itemsPerPage));
   };
 
-  const handleSearchUser = (searchValue: string) => {
-    const value: string = searchValue.trim().toLowerCase();
-    const filteredClients: Client[] =
-      value === ""
-        ? clients
-        : clients.filter(
-            (client: Client) =>
-              client.fullName?.toLowerCase().includes(value) ||
-              client.phoneNumber.includes(value)
-          );
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      if (searchParam && searchParam !== "") {
+        if (!(queryData?.filters as any)?.text || (queryData?.filters as any)?.text !== searchParam) {
+          setSavedFilters({})
+          setSearchParamDebounced(searchParam);
+          setCurrentPage(1);
+          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, filters: { text: searchParam } })) })
+        }
+      } else {
+        if ((!savedFilters || Object.keys(savedFilters).length === 0) && (!!(queryData?.filters as any)?.text)) {
+          setSearchParamDebounced("");
+          setCurrentPage(1);
+          setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 } })) })
+        }
+      }
+    }, 800);
+    return () => clearTimeout(getData)
+  }, [searchParam])
 
-    setCurrentData(filteredClients.slice(0, itemsPerPage));
+  const handleFilterChange = (filters: IClientGetParams['filters']) => {
     setCurrentPage(1);
-    setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
-  };
-
-  const handleFilterChange = (filteredClients: Client[], filterdata: any) => {
-    setCurrentData(filteredClients.slice(0, itemsPerPage));
-    setCurrentPage(1);
-    setTotalPage(Math.ceil(filteredClients.length / itemsPerPage));
-    setSavedFilters(filterdata);
+    if (searchParamDebounced !== "") {
+      setSearchParamDebounced("")
+      setSearchParam("")
+      if (filterRef?.current) { filterRef.current.clearSearch() }
+    }
+    setQuery({ filters: btoa(JSON.stringify({ pagination: { ...queryData?.pagination, page: 1 }, filters })) })
+    setSavedFilters(filters);
   };
 
   return (
-    <>
+    <div className="px-10">
       <PageTitle titulo="Clientes" icon="./clientes-icon.svg" />
       <FiltroPaginado
+        ref={filterRef}
         add={true}
         exportar={true}
         typeDataToExport="clients"
-        paginacion={true}
+        paginacion={totalPage > 1}
         totalPage={totalPage}
         currentPage={currentPage}
         handlePageChange={handlePageChange}
         onAdd={() => setShowModal(true)}
         resultados={true}
         filtro
-        total={clients.length}
-        search={handleSearchUser}
+        total={total}
+        search={setSearchParam}
         orderArray={orderClients}
         onFilter={() => setShowFiltro(true)}
+        hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
+        searchPlaceholder="Buscar clientes por nombre o teléfono"
+        sorted={sort === 'asc' ? "older" : "new"}
+        activeFilters={queryData?.filters}
       >
-        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-          {currentData.map((client: Client) => (
-            <InfoCliente key={client._id} client={client} zones={zones} />
-          ))}
-        </div>
+        {
+          currentData.length > 0 &&
+          <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+            {currentData.map((client: Client) => (
+              <InfoCliente key={client._id} client={client} zones={zones} />
+            ))}
+          </div>
+        }
+        {
+          currentData.length === 0 &&
+          <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+            Sin resultados
+          </div>
+        }
       </FiltroPaginado>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Registrar Cliente
         </h2>
-        <ClientForm isOpen={showModal} onCancel={() => setShowModal(false)} />
+        <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} />
       </Modal>
 
       <Modal
         isOpen={selectedClient._id !== "" && !showMiniModal}
         onClose={() => setSelectedClient(client)}
       >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Editar Cliente
         </h2>
-        <ClientForm
+        <ClientForm zones={zones}
           isOpen={
             selectedClient._id !== "" && showMiniModal === false ? true : false
           }
@@ -154,7 +218,7 @@ const Clientes: FC = () => {
         }}
         className="w-3/12"
       >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
           Opciones Cliente
         </h2>
         <div className="p-6">
@@ -169,12 +233,13 @@ const Clientes: FC = () => {
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroClientes
-          clients={clients}
+          distribuidores={distribuidores}
+          zones={zones}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
       </Modal>
-    </>
+    </div>
   );
 };
 

@@ -26,7 +26,6 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #000;
   font-family: "Poppins", sans-serif;
   font-size: 12px;
   font-style: normal;
@@ -36,22 +35,23 @@
 
 .infoClientes-body {
   display: flex;
-  align-items: center;
+  gap: 10px;
+  align-items: start;
   justify-content: space-between;
 }
 
 .infoClientes-ventasContainer {
   display: inline-flex;
   align-items: center;
-  gap: 26px;
+  gap: 10px 26px;
   flex-wrap: wrap;
 }
 
 .infoClientes-ventas {
+  margin: 0 !important;
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #000;
   font-family: "Poppins", sans-serif;
   font-size: 12px;
   font-style: normal;
@@ -60,6 +60,7 @@
 }
 
 .infoClientes-ultimaventa {
+  text-align: center;
   display: flex;
   padding: 5px 15px;
   align-items: flex-start;
@@ -110,7 +111,7 @@
 
 .infoClientes-imgStore {
   width: 30px;
-  height: 31px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
   overflow: hidden;

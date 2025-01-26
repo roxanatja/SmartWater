@@ -44,7 +44,7 @@ const HistorialCuentas: FC = () => {
                     </div>
                     :
                     <div style={{display:"flex", flexWrap: "wrap", gap: "23px"}}>
-                        <CuadroPagosProveedor/>
+                        {/* <CuadroPagosProveedor/> */}
                     </div>
                 }
             </FiltroPaginado>

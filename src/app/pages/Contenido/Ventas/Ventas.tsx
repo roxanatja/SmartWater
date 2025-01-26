@@ -1,16 +1,24 @@
 import { CuadroVentaCliente } from "./CuadroVentaCliente/CuadroVentaCliente";
-import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { OpcionesVentas } from "./OpcionesVentas/OpcionesVentas";
 import "./Ventas.css";
-import { FC, useContext, useEffect, useState } from "react";
-import moment from "moment";
+import { FC, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { VentasContext } from "./VentasContext";
 import FiltroVenta from "./FiltroVenta/FiltroVenta";
-import { Sale } from "../../../../type/Sale/Sale";
-import { GetSales } from "../../../../services/SaleService";
+import { Sale, SaleProduct } from "../../../../type/Sale/Sale";
 import Modal from "../../EntryComponents/Modal";
 import { client } from "../Clientes/ClientesContext";
+import { useGlobalContext } from "../../../SmartwaterContext";
+import { ClientsApiConector, ProductsApiConector, SalesApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ISalesGetParams } from "../../../../api/types/sales";
+import Product from "../../../../type/Products/Products";
+import { Zone } from "../../../../type/City";
+import { QueryMetadata } from "../../../../api/types/common";
+import millify from "millify";
+import { useSearchParams } from "react-router-dom";
+import { User } from "../../../../type/User";
+import moment from "moment";
 
 const Ventas: FC = () => {
   const {
@@ -19,115 +27,208 @@ const Ventas: FC = () => {
     setShowFiltro,
     showFiltro,
     setSelectedClient,
+    selectedClient
   } = useContext(VentasContext);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [sales, setSales] = useState<Array<Sale>>([]);
-  const [currenData, setCurrenData] = useState<Array<Sale>>([]);
-  const [savedFilters, setSavedFilters] = useState({});
+  const { setLoading } = useGlobalContext()
+  const [currentData, setCurrentData] = useState<Array<Sale>>([]);
+  const [summary, setSumary] = useState<Array<SaleProduct>>([]);
 
-  const getSales = async () => {
-    try {
-      const resp = await GetSales();
-      setSales(resp.data);
-      setLoading(false);
-      setCurrenData(resp.data); // Almacenar datos originales
-    } catch (e) {
-      console.error(e);
-      setLoading(false);
-      setError(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [distribuidores, setDistribuidores] = useState<User[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+
+  const itemsPerPage: number = 12;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+
+  const [searchParam, setSearchParam] = useState<string>('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
+  const [savedFilters, setSavedFilters] = useState<ISalesGetParams['filters']>({});
+
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
+
+  const [query, setQuery] = useSearchParams()
+  const [queryData, setQueryData] = useState<ISalesGetParams & { text?: string, clients?: string[] } | null>(null)
+
+  useEffect(() => {
+    if (query && query.has('filters')) {
+      const queryRes: ISalesGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
+      setQueryData(queryRes)
+
+      if (queryRes.pagination) {
+        setCurrentPage(queryRes.pagination.page)
+        if (queryRes.pagination.sort) setSort(queryRes.pagination.sort)
+      }
+
+      if (queryRes.text) {
+        filterRef.current?.setSearch(queryRes.text)
+      } else {
+        filterRef.current?.clearSearch()
+      }
+
+      if (queryRes.filters) {
+        setSavedFilters(queryRes.filters)
+      }
+    } else {
+      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' } })) })
     }
-  };
+  }, [query, setQuery])
+
+  const getSales = useCallback(async () => {
+    setLoading(true)
+
+    const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
+    let filters: ISalesGetParams['filters'] = {}
+
+    if (queryData) {
+      filters = { ...queryData.filters }
+
+      if (!filters.initialDate && !!filters.finalDate) {
+        filters.initialDate = moment(filters.finalDate).startOf("week").format("YYYY-MM-DD")
+      }
+
+      if (!!filters.initialDate && !filters.finalDate) {
+        filters.finalDate = moment().format("YYYY-MM-DD")
+      }
+
+      if (queryData.clients) {
+        queryData.clients.forEach(cf =>
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+        )
+      } else {
+        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters }))
+      }
+    }
+
+    const responses = await Promise.all(promises)
+    const datSales: Sale[] = []
+    let totalcount: number = 0
+    responses.forEach(r => {
+      datSales.push(...(r?.data || []))
+      totalcount += r?.metadata.totalCount || 0
+    })
+
+    setCurrentData(datSales);
+    setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
+    setTotal(totalcount)
+    setLoading(false)
+  }, [setLoading, queryData]);
+
+  useEffect(() => {
+    SalesApiConector.getSalesProducts({ filters: { initialDate: "2020-01-01", finalDate: moment().format("YYYY-MM-DD") } }).then(res => {
+      setSumary(res || [])
+    })
+  }, [])
 
   const orderArray = (orden: string) => {
-    let salesOrdenadas = [...sales];
     if (orden === "new") {
-      salesOrdenadas.sort(
-        (a, b) =>
-          moment(b.updated, "YYYY-MM-DD").valueOf() -
-          moment(a.updated, "YYYY-MM-DD").valueOf()
-      );
+      setSort('desc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'desc' } })) })
     } else if (orden === "older") {
-      salesOrdenadas.sort(
-        (a, b) =>
-          moment(a.updated, "YYYY-MM-DD").valueOf() -
-          moment(b.updated, "YYYY-MM-DD").valueOf()
-      );
+      setSort('asc')
+      setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, sort: 'asc' } })) })
     }
-    setSales(salesOrdenadas);
   };
 
-  const Onfilter = (filteredSales: Array<Sale>, filter: any) => {
-    setSales(filteredSales);
-    setSavedFilters(filter);
+  useEffect(() => {
+    const getData = setTimeout(async () => {
+      if (searchParam && searchParam.trim() !== "") {
+        if (!queryData?.text || queryData.text !== searchParam) {
+          const clients = await ClientsApiConector.searchClients({ filters: { text: searchParam } })
+          const clientsData = clients?.data || []
+          if (clientsData.length > 0) {
+            setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: clientsData.map(c => c._id), text: searchParam })) })
+          } else {
+            setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: [], text: searchParam })) })
+          }
+          setCurrentPage(1);
+        }
+      } else {
+        if (!!queryData?.text) {
+          setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, pageSize: itemsPerPage, page: 1 }, clients: undefined, text: undefined })) })
+        }
+      }
+    }, 800);
+    return () => clearTimeout(getData)
+  }, [searchParam])
+
+  useEffect(() => {
+    const fetchZones = async () => {
+      setZones((await ZonesApiConector.get({}))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+    }
+    fetchZones()
+  }, [])
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page } })) })
   };
 
   useEffect(() => {
     getSales();
-  }, []);
+  }, [getSales]);
 
-  if (loading) {
-    return <p>Cargando Ventas</p>;
-  }
-
-  if (error) {
-    return (
-      <p>
-        Ocurrio un error en la carga de datos, intentelo de nuevo en unos
-        minutos
-      </p>
-    );
-  }
-
-  const serchSale = (e: string) => {
-    const value = e;
-
-    if (value === "") {
-      setSales(currenData);
-      return;
-    } else {
-      const clientFilter = sales.filter((sale: Sale) =>
-        sale.client.some((client) =>
-          client.fullName?.toLowerCase().includes(value.toLowerCase())
-        )
-      );
-      setSales(clientFilter);
-    }
+  const handleFilterChange = (filters: ISalesGetParams['filters']) => {
+    setCurrentPage(1);
+    setSavedFilters(filters);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, filters })) })
   };
 
   return (
     <>
-      <div>
+      <div className="px-10">
         <PageTitle titulo="Ventas" icon="./Ventas-icon.svg" />
         <FiltroPaginado
-          filtro
+          ref={filterRef}
+          add={false}
           exportar={true}
           typeDataToExport={"sales"}
-          search={serchSale}
-          add={false}
-          paginacion={false}
-          infoPedidos={true}
+          paginacion={totalPage > 1}
+          totalPage={totalPage}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
           resultados={true}
-          total={sales.length}
+          filtro
+          total={total}
+          search={setSearchParam}
           orderArray={orderArray}
           onFilter={() => setShowFiltro(true)}
+          hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
+          searchPlaceholder="Buscar por nombre o teléfono de cliente"
+          infoPedidos={true}
+          infoPedidosData={summary.filter(s => s.cant > 0).map(s => ({ text: `${s.cant} ${s.prod}`, value: `${millify(s.total, { precision: 2 })} Bs` }))}
+          sorted={sort === 'asc' ? "older" : "new"}
+          activeFilters={{ ...queryData?.filters, clients: queryData?.clients }}
         >
-          <div className="grid grid-cols-4 max-sm:grid-cols-1 gap-4 pb-2 pt-2">
-            {sales.map((sale) => {
-              return <CuadroVentaCliente {...sale} key={sale._id} />;
-            })}
-          </div>
+          {
+            currentData.length > 0 &&
+            <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
+              {currentData.map((sale: Sale) => (
+                <CuadroVentaCliente sale={sale} key={sale._id} products={products} />
+              ))}
+            </div>
+          }
+          {
+            currentData.length === 0 &&
+            <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+              Sin resultados
+            </div>
+          }
         </FiltroPaginado>
       </div>
+
       <Modal
-        isOpen={showModal}
+        isOpen={showModal && selectedClient._id !== ""}
         onClose={() => {
           setSelectedClient(client);
           setShowModal(false);
         }}
         className="w-3/12"
       >
-        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-white">
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
           Opciones Cliente
         </h2>
         <div className="p-6">
@@ -138,11 +239,13 @@ const Ventas: FC = () => {
             }}
           />
         </div>
-      </Modal>
+      </Modal >
+
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroVenta
-          sales={currenData}
-          onChange={Onfilter}
+          zones={zones}
+          distribuidores={distribuidores}
+          onChange={handleFilterChange}
           initialFilters={savedFilters}
         />
       </Modal>

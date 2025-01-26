@@ -1,13 +1,10 @@
-.ArqueoCaja-containerform{
-    margin-top: 80px; 
-    width: 45%;
+.ArqueoCaja-containerform {
     gap: 24px;
-    display: flex; 
+    display: flex;
     flex-direction: column
 }
 
-.ArqueoCaja-tituloform{
-    color: #000;
+.ArqueoCaja-tituloform {
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
     font-style: normal;
@@ -15,25 +12,25 @@
     line-height: normal;
 }
 
-.ArqueoCaja-bodyform{
+.ArqueoCaja-bodyform {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.ArqueoCaja-itemform{
+.ArqueoCaja-itemform {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    color: #000;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 16px; /* 114.286% */
+    line-height: 16px;
+    /* 114.286% */
 }
 
-.ArqueoCaja-itemform input{
+.ArqueoCaja-itemform input {
     display: flex;
     padding: 12px 15px;
     justify-content: center;
@@ -41,10 +38,9 @@
     gap: 10px;
     align-self: stretch;
     border-radius: 5px;
-    border: 1px solid #000;
 }
 
-.ArqueoCaja-btn{
+.ArqueoCaja-btn {
     display: flex;
     padding: 11px 24px;
     justify-content: center;
@@ -64,7 +60,7 @@
     cursor: pointer;
 }
 
-.ArqueoCaja-btn:hover{
+.ArqueoCaja-btn:hover {
     border: 1px solid #234fa0;
     background: var(--Azul, #234fa0);
 }

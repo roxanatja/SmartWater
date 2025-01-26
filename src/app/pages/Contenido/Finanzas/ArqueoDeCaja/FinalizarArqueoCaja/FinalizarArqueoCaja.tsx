@@ -1,294 +1,387 @@
-import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import ApiMethodCash from "../../../../../../Class/api.cash";
-import AuthenticationService from "../../../../../../services/AuthenService";
 import { Transaction, CashClose } from "../../../../../../type/Cash";
-import { UserData } from "../../../../../../type/UserData";
 import Input from "../../../../EntryComponents/Inputs";
 import "./FinalizarArqueoCaja.css";
+import { User } from "../../../../../../type/User";
+import { CashRegisterApiConector } from "../../../../../../api/classes";
+import moment from "moment-timezone";
+import { formatDateTime } from "../../../../../../utils/helpers";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
+import { generate } from "@pdfme/generator";
+import { text, rectangle } from "@pdfme/schemas";
+import { pdfTemplate } from "./pdftemplate";
+import { Buffer } from 'buffer'
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 const FinalizarArqueoCaja = ({
   cash,
-  handleOnSubmit,
+  handleOnSubmit
 }: {
-  cash?: Transaction;
+  cash?: Transaction
   handleOnSubmit?: () => void;
 }) => {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (cash?.state) {
-      setIsChecked(cash?.state);
-    }
-  }, [cash?.state]);
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<CashClose>();
 
-  const getFormattedDate = (): string => {
-    const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const time = now.toTimeString().split(" ")[0].slice(0, 5);
-    return `${date}T${time}:00.000Z`;
-  };
+  const { setLoading } = useGlobalContext()
 
   const onSubmit: SubmitHandler<CashClose> = async (data) => {
-    const api = new ApiMethodCash();
-    const user: UserData = AuthenticationService.getUser();
-    try {
-      await api.closeCash({
-        ...data,
-        user: user._id,
-        endDate: getFormattedDate(),
-      });
+    const res = await CashRegisterApiConector.closeReport({
+      data: {
+        user: cash?.user || "",
+        endDate: moment.tz("America/La_Paz").format(),
+        cash: data.cash,
+        currentAccount: data.currentAccount
+      }
+    });
+
+    if (res) {
       toast.success("Caja Cerrada");
       if (handleOnSubmit) handleOnSubmit();
-    } catch (error) {
+    } else {
       toast.error("Upps error al cerrar caja");
-      console.log(error);
     }
   };
 
+  const save = async () => {
+    setLoading(true)
+
+    try {
+      const inputs = [
+        {
+          "date": cash?.startDate
+            ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
+            : "N/A",
+          "distribuidor": cash?.userDetails?.fullName || "Distribuidor desconocido",
+          "estado": !!cash?.state ? "Abierto" : "Cerrado",
+          "monto": (cash?.initialAmount || 0).toLocaleString(),
+          "ingresos": (cash?.incomeCashTotal || 0).toLocaleString(),
+          "ingreso_efectivo": (cash?.incomeCashTotal || 0).toLocaleString(),
+          "ingreso_cuenta": (cash?.incomeCurrentAccountTotal || 0).toLocaleString(),
+          "egresos": (cash?.expenseCashTotal || 0).toLocaleString(),
+          "egresos_efectivo": (cash?.expenseCashTotal || 0).toLocaleString(),
+          "egresos_cuenta": (cash?.expenseCurrentAccountTotal || 0).toLocaleString(),
+          "ingreso_efectivo_efectivo": (cash?.cashSales || 0).toLocaleString(),
+          "ingreso_efectivo_credito": (cash?.creditBillsSales || 0).toLocaleString(),
+          "ingreso_cuenta_efectivo": (cash?.cashCurrentAccount || 0).toLocaleString(),
+          "ingreso_cuenta_credito": (cash?.creditBillsSalesCurrentAccount || 0).toLocaleString(),
+          "egresos_efectivo_gastoscopy": (cash?.expenseCashTotal || 0).toLocaleString(),
+          "egresos_efectivo_obligacionescopy": (cash?.expensePayObligations || 0).toLocaleString(),
+          "egresos_cuenta_gastos": (cash?.expensePayCurrentAccount || 0).toLocaleString(),
+          "egresos_cuenta_obligaciones": (cash?.expenseCurrentPayObligations || 0).toLocaleString(),
+          "ventas_egresos_cuentapor_cobrar": "0",
+          "gastos_por_pagar": "0",
+          "saldo_en_caja": "0",
+          "diferencia": (cash?.difference || 0).toLocaleString(),
+        }
+      ]
+
+      const pdf = await generate({ template: pdfTemplate, inputs, plugins: { Text: text, Rectangle: rectangle } })
+      const pdfBuffer = Buffer.from(pdf)
+
+      const blob = new Blob([pdfBuffer])
+
+      try {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        if (link.download !== undefined) { // feature detection
+          link.setAttribute('href', url);
+          link.setAttribute('download', "Resumen de Arqueo.pdf");
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } catch (e) {
+        toast.error('Error guardando el pdf');
+      }
+    } catch (error) {
+      toast.error('Error generando el pdf');
+    }
+
+    setLoading(false)
+  }
+
+  const ref = useRef<HTMLDivElement>(null)
+  const handlePrint = useReactToPrint({
+    contentRef: ref,
+    documentTitle: `Resumen de Arqueo`,
+    onPrintError: () => alert("there is an error when printing"),
+  });
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="w-full p-6">
-        <div className="FinalizarArqueoCaja-hora">
-          <span>Hora de apertura</span>
-          <span className="font-medium">
-            {cash?.startDate
-              ? new Date(cash?.startDate).toLocaleString()
-              : "N/A"}
-          </span>
-        </div>
-        <div>
-          <table style={{ width: "25%" }}>
-            <thead>
-              <tr className="FinalizarArqueoCaja-titulos">
-                <th>
-                  <span>Distribuidor 1</span>
-                </th>
-                <th>
-                  <span>Abierto</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="FinalizarArqueoCaja-body">
-                <td>
-                  <div style={{ marginTop: "16px" }}>
-                    <span>Alberto</span>
-                  </div>
-                </td>
-                <td>
-                  <div style={{ marginTop: "16px" }}>
-                    <label className="switch-container">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => setIsChecked(!isChecked)}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="flex flex-col gap-6 pt-10">
-          <div className="FinalizarArqueoCaja-FormTitle">
-            <span>Saldos según sistema</span>
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-2 items-center w-3/12">
-              <label className="FinalizarArqueoCaja-item pl-4">Monto</label>
-              <input
-                className="FinalizarArqueoCaja-imput text-right"
-                type="number"
-                value={cash?.initialAmount}
-              />
-            </div>
-            <div className="flex gap-2 items-center w-3/12">
-              <label className="FinalizarArqueoCaja-item">Ingresos</label>
-              <input
-                className="FinalizarArqueoCaja-imput text-right"
-                type="number"
-                value={cash?.incomeCurrentAccountTotal}
-              />
-            </div>
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Efectivos</h2>
-                </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.incomeCashTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Cobro ventas. Crédito</p>
-                <p>{cash?.cashSales.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Ventas por cobrar</p>
-                <p>{cash?.creditBillsSales.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Cuenta Corriente</h2>
-                </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.incomeCurrentAccountTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Cobro ventas. Crédito</p>
-                <p>{cash?.cashCurrentAccount.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Ventas por cobrar</p>
-                <p>{cash?.creditBillsSalesCurrentAccount.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="w-5/12">
-              <div className="flex gap-2 items-center justify-between w-full">
-                <label className="FinalizarArqueoCaja-item w-full">
-                  Egresos
-                </label>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-36 text-right"
-                  value={cash?.expenseCashTotal}
-                />
-              </div>
-            </div>
-
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Efectivos</h2>
-                </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.expenseCashTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Gastos</p>
-                <p>{cash?.expenseCashTotal.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Pago de obligaciones</p>
-                <p>{cash?.expensePayObligations.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="w-4/12 bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
-              <div className="w-full flex justify-between items-center">
-                <div className="flex gap-2 items-center font-semibold w-[44rem]">
-                  <i className="fa-solid fa-angle-right"></i>
-                  <h2 className="font-bold">Cuenta Corriente</h2>
-                </div>
-                <Input
-                  name="asdsa"
-                  register={register}
-                  className="w-2/12 text-right"
-                  value={cash?.expenseCurrentAccountTotal}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Gastos</p>
-                <p>{cash?.expensePayCurrentAccount.toLocaleString()}</p>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="pl-4"> Pago de obligaciones</p>
-                <p>{cash?.expenseCurrentPayObligations.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="FinalizarArqueoCaja-FormTitle">
-            <span>Saldos según usuario</span>
-          </div>
-          <div className="flex flex-col gap-4 w-4/12">
-            <div className="flex justify-between items-center">
-              <p className="pl-4 font-bold"> Total ingresos</p>
-              <p>{cash?.incomeCashTotal.toLocaleString()}</p>
-            </div>
-
-            <div className="w-full flex justify-between items-center pl-4">
-              <div className="flex gap-2 items-center w-full">
-                <h2>Efetivo</h2>
-              </div>
-              <Input
-                name="cash"
-                register={register}
-                label="Efetivo"
-                isVisibleLable
-                className="w-2/12 text-right"
-                type="number"
-                errors={errors.cash}
-                required
-              />
-            </div>
-
-            <div className="w-full flex justify-between items-center pl-4">
-              <div className="flex gap-2 items-center w-full">
-                <h2>Cuenta Corriente</h2>
-              </div>
-              <Input
-                name="currentAccount"
-                register={register}
-                label="Cuenta Corriente"
-                isVisibleLable
-                type="number"
-                className="w-2/12 text-right"
-                errors={errors.currentAccount}
-                required
-              />
-            </div>
-
-            <div className="flex justify-between items-center pl-4">
-              <div className="flex gap-2 items-center w-screen font-bold">
-                <h2>Diferencia</h2>
-              </div>
-              <Input
-                name="asdsa"
-                register={register}
-                className="w-24 text-right"
-                value={cash?.difference.toLocaleString()}
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-center items-end">
-            <button type="submit" className="btn FinalizarArqueoCaja-btn">
-              Finalizar arqueo
+    <div className="" ref={ref}>
+      <form onSubmit={handleSubmit(onSubmit)} className="text-sm">
+        <div className="w-full p-6 relative">
+          <div className="flex gap-4 items-center justify-end absolute top-4 right-4 print:hidden">
+            <button type="button" className="border-blue_bright border w-20 h-12 flex items-center justify-center rounded-[30px]" onClick={() => handlePrint()}>
+              <img src="/print.svg" alt="" />
+            </button>
+            <button type="button" className="bg-blue_bright w-20 h-12 flex items-center justify-center rounded-[30px]" onClick={() => save()}>
+              <img src="/document.svg" alt="" />
             </button>
           </div>
+
+          <div id="printArea">
+            <div className="FinalizarArqueoCaja-hora mb-6">
+              <span>Hora de apertura</span>
+              <span className="font-medium">
+                {cash?.startDate
+                  ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
+                  : "N/A"}
+              </span>
+            </div>
+            <div className="w-full sm:w-1/2 md:w-1/4">
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2">Distribuidor</div>
+                  <div className="whitespace-normal md:whitespace-nowrap">{cash?.userDetails?.fullName || "Distribuidor desconocido"}</div>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2">Estado</div>
+                  <div className="flex gap-2 utems-center">
+                    <div className="relative inline-block w-11 h-5">
+                      <input
+                        id="switch-component"
+                        type="checkbox"
+                        readOnly
+                        checked={!!cash?.state}
+                        className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
+                      />
+                      <label
+                        htmlFor="switch-component"
+                        className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
+                      ></label>
+                    </div>
+                    <span className="ml-6">
+                      {cash?.state ? "Abierto" : "Cerrado"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6 pt-10">
+              <div className="FinalizarArqueoCaja-FormTitle">
+                <span>Saldos según sistema</span>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-3 gap-2 items-center w-full md:w-1/2">
+                  <label className="FinalizarArqueoCaja-item">Monto</label>
+                  <input
+                    readOnly
+                    className="FinalizarArqueoCaja-imput text-right col-span-2"
+                    type="number"
+                    value={(cash?.initialAmount || 0).toLocaleString()}
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 items-center w-full md:w-1/2 mt-6">
+                  <label className="FinalizarArqueoCaja-item">Ingresos</label>
+                  <Input
+                    readOnly
+                    name="one"
+                    register={register}
+                    containerClassName="col-span-2"
+                    className="text-right"
+                    value={(cash?.incomeCashTotal || 0).toLocaleString()}
+                  />
+                </div>
+
+                <div className="flex w-full flex-wrap gap-4">
+                  <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                    <div className="w-full flex justify-between items-center">
+                      <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                        <i className="fa-solid fa-angle-right"></i>
+                        <h2 className="font-bold">Efectivos</h2>
+                      </div>
+                      <Input
+                        readOnly
+                        name="two"
+                        register={register}
+                        className="w-2/12 text-right"
+                        value={(cash?.incomeCashTotal || 0).toLocaleString()}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4">Ventas efectivo</p>
+                      <p>{(cash?.cashSales || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4">Cobro ventas. Crédito</p>
+                      <p>{(cash?.creditBillsSales || 0).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                    <div className="w-full flex justify-between items-center">
+                      <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                        <i className="fa-solid fa-angle-right"></i>
+                        <h2 className="font-bold">Cuenta Corriente</h2>
+                      </div>
+                      <Input readOnly
+                        name="three"
+                        register={register}
+                        className="w-2/12 text-right"
+                        value={(cash?.incomeCurrentAccountTotal || 0).toLocaleString()}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Ventas efectivo</p>
+                      <p>{(cash?.cashCurrentAccount || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Cobro ventas. Crédito</p>
+                      <p>{(cash?.creditBillsSalesCurrentAccount || 0).toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+                <strong className="text-gray-500">Ventas por cobrar: 0</strong>
+
+                <div className="grid grid-cols-3 gap-2 items-center w-full md:w-1/2 mt-6">
+                  <label className="FinalizarArqueoCaja-item w-full">
+                    Egresos
+                  </label>
+                  <Input
+                    readOnly
+                    name="four"
+                    register={register}
+                    containerClassName="col-span-2"
+                    className="text-right"
+                    value={(cash?.expenseCashTotal || 0).toLocaleString()}
+                  />
+                </div>
+
+                <div className="flex w-full flex-wrap gap-4">
+                  <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                    <div className="w-full flex justify-between items-center">
+                      <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                        <i className="fa-solid fa-angle-right"></i>
+                        <h2 className="font-bold">Efectivos</h2>
+                      </div>
+                      <Input
+                        readOnly
+                        name="five"
+                        register={register}
+                        className="w-2/12 text-right"
+                        value={(cash?.expenseCashTotal || 0).toLocaleString()}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Gastos</p>
+                      <p>{(cash?.expenseCashTotal || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Pago de obligaciones</p>
+                      <p>{(cash?.expensePayObligations || 0).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="min-w-[320px] max-w-[500px] bg-white shadow-md border flex flex-col gap-4 shadow-zinc-300 rounded-2xl p-6">
+                    <div className="w-full flex justify-between items-center">
+                      <div className="flex gap-2 items-center font-semibold w-[44rem]">
+                        <i className="fa-solid fa-angle-right"></i>
+                        <h2 className="font-bold">Cuenta Corriente</h2>
+                      </div>
+                      <Input
+                        readOnly
+                        name="six"
+                        register={register}
+                        className="w-2/12 text-right"
+                        value={(cash?.expenseCurrentAccountTotal || 0).toLocaleString()}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Gastos</p>
+                      <p>{(cash?.expensePayCurrentAccount || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4"> Pago de obligaciones</p>
+                      <p>{(cash?.expenseCurrentPayObligations || 0).toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <strong className="text-gray-500">Gastos por pagar: 0</strong>
+              <strong className="text-gray-500">Saldo en caja: 0</strong>
+
+              {
+                cash?.state &&
+                <>
+                  <div className="FinalizarArqueoCaja-FormTitle mt-6 print:hidden">
+                    <span>Saldos según usuario</span>
+                  </div>
+                  <div className="flex flex-col gap-4 w-full md:w-1/2 print:hidden">
+                    <div className="flex justify-between items-center">
+                      <p className="pl-4 font-semibold"> Total ingresos</p>
+                      <p>{(cash?.incomeCashTotal || 0).toLocaleString()}</p>
+                    </div>
+
+                    <div className="w-full flex justify-between items-center pl-4">
+                      <div className="flex gap-2 items-center w-full">
+                        <h2>Efetivo</h2>
+                      </div>
+                      <Input
+                        name="cash"
+                        register={register}
+                        label="Efetivo"
+                        isVisibleLable
+                        className="w-2/12 text-right no-spinner"
+                        type="number"
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full flex justify-between items-center pl-4">
+                      <div className="flex gap-2 items-center w-full">
+                        <h2>Cuenta Corriente</h2>
+                      </div>
+                      <Input
+                        name="currentAccount"
+                        register={register}
+                        label="Cuenta Corriente"
+                        isVisibleLable
+                        type="number"
+                        className="w-2/12 text-right no-spinner"
+                        required
+                      />
+                    </div>
+
+                  </div>
+                </>
+              }
+            </div>
+            <div className="flex flex-col gap-4 w-full md:w-1/2 mt-4">
+              <div className="flex justify-between items-center pl-4">
+                <div className="flex gap-2 items-center font-bold w-full">
+                  <h2>Diferencia</h2>
+                </div>
+                <Input
+                  name="seven"
+                  register={register}
+                  className="w-2/12 text-right no-spinner"
+                  readOnly
+                  value={(cash?.difference || 0).toLocaleString()}
+                />
+              </div>
+            </div>
+          </div>
+          {
+            cash?.state &&
+            <div className="flex w-full sm:w-1/2 justify-center sm:justify-end items-center mt-6 print:hidden">
+              <button type="submit" className="btn FinalizarArqueoCaja-btn disabled:bg-gray-400 disabled:border-none" disabled={!isValid}>
+                Finalizar arqueo
+              </button>
+            </div>
+          }
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

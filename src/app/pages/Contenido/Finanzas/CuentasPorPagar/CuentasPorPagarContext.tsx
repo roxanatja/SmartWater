@@ -1,4 +1,6 @@
 import { createContext, useState } from "react";
+import { Providers } from "../../../../../type/providers";
+import { providerBlank } from "../Proveedores/ProveedoresContext";
 
 type CuentasPorPagarContextType = {
     showModal: boolean;
@@ -9,6 +11,8 @@ type CuentasPorPagarContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
+    providerSelect: Providers;
+    setProviderSelected: React.Dispatch<React.SetStateAction<Providers>>;
 }
 
 export const CuentasPorPagarContext = createContext<CuentasPorPagarContextType>(
@@ -20,17 +24,20 @@ export const CuentasPorPagarProvider = ({ children }: any) => {
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
+    const [providerSelect, setProviderSelected] = useState<Providers>(providerBlank);
 
     return (
         <CuentasPorPagarContext.Provider value={{
-            showModal, 
+            showModal,
             setShowModal,
-            showMiniModal, 
+            showMiniModal,
             setShowMiniModal,
-            selectedOption, 
+            selectedOption,
             setSelectedOption,
             showFiltro,
-            setShowFiltro
+            setShowFiltro,
+            providerSelect,
+            setProviderSelected,
         }}>
             {children}
         </CuentasPorPagarContext.Provider>

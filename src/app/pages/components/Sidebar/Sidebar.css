@@ -28,7 +28,6 @@
     padding-bottom: 20px;
     display: flex;
     justify-content: center;
-    font-family: 'Baloo Bhai 2', sans-serif;
 }
 
 .smart {
@@ -36,6 +35,7 @@
     font-size: 24px;
     font-weight: 600;
     line-height: 38.93px;
+    font-family: 'Baloo Bhai 2', sans-serif ;
 }
 
 .water {
@@ -43,6 +43,7 @@
     font-size: 24px;
     font-weight: 600;
     line-height: 38.93px;
+    font-family: 'Baloo Bhai 2', sans-serif ;
 }
 
 ul a {

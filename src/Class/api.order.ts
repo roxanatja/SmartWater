@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
-import { OrdenBody, Order } from "../type/Order/Order";
+import { Order } from "../type/Order/Order";
 import GetApiMethod from "./api.class";
 
 class ApiMethodOrder extends GetApiMethod {
-  public async saveOrder(dataToSave: OrdenBody) {
+  public async saveOrder(dataToSave: any) {
     try {
       const response = await this.axiosInstance.post(
         "/orders/register",

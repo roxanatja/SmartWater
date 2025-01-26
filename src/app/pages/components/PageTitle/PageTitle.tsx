@@ -1,25 +1,35 @@
+import NotificationsDropdown from "../Notificaciones/NotificationsDropdown";
 import "./PageTitle.css";
 import React, { FC } from "react";
 
 type TituloPages = {
   titulo: string;
   icon?: string;
+  hasBack?: boolean;
+  onBack?: () => void
 };
 
-const PageTitle: FC<TituloPages> = ({ titulo, icon }) => {
+const PageTitle: FC<TituloPages> = ({ titulo, icon, hasBack, onBack }) => {
   return (
     <>
-      <div className="Pages sticky top-0 z-10 ">
+      <div className="Pages sticky top-0 z-[49] py-5">
         <div className="Title-Pages">
-          <img src={icon} alt="" />
+
+          {
+            (hasBack && onBack) &&
+            <button className="RegistrarVenta-btn" onClick={onBack}>
+              <span className="material-symbols-outlined translate-y-0.5 text-font-color">
+                arrow_back
+              </span>
+            </button>
+          }
+
+          <img src={icon} alt="" className="invert dark:invert-0" />
           <div>
             <span>{titulo}</span>
           </div>
         </div>
-        <div className="bg-blue_custom text-xl text-white flex items-center justify-center px-4 rounded-full relative cursor-pointer hover:bg-blue-800">
-          <i className="fa-solid fa-bell"></i>
-          <div className="bg-red-500 rounded-full p-2 absolute top-0 right-0" />
-        </div>
+        <NotificationsDropdown />
       </div>
     </>
   );

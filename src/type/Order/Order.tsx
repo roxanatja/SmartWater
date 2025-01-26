@@ -1,49 +1,33 @@
 type Order = {
+  _id: string;
   user: string;
-  client: string;
+  client: string | any;
   comment: string;
   deliverDate: string;
-  distributorRedirectId: string;
+  distributorRedirectId?: string;
+  zone: string;
+  district: string;
   detail: Array<{
     product: string;
-    quantity: string;
+    quantity: number;
   }>;
   clientNotRegistered?: {
-    fullName: string;
-    phoneNumber: string;
-    address: string;
-    district: string;
-    zone: string;
+    fullName?: string;
+    phoneNumber?: string;
+    address?: string;
+    district?: string;
+    zone?: string;
     location: {
       latitude: string;
       longitude: string;
     };
+    hasOrder: boolean;
+    isClient: boolean;
+    from: "internal" | "customer"
   };
+  created: string;
+  updated: string;
+  attended?: string
 };
 
-type OrdenBody = {
-  user: string;
-  client: string;
-  comment: string;
-  deliverDate: string;
-  distributorRedirectId: string;
-  detail: {
-    product: string;
-    quantity: string;
-  }[];
-  clientNotRegistered: {
-    fullName: string;
-    phoneNumber: string;
-    address: string;
-    district: string;
-    zone: string;
-    cityId: string;
-    location: {
-      latitude: string;
-      longitude: string;
-    };
-  };
-  linkAddress?: string;
-};
-
-export type { Order, OrdenBody };
+export type { Order };

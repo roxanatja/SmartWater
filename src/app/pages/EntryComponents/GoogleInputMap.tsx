@@ -95,8 +95,9 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
           center: initialPosition,
           zoom: 14,
           mapTypeId: google.maps.MapTypeId.HYBRID,
-          clickableIcons: true,
           fullscreenControl: false,
+          disableDefaultUI: true,
+
         });
 
         setMap(mapInstance);
@@ -109,16 +110,21 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         });
         setMarker(centerMarker);
 
-        mapInstance.addListener("center_changed", () => {
-          const center = mapInstance.getCenter();
-          if (center) {
-            const newPosition = {
-              lat: center.lat(),
-              lng: center.lng(),
-            };
-            centerMarker.setPosition(center);
-            onChange(newPosition);
-          }
+        if (latitude && !isNaN(latitude) && longitude && !isNaN(longitude)) {
+          console.log(latitude, longitude)
+          centerMarker.setPosition({ lat: latitude, lng: longitude })
+        } else {
+          console.log(initialPosition)
+          centerMarker.setPosition({ lat: initialPosition.lat, lng: initialPosition.lng })
+        }
+
+        mapInstance.addListener("click", (e: any) => {
+          const newPosition = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          };
+          centerMarker.setPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+          onChange(newPosition);
         });
 
         const locationButton = document.createElement("button");
@@ -143,6 +149,31 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
             console.error("Error al obtener ubicación:", error);
           }
         });
+
+        const findMarkerButton = document.createElement("button");
+        findMarkerButton.classList.add("custom-map-control-button");
+        findMarkerButton.classList.add("!rounded-full");
+        findMarkerButton.classList.add("!left-0");
+        findMarkerButton.classList.add("!bottom-4");
+        findMarkerButton.setAttribute("type", "button");
+        findMarkerButton.style.cursor = "pointer";
+        findMarkerButton.innerHTML =
+          '<i class="fa fa-map-marker"></i>';
+
+        mapInstance.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(
+          findMarkerButton
+        );
+
+        findMarkerButton.addEventListener("click", async () => {
+          try {
+            const currentPosition = centerMarker.getPosition();
+            if (currentPosition) {
+              mapInstance.setCenter({ lat: currentPosition.lat(), lng: currentPosition.lng() });
+            }
+          } catch (error) {
+            console.error("Error al obtener ubicación:", error);
+          }
+        });
       }
     };
 
@@ -152,7 +183,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
 
     if (visible && map) {
       google.maps.event.trigger(map, "resize");
-      if (latitude !== undefined && longitude !== undefined) {
+      if (latitude !== undefined && !isNaN(latitude) && longitude !== undefined && !isNaN(longitude)) {
         map.setCenter({ lat: latitude, lng: longitude });
       }
     }
@@ -160,7 +191,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
   }, [apiKey, getCurrentLocation, map, updateMarkerPosition, visible]);
 
   useEffect(() => {
-    if (map && latitude !== undefined && longitude !== undefined) {
+    if (map && latitude !== undefined && !isNaN(latitude) && longitude !== undefined && !isNaN(longitude)) {
       const position = { lat: latitude, lng: longitude };
       centerMap(position);
       updateMarkerPosition(new google.maps.LatLng(latitude, longitude));
@@ -272,7 +303,7 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
             width: "100%",
             height: "100%",
             backgroundColor: "rgba(255, 255, 255, 0.2)",
-            zIndex: 40,
+            zIndex: 10,
           }}
         />
       )}

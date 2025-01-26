@@ -1,8 +1,10 @@
+import { User } from "./User";
+
 export type CashOpen = {
   startDate: string;
-  initialMount: number;
+  endDate?: string;
+  initialAmount: number;
   user: string;
-  startTime?: string;
 };
 
 export type CashClose = {
@@ -36,4 +38,36 @@ export type Transaction = {
   currentAccountRendered: number;
   created: string;
   updated: string;
+  userDetails: User
+};
+
+export type CashReport = {
+  initialMount: number;
+  finalMount: number;
+  incomes: {
+    cash: {
+      cashSales: number;
+      creditBillSales: number;
+      total: number;
+    };
+    currentAccount: {
+      cash: number;
+      creditBillSales: number;
+      total: number;
+    };
+    billPending: number;
+  };
+  expenses: {
+    cash: {
+      cashExpense: number;
+      expensespayobligations: number;
+      total: number;
+    };
+    currentAccount: {
+      expenseCurrentAccount: number;
+      expensespayobligations: number;
+      total: number;
+    };
+    expensesToPayPending: number;
+  }
 };

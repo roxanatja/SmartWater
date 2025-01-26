@@ -40,6 +40,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    gap: 20px;
 }
 
 .Cuadros {
@@ -56,6 +57,4 @@
     font-style: normal;
     font-weight: 600;
     line-height: normal;
-    margin-top: 10px;
-    margin-bottom: 30px;
 }

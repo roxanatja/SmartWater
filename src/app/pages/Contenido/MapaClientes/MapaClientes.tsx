@@ -12,7 +12,7 @@ import FiltroClientes from "../Reportes/ReportesIngresos/FiltroClientes/FiltroCl
 const MapaClientes: React.FC = () => {
   const { showMiniModal, setShowMiniModal, showFiltro, setShowFiltro } =
     useContext(MapaClientesContext);
-  const api: string = "AIzaSyClt5h7hYmQJYdfK_-ee5c3msh1rnt7GfE";
+  const api: string = process.env.REACT_APP_API_GOOGLE!;
 
   const [latitude, setLatitude] = useState<string>("");
   const [longitude, setLongitude] = useState<string>("");

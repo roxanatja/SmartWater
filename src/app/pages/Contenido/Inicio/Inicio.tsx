@@ -1,116 +1,72 @@
 import { useEffect, useState } from "react";
 import { BarChart } from "../../components/Barchart/Barchart";
 import { CuadroClientes } from "../../components/CuadroClientes/CuadroClientes";
-import {
-  CuadroInformativo,
-  CuadroInformativo2,
-} from "../../components/CuadroInformativo/CuadroInformativo";
-import { CuadroRealizarPedido } from "../../components/CuadroRealizarPedido/CuadroRealizarPedido";
+import { CuadroInformativo } from "../../components/CuadroInformativo/CuadroInformativo";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import { FC } from "react";
-import "./Inicio.css";
-import { Client } from "../../../../type/Cliente/Client";
-import { Sale } from "../../../../type/Sale/Sale";
-import { loadClients } from "../../../../services/ClientsService";
-import { GetLoans } from "../../../../services/LoansService";
-import { GetSales } from "../../../../services/SaleService";
 import PedidosResumido from "../Pedidos/CuadroPedidos/PedidosResumido";
+import { ClientsApiConector, LoansApiConector, OrdersApiConector, SalesApiConector } from "../../../../api/classes";
+import "./Inicio.css";
+import moment from "moment";
+import millify from "millify";
 
 const Inicio: FC = () => {
-  const [clientsCount, setClientsCount] = useState<number | undefined>(
-    undefined
-  );
-  const [clientsLastMonthCount, setClientsLastMonthCount] = useState<
-    number | undefined
-  >(undefined);
-  const [activeLoansCount, setActiveLoansCount] = useState<number | undefined>(
-    undefined
-  );
-  const [loansLastMonthCount, setLoansLastMonthCount] = useState<
-    number | undefined
-  >(undefined);
-  const [activeSalesCount, setActiveSalesCount] = useState<number | undefined>(
-    undefined
-  );
-  const [salesLastMonthCount, setSalesLastMonthCount] = useState<
-    number | undefined
-  >(undefined);
+  const [clientsCount, setClientsCount] = useState<number | undefined>(undefined);
+  const [clientsLastMonthCount, setClientsLastMonthCount] = useState<number | undefined>(undefined);
+  const [activeLoansCount, setActiveLoansCount] = useState<number | undefined>(undefined);
+  const [loansLastMonthCount, setLoansLastMonthCount] = useState<number | undefined>(undefined);
+  const [activeSalesCount, setActiveSalesCount] = useState<number | undefined>(undefined);
+  const [salesLastMonthCount, setSalesLastMonthCount] = useState<number | undefined>(undefined);
+  const [activeOrdersCount, setActiveordersCount] = useState<number | undefined>(undefined);
+  const [ordersLastMonthCount, setOrdersLastMonthCount] = useState<number | undefined>(undefined);
   const [totalIncome, setTotalIncome] = useState<number>(0);
+  const [totalIncomeMonth, setTotalIncomeMonth] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() + 1;
+
+        const promises = [
+          ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 1 } }),
+          ClientsApiConector.getClients({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
+          LoansApiConector.get({ pagination: { page: 1, pageSize: 1 } }),
+          LoansApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
+          SalesApiConector.get({ pagination: { page: 1, pageSize: 1 }, filters: { initialDate: "2020-01-01", finalDate: moment().format("YYYY-MM-DD") } }),
+          SalesApiConector.get({ filters: { month, year }, pagination: { page: 1, pageSize: 1 } }),
+          OrdersApiConector.get({ filters: { attended: false }, pagination: { page: 1, pageSize: 1 } }),
+          OrdersApiConector.get({ filters: { attended: false, month, year }, pagination: { page: 1, pageSize: 1 } })
+        ]
+
+        const salesPromises = [
+          SalesApiConector.getSalesConsolidated({}),
+          SalesApiConector.getSalesConsolidated({ filters: { initialDate: moment().startOf('month').toDate().toISOString(), finalDate: moment().endOf('month').toDate().toISOString() } })
+        ]
+
+        const [clientsData, clientsLastMonth, loansData, loansLastMonth, salesData, salesLastMonth, activeOrdersCountRes, ordersLastMonthCountRes] = await Promise.all(promises)
+        const [salesConsolidated, salesConsolidatedEnd] = await Promise.all(salesPromises)
+
         // Cargar clientes y calcular clientes del último mes (julio en este momento)
-        const clientsData = await loadClients();
-        if (clientsData && clientsData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
-
-          const filteredClients = clientsData.data.filter((client: Client) => {
-            const clientCreatedDate = new Date(client.created);
-            return (
-              clientCreatedDate >= firstDayOfMonth &&
-              clientCreatedDate <= currentDate
-            );
-          });
-
-          setClientsCount(clientsData.data.length);
-          setClientsLastMonthCount(filteredClients.length);
-        }
+        setClientsCount(clientsData?.metadata.totalCount || 0);
+        setClientsLastMonthCount(clientsLastMonth?.metadata.totalCount || 0);
 
         // Cargar préstamos activos y calcular préstamos del último mes (julio en este momento)
-        const loansData = await GetLoans();
-        if (loansData && loansData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
-
-          const filteredLoans = loansData.data.filter((loan: any) => {
-            const loanCreatedDate = new Date(loan.created);
-            return (
-              loanCreatedDate >= firstDayOfMonth &&
-              loanCreatedDate <= currentDate
-            );
-          });
-
-          setActiveLoansCount(loansData.data.length); // Total de préstamos activos
-          setLoansLastMonthCount(filteredLoans.length); // Préstamos del último mes
-        }
+        setActiveLoansCount(loansData?.metadata.totalCount || 0); // Total de préstamos activos
+        setLoansLastMonthCount(loansLastMonth?.metadata.totalCount || 0); // Préstamos del último mes
 
         // Cargar ventas activas y calcular ventas del último mes (julio en este momento)
-        const salesData = await GetSales();
-        if (salesData && salesData.data) {
-          const currentDate = new Date();
-          const firstDayOfMonth = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth(),
-            1
-          );
+        setActiveSalesCount(salesData?.metadata.totalCount || 0); // Total de ventas activas
+        setSalesLastMonthCount(salesLastMonth?.metadata.totalCount || 0); // Ventas del último mes
 
-          const filteredSales = salesData.data.filter((sale: Sale) => {
-            const saleCreatedDate = new Date(sale.created);
-            return (
-              saleCreatedDate >= firstDayOfMonth &&
-              saleCreatedDate <= currentDate
-            );
-          });
+        setActiveordersCount(activeOrdersCountRes?.metadata.totalCount || 0); // Total de ventas activas
+        setOrdersLastMonthCount(ordersLastMonthCountRes?.metadata.totalCount || 0); // Ventas del último mes
 
-          setActiveSalesCount(salesData.data.length); // Total de ventas activas
-          setSalesLastMonthCount(filteredSales.length); // Ventas del último mes
 
-          const totalIncome = salesData.data.reduce(
-            (sum: number, sale: Sale) => sum + sale.total,
-            0
-          );
-          setTotalIncome(totalIncome);
-        }
+        const totalIncome = (salesConsolidated || []).reduce((sum, res) => sum += res.total * res.quantity, 0);
+        setTotalIncome(parseFloat(totalIncome.toFixed(2)));
+        const totalIncomeMonth = (salesConsolidatedEnd || []).reduce((sum, res) => sum += res.total * res.quantity, 0);
+        setTotalIncomeMonth(parseFloat(totalIncomeMonth.toFixed(2)));
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -127,14 +83,14 @@ const Inicio: FC = () => {
 
   return (
     <>
-      <div>
+      <div className="px-10 pb-10 h-screen overflow-y-auto">
         <PageTitle titulo="Inicio" icon="./home-icon.svg" />
         <div className="Cuadros-informativos">
           <CuadroInformativo
             titulo="Clientes nuevos"
             numero={
-              clientsLastMonthCount !== undefined
-                ? clientsLastMonthCount.toString()
+              clientsCount !== undefined
+                ? clientsCount.toString()
                 : ""
             }
             porcentaje={
@@ -147,14 +103,29 @@ const Inicio: FC = () => {
           <CuadroInformativo
             titulo="Préstamos activos"
             numero={
-              loansLastMonthCount !== undefined
-                ? loansLastMonthCount.toString()
+              activeLoansCount !== undefined
+                ? activeLoansCount.toString()
                 : ""
             }
             porcentaje={
               activeLoansCount !== undefined &&
-              loansLastMonthCount !== undefined
+                loansLastMonthCount !== undefined
                 ? calculatePercentage(loansLastMonthCount, activeLoansCount)
+                : undefined
+            }
+          />
+
+          <CuadroInformativo
+            titulo="Pedidos en curso"
+            numero={
+              activeOrdersCount !== undefined
+                ? activeOrdersCount.toString()
+                : ""
+            }
+            porcentaje={
+              activeOrdersCount !== undefined &&
+                ordersLastMonthCount !== undefined
+                ? calculatePercentage(ordersLastMonthCount, activeOrdersCount)
                 : undefined
             }
           />
@@ -162,23 +133,24 @@ const Inicio: FC = () => {
           <CuadroInformativo
             titulo="Ventas Totales"
             numero={
-              salesLastMonthCount !== undefined
-                ? salesLastMonthCount.toString()
+              activeSalesCount !== undefined
+                ? activeSalesCount.toString()
                 : ""
             }
             porcentaje={
               activeSalesCount !== undefined &&
-              salesLastMonthCount !== undefined
+                salesLastMonthCount !== undefined
                 ? calculatePercentage(salesLastMonthCount, activeSalesCount)
                 : undefined
             }
           />
 
-          <CuadroInformativo2
+          <CuadroInformativo
+            mostrar_ultimo_mes_text={false}
             titulo="Ingresos Totales"
-            numero={totalIncome.toString()}
+            numero={millify(totalIncome, { precision: 2, locales: "es-AR" })}
             letra="Bs"
-            porcentaje={100}
+            porcentaje={calculatePercentage(totalIncomeMonth, totalIncome)}
           />
         </div>
         <div className="sub-title">
@@ -188,9 +160,9 @@ const Inicio: FC = () => {
           <div>
             <CuadroClientes />
           </div>
-          <div>
+          {/* <div>
             <CuadroRealizarPedido />
-          </div>
+          </div> */}
           <div>
             <PedidosResumido />
           </div>

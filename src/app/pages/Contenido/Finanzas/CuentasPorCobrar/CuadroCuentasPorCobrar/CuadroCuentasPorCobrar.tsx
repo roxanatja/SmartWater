@@ -2,14 +2,15 @@ import { useContext } from "react";
 import "./CuadroCuentasPorCobrar.css";
 import { CuentasPorCobrarContext } from "../CuentasPorCobrarContext";
 import { Sale } from "../../../../../../type/Sale/Sale";
-import Input from "../../../../EntryComponents/Inputs";
-import { BillBody } from "../../../../../../type/Bills";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ApiMethodBills from "../../../../../../Class/api.bills";
 import { toast } from "react-hot-toast";
 import { UserData } from "../../../../../../type/UserData";
-import AuthenticationService from "../../../../../../services/AuthenService";
-import { Client } from "../../../../../../Class/types.data";
+import { Client } from "../../../../../../type/Cliente/Client";
+import { IBillsBody } from "../../../../../../api/types/bills";
+import { AuthService } from "../../../../../../api/services/AuthService";
+import { BillsApiConector } from "../../../../../../api/classes";
+import Input from "../../../../EntryComponents/Inputs";
+import { formatDateTime } from "../../../../../../utils/helpers";
 
 const CuadroCuentasPorCobrar = ({
   sale,
@@ -28,40 +29,46 @@ const CuadroCuentasPorCobrar = ({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<BillBody>({
+  } = useForm<IBillsBody['data']>({
     defaultValues: {
-      amount: "0",
       cashPayment: true,
       paymentMethodCurrentAccount: false,
     },
+    mode: 'all'
   });
-  const onSubmit: SubmitHandler<BillBody> = async (data) => {
-    const api = new ApiMethodBills();
-    const auth = AuthenticationService;
-    const userData: UserData = auth.getUser();
-    try {
-      await api.registerBill({
+
+  const onSubmit: SubmitHandler<IBillsBody['data']> = async (data) => {
+    const userData: UserData | null = AuthService.getUser();
+    const client = sale.client[0]
+
+    const response = await BillsApiConector.create({
+      data: {
         ...data,
-        user: userData._id,
-        zone: sale.client[0].zone,
-        sale: sale._id,
-      });
+        client: client?._id || "",
+        user: userData?._id || "",
+        zone: client?.zone || "",
+        amount: data.amount,
+        cashPayment: data.cashPayment,
+        paymentMethodCurrentAccount: data.paymentMethodCurrentAccount,
+        sale: sale._id
+      }
+    });
+
+    if (response) {
       toast.success("Cobro registrado");
       reset();
-      onSendBill();
-    } catch (error) {
-      console.error(error);
+      window.location.reload();
+    } else {
       toast.error("Uppss error al registrar el Cobro");
     }
   };
 
-  const credi = sale.total;
   const validateAmount = (value: number) => {
-    if (value <= 0) {
+    if (value < 0) {
       return "El monto no puede ser menor que 0";
     }
-    if (value > credi) {
-      return `El monto no puede exceder el saldo de ${credi} Bs.`;
+    if (value > sale.total) {
+      return `El monto no puede exceder el saldo de ${sale.total} Bs.`;
     }
     return true;
   };
@@ -70,16 +77,25 @@ const CuadroCuentasPorCobrar = ({
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="CuadroCuentasPorCobrar-container"
+        className="CuadroCuentasPorCobrar-container bg-blocks dark:border-blocks"
       >
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="CuadroVentaCliente-header">
-              <img
-                src={sale?.client?.[0]?.storeImage || "../Cliente2.svg"}
-                className="w-8 h-8 rounded-full"
-                alt=""
-              />
+              {sale?.client?.[0]?.clientImage ? (
+                <img
+                  src={sale?.client?.[0]?.clientImage}
+                  alt=""
+                  className="infoClientes-imgStore"
+                />
+              ) : (
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
+                  <div className="opacity-0">.</div>
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {sale?.client?.[0]?.fullName?.[0] || "S"}
+                  </p>
+                </div>
+              )}
               <span>{sale?.client?.[0]?.fullName || "N/A"}</span>
             </div>
             <div className="flex items-center">
@@ -91,11 +107,11 @@ const CuadroCuentasPorCobrar = ({
                   setClientSelect(sale.client[0] as unknown as Client);
                 }}
               >
-                <img src="../Opciones-icon.svg" alt="" />
+                <img src="/Opciones-icon.svg" alt="" className="invert-0 dark:invert" />
               </button>
             </div>
-            <div className="CuadroCuentasPorCobrar-header">
-              <span>Prestamos activos</span>
+            <div className="CuadroCuentasPorCobrar-header text-blue_custom text-end">
+              <span>{!!sale?.client?.[0]?.hasLoan ? "Prestamos activos" : "Sin prestamos activos"}</span>
             </div>
           </div>
           <div className="flex justify-between items-start">
@@ -107,8 +123,8 @@ const CuadroCuentasPorCobrar = ({
                 </span>
               </span>
             </div>
-            <div className="moneda-clientes bg-blue_custom text-white gap-2 py-1 px-3 rounded-md flex items-center">
-              <img src="../Moneda-icon.svg" alt="" />
+            <div className="moneda-clientes bg-blue_custom text-white gap-4 py-1 px-3 rounded-md flex items-center">
+              <img src="/Moneda-icon.svg" alt="" />
               <div>
                 <span className="text-sm">
                   {sale.total.toLocaleString()} Bs.
@@ -116,17 +132,27 @@ const CuadroCuentasPorCobrar = ({
               </div>
             </div>
           </div>
+          <div className="flex justify-between items-start -mt-4">
+            <div className="CuadroVentaCliente-text">
+              <span>
+                Fecha:{" "}
+                <span className="text-blue_custom">
+                  {formatDateTime(sale.created, 'numeric', '2-digit', '2-digit', true, true) || "N/A"}
+                </span>
+              </span>
+            </div>
+          </div>
         </div>
         <div className="flex justify-start flex-col items-start gap-0 -translate-y-3 w-full">
           <div className="flex justify-between items-center w-full">
             <p className="text-sm text-nowrap w-full">Total a Cobrar</p>
             <div className="input-container flex flex-col w-full">
-              <div className="RegistrarVenta-grupo-checbox">
+              <div className="RegistrarVenta-grupo-checbox flex justify-end">
                 <div className="RegistrarVenta-grupo-check">
                   <input
-                    className="input-check cursor-pointer w-4 h-4"
+                    className="input-check cursor-pointer w-4 h-4 accent-blue_custom"
                     type="checkbox"
-                    id="checkbox1"
+                    id={`checkbox1_${sale._id}`}
                     checked={watch("cashPayment")}
                     onChange={() => {
                       setValue("cashPayment", !watch("cashPayment"));
@@ -134,17 +160,17 @@ const CuadroCuentasPorCobrar = ({
                     }}
                   />
                   <label
-                    htmlFor="checkbox1"
-                    className="text-check cursor-pointer text-md"
+                    htmlFor={`checkbox1_${sale._id}`}
+                    className="text-font-color cursor-pointer text-md"
                   >
                     Efectivo
                   </label>
                 </div>
                 <div className="RegistrarVenta-grupo-check">
                   <input
-                    className="input-check cursor-pointer w-4 h-4"
+                    className="input-check cursor-pointer w-4 h-4 accent-blue_custom"
                     type="checkbox"
-                    id="checkbox2"
+                    id={`checkbox2_${sale._id}`}
                     checked={watch("paymentMethodCurrentAccount")}
                     onChange={() => {
                       setValue(
@@ -155,8 +181,8 @@ const CuadroCuentasPorCobrar = ({
                     }}
                   />
                   <label
-                    htmlFor="checkbox2"
-                    className="text-check cursor-pointer text-md"
+                    htmlFor={`checkbox2_${sale._id}`}
+                    className="text-font-color cursor-pointer text-md"
                   >
                     Cta. Cte
                   </label>
@@ -165,21 +191,26 @@ const CuadroCuentasPorCobrar = ({
             </div>
           </div>
           <Input
+            label="Pago a cuenta"
+            isVisibleLable
             register={register}
             validateAmount={validateAmount}
             name="amount"
             type="number"
             placeholder="Monto a cobrar"
             min="0"
-            step="0.01"
+            max={sale.total}
+            step="1"
+            className="no-spinner"
             errors={errors.amount}
             button={<span className="text-lg">Bs</span>}
           />
         </div>
         <div className="flex justify-center items-center w-full">
           <button
+            disabled={!watch('amount') || watch('amount') <= 0 || watch('amount') > sale.total || (!watch('cashPayment') && !watch('paymentMethodCurrentAccount'))}
             type="submit"
-            className="btn CuadroCuentasPorCobrar-btn -translate-y-2"
+            className="btn CuadroCuentasPorCobrar-btn -translate-y-2 disabled:border-none disabled:bg-gray-400"
           >
             <span>Registrar Cobro</span>
           </button>

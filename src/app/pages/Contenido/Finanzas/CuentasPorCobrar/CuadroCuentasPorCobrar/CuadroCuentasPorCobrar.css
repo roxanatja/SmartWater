@@ -1,16 +1,15 @@
-.CuadroCuentasPorCobrar-container{
-    width: 358px;
+.CuadroCuentasPorCobrar-container {
     flex-shrink: 0;
     border-radius: 20px;
     border: 1px solid #F0F4FD;
-    background: #FFF;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     padding: 15px 16px;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
-.CuadroCuentasPorCobrar-header{
+
+.CuadroCuentasPorCobrar-header {
     color: var(--Azul-oscuro, #1A3D7D);
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -19,12 +18,10 @@
     line-height: normal;
 }
 
-.CuadroCuentasPorCobrar-pago{
-    width: 191.6px;
+.CuadroCuentasPorCobrar-pago {
     flex-shrink: 0;
     border-radius: 5px;
     border: 1px solid #000;
-    background: #FFF;
     display: flex;
     align-items: center;
     gap: 110px;
@@ -48,7 +45,7 @@
     line-height: normal;
 }
 
-.CuadroCuentasPorCobrar-btn{
+.CuadroCuentasPorCobrar-btn {
     width: 163.589px;
     height: 34px;
     flex-shrink: 0;
@@ -57,7 +54,6 @@
     background: #367DFD;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     text-align: center;
-    color: #FFF;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-style: normal;
@@ -65,12 +61,12 @@
     line-height: normal;
 }
 
-.CuadroCuentasPorCobrar-btn:hover{
+.CuadroCuentasPorCobrar-btn:hover {
     border: 1px solid #234fa0;
     background: var(--Azul, #234fa0);
 }
 
-.CobrosClientes-pago{
+.CobrosClientes-pago {
     color: #1A3D7D;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;

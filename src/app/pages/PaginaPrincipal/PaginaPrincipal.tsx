@@ -32,6 +32,10 @@ import { ProductosWrapper } from "../Contenido/Configuracion/Productos/Productos
 import { ItemsWrapper } from "../Contenido/Configuracion/Items/ItemsWrapper";
 import LoginFormWrapper from "../Contenido/LoginForm/LoginPageWrapper";
 import ProtectedRoute from "../EntryComponents/ProtectRouter";
+import { HorariosWrapper } from "../Contenido/Configuracion/Horarios/HorariosWrapper";
+import { CategoriesWrapper } from "../Contenido/Configuracion/Categorias/CategoriesWrapper";
+import DatosEmpresa from "../Contenido/Configuracion/DatosEmpresa/DatosEmpresa";
+import { PromocionesWrapper } from "../Contenido/Configuracion/Promociones/PromocionesWrapper";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -39,7 +43,7 @@ const PaginaPrincipal: FC = () => {
       <Router>
         <div className="flex">
           <Sidebar />
-          <div className="Contenedor max-sm:w-full">
+          <div className="Contenedor max-md:w-full relative bg-main-background overflow-hidden">
             <Routes>
               {/* Ruta de login */}
               <Route path="/users/login" element={<LoginFormWrapper />} />
@@ -48,17 +52,9 @@ const PaginaPrincipal: FC = () => {
                 <Route path="" element={<Navigate to="/Inicio" />} />
                 <Route path="/Inicio" element={<InicioWrapper />} />
                 <Route path="/Clientes/*" element={<ClientesWrapper />} />
-                <Route
-                  path="/MapaClientes/*"
-                  element={<MapaClientesWrapper />}
-                />
-                <Route
-                  path="/MonitoreoDistribuidores"
-                  element={<MonitoreoDistribuidoresWrapper />}
-                />
                 <Route path="/Ventas/*" element={<VentasWrapper />} />
-                <Route path="/Pedidos/*" element={<PedidosWrapper />} />
                 <Route path="/Prestamos/*" element={<PrestamosWrapper />} />
+                <Route path="/Pedidos/*" element={<PedidosWrapper />} />
                 <Route
                   path="/Finanzas/ArqueoDeCajas"
                   element={<ArqueoDeCajaWrapper />}
@@ -68,7 +64,7 @@ const PaginaPrincipal: FC = () => {
                   element={<CuentasPorCobrarWrapper />}
                 />
                 <Route
-                  path="/Finanzas/EgresosGastos"
+                  path="/Finanzas/EgresosGastos/*"
                   element={<EgresosGastosWrapper />}
                 />
                 <Route
@@ -78,6 +74,14 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Finanzas/CuentasPorPagar/*"
                   element={<CuentasPorPagarWrapper />}
+                />
+                {/* <Route
+                  path="/MapaClientes/*"
+                  element={<MapaClientesWrapper />}
+                />
+                <Route
+                  path="/MonitoreoDistribuidores"
+                  element={<MonitoreoDistribuidoresWrapper />}
                 />
                 <Route
                   path="/Reportes/Ingresos/*"
@@ -98,28 +102,39 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Reportes/Resultados/*"
                   element={<ReportesResultadosWrapper />}
-                />
+                /> */}
                 <Route
                   path="/Configuracion/General"
                   element={<ConfiguracionGeneralWrapper />}
+                />
+                <Route
+                  path="/Configuracion/DatosEmpresa"
+                  element={<DatosEmpresa />}
                 />
                 <Route
                   path="/Configuracion/Usuarios"
                   element={<UsuariosWrapper />}
                 />
                 <Route
+                  path="/Configuracion/Horarios"
+                  element={<HorariosWrapper />}
+                />
+                <Route
                   path="/Configuracion/Barrios"
                   element={<BarriosWrapper />}
                 />
                 <Route path="/Configuracion/Zonas" element={<ZonasWrapper />} />
+                <Route path="/Configuracion/Promociones" element={<PromocionesWrapper />} />
+                <Route path="/Configuracion/CategoriasUnidades" element={<Navigate to={"/Configuracion/CategoriasUnidades/Categorias"} replace={true} />} />
+                <Route path="/Configuracion/CategoriasUnidades/:section" element={<CategoriesWrapper />} />
                 <Route
                   path="/Configuracion/Productos"
                   element={<ProductosWrapper />}
                 />
                 <Route path="/Configuracion/Items" element={<ItemsWrapper />} />
               </Route>
-              {/* Redirige cualquier ruta desconocida a Inicio
-              <Route path="*" element={<Navigate to="/Inicio" />} /> */}
+              {/* Redirige cualquier ruta desconocida a Inicio */}
+              <Route path="*" element={<Navigate to="/Inicio" />} />
             </Routes>
           </div>
         </div>

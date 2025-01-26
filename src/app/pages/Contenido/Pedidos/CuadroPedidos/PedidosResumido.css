@@ -7,7 +7,6 @@
   padding-right: 24px;
   padding-bottom: 20px;
   border: 1px solid #d6d5d5;
-  background: #fff;
   font-family: "Poppins", sans-serif;
 }
 
@@ -15,13 +14,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #000;
   font-family: "Poppins", sans-serif;
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin: 20px;
+  /* margin: 20px; */
 }
 
 .pedidosResumido-body {
@@ -41,7 +39,6 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #000;
   font-family: "Poppins", sans-serif;
   font-size: 12px;
   font-style: normal;
@@ -53,6 +50,7 @@
   display: flex;
   padding: 5px 15px;
   align-items: flex-start;
+  justify-content: center;
   border-radius: 10px;
   border: 1px solid #1a3d7d;
   color: #1a3d7d;
@@ -61,7 +59,8 @@
   font-weight: 400;
   line-height: normal;
   font-family: "Poppins", sans-serif;
-  margin: 20px;
+  width: 100px;
+  /* margin: 20px; */
 }
 
 .pedidosResumido-moneda {
@@ -91,9 +90,12 @@
 
 .pedidosResumido-imgStore,
 .pedidosResumido-productImage {
-  width: 40px; /* Ancho del avatar */
-  height: 40px; /* Alto del avatar */
-  border-radius: 50%; /* Hacer la imagen circular */
+  width: 30px;
+  /* Ancho del avatar */
+  height: 30px;
+  /* Alto del avatar */
+  border-radius: 50%;
+  /* Hacer la imagen circular */
 }
 
 .titulo-pedidos {
@@ -106,7 +108,6 @@
 }
 
 .Pedidos-title {
-  color: #000;
   font-size: 16px;
   font-style: normal;
   font-weight: 600;

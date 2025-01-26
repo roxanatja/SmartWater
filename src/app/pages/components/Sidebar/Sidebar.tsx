@@ -2,8 +2,10 @@ import { AsideItem } from "../AsideMenu/AsideItem";
 import { AsideSubMenu } from "../AsideSubMenu/AsideSubMenu";
 import "./Sidebar.css";
 import { FC, useEffect, useRef, useState } from "react"; // Importar useState
-import AuthenticationService from "../../../../services/AuthenService";
 import { useNavigate } from "react-router-dom";
+import { AuthService } from "../../../../api/services/AuthService";
+import { OrdersApiConector } from "../../../../api/classes";
+import millify from "millify";
 
 const Sidebar: FC = () => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ const Sidebar: FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    AuthenticationService.logout();
+    AuthService.logout();
     navigate("users/login");
   };
 
@@ -19,6 +21,13 @@ const Sidebar: FC = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const [pedidosEnCurso, setPedidosEnCurso] = useState<number>(0)
+  useEffect(() => {
+    OrdersApiConector.get({ pagination: { page: 1, pageSize: 1 }, filters: { attended: false } }).then(res => {
+      setPedidosEnCurso(res?.metadata.totalCount || 0)
+    })
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -38,7 +47,7 @@ const Sidebar: FC = () => {
     <>
       {/* Botón de toggle para pantallas móviles con Font Awesome */}
       <button
-        className="md:hidden text-white bg-blue_custom py-2 z-50 px-4 m-2 fixed -top-2 -left-2"
+        className="md:hidden text-white bg-sidebarBackground py-2 z-50 px-4 m-2 fixed -top-2 -left-2"
         onClick={toggleMenu}
       >
         {/* Icono de hamburguesa de Font Awesome */}
@@ -48,9 +57,8 @@ const Sidebar: FC = () => {
       {/* Menú lateral */}
       <div
         ref={menuRef}
-        className={`Sidebar scrool bg-blue_custom text-white fixed z-50 inset-y-0 left-0 w-64 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:static md:translate-x-0`}
+        className={`Sidebar scrool bg-sidebarBackground text-white fixed z-50 inset-y-0 left-0 w-64 transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out md:static md:translate-x-0`}
       >
         <div className="Logo">
           <span className="smart">Smart</span>
@@ -87,7 +95,7 @@ const Sidebar: FC = () => {
               tituloItem="Pedidos"
               to="/Pedidos"
               icon="../../../Pedidos-icon.svg"
-              notificacion="1"
+              notificacion={pedidosEnCurso > 0 ? `${millify(pedidosEnCurso, { precision: 1, locales: "es-AR" })}` : undefined}
             />
             <AsideItem
               tituloItem="Préstamos"
@@ -97,7 +105,7 @@ const Sidebar: FC = () => {
             <AsideSubMenu
               tituloItem="Finanzas"
               icon="../../../Finanzas-icon.svg"
-              to="/Finanzas/ArqueoDeCajas"
+              to="/Finanzas"
               opciones={[
                 {
                   titulo: "Arqueo de cajas",
@@ -124,12 +132,39 @@ const Sidebar: FC = () => {
                   to: "/Finanzas/CuentasPorPagar",
                   id: 4,
                 },
+                {
+                  titulo: "Inventarios",
+                  to: "/Finanzas/Inventarios",
+                  id: 4,
+                  opciones: [
+                    {
+                      titulo: "Inventarios Físicos",
+                      to: "/Finanzas/Inventarios/Fisicos",
+                      id: 0,
+                    },
+                    {
+                      titulo: "Inventarios Físicos valorados",
+                      to: "/Finanzas/Inventarios/Valorados",
+                      id: 1,
+                    },
+                    {
+                      titulo: "Otros ingresos y salidas",
+                      to: "/Finanzas/Inventarios/Otros",
+                      id: 2,
+                    },
+                  ]
+                },
+                {
+                  titulo: "Comisiones",
+                  to: "/Finanzas/Comisiones",
+                  id: 5,
+                },
               ]}
             />
             <AsideSubMenu
               tituloItem="Reportes"
               icon="../../../Reportes-icon.svg"
-              to="/Reportes/Ingresos"
+              to="/Reportes"
               opciones={[
                 {
                   titulo: "Ingresos (cuentas por cobrar)",
@@ -147,18 +182,18 @@ const Sidebar: FC = () => {
             <AsideSubMenu
               tituloItem="Configuración"
               icon="../../../Configuracion-icon.svg"
-              to="/Configuración/ConfiguraciónGeneral"
+              to="/Configuracion"
               opciones={[
-                {
-                  titulo: "Configuración general",
-                  to: "/Configuracion/General",
-                  id: 0,
-                },
-                { titulo: "Usuarios", to: "/Configuracion/Usuarios", id: 1 },
-                { titulo: "Barrios", to: "/Configuracion/Barrios", id: 2 },
-                { titulo: "Zonas", to: "/Configuracion/Zonas", id: 3 },
-                { titulo: "Productos", to: "/Configuracion/Productos", id: 4 },
-                { titulo: "Items", to: "/Configuracion/Items", id: 5 },
+                { titulo: "Configuración general", to: "/Configuracion/General", id: 0 },
+                { titulo: "Datos de la empresa", to: "/Configuracion/DatosEmpresa", id: 1 },
+                { titulo: "Usuarios", to: "/Configuracion/Usuarios", id: 2 },
+                { titulo: "Horarios de trabajo", to: "/Configuracion/Horarios", id: 3 },
+                { titulo: "Barrios", to: "/Configuracion/Barrios", id: 4 },
+                { titulo: "Zonas", to: "/Configuracion/Zonas", id: 5 },
+                { titulo: "Categorías de productos", to: "/Configuracion/CategoriasUnidades", id: 6 },
+                { titulo: "Productos", to: "/Configuracion/Productos", id: 7 },
+                { titulo: "Items", to: "/Configuracion/Items", id: 8 },
+                { titulo: "Promociones", to: "/Configuracion/Promociones", id: 9 },
               ]}
             />
           </ul>

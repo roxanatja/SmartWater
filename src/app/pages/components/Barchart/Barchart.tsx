@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Barchat.css";
 import { Bar } from "react-chartjs-2";
 import {
@@ -11,13 +11,15 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ChartData,
 } from "chart.js";
-import { GetSales } from "../../../../services/SaleService";
-import { GetExpenses } from "../../../../services/Expenses";
-import { Sale } from "../../../../type/Sale/Sale";
+import { SalesApiConector } from "../../../../api/classes";
+import moment from "moment";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 // Registra los componentes necesarios de Chart.js para usar en el gráfico
 ChartJS.register(
+  ChartDataLabels,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -31,46 +33,25 @@ ChartJS.register(
 const BarChart = () => {
   // Estados para almacenar los datos de beneficios, gastos y semanas
   const [beneficios, setBeneficios] = useState<number[]>([]);
-  const [gastos, setGastos] = useState<number[]>([]);
-  const [semanas, setSemanas] = useState<string[]>([
-    "Semana 1",
-    "Semana 2",
-    "Semana 3",
-    "Semana 4",
-  ]);
+  const [productos, setProductos] = useState<string[]>();
 
-  // Efecto para cargar los datos de ventas y gastos al montar el componente
   useEffect(() => {
-    // Función asincrónica para obtener los datos de ventas
     const fetchSalesData = async () => {
       try {
-        const salesResponse = await GetSales(); // Llama al servicio para obtener datos de ventas
-        if (salesResponse && salesResponse.data) {
-          // Calcula las ventas de las últimas 4 semanas
-          const today = new Date();
-          const lastFourWeeks = [...Array(4)].map((_, index) => {
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - index * 7);
-            startOfWeek.setHours(0, 0, 0, 0); // Establece el primer día de la semana
+        const now = new Date()
+        const monthAgo = moment(now).subtract(1, 'month').toDate()
 
-            const endOfWeek = new Date(today);
-            endOfWeek.setDate(today.getDate() - index * 7 + 6);
-            endOfWeek.setHours(23, 59, 59, 999); // Establece el último día de la semana
+        const salesResponse = await SalesApiConector.getSalesProducts({ filters: { initialDate: monthAgo.toISOString(), finalDate: now.toISOString() } });
 
-            // Filtra las ventas para obtener las de la semana actual
-            const weeklySales = salesResponse.data.filter((sale: any) => {
-              const saleDate = new Date(sale.created);
-              return saleDate >= startOfWeek && saleDate <= endOfWeek;
-            });
+        if (salesResponse) {
+          const prods: string[] = []; const sales: number[] = []
+          salesResponse.forEach(sp => {
+            prods.push(sp.prod)
+            sales.push(Math.ceil(sp.total))
+          })
 
-            // Calcula el total de las ventas de la semana
-            return weeklySales.reduce(
-              (accumulator: number, sale: any) => accumulator + sale.total,
-              0
-            );
-          });
-          // Actualiza el estado de beneficios con los datos calculados
-          setBeneficios(lastFourWeeks);
+          setProductos(prods)
+          setBeneficios(sales)
         } else {
           console.log("No se encontraron datos de ventas.");
         }
@@ -79,112 +60,61 @@ const BarChart = () => {
       }
     };
 
-    // Función asincrónica para obtener los datos de gastos
-    const fetchExpensesData = async () => {
-      try {
-        const expensesResponse = await GetExpenses(); // Llama al servicio para obtener datos de gastos
-        if (expensesResponse && expensesResponse.data) {
-          // Calcula los gastos de las últimas 4 semanas
-          const today = new Date();
-          const lastFourWeeks = [...Array(4)].map((_, index) => {
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - index * 7);
-            startOfWeek.setHours(0, 0, 0, 0); // Establece el primer día de la semana
-
-            const endOfWeek = new Date(today);
-            endOfWeek.setDate(today.getDate() - index * 7 + 6);
-            endOfWeek.setHours(23, 59, 59, 999); // Establece el último día de la semana
-
-            // Filtra los gastos para obtener los de la semana actual
-            const weeklyExpenses = expensesResponse.data.filter(
-              (expense: any) => {
-                const expenseDate = new Date(expense.created);
-                return expenseDate >= startOfWeek && expenseDate <= endOfWeek;
-              }
-            );
-            // Calcula el total de los gastos de la semana
-            const totalWeeklyExpenses = weeklyExpenses.reduce(
-              (accumulator: number, expense: any) =>
-                accumulator + expense.amount,
-              0
-            );
-            return totalWeeklyExpenses;
-          });
-          // Actualiza el estado de gastos con los datos calculados
-          setGastos(lastFourWeeks);
-        } else {
-          console.log("No se encontraron datos de gastos.");
-        }
-      } catch (error) {
-        console.error("Error al obtener datos de gastos:", error);
-      }
-    };
-
-    // Llama a las funciones para obtener los datos al cargar el componente
     fetchSalesData();
-    fetchExpensesData();
   }, []);
 
-  // Opciones de configuración para el gráfico
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        ticks: {
-          stepSize: 500, // Establece el espaciado entre las etiquetas
-          callback: function (value: string | number) {
-            // Muestra solo ciertos valores
-            if (value === 500 || value === 1000 || value === 1500) {
-              return value.toString();
-            }
-            return "";
-          },
-        },
-      },
-      x: {
-        ticks: {
-          color: "#000",
-        },
-      },
-    },
-    maintainAspectRatio: false, // Esto evita que el gráfico mantenga el aspect ratio
-  };
-
   // Datos del gráfico
-  const data = {
-    labels: semanas,
+  const data: ChartData<"bar", number[], string> = {
+    labels: productos,
     datasets: [
       {
-        label: "Beneficios",
+        label: "Ventas",
         data: beneficios,
-        backgroundColor: "#1A3D7D",
-      },
-      {
-        label: "Gastos",
-        data: gastos, // Ahora los gastos se muestran como valores positivos
-        backgroundColor: "#367DFD",
-      },
+        backgroundColor: document.body.classList.contains('dark') ? "#367dfd" : "#1A3D7D",
+      }
     ],
   };
 
   // Componente que muestra el gráfico de barras
   return (
-    <div className="BarContainer">
-      <div
-        style={{
-          width: "76vw",
-          height: "256px",
-          paddingLeft: "69px",
-          paddingTop: "7px",
-          paddingRight: "8px",
-        }}
-      >
-        <Bar data={data} options={options} />
+    <div className="BarContainer bg-blocks dark:border-blocks !h-auto w-full p-10">
+      <h4 className="mb-4 font-[600] text-lg">Ventas de productos</h4>
+      <div className="w-full overflow-auto px-16">
+        <Bar data={data} options={{
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            datalabels: {
+              font: { family: "Poppins" },
+              anchor: 'center',
+              align: 'top',
+              formatter: (value: number) => `${value} Bs.`,
+              color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+            },
+            tooltip: {
+              titleFont: { family: "Poppins" },
+              bodyFont: { family: "Poppins" }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                font: { family: "Poppins" },
+                color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                stepSize: 500, // Establece el espaciado entre las etiquetas
+              },
+            },
+            x: {
+              ticks: {
+                font: { family: "Poppins" },
+                color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+              },
+            },
+          },
+          maintainAspectRatio: false, // Esto evita que el gráfico mantenga el aspect ratio
+        }} />
       </div>
     </div>
   );

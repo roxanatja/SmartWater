@@ -1,5 +1,5 @@
 import Product from "../type/Products/Products";
-import { Sale, SaleBody } from "../type/Sale/Sale";
+import { Sale } from "../type/Sale/Sale";
 import GetApiMethod from "./api.class";
 
 class ApiMethodSales extends GetApiMethod {
@@ -17,7 +17,7 @@ class ApiMethodSales extends GetApiMethod {
     }
   }
 
-  public async saveSale(dataToSave: SaleBody) {
+  public async saveSale(dataToSave: any) {
     try {
       const respose = await this.axiosInstance.post(
         "/sales/register",

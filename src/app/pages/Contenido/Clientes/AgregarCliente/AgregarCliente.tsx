@@ -164,7 +164,7 @@ const AgregarCliente = () => {
     setAddress(value);
   };
   const getCoordinates = async (address: string) => {
-    const apiKey = "AIzaSyClt5h7hYmQJYdfK_-ee5c3msh1rnt7GfE"; // Usa tu propia clave de API
+    const apiKey = process.env.REACT_APP_API_GOOGLE; // Usa tu propia clave de API
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
       address
     )}&key=${apiKey}`;

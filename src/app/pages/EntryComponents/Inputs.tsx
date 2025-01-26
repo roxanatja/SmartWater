@@ -10,13 +10,17 @@ interface InputProps {
   isVisibleLable?: boolean;
   required?: boolean;
   className?: string;
+  containerClassName?: string;
+  labelClassName?: string;
+  iconContainerClassName?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   numericalOnly?: boolean;
   isText?: boolean;
   button?: React.ReactNode;
   icon?: React.ReactNode;
+  sufix?: React.ReactNode;
   onClick?(): void;
-  validateAmount?(e: any): void;
+  validateAmount?(e: any): string | boolean;
   [key: string]: any;
 }
 
@@ -29,14 +33,18 @@ const Input = memo<InputProps>(
     textarea,
     required,
     className,
+    containerClassName,
     onChange,
     numericalOnly,
     icon,
+    sufix,
     isVisibleLable,
     isText,
     validateAmount,
     button,
     onClick,
+    iconContainerClassName,
+    labelClassName,
     ...rest
   }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,11 +79,11 @@ const Input = memo<InputProps>(
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ delay: 0.3 }}
-        className="flex flex-col gap-2 w-full"
+        className={`flex flex-col gap-2 w-full ${containerClassName}`}
       >
         {label && !isVisibleLable && (
           <label
-            className="font-normal text-md text-black text-md font-openSans"
+            className={`font-normal text-md text-md font-openSans ${labelClassName}`}
             htmlFor={name}
           >
             {label}
@@ -86,19 +94,18 @@ const Input = memo<InputProps>(
             {...register(
               name,
               required && {
-                required: `el ${label} es requerido`,
+                required: `${label} es requerido`,
                 onChange: handleChange,
               }
             )}
             {...rest}
-            className={`${
-              errors && "outline outline-red-500 text-black"
-            } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-2 outline-black text-black ${className}`}
+            className={`${errors && "outline outline-red-500"
+              } p-2 text-md rounded-lg focus:outline-4 font-pricedown bg-transparent outline outline-2 outline-black ${className}`}
           />
         ) : (
           <div className="relative w-full flex items-center">
             {icon && (
-              <div className="absolute ps-4 py-1.5 text-xl border-r h-full border-black pr-4">
+              <div className={`absolute ps-4 py-1.5 text-xl border-r h-full border-black pr-4 ${iconContainerClassName}`}>
                 {icon}
               </div>
             )}
@@ -107,33 +114,36 @@ const Input = memo<InputProps>(
                 name,
                 required
                   ? {
-                      required: `el ${label} es requerido`,
-                      validate: validateAmount,
-                      onChange:
-                        rest.type === "file" ? handleFileChange : handleChange,
-                    }
+                    required: `${label} es requerido`,
+                    validate: validateAmount,
+                    onChange:
+                      rest.type === "file" ? handleFileChange : handleChange,
+                  }
                   : {
-                      required: false,
-                      validate: validateAmount,
-                      onChange:
-                        rest.type === "file" ? handleFileChange : handleChange,
-                    }
+                    required: false,
+                    validate: validateAmount,
+                    onChange:
+                      rest.type === "file" ? handleFileChange : handleChange,
+                  }
               )}
               {...rest}
-              className={`${
-                errors && errors && "outline outline-red-500 text-black"
-              } ${className} ${icon ? "pl-16" : ""} ${
-                !isText && "text-sm"
-              }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black text-black w-full`}
+              className={`${errors && "outline outline-red-500"
+                } ${className} ${icon ? "pl-16" : ""} ${sufix ? "pr-16" : ""} ${!isText && "text-sm"
+                }  p-2 py-2.5 rounded-md focus:outline-4 bg-transparent outline outline-2 outline-black w-full`}
             />
             {button && (
               <button
-                className="absolute ps-4 py-1.5 text-black rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
+                className="absolute ps-4 py-1.5 rounded-r-md end-0 text-sm border-l h-full border-black pr-4"
                 type="button"
                 onClick={onClick}
               >
                 {button}
               </button>
+            )}
+            {sufix && (
+              <div className="absolute ps-4 py-1.5 text-xl border-l h-full border-black pr-4 right-0">
+                {sufix}
+              </div>
             )}
           </div>
         )}

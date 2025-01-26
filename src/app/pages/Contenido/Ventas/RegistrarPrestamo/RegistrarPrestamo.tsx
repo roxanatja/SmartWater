@@ -1,6 +1,6 @@
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 import RegisterPrestaForm from "../../../EntryComponents/RegisterPrestamo";
 import { VentasContext } from "../VentasContext";
@@ -10,24 +10,29 @@ const RegistrarPrestamo = () => {
   const { setSelectedClient, selectedClient } = useContext(VentasContext);
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate("/Ventas");
     setSelectedClient(client);
   };
 
+  useEffect(() => {
+    if (selectedClient._id === "") {
+      navigate(-1)
+    }
+  }, [selectedClient, navigate])
+
   return (
     <>
-      <div>
-        <PageTitle titulo="Clientes/Prestamos" icon="../clientes-icon.svg" />
+      <div className="px-10 h-screen overflow-y-auto">
+        <PageTitle titulo="Ventas / Registrar préstamos" icon="../Ventas-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}
         >
-          <button className="RegistrarVenta-btn">
+          <button className="RegistrarVenta-btn text-blue_custom">
             <span className="material-symbols-outlined translate-y-0.5">
               arrow_back
             </span>
           </button>
-          <span>Regresar</span>
+          <span className="text-blue_custom">Regresar</span>
         </div>
         <RegisterPrestaForm selectedClient={selectedClient} />
       </div>

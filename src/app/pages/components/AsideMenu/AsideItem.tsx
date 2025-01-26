@@ -11,7 +11,7 @@ type Item = {
 
 const AsideItem = ({ tituloItem, to, icon, iconDesplegable, notificacion }: Item) => {
     const location = useLocation();
-    const isActive = location.pathname === to;
+    const isActive = location.pathname.includes(to);
 
     return (
         <>

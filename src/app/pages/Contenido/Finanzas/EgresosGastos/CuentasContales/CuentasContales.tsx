@@ -1,66 +1,132 @@
-import { useContext } from "react";
-import { Account } from "../../../../../../type/AccountEntry";
-import { EgresosGastosContext } from "../EgresosGastosContext";
 import "./CuentasContales.css";
+import { FiltroPaginado } from "../../../../components/FiltroPaginado/FiltroPaginado";
+import { useNavigate } from "react-router-dom";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { account, EgresosGastosContext } from "../EgresosGastosContext";
+import { Account } from "../../../../../../type/AccountEntry";
+import { AccountEntryApiConector } from "../../../../../../api/classes";
+import CuentasItem from "./CuentasItem";
+import Modal from "../../../../EntryComponents/Modal";
+import RegisterAccount from "../../../../EntryComponents/RegisterAccount";
 
-const CuentasContales = ({ accounts }: { accounts?: Account[] }) => {
-  const { setShowModal } = useContext(EgresosGastosContext);
+const CuentasContales = () => {
+  const { setLoading } = useGlobalContext()
+  const { showModal, setShowModal, selectedAccount, setSelectedAccount } = useContext(EgresosGastosContext)
+  const navigate = useNavigate()
+
+  const [searchParam, setSearchParam] = useState<string>('');
+
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const ITEMS_PER_PAGE = 15
+
+  const [usersToShow, setUsersToShow] = useState<Account[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<Account[]>([])
+  const [users, setUsers] = useState<Account[]>([])
+
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+
+    const res = await AccountEntryApiConector.get()
+    const prods = res || []
+    setUsers(prods)
+    setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
+
+    setLoading(false)
+  }, [setLoading])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  useEffect(() => {
+    if (users) {
+      const itms = users.filter(d => d.name.toLowerCase().includes(searchParam.toLowerCase()))
+      setFilteredUsers(itms);
+      setTotalPages(Math.ceil(itms.length / ITEMS_PER_PAGE))
+      setPage(1);
+    }
+  }, [users, searchParam])
+
+  useEffect(() => {
+    if (filteredUsers) {
+      setUsersToShow(filteredUsers.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
+    }
+  }, [filteredUsers, page])
+
   return (
     <>
-      <div className="CuentasContales-container">
-        <div className="CuentasContables-titulo">
-          <span>Cuentas contables</span>
-        </div>
-        <div style={{ width: "324px" }}>
-          <form
-            className="search__container"
-            style={{ marginBottom: "0px" }}
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              className="search__input"
-              type="text"
-              placeholder="Buscar"
-              required
-            />
-            <button type="submit" className="boton-buscar">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
+      <FiltroPaginado
+        add
+        paginacion={totalPages > 1}
+        totalPage={totalPages}
+        currentPage={page}
+        handlePageChange={setPage}
+        onAdd={() => setShowModal(true)}
+        filtro={false}
+        resultados
+        order={false}
+        total={filteredUsers.length}
+        search={setSearchParam}
+        searchPlaceholder="Buscar por nombre"
+      >
+        <div className="w-full pb-10 sticky top-0 bg-main-background z-[20]">
+          <div className="w-full sm:w-1/2">
+            <div className="switch-contenido">
+              <div
+                className={`switch-option selected`}
+                onClick={() => navigate("/Finanzas/EgresosGastos/Cuentas")}
               >
-                <path
-                  d="M19.5 9.75C19.5 11.9016 18.8016 13.8891 17.625 15.5016L23.5594 21.4406C24.1453 22.0266 24.1453 22.9781 23.5594 23.5641C22.9734 24.15 22.0219 24.15 21.4359 23.5641L15.5016 17.625C13.8891 18.8062 11.9016 19.5 9.75 19.5C4.36406 19.5 0 15.1359 0 9.75C0 4.36406 4.36406 0 9.75 0C15.1359 0 19.5 4.36406 19.5 9.75ZM9.75 16.5C10.6364 16.5 11.5142 16.3254 12.3331 15.9862C13.1521 15.647 13.8962 15.1498 14.523 14.523C15.1498 13.8962 15.647 13.1521 15.9862 12.3331C16.3254 11.5142 16.5 10.6364 16.5 9.75C16.5 8.86358 16.3254 7.98583 15.9862 7.16689C15.647 6.34794 15.1498 5.60382 14.523 4.97703C13.8962 4.35023 13.1521 3.85303 12.3331 3.51381C11.5142 3.17459 10.6364 3 9.75 3C8.86358 3 7.98583 3.17459 7.16689 3.51381C6.34794 3.85303 5.60382 4.35023 4.97703 4.97703C4.35023 5.60382 3.85303 6.34794 3.51381 7.16689C3.17459 7.98583 3 8.86358 3 9.75C3 10.6364 3.17459 11.5142 3.51381 12.3331C3.85303 13.1521 4.35023 13.8962 4.97703 14.523C5.60382 15.1498 6.34794 15.647 7.16689 15.9862C7.98583 16.3254 8.86358 16.5 9.75 16.5Z"
-                  fill="black"
-                />
-              </svg>
-            </button>
-          </form>
-        </div>
-        <div className="flex flex-col w-full gap-4">
-          {accounts &&
-            accounts?.map((row, index) => (
-              <div className="flex gap-4 w-full" key={index}>
-                <div className="CuentasContales-input">
-                  <span>{row.name}</span>
-                </div>
-                <button className="btn">
-                  <span className="material-symbols-outlined">more_vert</span>
-                </button>
+                Cuentas contables
               </div>
-            ))}
+              <div
+                className={`switch-option`}
+                onClick={() => navigate("/Finanzas/EgresosGastos/Registro")}
+              >
+                Registros Egresos y Gastos
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="w-full flex justify-end gap-2 items-center py-6 pr-6">
-          <button
-            onClick={() => setShowModal(true)}
-            className="CuentasContables-btn-crear"
-          >
-            <span>Crear cuenta</span>
-          </button>
+
+        <div className="w-full">
+          {
+            usersToShow.length > 0 &&
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {
+                usersToShow.map(p => <CuentasItem key={p._id} account={p} />)
+              }
+            </div>
+          }
+          {
+            usersToShow.length === 0 &&
+            <div className="font-semibold text-xl min-h-[300px] flex items-center justify-center">
+              Sin resultados
+            </div>
+          }
         </div>
-      </div>
+        <div className="flex flex-wrap gap-4 pl-4">
+        </div>
+      </FiltroPaginado>
+
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+          Registrar cuenta contable
+        </h2>
+        <RegisterAccount onCancel={() => setShowModal(false)} />
+      </Modal>
+
+      <Modal
+        isOpen={selectedAccount._id !== ""}
+        onClose={() => { setSelectedAccount(account); setShowModal(false) }}
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+          Editar cuenta contable
+        </h2>
+        <RegisterAccount
+          onCancel={() => { setSelectedAccount(account); setShowModal(false) }} />
+      </Modal>
     </>
   );
 };

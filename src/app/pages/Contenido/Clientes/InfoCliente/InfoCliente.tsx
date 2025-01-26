@@ -1,15 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import "./InfoCliente.css";
 import { Option } from "../../../components/Option/Option";
 import { ClientesContext } from "../ClientesContext";
 import { Client } from "../../../../../type/Cliente/Client";
 import { formatDateTime } from "../../../../../utils/helpers";
-import { DeleteClient } from "../../../../../services/ClientsService";
 import CobroPopUp from "../../../components/CashRegister/CashRegister";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../EntryComponents/Modal";
-import { Zone } from "../../../../../Class/types.data";
+import { Zone } from "../../../../../type/City";
+import { formatIncompletePhoneNumber } from "libphonenumber-js";
+import { ClientsApiConector } from "../../../../../api/classes";
 
 const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const { setShowMiniModal, setSelectedClient } = useContext(ClientesContext);
@@ -18,12 +19,13 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const [zone, setZone] = useState<string>("");
   const [date, setDate] = useState<string>();
   const [showCobroPopUp, setShowCobroPopUp] = useState<boolean>(false);
+
+  const optionsRef = useRef<HTMLDivElement>(null);
   const location = client.location;
   const navigate = useNavigate();
 
-  const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${
-    location?.longitude || ""
-  }`;
+  const url = `https://www.google.com/maps/place/${location?.latitude || ""} ${location?.longitude || ""
+    }`;
 
   useEffect(() => {
     setZone(zones.find((x) => x._id === client.zone)?.name || "");
@@ -50,39 +52,52 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
   const Delete = async () => {
     toast.error(
       (t) => (
-        <span>
-          Se <b>eliminara</b> este cliente <br /> <b>pulsa</b> para continuar
-          <button
-            className="bg-red-500 px-2 py-1 rounded-lg ml-2"
-            onClick={async () => {
-              toast.dismiss(t.id);
-              try {
-                const response = await DeleteClient(client._id);
-                if (response.status === 200) {
-                  toast.success("Cliente eliminado", {
-                    position: "top-center",
-                  });
-                  window.location.reload();
+        <div>
+          <p className="mb-4 text-center text-[#888]">
+            Se <b>eliminará</b> este cliente <br /> pulsa <b>Proceder</b> para continuar
+          </p>
+          <div className="flex justify-center">
+            <button
+              className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+              onClick={() => { toast.dismiss(t.id); }}
+            >
+              Cancelar
+            </button>
+            <button
+              className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+              onClick={async () => {
+                toast.dismiss(t.id);
+                const response = await ClientsApiConector.deleteClient({ clientId: client?._id || '' }) as any;
+                if (!!response) {
+                  if (response.mensaje) {
+                    toast.success(response.mensaje, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                    window.location.reload();
+                  } else if (response.error) {
+                    toast.error(response.error, {
+                      position: "top-center",
+                      duration: 2000
+                    });
+                  }
                 } else {
                   toast.error("Error al eliminar cliente", {
                     position: "top-center",
+                    duration: 2000
                   });
-                  toast.error(response.data.error, {
-                    position: "top-center",
-                  });
-                  console.log("Error al eliminar cliente", response.data);
                 }
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-          >
-            <i className="fa-solid fa-xmark text-white"></i>
-          </button>
-        </span>
+              }}
+            >
+              Proceder
+            </button>
+          </div>
+        </div>
       ),
       {
-        position: "top-center",
+        className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+        icon: null,
+        position: "top-center"
       }
     );
     setShowOptions(false);
@@ -93,9 +108,25 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
     setSelectedClient(client);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        optionsRef.current &&
+        !optionsRef.current.contains(event.target as Node)
+      ) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
-      <div className="infoClientes-container relative">
+      <div className="infoClientes-container relative bg-blocks dark:border-blocks">
         <div
           onClick={() => {
             setSelectedClient(client);
@@ -104,99 +135,102 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
           className="bg-transparent w-full h-full absolute top-0 left-0 rounded-xl cursor-pointer"
         ></div>
         <div className="infoClientes-header">
-          <div className="flex justify-between w-8/12 max-sm:w-full">
+          <div className="flex justify-start gap-4 w-[calc(100%_-_30px)] flex-wrap">
             <div className="infoClientes-datos" style={{ fontWeight: "500" }}>
-              {client.storeImage ? (
+              {client.clientImage ? (
                 <img
-                  src={client.storeImage}
+                  src={client.clientImage}
                   alt=""
                   className="infoClientes-imgStore"
                 />
               ) : (
-                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
                   <div className="opacity-0">.</div>
-                  <p className="absolute font-extrabold ">
-                    {client.fullName[0]}
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {client.fullName?.[0] || "S"}
                   </p>
                 </div>
               )}
-              <span>{client.fullName}</span>
+              <span>{client.fullName || "Sin nombre"}</span>
             </div>
             <div className="infoClientes-datos">
-              <img src="./Location-icon.svg" alt="" />
-              <span>{zone}</span>
+              <img src="./Location-icon.svg" alt="" className="invert-0 dark:invert" />
+              <span className="whitespace-nowrap">{zone}</span>
             </div>
             <div className="infoClientes-datos">
-              <img src="./CasaUbi-icon.svg" alt="" />
-              <span>{client.code}</span>
+              <img src="./CasaUbi-icon.svg" alt="" className="invert-0 dark:invert" />
+              <span className="whitespace-nowrap">{client.code}</span>
             </div>
             <div className="infoClientes-datos relative z-10">
-              <a
-                href={`https://api.whatsapp.com/send?phone=${client?.phoneNumber}`}
-                className="btn-whatsapp"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
-              </a>
-              <span>{client.phoneNumber}</span>
+              <img src="./whap-icon.svg" alt="Icono de WhatsApp" />
+
+              {
+                (!!client.phoneNumber && client.phoneNumber !== undefined
+                  && client.phoneNumber.trim() !== "" && !client.phoneNumber.includes("undefined") && client.phoneNumber !== "+591") ?
+                  < a
+                    href={`https://wa.me/${client?.phoneNumber}`}
+                    className="btn-whatsapp flex items-center gap-1"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span className="whitespace-nowrap">{formatIncompletePhoneNumber(client.phoneNumber, "BO")}</span>
+                  </a> :
+                  <span>N/A</span>
+              }
             </div>
           </div>
-          <div className="absolute right-0 p-4 rounded-full z-10">
-            <button type="button" className="btn" onClick={showMiniModal}>
+          <div className="absolute right-0 p-4 rounded-full z-[35] top-0 flex flex-col gap-6">
+            <button type="button" className="invert-0 dark:invert" onClick={showMiniModal}>
               <img src="./Opciones-icon.svg" alt="" />
             </button>
+
+            <div className="relative" ref={optionsRef}>
+              <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
+                <img src="./opcion-icon.svg" alt="" />
+              </button>
+              <Option
+                editAction={Edit}
+                visible={showOptions}
+                editar={true}
+                eliminar={true}
+                deleteAction={Delete}
+              />
+            </div>
           </div>
         </div>
-        <div className="infoClientes-body">
-          <div className="infoClientes-ventasContainer">
+        <div className="infoClientes-body w-[calc(100%_-_30px)]">
+          <div className="infoClientes-ventasContainer justify-between w-full pr-10">
             <div className="infoClientes-ventas">
-              <span>última venta</span>
-              <div className="infoClientes-ultimaventa">
+              <span>Última venta</span>
+              <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
                 <span>{date}</span>
               </div>
             </div>
             <div className="infoClientes-ventas relative z-10">
-              {client.hasLoan && (
-                <span style={{ color: "#1A3D7D" }}>Prestamos activos</span>
-              )}
+              <span className="text-blue_custom">
+                {client.hasLoan ? "Préstamos activos" : "Sin préstamos"}</span>
               <div
-                className="infoClientes-moneda cursor-pointer"
+                className="infoClientes-moneda cursor-pointer bg-blue_custom"
                 onClick={() => setShowCobroPopUp(true)}
               >
                 <img src="./Moneda-icon.svg" alt="" />
                 <div>
-                  <span>{client.credit.toString()} Bs.</span>
+                  <span>{client.credit?.toString()} Bs.</span>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="relative z-10">
-            <button type="button" className="btn" onClick={() => Opciones()}>
-              <img src="./opcion-icon.svg" alt="" />
-            </button>
-            <Option
-              editAction={Edit}
-              visible={showOptions}
-              editar={true}
-              eliminar={true}
-              deleteAction={Delete}
-            />
-          </div>
         </div>
-        <div className="infoClientes-footer relative z-10">
+        <a className="infoClientes-footer relative z-10" rel="noreferrer"
+          target="_blank"
+          href={url}>
           <img src="./Location-azul-icon.svg" alt="" />
-          <a
-            className="infoClientes-ubi"
-            rel="noreferrer"
-            target="_blank"
-            href={url}
+          <span className="infoClientes-ubi text-blue_custom"
           >
             Ver ubicación en el mapa
-          </a>
-        </div>
-      </div>
+          </span>
+        </a>
+      </div >
 
       <Modal
         isOpen={showCobroPopUp}

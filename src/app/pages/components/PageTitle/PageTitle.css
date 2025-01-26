@@ -1,20 +1,16 @@
 .Pages {
     display: flex;
     justify-content: space-between;
-    height: 50px;
+    height: auto;
+    background-color: rgb(var(--bg-main));
 }
 
 .Title-Pages {
     display: inline-flex;
     align-items: center;
     gap: 20px;
-    color: #1B1B1B;
     font-family: 'Poppins', sans-serif;
     font-size: 24px;
     font-weight: 700;
     line-height: 100%;
-}
-
-.Title-Pages img {
-    filter: invert(1) !important;
 }

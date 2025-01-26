@@ -1,5 +1,5 @@
 .RealizarPedidoCuadro {
-  width: 450px;
+  /* width: 450px; */
   height: auto; /* Cambiado para que el contenedor crezca según el contenido */
   border-radius: 20px;
   padding-left: 17px;
@@ -7,7 +7,6 @@
   padding-top: 12px;
   padding-bottom: 20px;
   border: 1px solid #d6d5d5;
-  background: #fff;
   font-family: "Poppins", sans-serif;
 }
 
@@ -29,7 +28,6 @@
   padding: 8px 15px; /* Alineación de padding ajustada */
   border-radius: 5px;
   border: 1px solid #626262;
-  background: #fff;
   margin-top: 8px;
   font-size: 14px; /* Ajustado tamaño de fuente */
 }
@@ -39,7 +37,6 @@
   height: 38px;
   border-radius: 5px;
   border: 1px solid #626262;
-  background: #fff;
   color: #626262;
   font-size: 14px; /* Ajustado tamaño de fuente */
   font-weight: 600;
@@ -65,7 +62,6 @@
   border-radius: 5px;
   margin: 0 10px; /* Ajustado margen */
   border: 1px solid #626262;
-  background: #fff;
   text-align: center;
   color: #626262;
   font-family: Poppins;
@@ -78,7 +74,6 @@
   height: 38px;
   border-radius: 5px;
   border: 1px solid #626262;
-  background: #fff;
   padding-left: 10px;
   color: #626262;
   font-size: 14px; /* Ajustado tamaño de fuente */
@@ -90,7 +85,6 @@
   height: 38px;
   border-radius: 5px;
   border: 1px solid #626262;
-  background: #fff;
   color: #626262;
   font-size: 14px; /* Ajustado tamaño de fuente */
   font-weight: 600;
@@ -103,7 +97,6 @@
   border: 1px solid #367dfd;
   background: #367dfd;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  color: #fff;
   font-family: Poppins;
   font-size: 16px;
   font-weight: 600;
