@@ -36,6 +36,8 @@ export type Transaction = {
   expenseCurrentPayObligations: number;
   cashRendered: number;
   currentAccountRendered: number;
+  currentExpenses: number;
+  accountsReceivable: number;
   created: string;
   updated: string;
   userDetails: User;

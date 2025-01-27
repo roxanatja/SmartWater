@@ -75,7 +75,8 @@ const FinalizarArqueoCaja = ({
           "date": cash?.startDate
             ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
             : "N/A",
-          "distribuidor": cash?.userDetails?.fullName || "Distribuidor desconocido",
+          "distribuidor": `${(cash?.userDetails?.fullName || "Distribuidor desconocido")}  ${cash?.userDetails?.role === 'admin' ? "(Administrador)" : ""
+            }`,
           "estado": !!cash?.state ? "Abierto" : "Cerrado",
           "monto": (cash?.initialAmount || 0).toLocaleString(),
           "ingresos": ((cash?.incomeCashTotal || 0) + (cash?.incomeCurrentAccountTotal || 0)).toLocaleString(),
@@ -92,8 +93,8 @@ const FinalizarArqueoCaja = ({
           "egresos_efectivo_obligacionescopy": (cash?.expensePayObligations || 0).toLocaleString(),
           "egresos_cuenta_gastos": (cash?.expensePayCurrentAccount || 0).toLocaleString(),
           "egresos_cuenta_obligaciones": (cash?.expenseCurrentPayObligations || 0).toLocaleString(),
-          "ventas_egresos_cuentapor_cobrar": "0",
-          "gastos_por_pagar": "0",
+          "ventas_egresos_cuentapor_cobrar": (cash?.accountsReceivable || 0).toLocaleString(),
+          "gastos_por_pagar": (cash?.currentExpenses || 0).toLocaleString(),
           "saldo_en_caja": segunSistema.toLocaleString(),
           "diferencia": diferencia.toLocaleString(),
           "usuario_efectivo": (cash?.cashRendered || 0).toLocaleString(),
@@ -151,7 +152,7 @@ const FinalizarArqueoCaja = ({
             <div className="flex flex-col gap-3">
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">Distribuidor</div>
-                <div className="whitespace-normal md:whitespace-nowrap">{cash?.userDetails?.fullName || "Distribuidor desconocido"}</div>
+                <div className="whitespace-normal md:whitespace-nowrap">{cash?.userDetails?.fullName || "Distribuidor desconocido"} {cash?.userDetails?.role === 'admin' ? "(Administrador)" : ""}</div>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">Estado</div>
@@ -254,7 +255,7 @@ const FinalizarArqueoCaja = ({
                   </div>
                 </div>
               </div>
-              <strong className="text-gray-500">Ventas por cobrar: 0</strong>
+              <strong className="text-gray-500">Ventas por cobrar: {(cash?.accountsReceivable || 0).toLocaleString()}</strong>
 
               <div className="grid grid-cols-3 gap-2 items-center w-full md:w-1/2 mt-6">
                 <label className="FinalizarArqueoCaja-item w-full">
@@ -320,7 +321,7 @@ const FinalizarArqueoCaja = ({
                 </div>
               </div>
             </div>
-            <strong className="text-gray-500">Gastos por pagar: 0</strong>
+            <strong className="text-gray-500">Gastos por pagar: {(cash?.currentExpenses || 0).toLocaleString()}</strong>
 
             {
               cash?.state &&
