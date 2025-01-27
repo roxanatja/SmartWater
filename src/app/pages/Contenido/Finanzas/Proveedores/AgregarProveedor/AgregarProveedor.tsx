@@ -96,7 +96,7 @@ const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allP
 
   const name = watch('fullName')
   const exists = useMemo<boolean>(() => {
-    return !!name && allProviders.some(p => p.fullName.toLowerCase() === name.toLowerCase() && p._id !== provider._id)
+    return !!name && allProviders.some(p => p.fullName.trim().toLowerCase() === name.trim().toLowerCase() && p._id !== provider._id)
   }, [name, allProviders, provider])
 
   return (

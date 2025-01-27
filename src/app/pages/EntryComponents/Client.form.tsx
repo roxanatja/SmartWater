@@ -262,7 +262,7 @@ const ClientForm = ({
 
   const name = watch('fullName')
   const exists = useMemo<boolean>(() => {
-    return !!name && allClients.some(p => p.fullName && p.fullName.toLowerCase() === name.toLowerCase() && p._id !== selectedClient._id)
+    return !!name && allClients.some(p => p.fullName && p.fullName.trim().toLowerCase() === name.trim().toLowerCase() && p._id !== selectedClient._id)
   }, [name, allClients, selectedClient])
 
   return (

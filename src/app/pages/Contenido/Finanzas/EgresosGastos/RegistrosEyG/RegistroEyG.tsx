@@ -109,7 +109,7 @@ const RegistroEyG = () => {
 
     useEffect(() => {
         const fetchZones = async () => {
-            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user' } }))?.data || []);
+            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
             setAccounts((await AccountEntryApiConector.get()) || []);
             setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
             setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
@@ -217,7 +217,7 @@ const RegistroEyG = () => {
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
                 <FiltroEgresosGastos
-                    distribuidores={users}
+                    distribuidores={users.filter(u => !u.deactivated)}
                     zones={zones}
                     accounts={accounts}
                     providers={providers}

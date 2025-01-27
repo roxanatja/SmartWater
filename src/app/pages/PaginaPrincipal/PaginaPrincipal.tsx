@@ -36,6 +36,7 @@ import { HorariosWrapper } from "../Contenido/Configuracion/Horarios/HorariosWra
 import { CategoriesWrapper } from "../Contenido/Configuracion/Categorias/CategoriesWrapper";
 import DatosEmpresa from "../Contenido/Configuracion/DatosEmpresa/DatosEmpresa";
 import { PromocionesWrapper } from "../Contenido/Configuracion/Promociones/PromocionesWrapper";
+import InventariosWrapper from "../Contenido/Inventarios/InventariosWrapper";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -75,15 +76,11 @@ const PaginaPrincipal: FC = () => {
                   path="/Finanzas/CuentasPorPagar/*"
                   element={<CuentasPorPagarWrapper />}
                 />
+                <Route
+                  path="/Finanzas/Inventarios/*"
+                  element={<InventariosWrapper />}
+                />
                 {/* <Route
-                  path="/MapaClientes/*"
-                  element={<MapaClientesWrapper />}
-                />
-                <Route
-                  path="/MonitoreoDistribuidores"
-                  element={<MonitoreoDistribuidoresWrapper />}
-                />
-                <Route
                   path="/Reportes/Ingresos/*"
                   element={<ReportesIngresosWrapper />}
                 />
@@ -102,6 +99,14 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Reportes/Resultados/*"
                   element={<ReportesResultadosWrapper />}
+                />
+                <Route
+                  path="/MapaClientes/*"
+                  element={<MapaClientesWrapper />}
+                />
+                <Route
+                  path="/MonitoreoDistribuidores"
+                  element={<MonitoreoDistribuidoresWrapper />}
                 /> */}
                 <Route
                   path="/Configuracion/General"
