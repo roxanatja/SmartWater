@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import "./ArqueoDeCaja.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { TableArqueoCaja } from "./TableArqueoCaja/TableArqueoCaja";
@@ -12,16 +12,29 @@ import { CashRegisterApiConector, UsersApiConector } from "../../../../../api/cl
 import { User } from "../../../../../type/User";
 import moment from "moment";
 import momentTz from "moment-timezone";
+import { useGlobalContext } from "../../../../SmartwaterContext";
+import { ArqueoDeCajaContext } from "./ArqueoDeCajaContext";
 
 const ArqueoDeCaja: FC = () => {
-  const [data, setData] = useState<Transaction[]>([]);
+  const [arqueos, setArqueos] = useState<Transaction[]>([]);
+  const [justCrated, setJustCreated] = useState<string | null>(null);
 
   const [dist, setDist] = useState<User[]>([]);
+  const { setSelectedTransaction } = useContext(ArqueoDeCajaContext)
+  const { setLoading } = useGlobalContext()
 
   const getData = useCallback(async () => {
+    console.log("reloading", justCrated)
     const res = await CashRegisterApiConector.get({}) || []
-    return setData(res);
-  }, []);
+
+    if (justCrated) {
+      setSelectedTransaction(res.find(r => r._id === justCrated))
+      setJustCreated(null)
+      setLoading(false)
+    }
+
+    return setArqueos(res);
+  }, [justCrated, setSelectedTransaction, setLoading]);
 
   useEffect(() => {
     getData();
@@ -35,12 +48,14 @@ const ArqueoDeCaja: FC = () => {
     register,
     formState: { errors, isValid },
     handleSubmit,
-    watch
+    watch,
+    reset
   } = useForm<CashOpen>({
     mode: 'all'
   });
 
   const onSubmit: SubmitHandler<CashOpen> = async (data) => {
+    setLoading(true)
     let res: any | null = null
 
     if (data.endDate) {
@@ -63,10 +78,18 @@ const ArqueoDeCaja: FC = () => {
     }
 
     if (res) {
-      toast.success("Arqueo de caja creado");
-      window.location.reload()
+      console.log(res)
+      if (typeof res.cashRegister === 'object' && 'error' in res.cashRegister) {
+        toast.error(res.cashRegister.error);
+        setLoading(false)
+      } else {
+        toast.success("Arqueo de caja creado");
+        setJustCreated(res.cashRegister)
+        reset()
+      }
     } else {
       toast.error("Upps error al guardar el arqueo de caja");
+      setLoading(false)
     }
   };
 
@@ -107,7 +130,7 @@ const ArqueoDeCaja: FC = () => {
       <div className="px-10 h-screen overflow-y-auto pb-10">
         <PageTitle titulo="Arqueo De Cajas" icon="../Finanzas-icon.svg" />
         <div className="w-full p-6">
-          <TableArqueoCaja cash={data} />
+          <TableArqueoCaja cash={arqueos} />
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="ArqueoCaja-containerform w-full lg:w-1/2 mt-10">

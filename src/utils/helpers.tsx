@@ -34,3 +34,7 @@ export const convertTo12HourIntl = (time24: string) => {
 
     return formatter.format(date);
 }
+
+export function popUpWasBlocked(popUp: Window | null) {
+    return !popUp || popUp.closed || typeof popUp.closed === 'undefined'
+}

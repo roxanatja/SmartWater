@@ -38,7 +38,8 @@ export type Transaction = {
   currentAccountRendered: number;
   created: string;
   updated: string;
-  userDetails: User
+  userDetails: User;
+  creationMethod?: "create" | "open-close";
 };
 
 export type CashReport = {

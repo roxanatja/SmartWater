@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { Transaction } from "../../../../../type/Cash";
 
 type ArqueoDeCajaContextType = {
     showModal: boolean;
@@ -7,6 +8,8 @@ type ArqueoDeCajaContextType = {
     setShowMiniModal: React.Dispatch<React.SetStateAction<boolean>>;
     selectedOption: boolean;
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTransaction: Transaction | undefined;
+    setSelectedTransaction: React.Dispatch<React.SetStateAction<Transaction | undefined>>;
 }
 
 export const ArqueoDeCajaContext = createContext<ArqueoDeCajaContextType>(
@@ -17,15 +20,18 @@ export const ArqueoDeCajaProvider = ({ children }: any) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>(undefined)
 
     return (
         <ArqueoDeCajaContext.Provider value={{
-            showModal, 
+            showModal,
             setShowModal,
-            showMiniModal, 
+            showMiniModal,
             setShowMiniModal,
-            selectedOption, 
+            selectedOption,
             setSelectedOption,
+            selectedTransaction,
+            setSelectedTransaction,
         }}>
             {children}
         </ArqueoDeCajaContext.Provider>

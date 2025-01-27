@@ -7,6 +7,7 @@ export interface IRegistersGetParams extends FilteredSearch {
         month?: number;
         hour?: string;
         open?: boolean;
+        creationMethod?: "open-close" | 'create';
     }
 }
 
