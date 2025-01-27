@@ -1,0 +1,189 @@
+.filtro-contenido {
+    font-family: 'Poppins', sans-serif;
+    color: #000;
+}
+
+.search__container {
+    border-radius: 10px;
+    border: 1px solid #D6D5D5;
+    background: #FFF;
+    width: 100%;
+    height: 2.5em;
+    margin-Bottom: 1em;
+    display: flex;
+    align-items: center;
+    padding: 5px 12px;
+}
+
+.search__input {
+    width: 97%;
+    background-color: transparent;
+    border: none;
+    color: #000;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    transition: all 250ms ease-in-out;
+
+    &::placeholder {
+        color: color(#000);
+    }
+
+    &:hover,
+    &:focus {
+        outline: 0;
+        border: none;
+        color: #000;
+    }
+}
+
+.boton-buscar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 24px;
+    height: 24.5px;
+    flex-shrink: 0;
+}
+
+.boton-filtro {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.boton-paginado {
+    border: none;
+    border-radius: 2px;
+    background: #1E6DFD;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.boton-paginado:hover {
+    background: #13439b;
+}
+
+.text-paginado {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.28px;
+}
+
+.resultado-busqueda {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.select-filtro {
+    background: none;
+    border: none;
+    color: #1A3D7D;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}
+
+.boton-exportar {
+    width: 81px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.btn-export {
+    width: 81px;
+    height: 81px;
+    border: none;
+    border-radius: 50%;
+    background: #1A3D7D;
+    cursor: pointer;
+}
+
+.btn-export:hover {
+    background: #2455af;
+}
+
+.btn-agregar {
+    display: flex;
+    width: 56px;
+    height: 56px;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 50%;
+    background: #1A3D7D;
+    cursor: pointer;
+    color: #FFF;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.20), 0px 1px 10px 0px rgba(0, 0, 0, 0.12), 0px 4px 5px 0px rgba(0, 0, 0, 0.14);
+}
+
+.btn-agregar:hover {
+    background: #2455af;
+}
+
+.filtroScroll {
+    overflow-y: scroll;
+    background: #FFF;
+    scrollbar-width: thin;
+    scrollbar-color: #000 #F5F5F5;
+}
+
+/* Estilos específicos de las barras de desplazamiento en Chrome y Safari*/
+.filtroScroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filtroScroll::-webkit-scrollbar-thumb {
+    background-color: #000;
+    border-radius: 100px;
+}
+
+.filtroScroll::-webkit-scrollbar-track {
+    background-color: #F5F5F5;
+}
+
+.infoPedidos-filtro {
+    width: 213px;
+    min-width: 213px;
+    max-width: 213px;
+    height: 105px;
+    min-height: 105px;
+    max-height: 105px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    border: 1px solid #D6D5D5;
+    padding: 15px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.infoPedidosLetras-filtro {
+    font-family: 'Poppins', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}
