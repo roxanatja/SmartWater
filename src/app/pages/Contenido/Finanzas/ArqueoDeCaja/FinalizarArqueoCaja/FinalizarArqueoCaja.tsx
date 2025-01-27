@@ -170,6 +170,9 @@ const FinalizarArqueoCaja = ({
               <div className="FinalizarArqueoCaja-FormTitle">
                 <span>Saldos según sistema</span>
               </div>
+
+              {/* TODO monto + ingresos - gastos */}
+              <strong className="text-gray-500">Saldo en caja: 0</strong>
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-3 gap-2 items-center w-full md:w-1/2">
                   <label className="FinalizarArqueoCaja-item">Monto</label>
@@ -189,7 +192,7 @@ const FinalizarArqueoCaja = ({
                     register={register}
                     containerClassName="col-span-2"
                     className="text-right"
-                    value={(cash?.incomeCashTotal || 0).toLocaleString()}
+                    value={((cash?.incomeCashTotal || 0) + (cash?.creditBillsSales || 0)).toLocaleString()}
                   />
                 </div>
 
@@ -232,7 +235,7 @@ const FinalizarArqueoCaja = ({
                       />
                     </div>
                     <div className="flex justify-between items-center">
-                      <p className="pl-4"> Ventas efectivo</p>
+                      <p className="pl-4"> Ventas Cuenta Corriente</p>
                       <p>{(cash?.cashCurrentAccount || 0).toLocaleString()}</p>
                     </div>
                     <div className="flex justify-between items-center">
@@ -253,7 +256,7 @@ const FinalizarArqueoCaja = ({
                     register={register}
                     containerClassName="col-span-2"
                     className="text-right"
-                    value={(cash?.expenseCashTotal || 0).toLocaleString()}
+                    value={((cash?.expenseCashTotal || 0) + (cash?.expenseCurrentAccountTotal || 0)).toLocaleString()}
                   />
                 </div>
 
@@ -308,7 +311,6 @@ const FinalizarArqueoCaja = ({
                 </div>
               </div>
               <strong className="text-gray-500">Gastos por pagar: 0</strong>
-              <strong className="text-gray-500">Saldo en caja: 0</strong>
 
               {
                 cash?.state &&

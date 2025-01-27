@@ -270,6 +270,7 @@ const CobrosAClientes = ({ client }: Props) => {
           distribuidores={distribuidores}
           onChange={handleFilterChange}
           initialFilters={savedFilters}
+          isHistory={!!client}
         />
       </Modal>
     </>

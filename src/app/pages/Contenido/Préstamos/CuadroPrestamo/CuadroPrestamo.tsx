@@ -37,7 +37,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
 
   const Edit = () => {
     if (hasDevolution) {
-      toast.error("Este préstamo ya tiene devoluciones regsitradas. No es posible editarlo.")
+      toast.error("Este préstamo ya tiene devoluciones registradas. No es posible editarlo.")
     } else {
       setSelectedClient(loan.client[0] as unknown as Client);
       setSelectedLoan(loan)
@@ -48,7 +48,7 @@ const CuadroPrestamo: FC<Prestamo> = ({
 
   const Delete = async () => {
     if (hasDevolution) {
-      toast.error("Este préstamo ya tiene devoluciones regsitradas. No es posible eliminar.")
+      toast.error("Este préstamo ya tiene devoluciones registradas. No es posible eliminar.")
     } else {
       toast.error(
         (t) => (

@@ -202,6 +202,7 @@ const HistorialCuentasPorCobrar = ({ client }: Props) => {
         hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         sorted={sort === 'asc' ? "older" : "new"}
         infoPedidos={true}
+        infoPedidosClass='mb-0'
         infoPedidosData={summaryDetails.filter(s => s.quantity > 0).map(s => ({ text: `${s.quantity} ${products.find(p => p._id === s.product)?.name || "Producto desconocido"}`, value: `${millify(s.price, { precision: 2 })} Bs` }))}
         activeFilters={{ ...queryData?.filters, clients: queryData?.clients }}
         otherResults={[{

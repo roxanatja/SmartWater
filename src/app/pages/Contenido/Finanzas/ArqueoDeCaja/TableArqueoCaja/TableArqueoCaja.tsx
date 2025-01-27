@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import { Transaction } from "../../../../../../type/Cash";
-import { User } from "../../../../../../type/User";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import "./TableArqueoCaja.css";
 import DataTable, { TableColumn } from 'react-data-table-component';
@@ -80,7 +79,7 @@ const TableArqueoCaja = ({ cash }: {
     },
     {
       name: "Distibuidor",
-      selector: row => row.userDetails?.fullName || "Distribuidor desconocido"
+      selector: row => `${row.userDetails?.fullName || "Distribuidor desconocido"} ${row.userDetails?.role === 'admin' ? "(Administrador)" : ""}`
     },
     {
       name: "Sistema",

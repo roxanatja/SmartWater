@@ -165,7 +165,7 @@ const ArqueoDeCaja: FC = () => {
                     {dist.length > 0 &&
                       dist.map((city, index) => (
                         <option value={city._id} key={index} className="text-font-color">
-                          {city.fullName || "Sin nombre"}
+                          {city.fullName || "Sin nombre"} {city.role === 'admin' && "(Administrador)"}
                         </option>
                       ))}
                   </select>

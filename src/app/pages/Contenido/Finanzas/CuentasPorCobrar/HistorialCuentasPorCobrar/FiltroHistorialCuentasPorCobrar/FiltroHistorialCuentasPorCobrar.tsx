@@ -104,20 +104,9 @@ const FiltroHistorialCuentasPorCobrar = ({
                     </div>
                     <div className="flex gap-3 flex-wrap">
                         <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                            <span className="text-left text-sm">De</span>
-                            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                            <input
-                                max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
-                                type="date"
-                                {...register("fromDate")}
-                                className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
-                            />
-                        </div>
-                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
                             <span className="text-left text-sm">A</span>
                             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                             <input
-                                min={watch('fromDate')?.toString()}
                                 max={moment().format("YYYY-MM-DD")}
                                 type="date"
                                 {...register("toDate")}
@@ -125,111 +114,6 @@ const FiltroHistorialCuentasPorCobrar = ({
                             />
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col mb-4">
-                <div className="FiltroClientes-RenovaciónTitulo mb-2">
-                    <span className="text-blue_custom font-semibold">Factura</span>
-                </div>
-
-                <div className="flex flex-wrap gap-4">
-                    <div className="flex gap-3 items-center">
-                        <input
-                            className="input-check accent-blue_custom"
-                            type="checkbox"
-                            id="check5"
-                            checked={watch('withInvoice')}
-                            onChange={() => {
-                                const credit = watch("withInvoice")
-                                setValue("withInvoice", !credit);
-                                setValue("withoutInvoice", false);
-                            }}
-                        />
-                        <img src="/ConFactura.svg" alt="" />
-                        <label htmlFor="check5" className="text-sm" >
-                            Con factura
-                        </label>
-                    </div>
-                    <div className="flex gap-3 items-center">
-                        <input
-                            className="input-check accent-blue_custom"
-                            type="checkbox"
-                            id="check6"
-                            checked={watch('withoutInvoice')}
-                            onChange={() => {
-                                const credit = watch("withoutInvoice")
-                                setValue("withoutInvoice", !credit);
-                                setValue("withInvoice", false);
-                            }}
-                        />
-                        <img src="/nofactura.svg" alt="" />
-                        <label htmlFor="check6" className="text-sm" >
-                            Sin factura
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div className="w-full flex flex-col gap-2 mb-8">
-                <label className="font-semibold text-blue_custom">Distribuidores</label>
-                <div className="flex flex-wrap gap-x-6 gap-y-4">
-                    {distribuidores.map((dists, index) => (
-                        <div
-                            key={index}
-                            className="flex items-center gap-3"
-                        >
-                            <input
-                                className="input-check accent-blue_custom"
-                                type="checkbox"
-                                onChange={() => {
-                                    if (selectedDists.some(s => s._id === dists._id)) {
-                                        setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
-                                    } else {
-                                        setSelectedDists(prev => [...prev, dists])
-                                    }
-
-                                    zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
-                                }}
-                                checked={selectedDists.some(sd => sd._id === dists._id)}
-                                id={`distrib-${dists._id}`}
-                            />
-                            <label
-                                htmlFor={`distrib-${dists._id}`}
-                                className="text-sm"
-                            >
-                                {dists.fullName || "Sin nombre"}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="w-full flex flex-col gap-2 mb-8">
-                <label className="font-semibold text-blue_custom">Zonas</label>
-                <div className="flex flex-wrap gap-x-6 gap-y-4">
-                    {zones
-                        .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
-                        .map((zone, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-3"
-                            >
-                                <input
-                                    className="input-check accent-blue_custom"
-                                    type="checkbox"
-                                    {...register(`zones.${zone._id}`)}
-                                    value={zone._id}
-                                    id={`zone-${zone._id}`}
-                                />
-                                <label
-                                    htmlFor={`zone-${zone._id}`}
-                                    className="text-sm"
-                                >
-                                    {zone.name}
-                                </label>
-                            </div>
-                        ))}
                 </div>
             </div>
 

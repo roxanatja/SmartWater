@@ -204,7 +204,7 @@ const PagosAProveedores = ({ proveedor }: Props) => {
                                     }
                                 }}
                             >
-                                Cuentas por pagar
+                                {!!proveedor ? "Gastos al crédito" : "Cuentas por pagar"}
                             </div>
                             <div
                                 className={`switch-option selected`}
@@ -246,6 +246,7 @@ const PagosAProveedores = ({ proveedor }: Props) => {
                     distribuidores={distribuidores}
                     onChange={handleFilterChange}
                     initialFilters={savedFilters}
+                    isHistory={!!proveedor}
                 />
             </Modal>
         </>

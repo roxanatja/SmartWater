@@ -14,12 +14,14 @@ const CuadroRegistrarEyG = ({
   expense,
   users,
   accounts,
-  providers
+  providers,
+  isPayment
 }: {
   expense: Expense;
   users?: User[];
   providers?: Providers[];
   accounts?: Account[];
+  isPayment?: boolean;
 }) => {
   const user = users?.find((x) => x._id === expense.user);
   const [showOptions, setShowOptions] = useState<boolean>(false);
@@ -110,7 +112,7 @@ const CuadroRegistrarEyG = ({
     <>
       <div className="CuadroRegistrarEyG-container relative w-full bg-blocks dark:border-blocks">
         <div className="CuadroVentaCliente-header relative w-full">
-          <div className="flex justify-between w-[calc(100%_-_30px)] items-center">
+          <div className={`flex justify-between items-center ${!isPayment ? "w-[calc(100%_-_30px)]" : "w-full"}`}>
             <div className="flex gap-3 items-center">
               <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative z-0">
                 <div className="opacity-0">.</div>
@@ -126,20 +128,23 @@ const CuadroRegistrarEyG = ({
             </div>
           </div>
 
-          <div className="absolute -right-2 rounded-full top-1 flex flex-col gap-6">
-            <div className="relative" ref={optionsRef}>
-              <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
-                <img src="/opcion-icon.svg" alt="" />
-              </button>
-              <Option
-                editAction={Edit}
-                visible={showOptions}
-                editar={true}
-                eliminar={true}
-                deleteAction={Delete}
-              />
+          {
+            !isPayment &&
+            <div className="absolute -right-2 rounded-full top-1 flex flex-col gap-6">
+              <div className="relative" ref={optionsRef}>
+                <button type="button" className="invert-0 dark:invert" onClick={() => Opciones()}>
+                  <img src="/opcion-icon.svg" alt="" />
+                </button>
+                <Option
+                  editAction={Edit}
+                  visible={showOptions}
+                  editar={true}
+                  eliminar={true}
+                  deleteAction={Delete}
+                />
+              </div>
             </div>
-          </div>
+          }
         </div>
 
         <div className="flex flex-col w-full gap-2">
