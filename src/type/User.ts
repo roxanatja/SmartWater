@@ -1,6 +1,7 @@
 export type User = {
   _id: string;
   username: string;
+  deactivated?: string;
   phoneNumber: string;
   password: string;
   role: string;

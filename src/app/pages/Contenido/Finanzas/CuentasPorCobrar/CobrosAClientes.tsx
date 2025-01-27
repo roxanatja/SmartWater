@@ -142,7 +142,7 @@ const CobrosAClientes = ({ client }: Props) => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])

@@ -199,10 +199,41 @@ const FiltroPedidos: FC<{
                     </div>
                 }
 
-                <div className="w-full flex flex-col gap-2 mb-8">
+                <div className="w-full flex flex-col gap-2 my-6">
                     <label className="font-semibold text-blue_custom">Distribuidores</label>
                     <div className="flex flex-wrap gap-x-6 gap-y-4">
-                        {distribuidores.map((dists, index) => (
+                        {distribuidores.filter(d => d.role === 'user').map((dists, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-3"
+                            >
+                                <input
+                                    className="input-check accent-blue_custom"
+                                    type="checkbox"
+                                    onChange={() => {
+                                        if (selectedDists.some(s => s._id === dists._id)) {
+                                            setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
+                                        } else {
+                                            setSelectedDists(prev => [...prev, dists])
+                                        }
+
+                                        zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
+                                    }}
+                                    checked={selectedDists.some(sd => sd._id === dists._id)}
+                                    id={`distrib-${dists._id}`}
+                                />
+                                <label
+                                    htmlFor={`distrib-${dists._id}`}
+                                    className="text-sm"
+                                >
+                                    {dists.fullName || "Sin nombre"}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    <label className="text-blue_custom mt-2">Administradores</label>
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        {distribuidores.filter(d => d.role === 'admin').map((dists, index) => (
                             <div
                                 key={index}
                                 className="flex items-center gap-3"
