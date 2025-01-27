@@ -37,15 +37,16 @@ const CuentasPorCobrar = () => {
   const [searchParam, setSearchParam] = useState<string>('');
   const [sort, setSort] = useState<'asc' | 'desc'>('desc');
   const [savedFilters, setSavedFilters] = useState<ISalesGetParams['filters']>({});
+  const [showAll, setShowAll] = useState<boolean>(false);
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
 
   const [query, setQuery] = useSearchParams()
-  const [queryData, setQueryData] = useState<ISalesGetParams & { text?: string, clients?: string[] } | null>(null)
+  const [queryData, setQueryData] = useState<ISalesGetParams & { text?: string, clients?: string[], showAll?: boolean; } | null>(null)
 
   useEffect(() => {
     if (query && query.has('filters')) {
-      const queryRes: ISalesGetParams & { text?: string, clients?: string[] } = JSON.parse(atob(query.get('filters')!))
+      const queryRes: ISalesGetParams & { text?: string, clients?: string[], showAll?: boolean; } = JSON.parse(atob(query.get('filters')!))
       setQueryData(queryRes)
 
       if (queryRes.pagination) {
@@ -62,8 +63,10 @@ const CuentasPorCobrar = () => {
       if (queryRes.filters) {
         setSavedFilters(queryRes.filters)
       }
+
+      setShowAll(!!queryRes.showAll)
     } else {
-      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' } })) })
+      setQuery({ filters: btoa(JSON.stringify({ pagination: { page: 1, pageSize: itemsPerPage, sort: 'desc' }, showAll: false })) })
     }
   }, [query, setQuery])
 
@@ -86,10 +89,10 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true, pendingBalance: true } }))
+        promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
       }
     }
 
@@ -162,6 +165,12 @@ const CuentasPorCobrar = () => {
     setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, filters })) })
   };
 
+  const handleShowAllChange = (val: boolean) => {
+    setCurrentPage(1);
+    setShowAll(val);
+    setQuery({ filters: btoa(JSON.stringify({ ...queryData, pagination: { ...queryData?.pagination, page: 1 }, showAll: val })) })
+  };
+
   useEffect(() => {
     const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
     let filters: ISalesGetParams['filters'] = {}
@@ -179,10 +188,10 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, pendingBalance: true } }))
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
       }
     }
 
@@ -220,7 +229,7 @@ const CuentasPorCobrar = () => {
           value: `${summary.reduce((cont, sale) => cont += sale.total, 0).toLocaleString()} Bs`
         }]}
       >
-        <div className="w-full pb-10 sticky top-0 bg-main-background z-[20]">
+        <div className="w-full pb-10 sticky top-0 bg-main-background z-[20] flex justify-between items-center gap-10 flex-wrap">
           <div className="w-full sm:w-1/2">
             <div className="switch-contenido">
               <div
@@ -236,6 +245,11 @@ const CuentasPorCobrar = () => {
                 Cobros a clientes
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="all" className="accent-blue_custom" checked={showAll} onChange={() => handleShowAllChange(!showAll)} />
+            <label htmlFor="all" className="text-sm">Mostrar todos</label>
           </div>
         </div>
 

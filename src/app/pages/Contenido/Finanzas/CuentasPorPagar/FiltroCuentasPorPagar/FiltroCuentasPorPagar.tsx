@@ -27,15 +27,17 @@ const FiltroCuentasPorPagar = ({
     initialFilters,
     zones,
     distribuidores,
-    providers
+    providers,
+    isPayment
 }: {
     providers: Providers[];
     zones: Zone[];
     distribuidores: User[];
     onChange: (filters: IExpensesGetParams['filters']) => void;
     initialFilters: IExpensesGetParams['filters'];
+    isPayment?: boolean;
 }) => {
-    const { register, handleSubmit, setValue, watch } = useForm<IExpenseFilters>({
+    const { register, handleSubmit, setValue } = useForm<IExpenseFilters>({
         defaultValues: initialState || {},
     });
 
@@ -99,7 +101,6 @@ const FiltroCuentasPorPagar = ({
                             <span className="text-left text-sm">A</span>
                             <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
                             <input
-                                min={watch('toDate')?.toString()}
                                 max={moment().format("YYYY-MM-DD")}
                                 type="date"
                                 {...register("toDate")}
@@ -110,87 +111,92 @@ const FiltroCuentasPorPagar = ({
                 </div>
             </div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.3 }}
-                className="w-full sm:w-1/2 flex flex-col gap-2 my-4"
-            >
-                <label>Proveedor o beneficiario</label>
-                <select {...register("provider")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
-                    <option value="">Seleccione un proveedor</option>
-                    {
-                        providers.map((row, index) => (
-                            <option value={row._id} key={index}>
-                                {row.fullName || "Sin nombre"}
-                            </option>
-                        ))
-                    }
-                </select>
-            </motion.div>
+            {
+                !isPayment &&
+                <>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="w-full sm:w-1/2 flex flex-col gap-2 my-4"
+                    >
+                        <label>Proveedor o beneficiario</label>
+                        <select {...register("provider")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
+                            <option value="">Seleccione un proveedor</option>
+                            {
+                                providers.map((row, index) => (
+                                    <option value={row._id} key={index}>
+                                        {row.fullName || "Sin nombre"}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </motion.div>
 
-            <div className="w-full flex flex-col gap-2 mb-8">
-                <label className="font-semibold text-blue_custom">Distribuidores</label>
-                <div className="flex flex-wrap gap-x-6 gap-y-4">
-                    {distribuidores.map((dists, index) => (
-                        <div
-                            key={index}
-                            className="flex items-center gap-3"
-                        >
-                            <input
-                                className="input-check accent-blue_custom"
-                                type="checkbox"
-                                onChange={() => {
-                                    if (selectedDists.some(s => s._id === dists._id)) {
-                                        setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
-                                    } else {
-                                        setSelectedDists(prev => [...prev, dists])
-                                    }
-
-                                    zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
-                                }}
-                                checked={selectedDists.some(sd => sd._id === dists._id)}
-                                id={`distrib-${dists._id}`}
-                            />
-                            <label
-                                htmlFor={`distrib-${dists._id}`}
-                                className="text-sm"
-                            >
-                                {dists.fullName || "Sin nombre"}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="w-full flex flex-col gap-2 mb-8">
-                <label className="font-semibold text-blue_custom">Zonas</label>
-                <div className="flex flex-wrap gap-x-6 gap-y-4">
-                    {zones
-                        .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
-                        .map((zone, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-3"
-                            >
-                                <input
-                                    className="input-check accent-blue_custom"
-                                    type="checkbox"
-                                    {...register(`zones.${zone._id}`)}
-                                    value={zone._id}
-                                    id={`zone-${zone._id}`}
-                                />
-                                <label
-                                    htmlFor={`zone-${zone._id}`}
-                                    className="text-sm"
+                    <div className="w-full flex flex-col gap-2 mb-8">
+                        <label className="font-semibold text-blue_custom">Distribuidores</label>
+                        <div className="flex flex-wrap gap-x-6 gap-y-4">
+                            {distribuidores.map((dists, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-3"
                                 >
-                                    {zone.name}
-                                </label>
-                            </div>
-                        ))}
-                </div>
-            </div>
+                                    <input
+                                        className="input-check accent-blue_custom"
+                                        type="checkbox"
+                                        onChange={() => {
+                                            if (selectedDists.some(s => s._id === dists._id)) {
+                                                setSelectedDists(prev => prev.filter(s => s._id !== dists._id))
+                                            } else {
+                                                setSelectedDists(prev => [...prev, dists])
+                                            }
+
+                                            zones.forEach(z => setValue(`zones.${z._id}`, "", { shouldValidate: true }))
+                                        }}
+                                        checked={selectedDists.some(sd => sd._id === dists._id)}
+                                        id={`distrib-${dists._id}`}
+                                    />
+                                    <label
+                                        htmlFor={`distrib-${dists._id}`}
+                                        className="text-sm"
+                                    >
+                                        {dists.fullName || "Sin nombre"}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="w-full flex flex-col gap-2 mb-8">
+                        <label className="font-semibold text-blue_custom">Zonas</label>
+                        <div className="flex flex-wrap gap-x-6 gap-y-4">
+                            {zones
+                                .filter(zone => selectedDists.length > 0 ? selectedDists.some(d => d.zones?.includes(zone._id)) : true)
+                                .map((zone, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <input
+                                            className="input-check accent-blue_custom"
+                                            type="checkbox"
+                                            {...register(`zones.${zone._id}`)}
+                                            value={zone._id}
+                                            id={`zone-${zone._id}`}
+                                        />
+                                        <label
+                                            htmlFor={`zone-${zone._id}`}
+                                            className="text-sm"
+                                        >
+                                            {zone.name}
+                                        </label>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </>
+            }
 
             <div className="flex justify-between w-full items-center gap-3 px-4">
                 <button

@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { Transaction } from "../../../../../../type/Cash";
-import { User } from "../../../../../../type/User";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import "./TableArqueoCaja.css";
 import DataTable, { TableColumn } from 'react-data-table-component';
@@ -8,12 +7,13 @@ import toast from "react-hot-toast";
 import Modal from "../../../../EntryComponents/Modal";
 import { FinalizarArqueoCaja } from "../FinalizarArqueoCaja/FinalizarArqueoCaja";
 import { CashRegisterApiConector } from "../../../../../../api/classes";
+import { ArqueoDeCajaContext } from "../ArqueoDeCajaContext";
 
 
 const TableArqueoCaja = ({ cash }: {
   cash: Transaction[];
 }) => {
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>(undefined)
+  const { selectedTransaction, setSelectedTransaction } = useContext(ArqueoDeCajaContext)
 
   const deleteRegistry = useCallback((id: string) => {
     toast.error(
@@ -73,29 +73,36 @@ const TableArqueoCaja = ({ cash }: {
     {
       name: "Hora de apertura",
       selector: row => (row.startDate ? formatDateTime(row?.startDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+      width: "15%"
     },
     {
       name: "Hora de cierre",
-      selector: row => (row.endDate ? formatDateTime(row?.endDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A")
+      selector: row => (row.endDate ? formatDateTime(row?.endDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+      width: "15%"
     },
     {
       name: "Distibuidor",
-      selector: row => row.userDetails?.fullName || "Distribuidor desconocido"
+      selector: row => `${row.userDetails?.fullName || "Distribuidor desconocido"} ${row.userDetails?.role === 'admin' ? "(Administrador)" : ""}`,
+      width: "30%"
     },
     {
       name: "Sistema",
-      selector: row => row?.initialAmount.toLocaleString() || "N/A"
+      selector: row => `${(row?.initialAmount || 0) + (row?.incomeCashTotal || 0) + (row?.creditBillsSales || 0) - ((row?.expenseCashTotal || 0) + (row?.expenseCurrentAccountTotal || 0)) || "N/A"} Bs`,
+      width: "10%"
     },
     {
       name: "Diferencia",
-      selector: row => row?.difference.toLocaleString() || "N/A"
+      selector: row => `${!row.creationMethod || row.creationMethod === 'open-close' ? "0" : (row?.difference.toLocaleString() || "N/A")} Bs`,
+      width: "10%"
     },
     {
       name: "Estado",
       selector: row => row?.state ? "Abierto" : "Cerrado",
+      width: "10%"
     },
     {
       name: "Acciones",
+      width: "10%",
       cell: (row) =>
         <div className="flex items-center w-full gap-4">
           <button onClick={() => setSelectedTransaction(row)}>
@@ -106,7 +113,7 @@ const TableArqueoCaja = ({ cash }: {
           </button>
         </div>
     }
-  ], [deleteRegistry])
+  ], [deleteRegistry, setSelectedTransaction])
 
   const [onlyOpen, setOnlyOpen] = useState<boolean>(false)
 

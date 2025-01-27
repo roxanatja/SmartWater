@@ -28,7 +28,7 @@ export abstract class CashRegisterApiConector {
         }
     }
 
-    static async open(params: IRegistersOpenBody): Promise<{ id: string } | null> {
+    static async open(params: IRegistersOpenBody): Promise<{ cashRegister: string } | { cashRegister: { error: string } } | null> {
         try {
             const res = await ApiConnector.getInstance().post(`${this.root_path}/create`, params.data)
             return res.data
