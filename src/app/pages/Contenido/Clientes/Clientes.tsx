@@ -32,6 +32,7 @@ const Clientes: FC = () => {
 
   const [currentData, setCurrentData] = useState<Client[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
+  const [allClients, setAllClients] = useState<Client[]>([]);
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
 
   const itemsPerPage: number = 10;
@@ -76,6 +77,7 @@ const Clientes: FC = () => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+      setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -192,7 +194,7 @@ const Clientes: FC = () => {
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Registrar Cliente
         </h2>
-        <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} />
+        <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} allClients={allClients} />
       </Modal>
 
       <Modal
@@ -202,7 +204,7 @@ const Clientes: FC = () => {
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Editar Cliente
         </h2>
-        <ClientForm zones={zones}
+        <ClientForm zones={zones} allClients={allClients}
           isOpen={
             selectedClient._id !== "" && showMiniModal === false ? true : false
           }

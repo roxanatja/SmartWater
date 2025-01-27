@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import "./AgregarProveedor.css";
 import { ProveedoresContext } from "../ProveedoresContext";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -8,13 +8,15 @@ import { ProvidersApiConector } from "../../../../../../api/classes";
 import { IProviderBody } from "../../../../../../api/types/providers";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import * as Yup from "yup";
+import { Providers } from "../../../../../../type/providers";
 
-const AgregarProveedor = ({ onClose }: { onClose: () => void }) => {
+const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allProviders: Providers[] }) => {
   const { provider } = useContext(ProveedoresContext);
   const [active, setActive] = useState(false);
 
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<IProviderBody['data']>({
@@ -23,23 +25,79 @@ const AgregarProveedor = ({ onClose }: { onClose: () => void }) => {
   });
 
   const onSubmit: SubmitHandler<IProviderBody['data']> = async (data) => {
-    let res = null
     setActive(true)
 
-    if (provider._id !== "") {
-      res = await ProvidersApiConector.update({ providerId: provider._id, data })
+    if (exists) {
+      toast.error(
+        (t) => (
+          <div>
+            <p className="mb-4 text-center text-[#888]">
+              Ya existe un proveedor con este nombre ¿Deseas crear el proveedor con este nombre de todos modos?
+            </p>
+            <div className="flex justify-center">
+              <button
+                className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                onClick={() => { toast.dismiss(t.id); setActive(false) }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                onClick={async () => {
+                  toast.dismiss(t.id);
+                  let res = null
+
+                  if (provider._id !== "") {
+                    res = await ProvidersApiConector.update({ providerId: provider._id, data })
+                  } else {
+                    res = await ProvidersApiConector.create({ data })
+                  }
+
+                  if (res) {
+                    toast.success(`Proveedor ${provider._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+                    window.location.reload();
+                  } else {
+                    toast.error(`Upps error al ${provider._id === "" ? "crear" : "editar"} el proveedor`, { position: "bottom-center" });
+                    setActive(false)
+                  }
+                }}
+              >
+                Proceder
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+          icon: null,
+          position: "top-center",
+          duration: 2 * 60000
+        }
+      );
     } else {
-      res = await ProvidersApiConector.create({ data })
+      let res = null
+
+      if (provider._id !== "") {
+        res = await ProvidersApiConector.update({ providerId: provider._id, data })
+      } else {
+        res = await ProvidersApiConector.create({ data })
+      }
+
+      if (res) {
+        toast.success(`Proveedor ${provider._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+        window.location.reload();
+      } else {
+        toast.error(`Upps error al ${provider._id === "" ? "crear" : "editar"} el proveedor`, { position: "bottom-center" });
+        setActive(false)
+      }
     }
 
-    if (res) {
-      toast.success(`Proveedor ${provider._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-      window.location.reload();
-    } else {
-      toast.error(`Upps error al ${provider._id === "" ? "crear" : "editar"} el proveedor`, { position: "bottom-center" });
-      setActive(false)
-    }
   };
+
+  const name = watch('fullName')
+  const exists = useMemo<boolean>(() => {
+    return !!name && allProviders.some(p => p.fullName.toLowerCase() === name.toLowerCase() && p._id !== provider._id)
+  }, [name, allProviders, provider])
 
   return (
     <>
@@ -51,6 +109,12 @@ const AgregarProveedor = ({ onClose }: { onClose: () => void }) => {
           label="Nombre"
           required
         />
+        {exists &&
+          <span className="text-yellow-500 font-normal text-sm w-full flex gap-2 items-center -mt-4">
+            <i className="fa-solid fa-triangle-exclamation"></i>
+            Existe un proveedor con este nombre
+          </span>
+        }
         <Input
           register={register}
           errors={errors.email}

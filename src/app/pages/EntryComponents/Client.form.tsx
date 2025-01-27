@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "./Inputs";
 import { motion } from "framer-motion";
@@ -12,19 +12,23 @@ import { IClientForm } from "../../../api/types/clients";
 import { formatNumber, isValidPhoneNumber } from "libphonenumber-js";
 import { AuthService } from "../../../api/services/AuthService";
 import toast from "react-hot-toast";
+import { Client } from "../../../type/Cliente/Client";
 
 const ClientForm = ({
   isOpen,
   onCancel,
-  zones
+  zones,
+  allClients
 }: {
   onCancel?: () => void;
   isOpen: boolean;
   zones: Zone[];
+  allClients: Client[]
 }) => {
   const user = AuthService.getUser()
   const [isJeshua, setIsJeshua] = useState<boolean>(false)
   const { selectedClient } = useContext(ClientesContext);
+  const [active, setActive] = useState(false);
 
   const [disti, setDisti] = useState<District[]>(selectedClient._id !== "" ? zones.find(z => z._id === selectedClient.zone)?.districts || [] : []);
   const [date, setDate] = useState(true);
@@ -65,6 +69,47 @@ const ClientForm = ({
 
 
   const onSubmit: SubmitHandler<IClientForm> = async (data) => {
+    setActive(true)
+
+    if (exists) {
+      toast.error(
+        (t) => (
+          <div>
+            <p className="mb-4 text-center text-[#888]">
+              Ya existe un cliente con este nombre ¿Deseas crear el proveedor con este nombre de todos modos?
+            </p>
+            <div className="flex justify-center">
+              <button
+                className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                onClick={() => { toast.dismiss(t.id); setActive(false) }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                onClick={async () => {
+                  toast.dismiss(t.id);
+                  saveClient(data)
+                }}
+              >
+                Proceder
+              </button>
+            </div>
+          </div>
+        ),
+        {
+          className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+          icon: null,
+          position: "top-center",
+          duration: 2 * 60000
+        }
+      );
+    } else {
+      saveClient(data)
+    }
+  };
+
+  const saveClient = async (data: IClientForm) => {
     let res = null
 
     if (selectedClient._id !== "") {
@@ -127,8 +172,9 @@ const ClientForm = ({
       window.location.reload();
     } else {
       toast.error("Upps error al crear cliente");
+      setActive(false)
     }
-  };
+  }
 
   const selectedZone = watch('zone')
   useEffect(() => {
@@ -214,6 +260,11 @@ const ClientForm = ({
     return responseData;
   };
 
+  const name = watch('fullName')
+  const exists = useMemo<boolean>(() => {
+    return !!name && allClients.some(p => p.fullName && p.fullName.toLowerCase() === name.toLowerCase() && p._id !== selectedClient._id)
+  }, [name, allClients, selectedClient])
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -280,13 +331,21 @@ const ClientForm = ({
       </motion.div>
 
       <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 gap-4 w-full px-6">
-        <Input
-          label="Nombre"
-          name="fullName"
-          register={register}
-          errors={errors.fullName}
-          required={!isJeshua}
-        />
+        <div className="flex flex-col">
+          <Input
+            label="Nombre"
+            name="fullName"
+            register={register}
+            errors={errors.fullName}
+            required={!isJeshua}
+          />
+          {exists &&
+            <span className="text-yellow-500 font-normal text-sm w-full flex gap-2 items-center mt-1">
+              <i className="fa-solid fa-triangle-exclamation"></i>
+              Existe un proveedor con este nombre
+            </span>
+          }
+        </div>
         <Input
           label="Datos de Factura"
           name="billingInfo.name"
@@ -670,7 +729,13 @@ const ClientForm = ({
             type="submit"
             className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
           >
-            {selectedClient._id !== "" ? "Editar" : "Registrar"} cliente
+            {
+              active ?
+                <i className="fa-solid fa-spinner animate-spin"></i> :
+                <span>
+                  {selectedClient._id !== "" ? "Editar" : "Registrar"} cliente
+                </span>
+            }
           </button>
         </div>
       </div>

@@ -134,6 +134,7 @@ const Proveedores: FC = () => {
           Registrar Proveedor
         </h2>
         <AgregarProveedor
+          allProviders={allProviders}
           onClose={() => {
             setShowModal(false);
           }}
@@ -148,6 +149,7 @@ const Proveedores: FC = () => {
           Editar Proveedor
         </h2>
         <AgregarProveedor
+          allProviders={allProviders}
           onClose={() => {
             setProvider(providerBlank)
             setShowModal(false);
