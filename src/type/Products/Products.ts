@@ -8,7 +8,7 @@ interface Product {
   price: number;
   priceBusiness: number;
   imageUrl: string;
-  category: CategoryProduct | string;
-  unitMeasure: UnitMeasure | string;
+  category: Partial<CategoryProduct> | string;
+  unitMeasure: Partial<UnitMeasure> | string;
 }
 export default Product;

@@ -34,7 +34,8 @@ export interface IMockInOuts {
     initialDate: string,
     comment: string,
     type: 'production' | 'fixing',
-    quantity: number
+    quantity: number;
+    item?: string;
 }
 
 export const otros_invetarios: IMockInOuts[] = [
@@ -43,13 +44,15 @@ export const otros_invetarios: IMockInOuts[] = [
         initialDate: "2023-09-14T23:43",
         comment: "Recibido tarde",
         type: 'production',
-        quantity: 20
+        quantity: 20,
+        item: "62d4419b1d5a22315c45088b"
     },
     {
         _id: "2135498794",
         initialDate: "2023-09-14T23:43",
         comment: "Por error",
         type: 'fixing',
-        quantity: 5
+        quantity: 5,
+        item: "62d4419b1d5a22315c45088b"
     },
 ]
