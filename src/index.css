@@ -168,12 +168,21 @@ input[type=number].no-spinner { -moz-appearance:textfield; }
   color: rgb(var(--font-color)) !important;
 }
 
+.rdt_TableHeadRow  {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
 .rdt_TableHeadRow,
 .rdt_TableRow:not(:last-of-type) {
-  border-bottom-color: rgb(var(--font-color)) !important;
+  @apply !border-b-font-color/20;
 }
 
 .no-border .rdt_TableHeadRow,
 .no-border .rdt_TableRow:not(:last-of-type) {
+  border: none !important;
+}
+
+.no-inner-border .rdt_TableRow:not(:last-of-type) {
   border: none !important;
 }

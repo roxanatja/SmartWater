@@ -3,6 +3,8 @@ import InventariosLayout from '../InventariosLayout/InventariosLayout'
 import { InventariosOtrosContext } from './InventariosOtrosProvider';
 import Modal from '../../../EntryComponents/Modal';
 import FiltrosEntradas from './Filtros/FiltrosEntradas';
+import TableOtrosIngresos from './Tables/TableOtrosIngresos';
+import { otros_invetarios } from '../mock-data';
 
 const Ingresos = () => {
     const { setShowFiltro, showFiltro } = useContext(InventariosOtrosContext)
@@ -36,7 +38,7 @@ const Ingresos = () => {
                         url: "/Finanzas/Inventarios/Otros/Salidas"
                     },
                 ]} add onAdd={() => { alert("OnAdd") }}>
-                Ingresos
+                <TableOtrosIngresos data={otros_invetarios} className='w-full xl:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>

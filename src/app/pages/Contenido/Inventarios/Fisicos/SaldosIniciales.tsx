@@ -5,6 +5,8 @@ import { InventariosFisicosContext } from './InventariosFisicosProvider'
 import Modal from '../../../EntryComponents/Modal'
 import FiltrosSaldosIniciales from './Filtros/FiltrosSaldosIniciales'
 import { UsersApiConector } from '../../../../../api/classes'
+import TableFisicosSaldosIniciales from './Tables/TableFisicosSaldosIniciales'
+import { fisicos_saldos } from '../mock-data'
 
 const SaldosIniciales = () => {
     const { setShowFiltro, showFiltro } = useContext(InventariosFisicosContext)
@@ -26,7 +28,7 @@ const SaldosIniciales = () => {
         setCurrentPage(1);
         setSavedFilters(filters);
     };
-    
+
     return (
         <>
             <InventariosLayout filtro
@@ -44,7 +46,7 @@ const SaldosIniciales = () => {
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
                 ]} add onAdd={() => { alert("OnAdd") }} >
-                Saldos iniciales
+                <TableFisicosSaldosIniciales data={fisicos_saldos} className='w-full lg:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>

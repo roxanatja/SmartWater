@@ -5,6 +5,8 @@ import { User } from '../../../../../type/User';
 import { UsersApiConector } from '../../../../../api/classes';
 import Modal from '../../../EntryComponents/Modal';
 import FiltrosReportesInventarios from './Filtros/FiltrosReportesInventarios';
+import TableFisicosReportes from './Tables/TableFisicosReportes';
+import { fisicos_saldos } from '../mock-data';
 
 const ReportesInventarios = () => {
     const { setShowFiltro, showFiltro } = useContext(InventariosFisicosContext)
@@ -44,7 +46,7 @@ const ReportesInventarios = () => {
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
                 ]} add onAdd={() => { alert("OnAdd") }}>
-                Reportes Inventarios
+                <TableFisicosReportes data={fisicos_saldos} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
