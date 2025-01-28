@@ -4,7 +4,7 @@ import InventariosLayout from '../InventariosLayout/InventariosLayout'
 const SaldosIniciales = () => {
     return (
         <>
-            <InventariosLayout filtro swith switchDetails={[
+            <InventariosLayout swith switchDetails={[
                 {
                     isSelected: true,
                     text: "Saldos iniciales",
@@ -15,7 +15,7 @@ const SaldosIniciales = () => {
                     text: "Reportes de inventario",
                     url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
                 },
-            ]} add onAdd={() => {alert("OnAdd")}}>
+            ]} add onAdd={() => { alert("OnAdd") }}>
                 Saldos iniciales
             </InventariosLayout>
         </>
