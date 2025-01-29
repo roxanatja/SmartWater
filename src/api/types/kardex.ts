@@ -1,0 +1,46 @@
+import { FilteredSearch } from "./common";
+
+export interface IKardexDetailGetParams extends FilteredSearch {
+    filters?: {
+        elementId: string;
+    }
+}
+
+export interface IInitialBalanceBody {
+    data: {
+        user: string;
+        documentNumber: string;
+        openingDate: string;
+        elements: {
+            product?: string;
+            item?: string;
+            quantity: number;
+            inputImport: number;
+        };
+    }
+}
+
+export interface IItemFilter {
+    productId: string;
+}
+
+export interface IOthersBody {
+    user: string;
+    comment: string;
+    documentNumber: string;
+    elements: {
+        product?: string;
+        item?: string;
+        quantity: number;
+        unitPrice: number;
+    };
+    registerDate: string;
+}
+
+export interface IOtherEntryBody extends IOthersBody {
+    inputType: 'production_received' | 'adjustment_entry';
+}
+
+export interface IOtherOutputBody extends IOthersBody {
+    outputType: 'production_delivered' | 'adjustment_exit';
+}

@@ -55,7 +55,6 @@ const BarrioForm = ({ isOpen, onCancel, zonas }: Props) => {
                 setActive(false)
             }
         } else {
-            // FIXME: Presenting issues while creating. If it already exists and takes the suggestion, there's not problem
             const endRes = await ZonesApiConector.assignDistrict({ data: { cityId, districtName: data.name, zoneId: data.zone } })
 
             if (endRes) {

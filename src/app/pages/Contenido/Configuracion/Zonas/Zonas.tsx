@@ -59,8 +59,6 @@ const Zonas: FC = () => {
             <div className="px-10">
                 <PageTitle titulo="Configuración / Zonas" icon="../../../Configuracion-icon.svg" />
 
-                {/* TODO: What filters */}
-
                 <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
                     onAdd={() => setShowModal(true)} resultados order={false} total={filteredZonas.length} search={setSearchParam}>
                     <div className="w-full">
@@ -81,11 +79,6 @@ const Zonas: FC = () => {
                         }
                     </div>
                 </FiltroPaginado >
-                {/* <div className="flex w-full sm:justify-end items-center gap-4 flex-wrap justify-center">
-                    <button className="CuentasContables-btn" onClick={() => }>
-                        <span>Crear</span>
-                    </button>
-                </div> */}
             </div>
 
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>

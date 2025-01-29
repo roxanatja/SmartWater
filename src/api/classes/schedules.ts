@@ -23,7 +23,6 @@ export abstract class SchedulesApiConector {
         }
     }
 
-    // FIXME: Error trying
     static async update(params: IScheduleBody & IScheduleFilter): Promise<any | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.scheduleId}/edit`, params.data)

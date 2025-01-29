@@ -16,7 +16,10 @@ import Modal from '../../../../EntryComponents/Modal'
 import { FiltroEgresosGastos } from '../FiltroEgresosGastos/FiltroEgresosGastos'
 import millify from 'millify'
 import { Zone } from '../../../../../../type/City'
+import EditEgresosGastos from '../EditEgresosGastos/EditEgresosGastos'
 import AddEgresosGastos from '../AddEgresosGastos/AddEgresosGastos'
+import { MatchedElement } from '../../../../../../type/Kardex'
+import { KardexApiConector } from '../../../../../../api/classes/kardex'
 
 const RegistroEyG = () => {
     const navigate = useNavigate()
@@ -36,6 +39,7 @@ const RegistroEyG = () => {
     const [zones, setZones] = useState<Zone[]>([]);
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [providers, setProviders] = useState<Providers[]>([]);
+    const [elements, setElements] = useState<MatchedElement[]>([]);
 
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -113,6 +117,7 @@ const RegistroEyG = () => {
             setAccounts((await AccountEntryApiConector.get()) || []);
             setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
             setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setElements((await KardexApiConector.getKardexElements())?.elements || []);
         }
         fetchZones()
     }, [])
@@ -230,7 +235,7 @@ const RegistroEyG = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro de egresos y gastos
                 </h2>
-                <AddEgresosGastos onCancel={() => setShowModal(false)} accounts={accounts} provider={providers} />
+                <AddEgresosGastos onCancel={() => setShowModal(false)} accounts={accounts} provider={providers} elements={elements} />
             </Modal>
 
             <Modal
@@ -240,7 +245,7 @@ const RegistroEyG = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar egresos y gastos
                 </h2>
-                <AddEgresosGastos accounts={accounts} provider={providers}
+                <EditEgresosGastos accounts={accounts} provider={providers}
                     onCancel={() => { setSelectedExpense(expense); setShowModal(false) }} />
             </Modal> F
         </>
