@@ -36,9 +36,11 @@ const BalancesReportModal = ({ toDate }: Props) => {
             const inputs = [
                 {
                     subtitle: JSON.stringify({ date: formatDateTime(toDate, 'numeric', '2-digit', '2-digit', false, true) }),
+                    total: JSON.stringify({ total: balanceReport.totalGeneral }),
                     table: balanceReport.elements.map(row => {
                         return [`${row.nro}`, `${row.name}`, `${row.unit}`, `${row.quantity}`, `${row.weightedAverageCost}`, `${row.totalAmount}`]
-                    })
+                    }),
+
                 }
             ]
 
