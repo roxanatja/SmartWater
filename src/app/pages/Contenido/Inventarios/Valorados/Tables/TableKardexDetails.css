@@ -1,0 +1,5 @@
+div[role="cell"] > div,
+div[role="columnheader"] > div {
+    white-space: normal !important;
+    text-overflow: unset !important;
+}

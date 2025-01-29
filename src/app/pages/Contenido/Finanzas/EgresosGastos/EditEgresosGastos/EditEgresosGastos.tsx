@@ -1,64 +1,79 @@
-import { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Providers } from '../../../../../../type/providers';
 import { Account } from '../../../../../../type/AccountEntry';
-import { IExpenseDetailsBody } from '../../../../../../api/types/expenses';
+import { EgresosGastosContext } from '../EgresosGastosContext';
+import { IExpenseBody } from '../../../../../../api/types/expenses';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ExpensesApiConector } from '../../../../../../api/classes';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import Input from '../../../../EntryComponents/Inputs';
-import { MatchedElement } from '../../../../../../type/Kardex';
-import InventoriesForm from './InventoriesForm';
 import { AuthService } from '../../../../../../api/services/AuthService';
-import moment from 'moment-timezone';
 
 interface Props {
   onCancel?: () => void;
   accounts: Account[];
   provider: Providers[];
-  elements: MatchedElement[]
 }
 
-const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => {
+const EditEgresosGastos = ({ accounts, provider, onCancel }: Props) => {
+  const { selectedExpense } = useContext(EgresosGastosContext);
   const [active, setActive] = useState(false);
-  const [inventoryDetails, setInventoryDetails] = useState<IExpenseDetailsBody['data']['details']>([])
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid }, watch, setValue
-  } = useForm<IExpenseDetailsBody['data']>({
-    defaultValues: {},
+  } = useForm<IExpenseBody['data']>({
+    defaultValues: selectedExpense._id === "" ? {} : {
+      accountEntry: selectedExpense.accountEntry,
+      amount: selectedExpense.amount,
+      comment: selectedExpense.comment,
+      creditBuy: selectedExpense.creditBuy,
+      documentNumber: selectedExpense.documentNumber,
+      hasInVoice: selectedExpense.hasInVoice,
+      paymentMethodCurrentAccount: selectedExpense.paymentMethodCurrentAccount,
+      provider: selectedExpense.provider?._id || "",
+      user: selectedExpense.user
+    },
     mode: 'all'
   });
 
   const [selectedPayment, setSelectedPayment] = useState<"credit" | 'cta' | 'cash'>('cash')
-  const [inventories, setInventories] = useState<IExpenseDetailsBody['data']['details']>([])
 
-  const onSubmit: SubmitHandler<IExpenseDetailsBody['data']> = async (data) => {
+  const onSubmit: SubmitHandler<IExpenseBody['data']> = async (data) => {
     let res = null
     setActive(true)
 
-    const userData = AuthService.getUser()
-
-    // FIXME: Error submitting
-    res = await ExpensesApiConector.createWithDetails({
-      data: {
-        ...data,
-        user: userData?._id || "",
-        details: inventories,
-        registerDate: moment.tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss")
-      }
-    })
+    if (selectedExpense._id !== "") {
+      res = await ExpensesApiConector.update({ expenseId: selectedExpense._id, data })
+    } else {
+      res = await ExpensesApiConector.create({ data })
+    }
 
     if (res) {
-      toast.success("Gasto registrado correctamente", { position: "bottom-center" });
+      toast.success(`Item ${selectedExpense._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
       window.location.reload();
     } else {
-      toast.error("Upps error al crear el gasto", { position: "bottom-center" });
+      toast.error("Upps error al crear el item", { position: "bottom-center" });
       setActive(false)
     }
   };
+
+  useEffect(() => {
+    if (selectedExpense._id !== "") {
+      const credit = selectedExpense.creditBuy
+      const cta = selectedExpense.paymentMethodCurrentAccount
+
+      let is: "credit" | 'cta' | 'cash' = 'cash'
+      if (!!credit && !cta) { is = 'credit' }
+      else if (!credit && !!cta) { is = 'cta' }
+
+      setSelectedPayment(is)
+    } else {
+      setSelectedPayment('cash')
+    }
+  }, [selectedExpense])
 
   const handleChangePayment = (e: ChangeEvent<HTMLSelectElement>) => {
     const selection = e.target.value as typeof selectedPayment
@@ -79,31 +94,6 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
         break;
     }
   }
-
-  const onAddElements = (val: IExpenseDetailsBody['data']['details'][0], index: number = -1) => {
-    if (index > -1) {
-      const updateElements = [...inventories]
-      updateElements[index] = val
-      setInventories(updateElements)
-    } else {
-      const idx = inventories.findIndex(i => val.product ? i.product === val.product : i.item === val.item);
-      if (idx !== -1) {
-        setInventories(prev => prev.map(i => {
-          if ((!!val.product && i.product === val.product) || (!!val.item && i.item === val.item)) {
-            return { ...i, inputImport: val.inputImport, quantity: val.quantity }
-          } else {
-            return i
-          }
-        }))
-      } else {
-        setInventories([...inventories, val])
-      }
-    }
-  }
-
-  const handleDeleteElement = (index: number) => {
-    setInventories(inventories.filter((_, i) => i !== index));
-  };
 
   return (
     <form
@@ -222,7 +212,6 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
         </label>
         <input
           type="checkbox"
-          {...register("hasReceipt")}
           className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded accent-blue-700"
           id="isAgency"
         />
@@ -240,13 +229,11 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
       <Input
         textarea
         label="Comentario"
-        rows={2}
+        rows={3}
         name="comment"
         register={register}
         errors={errors.comment}
       />
-
-      <InventoriesForm elements={elements} handleDeleteElement={handleDeleteElement} updateDetails={onAddElements} inventories={inventories} />
 
       <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
         <div className="py-4 flex flex-row gap-4 items-center justify-center px-6">
@@ -258,14 +245,14 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
           </button>
           <button
             type="submit"
-            disabled={!isValid || inventories.length === 0 || active}
+            disabled={!isValid || active}
             className="disabled:bg-gray-400 w-full bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
           >
             {active ? (
               <i className="fa-solid fa-spinner animate-spin"></i>
             ) : (
               <>
-                Registrar
+                {selectedExpense._id !== "" ? "Editar" : "Registrar"}
               </>
             )}
           </button>
@@ -275,4 +262,4 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
   )
 }
 
-export default AddEgresosGastos
+export default EditEgresosGastos

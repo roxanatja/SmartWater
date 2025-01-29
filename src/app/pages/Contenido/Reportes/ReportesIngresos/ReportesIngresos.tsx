@@ -8,10 +8,10 @@ import { FiltroCuentasPorCobrar } from "./FiltroCuentasPorCobrar/FiltroCuentasPo
 import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
 import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
 import Modal from "../../../EntryComponents/Modal";
-import ApiMethodClient from "../../../../../Class/api.client";
 import { Client } from "../../../../../type/Cliente/Client";
 import FiltroClientes from "./FiltroClientes/FiltroClientes";
 import * as XLSX from "xlsx";
+import { ClientsApiConector } from "../../../../../api/classes";
 
 const ReportesIngresos: FC = () => {
   const {
@@ -30,8 +30,7 @@ const ReportesIngresos: FC = () => {
   const [data, setData] = useState<{ client?: Client[] }>();
 
   const getClients = useCallback(async () => {
-    const api = new ApiMethodClient();
-    const datClien = await api.loadClients();
+    const datClien = (await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
     setData({
       client: datClien as unknown as Client[],
     });

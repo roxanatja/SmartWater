@@ -1,10 +1,42 @@
-import React from 'react'
+import { useState } from 'react';
 import InventariosLayout from '../InventariosLayout/InventariosLayout'
+import FiltrosReportesInventarios, { IInitialBalancesFilters } from './Filtros/FiltrosReportesInventarios';
+import Modal from '../../../EntryComponents/Modal';
+import BalancesReportModal from './Modals/BalancesReportModal';
+import moment from 'moment';
 
 const ReportesInventarios = () => {
+    const [showBalancesReport, setShowBalancesReport] = useState<boolean>(false)
+    const [showEntriesReport, setShowEntriesReport] = useState<boolean>(false)
+    const [showOutputsReport, setShowOutputsReport] = useState<boolean>(false)
+
+    const [selectedDate, setSelectedDate] = useState<string>(moment().format("YYYY-MM-DD"))
+
+
+    const handleFilterChange = (filters: IInitialBalancesFilters) => {
+        setShowBalancesReport(false)
+        setShowEntriesReport(false)
+        setShowOutputsReport(false)
+
+        setSelectedDate(filters.toDate || moment().format("YYYY-MM-DD"))
+
+        switch (filters.type) {
+            case 'entry':
+                setShowEntriesReport(true)
+                break;
+            case 'output':
+                setShowOutputsReport(true)
+                break;
+            case 'balance':
+                setShowBalancesReport(true)
+                break;
+        }
+
+    };
+
     return (
         <>
-            <InventariosLayout filtro swith switchDetails={[
+            <InventariosLayout swith switchDetails={[
                 {
                     isSelected: false,
                     text: "Saldos iniciales",
@@ -16,8 +48,15 @@ const ReportesInventarios = () => {
                     url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
                 },
             ]}>
-                Reportes Inventarios
+                <FiltrosReportesInventarios initialFilters={{}} onChange={handleFilterChange} />
             </InventariosLayout>
+
+            <Modal isOpen={showBalancesReport} onClose={() => { setShowBalancesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
+                    Reporte saldos físicos valorados
+                </h2>
+                <BalancesReportModal toDate={selectedDate} />
+            </Modal>
         </>
     )
 }

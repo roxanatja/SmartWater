@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { GoogleMap, LoadScript, InfoWindow } from "@react-google-maps/api";
-import { loadClients } from "../../../../services/ClientsService";
 import { subMonths, isAfter } from "date-fns";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
+import { ClientsApiConector } from "../../../../api/classes";
 
 interface MapProps {
   apiKey: string;
@@ -70,9 +70,9 @@ const GoogleMaps: React.FC<MapProps> = ({
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const clientsData = await loadClients();
-        setClients(clientsData.data);
-        setFilteredClients(clientsData.data);
+        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } });
+        setClients(clientsData?.data || []);
+        setFilteredClients(clientsData?.data || []);
       } catch (error) {
         console.error("Error fetching clients:", error);
       }

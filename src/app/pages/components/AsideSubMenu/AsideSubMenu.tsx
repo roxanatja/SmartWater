@@ -63,7 +63,7 @@ const AsideSubMenu = ({ tituloItem, icon, opciones, to, isInner }: Item) => {
                     <div className={`infoSub-item cursor-pointer m-0 ${opcionesVisibles ? "active-link pl-1 rounded-md" : "hover:text-[#3C9FFF]"}`} onClick={handleOpcionesClick}>
                         <div className="infoTitle-item">
                             {icon && <img src={icon} alt="" />}
-                            <span className="tituloSub-item font-semibold">{tituloItem}</span>
+                            <span className="tituloSub-item font-[500] !text-[12px]">{tituloItem}</span>
                         </div>
                         <div className="infoTitle-item">
                             <button type="button" className={opcionesVisibles ? "btn-option active-btn" : "btn-option"}>
