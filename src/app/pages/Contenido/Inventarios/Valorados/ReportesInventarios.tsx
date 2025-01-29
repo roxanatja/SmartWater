@@ -1,48 +1,61 @@
-import React, { useContext, useState } from 'react'
+import { useState } from 'react';
 import InventariosLayout from '../InventariosLayout/InventariosLayout'
-import { InventariosValoradosContext } from './InventariosValoradosProvider';
+import FiltrosReportesInventarios, { IInitialBalancesFilters } from './Filtros/FiltrosReportesInventarios';
 import Modal from '../../../EntryComponents/Modal';
-import FiltrosSaldosIniciales from './Filtros/FiltrosSaldosIniciales';
-import FiltrosReportesInventarios from './Filtros/FiltrosReportesInventarios';
+import BalancesReportModal from './Modals/BalancesReportModal';
+import moment from 'moment';
 
 const ReportesInventarios = () => {
-    const { setShowFiltro, showFiltro } = useContext(InventariosValoradosContext)
+    const [showBalancesReport, setShowBalancesReport] = useState<boolean>(false)
+    const [showEntriesReport, setShowEntriesReport] = useState<boolean>(false)
+    const [showOutputsReport, setShowOutputsReport] = useState<boolean>(false)
 
-    const itemsPerPage: number = 12;
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalPage, setTotalPage] = useState<number>(0);
-    const [total, setTotal] = useState<number>(0);
+    const [selectedDate, setSelectedDate] = useState<string>(moment().format("YYYY-MM-DD"))
 
-    const [savedFilters, setSavedFilters] = useState<any>({})
 
-    const handleFilterChange = (filters: any) => {
-        setCurrentPage(1);
-        setSavedFilters(filters);
+    const handleFilterChange = (filters: IInitialBalancesFilters) => {
+        setShowBalancesReport(false)
+        setShowEntriesReport(false)
+        setShowOutputsReport(false)
+
+        setSelectedDate(filters.toDate || moment().format("YYYY-MM-DD"))
+
+        switch (filters.type) {
+            case 'entry':
+                setShowEntriesReport(true)
+                break;
+            case 'output':
+                setShowOutputsReport(true)
+                break;
+            case 'balance':
+                setShowBalancesReport(true)
+                break;
+        }
+
     };
 
     return (
         <>
-            <InventariosLayout filtro
-                onFilter={() => setShowFiltro(true)}
-                hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
-                swith switchDetails={[
-                    {
-                        isSelected: false,
-                        text: "Saldos iniciales",
-                        url: "/Finanzas/Inventarios/Valorados/Saldos"
-                    },
-                    {
-                        isSelected: true,
-                        text: "Reportes de inventario",
-                        url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
-                    },
-                ]}>
-                Reportes Inventarios
+            <InventariosLayout swith switchDetails={[
+                {
+                    isSelected: false,
+                    text: "Saldos iniciales",
+                    url: "/Finanzas/Inventarios/Valorados/Saldos"
+                },
+                {
+                    isSelected: true,
+                    text: "Reportes de inventario",
+                    url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
+                },
+            ]}>
+                <FiltrosReportesInventarios initialFilters={{}} onChange={handleFilterChange} />
             </InventariosLayout>
 
-
-            <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-                <FiltrosReportesInventarios initialFilters={savedFilters} onChange={handleFilterChange} />
+            <Modal isOpen={showBalancesReport} onClose={() => { setShowBalancesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
+                    Reporte saldos físicos valorados
+                </h2>
+                <BalancesReportModal toDate={selectedDate} />
             </Modal>
         </>
     )

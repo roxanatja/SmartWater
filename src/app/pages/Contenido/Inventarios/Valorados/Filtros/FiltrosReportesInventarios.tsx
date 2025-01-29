@@ -3,8 +3,9 @@ import { useContext, useEffect } from "react";
 import moment from "moment";
 import { motion } from "framer-motion";
 import { InventariosValoradosContext } from "../InventariosValoradosProvider";
+import Input from "../../../../EntryComponents/Inputs";
 
-interface IInitialBalancesFilters {
+export interface IInitialBalancesFilters {
     toDate: string | null;
     type: string | null
 }
@@ -18,10 +19,10 @@ const FiltrosReportesInventarios = ({
     onChange,
     initialFilters
 }: {
-    onChange: (filters: any) => void;
+    onChange: (filters: IInitialBalancesFilters) => void;
     initialFilters: any;
 }) => {
-    const { register, handleSubmit, setValue } = useForm<IInitialBalancesFilters>({
+    const { register, handleSubmit, setValue, formState: { isValid }, reset } = useForm<IInitialBalancesFilters>({
         defaultValues: initialState || {},
     });
 
@@ -39,76 +40,52 @@ const FiltrosReportesInventarios = ({
     const { setShowFiltro } = useContext(InventariosValoradosContext);
 
     const onSubmit = (data: IInitialBalancesFilters) => {
-        const filters = filterClients(data);
-        onChange(filters);
+        onChange(data);
         setShowFiltro(false);
-    };
-
-    const filterClients = (filters: IInitialBalancesFilters): any => {
-        const result: any = {}
-
-        if (filters.toDate) { result.finalDate = filters.toDate.toString() }
-        if (filters.type) { result.type = filters.type }
-
-        return result
+        reset()
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-2">
-            <div className="flex flex-col sm:flex-row mb-4">
-                <div className="flex-1">
-                    <div className="FiltroClientes-Fechastitulo mb-2">
-                        <span className="text-blue_custom font-semibold">Fechas</span>
-                    </div>
-                    <div className="flex gap-3 flex-wrap">
-                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                            <span className="text-left text-sm">A</span>
-                            <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                            <input
-                                max={moment().format("YYYY-MM-DD")}
-                                type="date"
-                                {...register("toDate")}
-                                className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
+        <form onSubmit={handleSubmit(onSubmit)} className="px-3 py-1 flex gap-8 flex-col sm:flex-row items-center mb-6">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.3 }}
-                className="w-full flex flex-col gap-2"
+                className="w-full sm:w-1/3 flex flex-col gap-2"
             >
-                <label>Tipo</label>
-                <select {...register("type")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
+                <select {...register("type", {
+                    required: "Seleccione un tipo"
+                })} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
                     <option value="">Seleccione un tipo</option>
-                    <option value="in">Entradas físico valorado</option>
-                    <option value="out">Salidas físico valorado</option>
+                    <option value="entry">Entradas físico valorado</option>
+                    <option value="output">Salidas físico valorado</option>
                     <option value="balance">Saldos físicos valorados</option>
                 </select>
             </motion.div>
 
-            <div className="flex justify-between w-full items-center gap-3 px-4">
-                <button
-                    type="button"
-                    onClick={() => {
-                        setShowFiltro(false);
-                        onChange({});
-                    }}
-                    className="mt-4 border-blue-500 border-2 rounded-full px-4 py-2.5 shadow-xl text-blue-500 font-bold w-full"
-                >
-                    Quitar Filtros
-                </button>
-                <button
-                    type="submit"
-                    className="mt-4 bg-blue-500 border-2 border-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold"
-                >
-                    Aplicar Filtros
-                </button>
-            </div>
+            <Input
+                required
+                max={moment().format("YYYY-MM-DD")}
+                type="date"
+                label="Fecha de apertura"
+                isVisibleLable
+                containerClassName="flex-1"
+                iconContainerClassName="!border-0 !ps-1"
+                name="toDate"
+                register={register}
+                className="full-selector bg-transparent w-full h-[45px]"
+                icon={<img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />}
+            />
+
+
+            <button
+                type="submit"
+                disabled={!isValid}
+                className="bg-blue-500 shadow-xl text-white rounded-full px-4 py-2.5 w-full font-bold flex-1 disabled:bg-gray-400"
+            >
+                Generar
+            </button>
         </form >
     )
 }

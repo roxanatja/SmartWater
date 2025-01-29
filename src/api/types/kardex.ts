@@ -16,7 +16,7 @@ export interface IInitialBalanceBody {
             item?: string;
             quantity: number;
             inputImport: number;
-        };
+        }[];
     }
 }
 

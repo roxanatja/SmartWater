@@ -1,5 +1,4 @@
 import { BalanceReport, KardexDetail, MatchedElement } from "../../type/Kardex";
-import { QueryMetadata } from "../types/common";
 import { IInitialBalanceBody, IKardexDetailGetParams, IOtherEntryBody, IOtherOutputBody } from "../types/kardex";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
@@ -16,7 +15,7 @@ export abstract class KardexApiConector {
         }
     }
 
-    static async reportBalance(): Promise<{ balances: BalanceReport } & QueryMetadata | null> {
+    static async reportBalance(): Promise<{ balances: BalanceReport } | null> {
         try {
             const res = await ApiConnector.getInstance().get(`${this.root_path}/report-balance`)
             return res.data
@@ -25,7 +24,7 @@ export abstract class KardexApiConector {
         }
     }
 
-    static async reportDetails(params: IKardexDetailGetParams): Promise<{ balances: KardexDetail[] } & QueryMetadata | null> {
+    static async reportDetails(params: IKardexDetailGetParams): Promise<{ balances: KardexDetail[] } | null> {
         const query = generateQueryString(params)
 
         try {

@@ -52,7 +52,15 @@ export type MatchedElement = {
     priceBusiness?: string | number;
     category?: CategoryProduct;
     unitMeasure?: UnitMeasure;
-    matchingItems?: any[];
+    matchingItems?: {
+        _id: string;
+        name: string;
+        description?: string;
+        imageUrl?: string;
+        updated?: string;
+        category?: string;
+        unitMeasure?: string;
+    }[];
     isProduct: boolean | null;
     hasItemMatch?: boolean;
     type: "product" | "item";
