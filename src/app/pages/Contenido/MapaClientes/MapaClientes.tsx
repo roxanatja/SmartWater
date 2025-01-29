@@ -5,9 +5,9 @@ import "./MapaClientes.css";
 import { RegistrarNuevo } from "./RegistrarNuevo/RegistrarNuevo";
 import { MapaClientesContext } from "./MapaClientesContext";
 import GoogleMaps from "../../components/GoogleMaps/GoogleMaps";
-import { loadClients } from "../../../../services/ClientsService";
 import { Client } from "../../../../type/Cliente/Client";
 import FiltroClientes from "../Reportes/ReportesIngresos/FiltroClientes/FiltroClientes";
+import { ClientsApiConector } from "../../../../api/classes";
 
 const MapaClientes: React.FC = () => {
   const { showMiniModal, setShowMiniModal, showFiltro, setShowFiltro } =
@@ -28,8 +28,8 @@ const MapaClientes: React.FC = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const clientsData = await loadClients();
-        setClients(clientsData.data);
+        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } });
+        setClients(clientsData?.data || []);
       } catch (error) {
         console.error("Error fetching clients:", error);
       }

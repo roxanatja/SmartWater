@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import GetApiMethod from "../../../../../../Class/api.class";
-import { Zone } from "../../../../../../Class/types.data";
 import { Client } from "../../../../../../type/Cliente/Client";
 import { Contador } from "../../../../components/Contador/Contador";
 import { ReportesIngresosContext } from "../ReportesIngresosContext";
 import "./FiltroClientes.css";
+import { ZonesApiConector } from "../../../../../../api/classes";
+import { Zone } from "../../../../../../type/City";
 
 const FiltroClientes = ({
   clients,
@@ -23,9 +23,8 @@ const FiltroClientes = ({
   });
 
   const getData = useCallback(async () => {
-    const api = new GetApiMethod();
     return setData({
-      zones: await api.getZone(),
+      zones: (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
     });
   }, []);
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "./PedidosResumido.css";
-import { GetProducts } from "../../../../../services/ProductsService";
-import { ClientsApiConector, OrdersApiConector } from "../../../../../api/classes";
+import { ClientsApiConector, OrdersApiConector, ProductsApiConector } from "../../../../../api/classes";
 import { Order } from "../../../../../type/Order/Order";
 import Modal from "../../../EntryComponents/Modal";
 import { CuadroRealizarPedido } from "../../../components/CuadroRealizarPedido/CuadroRealizarPedido";
@@ -17,7 +16,7 @@ const PedidosResumido = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsData = await GetProducts();
+        const productsData = await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } });
         const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 4 } });
 
         const ordersPopulated: Order[] = []
@@ -27,7 +26,7 @@ const PedidosResumido = () => {
           ordersPopulated.push({ ...order, client })
         }
 
-        setProducts(productsData.data);
+        setProducts(productsData?.data || []);
         setOrders(ordersPopulated);
       } catch (error) {
         console.error("Error fetching data:", error);
