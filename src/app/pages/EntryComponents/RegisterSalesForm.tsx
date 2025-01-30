@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import Product from "../../../type/Products/Products";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -12,6 +11,9 @@ import { AuthService } from "../../../api/services/AuthService";
 import { useNavigate } from "react-router-dom";
 import { Sale } from "../../../type/Sale/Sale";
 import { useGlobalContext } from "../../SmartwaterContext";
+import DecimalOptionScroll from "../components/OptionScrooll/DecimalOptionScroll";
+import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionScroll";
+import { SelectableOptionScrooll } from "../components/OptionScrooll/SelectableOptionScrooll";
 
 const RegisterSalesForm = ({ selectedClient, selectedSale }: {
   selectedClient: Client;
@@ -27,6 +29,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
   const [editar, setEditar] = useState<{
     quantity: number;
     item: number;
+    price: number;
     index: number;
   } | null>(null);
 
@@ -75,7 +78,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
       setAddedProducts([]);
 
       navigate("/Ventas", { replace: true })
-      window.location.reload()
+      // window.location.reload()
     } else {
       toast.error("Upss error al registrar venta");
     }
@@ -242,15 +245,19 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
             <p>Precio</p>
           </div>
           <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-3 rounded-b-2xl w-full py-20 gap-10">
-            <OptionScrooll
-              options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+            <NumericOptionScrooll
+              numeric={{
+                isDecimal: false,
+                min: 1,
+                max: 100
+              }}
               value={editar?.quantity}
               className="text-md"
               onOptionChange={(selectedOption) =>
                 setValue(`detail.0.quantity`, parseInt(selectedOption))
               }
             />
-            <OptionScrooll
+            <SelectableOptionScrooll
               options={products ? products.map((product) => product.name) : []}
               className="text-md text-nowrap"
               value={editar?.item}
@@ -266,18 +273,13 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
                 }
               }}
             />
-            <OptionScrooll
-              options={
-                products && watch(`detail.0.product`)
-                  ? products
-                    .filter((x) => x.name === watch(`detail.0.product`))
-                    .map((product) => product.price.toString())
-                  : []
-              }
+            <DecimalOptionScroll
+              value={editar?.price || ((products && watch(`detail.0.product`)) ? (!!products.find((x) => x.name === watch(`detail.0.product`)) ? Number(products.find((x) => x.name === watch(`detail.0.product`))!.price) : 0) : 0)}
               className="text-md"
+              max={10000}
+              min={0}
               onOptionChange={(selectedOption) => {
-                const priceValue = parseFloat(selectedOption);
-                setValue(`detail.0.price`, priceValue.toString());
+                setValue(`detail.0.price`, selectedOption);
               }}
             />
           </div>
@@ -335,6 +337,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
 
                           console.log(indepro)
                           setEditar({
+                            price: Number(product.price),
                             quantity: Number(product.quantity) - 1,
                             item: indepro,
                             index,
@@ -356,7 +359,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
               </div>
 
               <div className="mt-2 flex justify-end gap-2 items-center bg-blocks dark:border-blocks shadow-md border shadow-zinc-300/25 rounded-2xl py-2 px-6">
-                Total: <span className="text-blue_custom">{addedProducts.reduce((acc, p) => acc += (parseFloat(p.price) * p.quantity), 0)} Bs</span>
+                Total: <span className="text-blue_custom">{addedProducts.reduce((acc, p) => acc += (parseFloat(p.price) * p.quantity), 0).toFixed(2)} Bs</span>
               </div>
             </div>
           }

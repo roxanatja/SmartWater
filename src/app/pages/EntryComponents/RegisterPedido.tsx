@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Product from "../../../type/Products/Products";
-import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-hot-toast";
@@ -19,6 +18,8 @@ import { User } from "../../../type/User";
 import { Order } from "../../../type/Order/Order";
 import { useGlobalContext } from "../../SmartwaterContext";
 import moment from "moment";
+import { SelectableOptionScrooll } from "../components/OptionScrooll/SelectableOptionScrooll";
+import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionScroll";
 
 const RegisterPedidoForm = ({
   isNoClient,
@@ -29,7 +30,6 @@ const RegisterPedidoForm = ({
   selectedClient: Client;
   selectedOrder?: Order;
 }) => {
-  const Cantidad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const [products, setProducts] = useState<Product[]>([]);
   const [mapview, setMapview] = useState(true);
   const [active, setActive] = useState(false);
@@ -358,19 +358,25 @@ const RegisterPedidoForm = ({
               <p>Producto</p>
             </div>
             <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
-              <OptionScrooll
+              <NumericOptionScrooll
+                numeric={{
+                  isDecimal: false,
+                  min: 1,
+                  max: 100
+                }}
                 value={editar?.quantity}
-                options={Cantidad}
+                className="text-md"
                 onOptionChange={(selectedOption) =>
                   handleOptionChange(selectedOption, "quantity")
                 }
               />
-              <OptionScrooll
+              <SelectableOptionScrooll
+                options={products ? products.map((product) => product.name) : []}
+                className="text-md text-nowrap"
                 value={editar?.item}
-                options={products.map((product) => product.name)}
-                onOptionChange={(selectedOption) =>
+                onOptionChange={(selectedOption) => {
                   handleOptionChange(selectedOption, "product")
-                }
+                }}
               />
             </div>
 

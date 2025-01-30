@@ -9,8 +9,10 @@ import { AuthService } from '../../../../../api/services/AuthService';
 import { UserData } from '../../../../../type/UserData';
 import { OrdersApiConector, ProductsApiConector, SalesApiConector } from '../../../../../api/classes';
 import { motion } from 'framer-motion';
-import { OptionScrooll } from '../../../components/OptionScrooll/OptionScrooll';
 import { useGlobalContext } from '../../../../SmartwaterContext';
+import { NumericOptionScrooll } from '../../../components/OptionScrooll/NumericOptionScroll';
+import { SelectableOptionScrooll } from '../../../components/OptionScrooll/SelectableOptionScrooll';
+import DecimalOptionScroll from '../../../components/OptionScrooll/DecimalOptionScroll';
 
 const RegistrarVentasPedidosForm = () => {
     const { selectedClient, selectedOrder } = useContext(PedidosContext)
@@ -26,6 +28,7 @@ const RegistrarVentasPedidosForm = () => {
         quantity: number;
         item: number;
         index: number;
+        price: number;
     } | null>(null);
 
     const { register, handleSubmit, watch, setValue, reset } =
@@ -228,15 +231,19 @@ const RegistrarVentasPedidosForm = () => {
                         <p>Precio</p>
                     </div>
                     <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-3 rounded-b-2xl w-full py-20 gap-10">
-                        <OptionScrooll
-                            options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+                        <NumericOptionScrooll
+                            numeric={{
+                                isDecimal: false,
+                                min: 1,
+                                max: 100
+                            }}
                             value={editar?.quantity}
                             className="text-md"
                             onOptionChange={(selectedOption) =>
                                 setValue(`detail.0.quantity`, parseInt(selectedOption))
                             }
                         />
-                        <OptionScrooll
+                        <SelectableOptionScrooll
                             options={products ? products.map((product) => product.name) : []}
                             className="text-md text-nowrap"
                             value={editar?.item}
@@ -252,18 +259,13 @@ const RegistrarVentasPedidosForm = () => {
                                 }
                             }}
                         />
-                        <OptionScrooll
-                            options={
-                                products && watch(`detail.0.product`)
-                                    ? products
-                                        .filter((x) => x.name === watch(`detail.0.product`))
-                                        .map((product) => product.price.toString())
-                                    : []
-                            }
+                        <DecimalOptionScroll
+                            value={editar?.price || ((products && watch(`detail.0.product`)) ? (!!products.find((x) => x.name === watch(`detail.0.product`)) ? Number(products.find((x) => x.name === watch(`detail.0.product`))!.price) : 0) : 0)}
                             className="text-md"
+                            max={10000}
+                            min={0}
                             onOptionChange={(selectedOption) => {
-                                const priceValue = parseFloat(selectedOption);
-                                setValue(`detail.0.price`, priceValue.toString());
+                                setValue(`detail.0.price`, selectedOption);
                             }}
                         />
                     </div>
@@ -321,6 +323,7 @@ const RegistrarVentasPedidosForm = () => {
 
                                                     console.log(indepro)
                                                     setEditar({
+                                                        price: Number(product.price),
                                                         quantity: Number(product.quantity) - 1,
                                                         item: indepro,
                                                         index,
