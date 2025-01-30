@@ -116,16 +116,12 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
 
                             <Input
                                 label="Costo unitario"
-                                lang="en"
                                 name="inputImport"
                                 register={register}
-                                type="number"
-                                min={0}
-                                step={0.01}
-                                className="no-spinner"
                                 sufix={<span>Bs</span>}
                                 errors={errors.inputImport}
                                 required
+                                numericalOnly
                                 containerClassName='flex-1'
                                 validateAmount={(val: number) => val > 0 ? true : "El costo debe ser mayor que 0"}
                             />

@@ -239,7 +239,7 @@ const RegistroEyG = () => {
                 />
             </Modal>
 
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} className='!w-3/4 sm:!w-1/2 xl:!w-1/3'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro de egresos y gastos
                 </h2>
@@ -247,6 +247,7 @@ const RegistroEyG = () => {
             </Modal>
 
             <Modal
+                className='!w-3/4 sm:!w-1/2 xl:!w-1/3'
                 isOpen={selectedExpense._id !== "" && selectedOption}
                 onClose={() => { setSelectedExpense(expense); setSelectedOption(false) }}
             >

@@ -242,7 +242,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
         name="documentNumber"
         register={register}
         errors={errors.documentNumber}
-        required
+        required={(!!watch('hasInVoice') || !!watch('hasReceipt'))}
       />
 
       <Input
