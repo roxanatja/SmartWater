@@ -24,15 +24,14 @@ const ArqueoDeCaja: FC = () => {
   const { setLoading } = useGlobalContext()
 
   const getData = useCallback(async () => {
-    console.log("reloading", justCrated)
     const res = await CashRegisterApiConector.get({}) || []
 
     if (justCrated) {
       setSelectedTransaction(res.find(r => r._id === justCrated))
       setJustCreated(null)
-      setLoading(false)
     }
 
+    setLoading(false)
     return setArqueos(res);
   }, [justCrated, setSelectedTransaction, setLoading]);
 
@@ -78,14 +77,33 @@ const ArqueoDeCaja: FC = () => {
     }
 
     if (res) {
-      console.log(res)
-      if (typeof res.cashRegister === 'object' && 'error' in res.cashRegister) {
-        toast.error(res.cashRegister.error);
-        setLoading(false)
+      if (data.endDate) {
+        if (res) {
+          if ('arqueo' in res) {
+            setJustCreated(res.arqueo?._id || "")
+            reset()
+            if ('message' in res) {
+              toast.success(res.message);
+            } else {
+              toast.success("Arqueo de caja creado");
+            }
+          } else {
+            toast.error("Upps error al guardar el arqueo de caja");
+            setLoading(false)
+          }
+        } else {
+          toast.error("Upps error al guardar el arqueo de caja");
+          setLoading(false)
+        }
       } else {
-        toast.success("Arqueo de caja creado");
-        setJustCreated(res.cashRegister)
-        reset()
+        if (typeof res.cashRegister === 'object' && 'error' in res.cashRegister) {
+          toast.error(res.cashRegister.error);
+          setLoading(false)
+        } else {
+          toast.success("Arqueo de caja creado");
+          setJustCreated(res.cashRegister)
+          reset()
+        }
       }
     } else {
       toast.error("Upps error al guardar el arqueo de caja");

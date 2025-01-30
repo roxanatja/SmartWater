@@ -37,7 +37,7 @@ export abstract class CashRegisterApiConector {
         }
     }
 
-    static async openClose(params: IRegistersOpenCloseBody): Promise<{ id: string } | null> {
+    static async openClose(params: IRegistersOpenCloseBody): Promise<{ arqueo: Transaction, message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().post(`${this.root_path}/open-close`, params.data)
             return res.data
