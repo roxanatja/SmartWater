@@ -66,4 +66,32 @@ export type MatchedElement = {
     type: "product" | "item";
     isItem: boolean | null;
     canSellAndLend: boolean;
+
+    productKardex?: {
+        _id: string;
+        user: string;
+        product: string;
+    }[];
+    itemKardex?: {
+        _id: string;
+        user: string;
+        item: string;
+    }[];
+    hasKardex: boolean;
+}
+
+export type EntryItemBody = {
+    product?: string;
+    item?: string;
+    quantity: number;
+    // unitPrice: number;
+    inputType: 'production_received' | 'adjustment_entry';
+}
+
+export type OutputItemBody = {
+    product?: string;
+    item?: string;
+    quantity: number;
+    // unitPrice: number;
+    outputType: 'production_delivered' | 'adjustment_exit';
 }

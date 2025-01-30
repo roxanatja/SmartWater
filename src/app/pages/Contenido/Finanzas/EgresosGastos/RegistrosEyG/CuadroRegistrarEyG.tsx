@@ -174,7 +174,7 @@ const CuadroRegistrarEyG = ({
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Documento</span>
-            <span>{expense.documentNumber}</span>
+            <span>{expense.hasInVoice ? "Factura" : expense.hasReceipt ? "Recibo" : "Sin documento"}</span>
           </div>
           <div className="RegistrosEyG-Cuadro1-text flex flex-col gap-4">
             <span>Comenatrios</span>

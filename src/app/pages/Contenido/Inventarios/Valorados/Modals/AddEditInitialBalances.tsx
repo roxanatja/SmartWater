@@ -1,5 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import { InventariosValoradosContext } from "../InventariosValoradosProvider";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IInitialBalanceBody } from "../../../../../../api/types/kardex";
 import { MatchedElement } from "../../../../../../type/Kardex";
@@ -7,8 +6,6 @@ import moment from "moment";
 import Input from "../../../../EntryComponents/Inputs";
 import React from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
-import { formatDateTime } from "../../../../../../utils/helpers";
-import { IMockInventories } from "../../mock-data";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import toast from "react-hot-toast";
@@ -19,10 +16,9 @@ interface Props {
 }
 
 const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
-    const { selectedInventario } = useContext(InventariosValoradosContext)
     const [active, setActive] = useState(false);
 
-    const { register, formState: { errors, isValid }, handleSubmit, watch, setValue } = useForm<IInitialBalanceBody['data']>({
+    const { register, formState: { errors, isValid }, handleSubmit } = useForm<IInitialBalanceBody['data']>({
         defaultValues: {
             elements: elemnts.map(e => ({
                 product: e.isProduct ? e._id : undefined,

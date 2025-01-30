@@ -10,6 +10,8 @@ import Product from '../../../../../type/Products/Products';
 import { Item } from '../../../../../type/Item';
 import { ItemsApiConector, ProductsApiConector } from '../../../../../api/classes';
 import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
+import { MatchedElement } from '../../../../../type/Kardex';
+import { KardexApiConector } from '../../../../../api/classes/kardex';
 
 const Ingresos = () => {
     const {
@@ -25,8 +27,7 @@ const Ingresos = () => {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
 
-    const [products, setProducts] = useState<Product[]>([])
-    const [items, setItems] = useState<Item[]>([])
+    const [elements, setElements] = useState<MatchedElement[]>([]);
 
     const [savedFilters, setSavedFilters] = useState<any>({})
 
@@ -36,8 +37,7 @@ const Ingresos = () => {
     };
 
     useEffect(() => {
-        ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setProducts(res?.data || []))
-        ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setItems(res?.data || []))
+        KardexApiConector.getKardexElements().then(res => setElements(res?.elements || []));
     }, [])
 
     return (
@@ -64,23 +64,23 @@ const Ingresos = () => {
                 <FiltrosEntradas initialFilters={savedFilters} onChange={handleFilterChange} />
             </Modal>
 
-            <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)}>
+            <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)} className='!w-3/4 md:!w-1/2 xl:!w-1/3'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro otros ingresos
                 </h2>
-                <OtrosIngresosForm onCancel={() => setShowMiniModal(false)} products={products} items={items} />
+                <OtrosIngresosForm onCancel={() => setShowMiniModal(false)} elements={elements} />
             </Modal>
 
             <Modal
                 isOpen={selectedInventario._id !== "" && showModal}
-                onClose={() => { setSelectedInvetario(otroInventario); setShowModal(false) }}
+                onClose={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} className='!w-3/4 md:!w-1/2'
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar otros ingresos
                 </h2>
-                <OtrosIngresosForm onCancel={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} products={products} items={items} />
+                <OtrosIngresosForm onCancel={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} elements={elements} />
             </Modal>
-
+            {/* 
             <Modal
                 isOpen={selectedInventario._id !== "" && selectedOption}
                 onClose={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }}
@@ -89,7 +89,7 @@ const Ingresos = () => {
                     Otros ingresos
                 </h2>
                 <OtrosIgresosDetails type='in' onCancel={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }} products={products} items={items} />
-            </Modal>
+            </Modal> */}
         </>
     )
 }
