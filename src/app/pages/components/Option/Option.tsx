@@ -3,10 +3,13 @@ import "./Option.css";
 
 interface OptionsMenuProps {
   visible: boolean;
+  details?: boolean;
   editar?: boolean;
   eliminar?: boolean;
   editarText?: string;
+  detailsText?: string;
   eliminarText?: string;
+  detailsAction?: () => void;
   editAction?: () => void;
   deleteAction?: () => void;
 }
@@ -19,11 +22,20 @@ const Option: FC<OptionsMenuProps> = ({
   eliminar,
   editarText,
   deleteAction,
+  details,
+  detailsAction,
+  detailsText
 }) => {
   return (
     <>
       {visible && (
         <div className="options-menu right-6 bg-main-background">
+          {details && (
+            <div onClick={detailsAction} className="option-item">
+              <i className="fa fa-eye"></i>
+              <span>{detailsText || "Ver detalles"}</span>
+            </div>
+          )}
           {editar && (
             <div onClick={editAction} className="option-item">
               <svg
