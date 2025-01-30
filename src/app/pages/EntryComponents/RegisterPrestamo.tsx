@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
@@ -16,6 +15,8 @@ import Input from "./Inputs";
 import { Loans } from "../../../type/Loans/Loans";
 import { useGlobalContext } from "../../SmartwaterContext";
 import moment from "moment";
+import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionScroll";
+import { SelectableOptionScrooll } from "../components/OptionScrooll/SelectableOptionScrooll";
 
 const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: Client; selectedLoan?: Loans }) => {
   const [products, setProducts] = useState<Item[] | null>(null);
@@ -191,21 +192,25 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
             <p>Item</p>
           </div>
           <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
-            <OptionScrooll
-              options={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+            <NumericOptionScrooll
+              numeric={{
+                isDecimal: false,
+                min: 1,
+                max: 100
+              }}
               value={editar?.quantity}
+              className="text-md"
               onOptionChange={(selectedOption) =>
                 handleOptionChange(selectedOption, "quantity")
               }
             />
-            <OptionScrooll
-              options={
-                products ? products.map((product) => product.name) : []
-              }
+            <SelectableOptionScrooll
+              options={products ? products.map((product) => product.name) : []}
+              className="text-md text-nowrap"
               value={editar?.item}
-              onOptionChange={(selectedOption) =>
+              onOptionChange={(selectedOption) => {
                 handleOptionChange(selectedOption, "item")
-              }
+              }}
             />
           </div>
 

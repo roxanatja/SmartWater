@@ -10,6 +10,8 @@ import { UserData } from "../../../type/UserData";
 import { IDevolutionBody } from "../../../api/types/devolutions";
 import { AuthService } from "../../../api/services/AuthService";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector, ProductsApiConector } from "../../../api/classes";
+import { SelectableOptionScrooll } from "../components/OptionScrooll/SelectableOptionScrooll";
+import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionScroll";
 
 const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
   const [products, setProducts] = useState<Loans['detail']>([]);
@@ -392,21 +394,26 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
                     <p>Producto</p>
                   </div>
                   <div className="bg-gradient-to-b from-transparentLight via-customLightBlue to-customBlue grid grid-cols-2 rounded-b-2xl w-full py-20 gap-10">
-                    <OptionScrooll
-                      value={(watch('detail')[0]?.quantity || 0) - 1}
+                    <NumericOptionScrooll
+                      numeric={{
+                        isDecimal: false,
+                        min: Number(quantityOptions[0]),
+                        max: Number(quantityOptions[-1])
+                      }}
                       options={quantityOptions}
+                      value={(watch('detail')[0]?.quantity || 0) - 1}
+                      className="text-md"
                       onOptionChange={(selectedOption) =>
                         handleOptionChange(selectedOption, "quantity")
                       }
                     />
-                    <OptionScrooll
+                    <SelectableOptionScrooll
+                      options={products ? products.map((product) => product.name) : []}
+                      className="text-md text-nowrap"
                       value={products.findIndex(p => p.name === watch('detail')[0]?.item)}
-                      options={
-                        products ? products.map((product) => product.name) : []
-                      }
-                      onOptionChange={(selectedOption) =>
+                      onOptionChange={(selectedOption) => {
                         handleOptionChange(selectedOption, "item")
-                      }
+                      }}
                     />
                   </div>
                   <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
