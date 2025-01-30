@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { Account } from "../../../../../type/AccountEntry";
 import { Expense } from "../../../../../type/Expenses";
+import { user } from "../../Configuracion/Usuarios/UsuariosContext";
 
 type EgresosGastosContextType = {
     showModal: boolean;
@@ -26,7 +27,7 @@ export const account: Account = { _id: "", created: "", desactivated: false, des
 export const expense: Expense = {
     _id: "",
     created: "",
-    accountEntry: "",
+    accountEntry: account,
     amount: 0,
     comment: "",
     creditBuy: false,
@@ -35,7 +36,12 @@ export const expense: Expense = {
     paymentMethodCurrentAccount: false,
     provider: undefined,
     updated: "",
-    user: ""
+    user: user,
+    hasReceipt: false,
+    items: [],
+    itemsTotal: 0,
+    products: [],
+    productsTotal: 0
 }
 
 export const EgresosGastosProvider = ({ children }: any) => {

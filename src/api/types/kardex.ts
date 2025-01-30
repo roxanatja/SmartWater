@@ -15,7 +15,7 @@ export interface IInitialBalanceBody {
             product?: string;
             item?: string;
             quantity: number;
-            inputImport: number;
+            unitPrice: number;
         }[];
     }
 }
@@ -33,7 +33,7 @@ export interface IOthersBody {
         item?: string;
         quantity: number;
         unitPrice: number;
-    };
+    }[];
     registerDate: string;
 }
 
@@ -43,4 +43,36 @@ export interface IOtherEntryBody extends IOthersBody {
 
 export interface IOtherOutputBody extends IOthersBody {
     outputType: 'production_delivered' | 'adjustment_exit';
+}
+
+export interface IOthersEntryMoreBody {
+    user: string;
+    comment: string;
+    documentNumber: string;
+    elementsDetails: {
+        elements: {
+            product?: string;
+            item?: string;
+            quantity: number;
+            unitPrice?: number;
+        }[];
+        inputType: 'production_received' | 'adjustment_entry';
+    }[]
+    registerDate: string;
+}
+
+export interface IOthersOutputMoreBody {
+    user: string;
+    comment: string;
+    documentNumber: string;
+    elementsDetails: {
+        elements: {
+            product?: string;
+            item?: string;
+            quantity: number;
+            unitPrice?: number;
+        }[];
+        outputType: 'production_delivered' | 'adjustment_exit';
+    }[]
+    registerDate: string;
 }

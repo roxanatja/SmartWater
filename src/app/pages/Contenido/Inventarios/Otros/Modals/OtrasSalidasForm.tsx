@@ -2,148 +2,148 @@ import { useContext, useState } from "react"
 import { InventariosOtrosContext } from "../InventariosOtrosProvider"
 import { useForm } from "react-hook-form"
 import { IMockInOuts } from "../../mock-data"
-import Product from "../../../../../../type/Products/Products";
-import { Item } from "../../../../../../type/Item";
 import Input from "../../../../EntryComponents/Inputs";
 import { motion } from "framer-motion"
 import moment from "moment";
+import { MatchedElement, OutputItemBody } from "../../../../../../type/Kardex";
+import { AuthService } from "../../../../../../api/services/AuthService";
+import { IOthersOutputMoreBody } from "../../../../../../api/types/kardex";
+import { KardexApiConector } from "../../../../../../api/classes/kardex";
+import toast from "react-hot-toast";
+import InventoriesOutputForm from "./InventoriesOutputForm";
 
 interface Props {
     onCancel?: () => void;
-    products: Product[];
-    items: Item[];
+    elements: MatchedElement[]
 }
 
-const OtrasSalidasForm = ({ items, products, onCancel }: Props) => {
-    const { selectedInventario } = useContext(InventariosOtrosContext)
+type FormType = {
+    comment: string;
+    documentNumber: string;
+    registerDate: string;
+}
+
+const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
+    // const { selectedInventario } = useContext(InventariosOtrosContext)
     const [active, setActive] = useState(false);
 
-    const { register, formState: { errors, isValid }, handleSubmit } = useForm<IMockInOuts>({
-        defaultValues: {
-            ...selectedInventario,
-            initialDate: moment(selectedInventario.initialDate).format("YYYY-MM-DD")
-        },
+    const { register, formState: { errors, isValid }, handleSubmit } = useForm<FormType>({
+        defaultValues: {},
         mode: 'all'
     })
 
-    const onSubmit = (data: IMockInOuts) => {
-        console.log(selectedInventario._id !== "" ? "Editing" : "Adding")
-        console.log(data)
+    const [inventories, setInventories] = useState<OutputItemBody[]>([])
 
-        // let res = null
-        // setActive(true)
+    const onSubmit = async (data: FormType) => {
+        const userData = AuthService.getUser()
+
+        const reduced = inventories.reduce<{ [key: string]: IOthersOutputMoreBody['elementsDetails'][0]['elements'] }>((acc, prev) => {
+            const entity: IOthersOutputMoreBody['elementsDetails'][0]['elements'][0] = {
+                quantity: prev.quantity,
+                // unitPrice: prev.unitPrice,
+            }
+            if (prev.item) {
+                entity.item = prev.item
+            }
+            if (prev.product) {
+                entity.product = prev.product
+            }
+
+            if (acc[prev.outputType]) {
+                acc[prev.outputType].push(entity)
+            } else {
+                acc[prev.outputType] = [entity]
+            }
+
+            return acc
+        }, {})
+
+        const requestBody: IOthersOutputMoreBody = {
+            comment: data.comment,
+            documentNumber: data.documentNumber,
+            registerDate: data.registerDate,
+            user: userData?._id || '',
+            elementsDetails: Object.keys(reduced).map(k => ({
+                outputType: k as IOthersOutputMoreBody['elementsDetails'][0]['outputType'],
+                elements: reduced[k]
+            }))
+        }
+
+        let res = null
+        setActive(true)
 
         // if (selectedItem._id !== "") {
         //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
         // } else {
-        //     res = await ItemsApiConector.create({ data })
+        res = await KardexApiConector.registerOutputMore({ data: requestBody });
         // }
 
-        // if (res) {
-        //     toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-        //     window.location.reload();
-        // } else {
-        //     toast.error("Upps error al crear el item", { position: "bottom-center" });
-        //     setActive(false)
-        // }
+        if (res) {
+            // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            toast.success(`Salida registrada correctamente`, { position: "bottom-center" });
+            window.location.reload();
+        } else {
+            toast.error("Upps error al registrar la salida", { position: "bottom-center" });
+            setActive(false)
+        }
     }
+
+    const onAddElements = (val: OutputItemBody, index: number = -1) => {
+        if (index > -1) {
+            const updateElements = [...inventories]
+            updateElements[index] = val
+            setInventories(updateElements)
+        } else {
+            const idx = inventories.findIndex(i => val.product ? i.product === val.product : i.item === val.item);
+            if (idx !== -1) {
+                setInventories(prev => prev.map(i => {
+                    if ((!!val.product && i.product === val.product) || (!!val.item && i.item === val.item)) {
+                        // return { ...i, unitPrice: val.unitPrice, quantity: val.quantity, inputType: val.inputType }
+                        return { ...i, quantity: val.quantity, inputType: val.outputType }
+                    } else {
+                        return i
+                    }
+                }))
+            } else {
+                setInventories([...inventories, val])
+            }
+        }
+    }
+
+    const handleDeleteElement = (index: number) => {
+        setInventories(inventories.filter((_, i) => i !== index));
+    };
 
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-6 justify-center items-center w-full p-6"
-        >
-            <Input
-                required
-                max={moment().format("YYYY-MM-DD")}
-                type="date"
-                label="Fecha"
-                labelClassName="text-blue_custom text-md font-semibold"
-                iconContainerClassName="!border-0 !ps-1"
-                name="initialDate"
-                register={register}
-                errors={errors.initialDate}
-                className="full-selector bg-transparent w-full"
-                icon={<img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />}
-            />
-
-            <div className="flex gap-6 items-start w-full flex-col md:flex-row">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full md:w-1/3 flex flex-col gap-2"
-                >
-                    <label>Tipo de ingreso</label>
-                    <select
-                        {...register("type", {
-                            required: "Debes seleccionar un tipo"
-                        })}
-                        className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
-                    >
-                        <option value="production">Salida a producción</option>
-                        <option value="fixing">Salida por ajuste</option>
-                    </select>
-                    {errors.type && (
-                        <span className="text-red-500 font-normal text-sm font-pricedown">
-                            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                            {errors.type.message}
-                        </span>
-                    )}
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="w-full md:w-1/3 flex flex-col gap-2"
-                >
-                    <label>Producto o item</label>
-                    <select
-                        {...register("item", {
-                            required: "Debes seleccionar uno"
-                        })}
-                        className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
-                    >
-                        <option value="">Selccione uno</option>
-                        <optgroup label="Productos">
-                            {
-                                products.map((row, index) => (
-                                    <option value={row._id} key={index}>
-                                        {row.name}
-                                    </option>
-                                ))
-                            }
-                        </optgroup>
-                        <optgroup label="Items">
-                            {
-                                items.map((row, index) => (
-                                    <option value={row._id} key={index}>
-                                        {row.name}
-                                    </option>
-                                ))
-                            }
-                        </optgroup>
-                    </select>
-                    {errors.item && (
-                        <span className="text-red-500 font-normal text-sm font-pricedown">
-                            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
-                            {errors.item.message}
-                        </span>
-                    )}
-                </motion.div>
+        ><div className="flex gap-4 justify-between text-sm flex-wrap w-full">
                 <Input
-                    type="number"
-                    className="no-spinner"
-                    min={0}
-                    label="Cantidad"
-                    name="quantity"
+                    required
+                    max={moment().format("YYYY-MM-DD")}
+                    type="date"
+                    label="Fecha"
+                    iconContainerClassName="!border-0 !ps-1"
+                    name="registerDate"
                     register={register}
-                    errors={errors.quantity}
-                    validateAmount={(val: number) => val <= 0 ? "Indica un valor" : true}
+                    errors={errors.registerDate}
+                    containerClassName="flex-1"
+                    className="full-selector bg-transparent w-full"
+                    icon={<img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />}
+                />
+
+                <Input
+                    containerClassName="flex-1"
+                    label="Número de documento"
+                    name="documentNumber"
+                    required
+                    register={register}
+                    errors={errors.documentNumber}
                 />
             </div>
+
+            <InventoriesOutputForm elements={elements} handleDeleteElement={handleDeleteElement} inventories={inventories} updateDetails={onAddElements} />
 
             <Input
                 rows={3}
@@ -171,7 +171,8 @@ const OtrasSalidasForm = ({ items, products, onCancel }: Props) => {
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
                             <>
-                                {selectedInventario._id !== "" ? "Editar" : "Registrar"}
+                                Registrar
+                                {/* {selectedInventario._id !== "" ? "Editar" : "Registrar"} */}
                             </>
                         )}
                     </button>

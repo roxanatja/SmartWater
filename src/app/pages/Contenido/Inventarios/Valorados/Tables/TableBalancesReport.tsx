@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { KardexElement } from '../../../../../../type/Kardex'
 import Modal from '../../../../EntryComponents/Modal';

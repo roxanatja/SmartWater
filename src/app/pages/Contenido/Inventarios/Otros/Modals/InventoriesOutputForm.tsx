@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { IExpenseDetailsBody } from "../../../../../../api/types/expenses"
-import { MatchedElement } from "../../../../../../type/Kardex";
+import { OutputItemBody, MatchedElement } from "../../../../../../type/Kardex";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import Input from "../../../../EntryComponents/Inputs";
 
 interface Props {
-    updateDetails: (val: IExpenseDetailsBody['data']['details'][0], index?: number) => void;
+    updateDetails: (val: OutputItemBody, index?: number) => void;
     handleDeleteElement: (index: number) => void;
     elements: MatchedElement[];
-    inventories: IExpenseDetailsBody['data']['details']
+    inventories: OutputItemBody[]
 }
 
-const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, inventories }: Props) => {
+const InventoriesOutputForm = ({ elements, updateDetails, handleDeleteElement, inventories }: Props) => {
     const [isOpen, setIsOpen] = useState<boolean>(true)
     const [edit, setEdit] = useState<number>(-1)
 
-    const { register, setValue, formState: { errors, isValid }, getValues, reset } = useForm<IExpenseDetailsBody['data']['details'][0] & { element: string }>({
+    const { register, setValue, formState: { errors, isValid }, getValues, reset } = useForm<OutputItemBody & { element: string }>({
         mode: 'all'
     })
 
@@ -31,14 +30,15 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
             setValue('element', inv.product, { shouldValidate: true })
         }
 
-        setValue('inputImport', inv.inputImport, { shouldValidate: true })
+        // setValue('unitPrice', inv.unitPrice, { shouldValidate: true })
         setValue('quantity', inv.quantity, { shouldValidate: true })
     }
 
     const onSubmit = () => {
-        const res: IExpenseDetailsBody['data']['details'][0] = {
-            inputImport: parseFloat(String(getValues('inputImport'))),
-            quantity: parseFloat(String(getValues('quantity')))
+        const res: OutputItemBody = {
+            // unitPrice: parseFloat(String(getValues('unitPrice'))),
+            quantity: parseFloat(String(getValues('quantity'))),
+            outputType: getValues('outputType')
         }
 
         const elem = getValues('element')
@@ -52,13 +52,14 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
 
         updateDetails(res, edit)
         if (edit !== -1) { setEdit(-1) }
-        reset({ element: "", inputImport: 0, quantity: 0 })
+        // reset({ element: "", unitPrice: 0, quantity: 0, inputType: "production_received" })
+        reset({ element: "", quantity: 0, outputType: "production_delivered" })
     }
 
     return (
         <div className="w-full rounded-[15px] shadow dark:shadow-gray-300 p-4">
             <div className={`w-full flex justify-between cursor-pointer ${isOpen ? "border-b-2 pb-4 mb-4" : ""}`} onClick={() => setIsOpen(!isOpen)}>
-                <h4 className="text-sm font-semibold">Agregar inventarios</h4>
+                <h4 className="text-sm font-semibold">Agregar productos e items</h4>
                 <i className={`fa-solid fa-angle-down transition-all ${isOpen && "rotate-180"}`}></i>
             </div>
 
@@ -66,7 +67,31 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                 isOpen &&
                 <div className="flex flex-col gap-4 text-sm">
                     <div className="flex flex-col gap-4 text-sm">
-                        <div className="flex gap-4 justify-between text-sm flex-wrap">
+                        <div className="flex gap-4 justify-between text-sm">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="w-full md:w-1/3 flex flex-col gap-2"
+                            >
+                                <label>Tipo de salida</label>
+                                <select
+                                    {...register("outputType", {
+                                        required: "Debes seleccionar un tipo"
+                                    })}
+                                    className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
+                                >
+                                    <option value="production_received">Salida a producción</option>
+                                    <option value="adjustment_entry">Salida por ajuste</option>
+                                </select>
+                                {errors.outputType && (
+                                    <span className="text-red-500 font-normal text-sm font-pricedown">
+                                        <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                                        {errors.outputType.message}
+                                    </span>
+                                )}
+                            </motion.div>
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -97,7 +122,6 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                                     </span>
                                 )}
                             </motion.div>
-
                             <Input
                                 label="Cantidad"
                                 name="quantity"
@@ -113,19 +137,24 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                                     return val > 0 ? Number.isInteger(val) ? true : "La cantidad debe ser un número entero" : "La cantidad debe ser mayor que 0"
                                 }}
                             />
+                        </div>
+                        {/* <div className="flex gap-4 justify-between text-sm flex-wrap"> */}
 
-                            <Input
+                        {/* <Input
                                 label="Costo unitario"
-                                name="inputImport"
+                                name="unitPrice"
                                 register={register}
+                                type="number"
+                                min={0}
+                                step={0.01}
+                                className="no-spinner"
                                 sufix={<span>Bs</span>}
-                                errors={errors.inputImport}
+                                errors={errors.unitPrice}
                                 required
-                                numericalOnly
                                 containerClassName='flex-1'
                                 validateAmount={(val: number) => val > 0 ? true : "El costo debe ser mayor que 0"}
-                            />
-                        </div>
+                            /> */}
+                        {/* </div> */}
                         <button
                             type="button"
                             onClick={() => onSubmit()}
@@ -141,8 +170,7 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                     {
                         inventories.length > 0 &&
                         <>
-                            <h4 className="text-sm font-semibold">Lista de inventarios</h4>
-                            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="max-h-[300px] overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                                 {inventories.map((product, index) => (
                                     <motion.div
                                         key={index}
@@ -160,11 +188,11 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                                             </p>
                                             <div className="flex gap-1 items-start flex-col">
                                                 <p className="text-xs">Cantidad: {product.quantity}</p>
-                                                <p className="text-xs">Costo unitario: {product.inputImport.toLocaleString()}</p>
-                                                <p className="text-xs">Subtotal: {(product.inputImport * product.quantity).toLocaleString()}</p>
+                                                {/* <p className="text-xs">Precio unitario: {product.unitPrice.toLocaleString()}</p> */}
+                                                <p className="text-xs">{product.outputType === 'production_delivered' ? "Salida a producción" : "Salida por ajuste"}</p>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2 items-center flex-col pr-4">
+                                        <div className="flex gap-2 items-center flex-col pr-4 pt-2 h-full">
                                             <button
                                                 type="button"
                                                 className="text-blue_custom hover:text-blue-600"
@@ -182,7 +210,6 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
                                     </motion.div>
                                 ))}
                             </div>
-                            <div className="w-full text-end border-t pt-2"><span className="font-semibold">Total:</span> {inventories.reduce<number>((acc, curr) => acc += curr.inputImport * curr.quantity, 0)}</div>
                         </>
                     }
                 </div>
@@ -191,4 +218,4 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
     )
 }
 
-export default InventoriesForm
+export default InventoriesOutputForm

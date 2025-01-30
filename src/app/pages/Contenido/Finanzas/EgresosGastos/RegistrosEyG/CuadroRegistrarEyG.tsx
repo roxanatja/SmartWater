@@ -23,9 +23,8 @@ const CuadroRegistrarEyG = ({
   accounts?: Account[];
   isPayment?: boolean;
 }) => {
-  const user = users?.find((x) => x._id === expense.user);
   const [showOptions, setShowOptions] = useState<boolean>(false);
-  const { setSelectedExpense } = useContext(EgresosGastosContext);
+  const { setSelectedExpense, setSelectedOption, setShowMiniModal } = useContext(EgresosGastosContext);
 
   const optionsRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +35,13 @@ const CuadroRegistrarEyG = ({
   const Edit = () => {
     setSelectedExpense(expense);
     setShowOptions(false);
+    setSelectedOption(true);
+  };
+
+  const Details = () => {
+    setSelectedExpense(expense);
+    setShowOptions(false);
+    setShowMiniModal(true);
   };
 
   const Delete = async () => {
@@ -136,6 +142,8 @@ const CuadroRegistrarEyG = ({
                   <img src="/opcion-icon.svg" alt="" />
                 </button>
                 <Option
+                  details={expense.items.length > 0 || expense.products.length > 0}
+                  detailsAction={Details}
                   editAction={Edit}
                   visible={showOptions}
                   editar={true}
@@ -151,8 +159,7 @@ const CuadroRegistrarEyG = ({
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Tipo de gasto</span>
             <span>
-              {accounts?.find((x) => x._id === expense.accountEntry)?.name ||
-                "Cuenta no reconocida"}
+              {expense.accountEntry?.name || "Cuenta no reconocida"}
             </span>
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
@@ -167,7 +174,7 @@ const CuadroRegistrarEyG = ({
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Documento</span>
-            <span>{expense.documentNumber}</span>
+            <span>{expense.hasInVoice ? `Fac-${expense.documentNumber}` : expense.hasReceipt ? `Rec-${expense.documentNumber}` : "Sin documento"}</span>
           </div>
           <div className="RegistrosEyG-Cuadro1-text flex flex-col gap-4">
             <span>Comenatrios</span>

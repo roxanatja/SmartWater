@@ -26,7 +26,7 @@ const EditEgresosGastos = ({ accounts, provider, onCancel }: Props) => {
     formState: { errors, isValid }, watch, setValue
   } = useForm<IExpenseBody['data']>({
     defaultValues: selectedExpense._id === "" ? {} : {
-      accountEntry: selectedExpense.accountEntry,
+      accountEntry: selectedExpense.accountEntry._id,
       amount: selectedExpense.amount,
       comment: selectedExpense.comment,
       creditBuy: selectedExpense.creditBuy,
@@ -34,7 +34,7 @@ const EditEgresosGastos = ({ accounts, provider, onCancel }: Props) => {
       hasInVoice: selectedExpense.hasInVoice,
       paymentMethodCurrentAccount: selectedExpense.paymentMethodCurrentAccount,
       provider: selectedExpense.provider?._id || "",
-      user: selectedExpense.user
+      user: selectedExpense.user._id
     },
     mode: 'all'
   });

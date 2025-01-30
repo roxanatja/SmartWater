@@ -6,10 +6,9 @@ import FiltrosSalidas from './Filtros/FiltrosSalidas';
 import TableOtrasSalidas from './Tables/TableOtrasSalidas';
 import { otros_invetarios } from '../mock-data';
 import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
-import { ProductsApiConector, ItemsApiConector } from '../../../../../api/classes';
-import Product from '../../../../../type/Products/Products';
-import { Item } from '../../../../../type/Item';
 import OtrasSalidasForm from './Modals/OtrasSalidasForm';
+import { KardexApiConector } from '../../../../../api/classes/kardex';
+import { MatchedElement } from '../../../../../type/Kardex';
 
 const Salidas = () => {
     const {
@@ -19,9 +18,7 @@ const Salidas = () => {
         selectedInventario, setSelectedInvetario,
         selectedOption, setSelectedOption
     } = useContext(InventariosOtrosContext)
-
-    const [products, setProducts] = useState<Product[]>([])
-    const [items, setItems] = useState<Item[]>([])
+    const [elements, setElements] = useState<MatchedElement[]>([]);
 
     const itemsPerPage: number = 12;
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -36,8 +33,7 @@ const Salidas = () => {
     };
 
     useEffect(() => {
-        ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setProducts(res?.data || []))
-        ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setItems(res?.data || []))
+        KardexApiConector.getKardexElements().then(res => setElements(res?.elements || []));
     }, [])
 
     return (
@@ -64,24 +60,24 @@ const Salidas = () => {
                 <FiltrosSalidas initialFilters={savedFilters} onChange={handleFilterChange} />
             </Modal>
 
-            <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)}>
+            <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)} className='!w-3/4 md:!w-1/2 xl:!w-1/3'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro otras salidas
                 </h2>
-                <OtrasSalidasForm onCancel={() => setShowMiniModal(false)} products={products} items={items} />
+                <OtrasSalidasForm onCancel={() => setShowMiniModal(false)} elements={elements} />
             </Modal>
 
-            <Modal
+            <Modal className='!w-3/4 md:!w-1/2 xl:!w-1/3'
                 isOpen={selectedInventario._id !== "" && showModal}
                 onClose={() => { setSelectedInvetario(otroInventario); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar otras salidas
                 </h2>
-                <OtrasSalidasForm onCancel={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} products={products} items={items} />
+                <OtrasSalidasForm onCancel={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} elements={elements} />
             </Modal>
 
-            <Modal
+            {/* <Modal
                 isOpen={selectedInventario._id !== "" && selectedOption}
                 onClose={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }}
             >
@@ -89,7 +85,7 @@ const Salidas = () => {
                     Otras salidas
                 </h2>
                 <OtrosIgresosDetails type='out' onCancel={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }} products={products} items={items} />
-            </Modal>
+            </Modal> */}
         </>
     )
 }

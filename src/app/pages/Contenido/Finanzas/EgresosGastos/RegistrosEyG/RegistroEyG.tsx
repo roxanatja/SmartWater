@@ -20,6 +20,7 @@ import EditEgresosGastos from '../EditEgresosGastos/EditEgresosGastos'
 import AddEgresosGastos from '../AddEgresosGastos/AddEgresosGastos'
 import { MatchedElement } from '../../../../../../type/Kardex'
 import { KardexApiConector } from '../../../../../../api/classes/kardex'
+import CuadroEgresoDetails from './CuadroEgresoDetails'
 
 const RegistroEyG = () => {
     const navigate = useNavigate()
@@ -30,7 +31,11 @@ const RegistroEyG = () => {
         showModal,
         setShowModal,
         selectedExpense,
-        setSelectedExpense
+        setSelectedExpense,
+        selectedOption,
+        setSelectedOption,
+        showMiniModal,
+        setShowMiniModal
     } = useContext(EgresosGastosContext);
 
     const { setLoading } = useGlobalContext()
@@ -135,14 +140,17 @@ const RegistroEyG = () => {
         setSavedFilters(filters);
     };
 
-    const grouppedData = useMemo<{ [key: string]: number }>(() => {
-        const result: { [key: string]: number } = {}
+    const grouppedData = useMemo<{ [key: string]: { name: string, total: number } }>(() => {
+        const result: { [key: string]: { name: string, total: number } } = {}
 
         items.forEach(exp => {
-            if (result[exp.accountEntry]) {
-                result[exp.accountEntry] += exp.amount
+            if (result[exp.accountEntry._id]) {
+                result[exp.accountEntry._id].total += exp.amount
             } else {
-                result[exp.accountEntry] = exp.amount
+                result[exp.accountEntry._id] = {
+                    name: exp.accountEntry.name,
+                    total: exp.amount
+                }
             }
         })
 
@@ -169,12 +177,12 @@ const RegistroEyG = () => {
                 searchPlaceholder="Buscar por nombre de usuario"
                 infoPedidos
                 infoPedidosData={
-                    Object.keys(grouppedData)
-                        .sort((a, b) => a > b ? 1 : a === b ? 0 : -1)
+                    Object.values(grouppedData)
+                        .sort((a, b) => a.name > b.name ? 1 : a === b ? 0 : -1)
                         .map(row => (
                             {
-                                text: (accounts?.find((x) => x._id === row)?.name || "Cuenta no Reconociada"),
-                                value: `${millify(grouppedData[row], { precision: 2 })} Bs.`
+                                text: (row?.name || "Cuenta no Reconociada"),
+                                value: `${millify(row.total, { precision: 2 })} Bs.`
                             }
                         ))
                 }
@@ -231,7 +239,7 @@ const RegistroEyG = () => {
                 />
             </Modal>
 
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} className='!w-3/4 sm:!w-1/2 xl:!w-1/3'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Registro de egresos y gastos
                 </h2>
@@ -239,14 +247,26 @@ const RegistroEyG = () => {
             </Modal>
 
             <Modal
-                isOpen={selectedExpense._id !== ""}
-                onClose={() => { setSelectedExpense(expense); setShowModal(false) }}
+                className='!w-3/4 sm:!w-1/2 xl:!w-1/3'
+                isOpen={selectedExpense._id !== "" && selectedOption}
+                onClose={() => { setSelectedExpense(expense); setSelectedOption(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar egresos y gastos
                 </h2>
                 <EditEgresosGastos accounts={accounts} provider={providers}
-                    onCancel={() => { setSelectedExpense(expense); setShowModal(false) }} />
+                    onCancel={() => { setSelectedExpense(expense); setSelectedOption(false) }} />
+            </Modal> F
+
+            <Modal
+                isOpen={selectedExpense._id !== "" && showMiniModal}
+                onClose={() => { setSelectedExpense(expense); setShowMiniModal(false) }}
+                className='!w-3/4 sm:!w-1/2'
+            >
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Detalles de egreso
+                </h2>
+                <CuadroEgresoDetails onCancel={() => { setSelectedExpense(expense); setShowMiniModal(false) }} />
             </Modal> F
         </>
     )

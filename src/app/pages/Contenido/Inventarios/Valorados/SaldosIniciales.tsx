@@ -5,17 +5,12 @@ import TableValoradosSaldosIniciales from './Tables/TableValoradosSaldosIniciale
 import Modal from '../../../EntryComponents/Modal'
 import { InventariosValoradosContext } from './InventariosValoradosProvider'
 import { MatchedElement } from '../../../../../type/Kardex'
-import { ProductsApiConector, ItemsApiConector } from '../../../../../api/classes'
 import { KardexApiConector } from '../../../../../api/classes/kardex'
 import AddEditInitialBalances from './Modals/AddEditInitialBalances'
 
 const SaldosIniciales = () => {
     const {
-        setShowFiltro, showFiltro,
-        setShowModal, showModal,
-        showMiniModal, setShowMiniModal,
-        selectedInventario, setSelectedInvetario,
-        selectedOption, setSelectedOption
+        showMiniModal, setShowMiniModal
     } = useContext(InventariosValoradosContext)
 
     const [elements, setElements] = useState<MatchedElement[]>([])
@@ -37,7 +32,9 @@ const SaldosIniciales = () => {
                     text: "Reportes de inventario",
                     url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
                 },
-            ]} add onAdd={() => setShowMiniModal(true)}>
+            ]}
+                add={elements.some(e => !e.hasKardex)}
+                onAdd={() => setShowMiniModal(true)}>
                 <TableValoradosSaldosIniciales data={fisicos_saldos} className='w-full lg:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
@@ -45,7 +42,7 @@ const SaldosIniciales = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Agregar saldos iniciales
                 </h2>
-                <AddEditInitialBalances onCancel={() => setShowMiniModal(false)} elemnts={elements} />
+                <AddEditInitialBalances onCancel={() => setShowMiniModal(false)} elemnts={elements.filter(e => !e.hasKardex)} />
             </Modal>
         </>
     )

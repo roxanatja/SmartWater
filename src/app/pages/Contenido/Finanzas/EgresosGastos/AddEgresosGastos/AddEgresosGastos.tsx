@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { Providers } from '../../../../../../type/providers';
 import { Account } from '../../../../../../type/AccountEntry';
 import { IExpenseDetailsBody } from '../../../../../../api/types/expenses';
@@ -21,7 +21,6 @@ interface Props {
 
 const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => {
   const [active, setActive] = useState(false);
-  const [inventoryDetails, setInventoryDetails] = useState<IExpenseDetailsBody['data']['details']>([])
 
   const {
     register,
@@ -41,12 +40,14 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
 
     const userData = AuthService.getUser()
 
-    // FIXME: Error submitting
     res = await ExpensesApiConector.createWithDetails({
       data: {
         ...data,
         user: userData?._id || "",
-        details: inventories,
+        details: inventories.map(i => ({
+          ...i,
+          inputImport: i.inputImport * i.quantity
+        })),
         registerDate: moment.tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss")
       }
     })
@@ -213,7 +214,12 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
       >
         <input
           type="checkbox"
-          {...register("hasInVoice")}
+          checked={watch("hasInVoice")}
+          onChange={() => {
+            const check = watch("hasInVoice")
+            setValue("hasInVoice", !check, { shouldValidate: true })
+            setValue("hasReceipt", false, { shouldValidate: true })
+          }}
           className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded accent-blue-700"
           id="isClient"
         />
@@ -222,7 +228,12 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
         </label>
         <input
           type="checkbox"
-          {...register("hasReceipt")}
+          checked={watch("hasReceipt")}
+          onChange={() => {
+            const check = watch("hasReceipt")
+            setValue("hasReceipt", !check, { shouldValidate: true })
+            setValue("hasInVoice", false, { shouldValidate: true })
+          }}
           className="w-5 h-5 text-blue-900 bg-gray-100 border-gray-300 rounded accent-blue-700"
           id="isAgency"
         />
@@ -234,7 +245,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
         name="documentNumber"
         register={register}
         errors={errors.documentNumber}
-        required
+        required={(!!watch('hasInVoice') || !!watch('hasReceipt'))}
       />
 
       <Input
@@ -258,7 +269,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
           </button>
           <button
             type="submit"
-            disabled={!isValid || inventories.length === 0 || active}
+            disabled={!isValid || active}
             className="disabled:bg-gray-400 w-full bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
           >
             {active ? (
