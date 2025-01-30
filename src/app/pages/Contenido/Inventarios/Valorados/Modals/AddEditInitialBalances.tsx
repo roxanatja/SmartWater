@@ -43,7 +43,7 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                 elements: data.elements.map(e => {
                     const cpy: IInitialBalanceBody['data']['elements'][0] = {
                         quantity: parseFloat(String(e.quantity)),
-                        inputImport: parseFloat(String(e.inputImport))
+                        unitPrice: parseFloat(String(e.unitPrice))
                     }
                     if (e.product) { cpy.product = e.product }
                     if (e.item) { cpy.item = e.item }
@@ -105,9 +105,9 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                 step={0.01}
                 label="Costo unitario"
                 isVisibleLable
-                name={`elements.${index}.inputImport`}
+                name={`elements.${index}.unitPrice`}
                 register={register}
-                errors={errors.elements?.[index]?.inputImport}
+                errors={errors.elements?.[index]?.unitPrice}
                 validateAmount={(val: number) => val < 0 ? "Indica un valor" : true}
             />
         },

@@ -44,7 +44,10 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
       data: {
         ...data,
         user: userData?._id || "",
-        details: inventories,
+        details: inventories.map(i => ({
+          ...i,
+          inputImport: i.inputImport * i.quantity
+        })),
         registerDate: moment.tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss")
       }
     })

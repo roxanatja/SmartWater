@@ -15,7 +15,7 @@ export interface IInitialBalanceBody {
             product?: string;
             item?: string;
             quantity: number;
-            inputImport: number;
+            unitPrice: number;
         }[];
     }
 }
