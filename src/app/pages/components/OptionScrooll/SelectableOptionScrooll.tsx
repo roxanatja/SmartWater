@@ -111,8 +111,8 @@ const SelectableOptionScrooll = memo<CustomSelectProps>((props) => {
             </div>
             {
               optionsFiltered.length > 0 && <>
-                {optionsFiltered.map((o, index) => <div className="px-4 py-3 whitespace-nowrap hover:bg-gray-400 rounded-md cursor-pointer text-font-color" onClick={() => {
-                  setSelectedOption(index)
+                {optionsFiltered.map((o) => <div className="px-4 py-3 whitespace-nowrap hover:bg-gray-400 rounded-md cursor-pointer text-font-color" onClick={() => {
+                  setSelectedOption(options.findIndex(op => op === o))
                   setActive(true)
                   setShowSelect(false)
                   setSelectSearch("");
