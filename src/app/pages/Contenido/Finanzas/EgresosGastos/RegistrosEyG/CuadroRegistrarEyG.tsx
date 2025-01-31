@@ -169,7 +169,7 @@ const CuadroRegistrarEyG = ({
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Formas de pago</span>
             <span>
-              {expense.paymentMethodCurrentAccount ? "Cta. Cte" : expense.creditBuy ? "Crédito" : "Contado"}
+              {expense.paymentMethodCurrentAccount ? "Cta. Cte" : expense.creditBuy ? "Crédito" : "Efectivo"}
             </span>
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
