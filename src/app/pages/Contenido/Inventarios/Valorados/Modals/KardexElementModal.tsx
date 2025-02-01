@@ -92,7 +92,7 @@ const KardexElementModal = ({ kardexElement }: Props) => {
                         </div>
                     </div>
 
-                    <TableKardexDetails data={balanceReport.movements} className='w-full no-inner-border' />
+                    <TableKardexDetails data={balanceReport.movements} className='w-full with-vertical-border' />
                 </div>
             }
         </div>

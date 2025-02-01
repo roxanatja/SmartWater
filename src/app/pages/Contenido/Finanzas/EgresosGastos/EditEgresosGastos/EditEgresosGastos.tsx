@@ -146,7 +146,7 @@ const EditEgresosGastos = ({ accounts, provider, onCancel }: Props) => {
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
           >
-            <option value={"null"}>Selccione un proveedor</option>
+            <option value={"null"}>Seleccione un proveedor</option>
             {
               provider.map((row, index) => (
                 <option value={row._id} key={index}>
@@ -169,14 +169,14 @@ const EditEgresosGastos = ({ accounts, provider, onCancel }: Props) => {
           transition={{ delay: 0.3 }}
           className="w-full sm:w-1/2 flex flex-col gap-2"
         >
-          <label>Cuenta contable</label>
+          <label>Tipo de gasto</label>
           <select
             {...register("accountEntry", {
               required: "Debes seleccionar una cuenta"
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
-            <option value={"null"}>Selccione una cuenta</option>
+            <option value={"null"}>Seleccione una cuenta</option>
             {
               accounts.map((row, index) => (
                 <option value={row._id} key={index}>

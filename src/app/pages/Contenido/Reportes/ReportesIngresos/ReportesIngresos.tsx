@@ -49,12 +49,12 @@ const ReportesIngresos: FC = () => {
 
   return (
     <>
-      <div>
+      <div className="px-10">
         <PageTitle
           titulo="Reportes ingresos / C.por cobrar"
-          icon="../../Reportes-icon.svg"
+          icon="/Reportes-icon.svg"
         />
-        <div className="ReportesIngresos-container">
+        <div className="ReportesIngresos-container py-4 overflow-auto">
           <button
             className="ReportesIngresos-item"
             onClick={() => setClientes(true)}
@@ -110,10 +110,18 @@ const ReportesIngresos: FC = () => {
           }}
         />
       </Modal>
-      {ventas && <FiltroVenta />}
-      {cuentasPorCobrarCobros && <FiltroCuentasPorCobrar />}
-      {prestamos && <FiltroPrestamos />}
-      {egresosGastos && <FiltroEgresosGastos />}
+      <Modal isOpen={ventas} onClose={() => setVentas(false)}>
+        <FiltroVenta />
+      </Modal>
+      <Modal isOpen={cuentasPorCobrarCobros} onClose={() => setCuentasPorCobrarCobros(false)}>
+        <FiltroCuentasPorCobrar />
+      </Modal>
+      <Modal isOpen={prestamos} onClose={() => setPrestamos(false)}>
+        <FiltroPrestamos />
+      </Modal>
+      <Modal isOpen={egresosGastos} onClose={() => setEgresosGastos(false)}>
+        <FiltroEgresosGastos />
+      </Modal>
     </>
   );
 };
