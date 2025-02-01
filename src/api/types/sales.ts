@@ -56,6 +56,7 @@ export interface ISaleBody {
         }[];
         creditSale: boolean;
         hasInvoice: boolean;
+        forceOut: boolean;
         paymentMethodCurrentAccount: boolean;
     };
 }

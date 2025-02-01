@@ -63,14 +63,67 @@ const RegistrarVentasPedidosForm = () => {
             client: selectedClient._id,
         };
 
-        const res = await Promise.all([SalesApiConector.create({ data: values }), OrdersApiConector.markAsAttended({ orderId: selectedOrder._id })])
+        const res = await SalesApiConector.create({ data: values });
+        
+        if (res) {
+            if ('error' in res) {
+                toast.error(
+                    (t) => (
+                        <div>
+                            <p className="mb-4 text-center text-[#888]">
+                                No hay saldos suficiente en invenatario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
+                            </p>
+                            <div className="flex justify-center">
+                                <button
+                                    className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                                    onClick={() => {
+                                        toast.dismiss(t.id);
+                                        toast.error("Venta no registrada");
+                                        reset();
+                                        setAddedProducts([]);
+                                        navigate("/Ventas", { replace: true })
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                                    onClick={async () => {
+                                        toast.dismiss(t.id);
+                                        console.log("In check continue")
+                                        let resp2 = await SalesApiConector.create({ data: { ...values, forceOut: true } });
 
-        if (res.every(r => !!r)) {
-            toast.success("Venta registrada");
-            reset();
-            setAddedProducts([]);
+                                        if (resp2) {
+                                            toast.success(`Venta registrada`);
+                                            OrdersApiConector.markAsAttended({ orderId: selectedOrder._id })
+                                            reset();
+                                            setAddedProducts([]);
 
-            navigate("/Ventas", { replace: true })
+                                            navigate("/Ventas", { replace: true })
+                                        } else {
+                                            toast.error("Upss error al registrar venta");
+                                        }
+                                    }}
+                                >
+                                    Proceder
+                                </button>
+                            </div>
+                        </div>
+                    ),
+                    {
+                        className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+                        icon: null,
+                        position: "top-center"
+                    }
+                );
+            } else {
+                toast.success(`Venta registrada`);
+                OrdersApiConector.markAsAttended({ orderId: selectedOrder._id })
+                reset();
+                setAddedProducts([]);
+
+                navigate("/Ventas", { replace: true })
+            }
         } else {
             toast.error("Upss error al registrar venta");
         }

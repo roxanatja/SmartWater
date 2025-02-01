@@ -23,8 +23,8 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
             elements: elemnts.map(e => ({
                 product: e.isProduct ? e._id : undefined,
                 item: e.isItem ? ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id) : undefined,
-                quantity: 0,
-                inputImport: 0
+                quantity: e.initialBalance,
+                unitPrice: (e.initialBalance > 0 && e.initialBalanceTransactions.length > 0) ? e.initialBalanceTransactions[0].balance.weightedAverageCost : 0
             })),
             user: AuthService.getUser()?._id || ""
         },
@@ -43,13 +43,14 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                 elements: data.elements.map(e => {
                     const cpy: IInitialBalanceBody['data']['elements'][0] = {
                         quantity: parseFloat(String(e.quantity)),
-                        unitPrice: parseFloat(String(e.unitPrice))
+                        unitPrice: parseFloat(String(e.unitPrice)),
+                        inputImport: parseFloat(String(e.unitPrice)) * parseFloat(String(e.quantity))
                     }
                     if (e.product) { cpy.product = e.product }
                     if (e.item) { cpy.item = e.item }
 
                     return cpy
-                }),
+                }).filter(e => e.quantity > 0),
                 user: userData?._id || ""
             }
         })

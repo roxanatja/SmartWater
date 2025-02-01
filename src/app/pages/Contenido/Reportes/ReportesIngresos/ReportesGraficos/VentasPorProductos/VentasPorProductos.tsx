@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { SaleReport } from "../../../../../../../type/Sale/Sale";
 import { useForm } from "react-hook-form";
 import moment from "moment";
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
+import Product from "../../../../../../../type/Products/Products";
 import { ProductsApiConector, SalesApiConector } from "../../../../../../../api/classes";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
 import { Line } from "react-chartjs-2";
 import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
-import Product from "../../../../../../../type/Products/Products";
 import "moment/locale/es";
 
 ChartJS.register(
@@ -46,7 +46,10 @@ const VentasPorProductos: FC = () => {
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setProducts(res?.data || []))
+        ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
+            setProducts(res?.data || [])
+            setProductsSelected(res?.data || [])
+        })
     }, [])
 
     const onSubmit = (data: { initialDate?: string; finalDate?: string }) => {
@@ -194,7 +197,7 @@ const VentasPorProductos: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Ventas por producto" icon="../../../Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Ventas por producto" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

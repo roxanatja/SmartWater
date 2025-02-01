@@ -51,19 +51,38 @@ export abstract class SalesApiConector {
         }
     }
 
-    static async create(params: ISaleBody): Promise<{ id: string } | null> {
+    static async create(params: ISaleBody): Promise<{ id: string } | { error: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().post(`${this.root_path}/register`, params.data)
-            return res.data
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/register`, params.data, {
+                validateStatus(status) {
+                    if (status === 409 || status === 200) return true
+                    return false
+                },
+            })
+
+            if (res.status === 409) {
+                return { error: "conflict" }
+            } else {
+                return res.data
+            }
         } catch (error) {
             return null
         }
     }
 
-    static async update(params: ISaleBody & ISaleFilter): Promise<{ mensaje: string } | null> {
+    static async update(params: ISaleBody & ISaleFilter): Promise<{ mensaje: string } | { error: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.saleId}/update`, params.data)
-            return res.data
+            const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.saleId}/update`, params.data, {
+                validateStatus(status) {
+                    if (status === 409 || status === 200) return true
+                    return false
+                }
+            })
+            if (res.status === 409) {
+                return { error: "conflict" }
+            } else {
+                return res.data
+            }
         } catch (error) {
             return null
         }

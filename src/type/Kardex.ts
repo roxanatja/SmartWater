@@ -67,17 +67,46 @@ export type MatchedElement = {
     isItem: boolean | null;
     canSellAndLend: boolean;
 
-    productKardex?: {
-        _id: string;
-        user: string;
-        product: string;
-    }[];
-    itemKardex?: {
-        _id: string;
-        user: string;
-        item: string;
-    }[];
+    productKardex?: ProductKardex[];
+    itemKardex?: ItemKardex[];
     hasKardex: boolean;
+    allKardexes?: (ItemKardex | ProductKardex)[];
+    initialBalanceTransactions: {
+        _id: string;
+        user: string;
+        kardex: string;
+        type: string;
+        comment: string;
+        quantity: number,
+        balance: {
+            _id: string,
+            user: string,
+            registerDate: string,
+            inputQuantity: number,
+            unitPriceInput: string,
+            inputImport: string,
+            outputQuantity: number,
+            unitPriceOutput: number,
+            outputImport: number,
+            balanceAmount: number,
+            weightedAverageCost: number,
+            balanceImport: number
+        }
+        registerDate: string;
+        documentNumber: string;
+    }[];
+    initialBalance: number;
+}
+
+type ItemKardex = {
+    _id: string;
+    user: string;
+    item: string;
+}
+type ProductKardex = {
+    _id: string;
+    user: string;
+    product: string;
 }
 
 export type EntryItemBody = {

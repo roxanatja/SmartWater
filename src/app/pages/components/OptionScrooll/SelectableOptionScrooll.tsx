@@ -34,8 +34,6 @@ const SelectableOptionScrooll = memo<CustomSelectProps>((props) => {
 
   const handleOptionChange = useCallback(() => {
     if (active) {
-      console.log(selectedOption)
-      console.log(options[selectedOption])
       onOptionChange(options[selectedOption]);
       setTimeout(
         () => {

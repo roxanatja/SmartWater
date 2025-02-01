@@ -62,19 +62,37 @@ export abstract class KardexApiConector {
         }
     }
 
-    static async registerOutput(params: { data: IOtherOutputBody }): Promise<{ id: string } | null> {
+    static async registerOutput(params: { data: IOtherOutputBody }): Promise<{ id: string } | { error: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().post(`${this.root_path}/outputs`, params.data)
-            return res.data
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/outputs`, params.data, {
+                validateStatus(status) {
+                    if (status === 409 || status === 200) return true
+                    return false
+                },
+            })
+            if (res.status === 409) {
+                return { error: "conflict" }
+            } else {
+                return res.data
+            }
         } catch (error) {
             return null
         }
     }
 
-    static async registerOutputMore(params: { data: IOthersOutputMoreBody }): Promise<{ id: string } | null> {
+    static async registerOutputMore(params: { data: IOthersOutputMoreBody }): Promise<{ id: string } | { error: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().post(`${this.root_path}/outputs/more`, params.data)
-            return res.data
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/outputs/more`, params.data, {
+                validateStatus(status) {
+                    if (status === 409 || status === 200) return true
+                    return false
+                },
+            })
+            if (res.status === 409) {
+                return { error: "conflict" }
+            } else {
+                return res.data
+            }
         } catch (error) {
             return null
         }

@@ -56,16 +56,16 @@ const Contador: FC<typeContadorProduct> = ({
 
   return (
     <>
-      <div className="FiltroClientes-Botones flex items-center gap-3 w-fit">
+      <div className="flex items-center gap-3 w-fit">
         <button
           type="button"
           disabled={!!min && count <= min}
-          className={`FiltroClientes-Botonesbtn flex items-center disabled:opacity-30 ${iconsClassname}`}
+          className={`flex items-center disabled:opacity-30 ${iconsClassname}`}
           onClick={decrementar}
         >
           <span className="material-symbols-outlined">do_not_disturb_on</span>
         </button>
-        <input className={`FiltroClientes-BotonesNumero outline-none max-w-[50px] no-spinner text-center bg-transparent ${numberClassname}`} value={count.toFixed(0)}
+        <input className={`outline-none w-[50px] no-spinner text-center bg-transparent text-font-color ${numberClassname}`} value={count.toFixed(0)}
           min={min || 0}
           max={max || undefined}
           onChange={(e) => {
@@ -91,7 +91,7 @@ const Contador: FC<typeContadorProduct> = ({
         <button
           type="button"
           disabled={!!max && count >= max}
-          className={`FiltroClientes-Botonesbtn flex items-center disabled:opacity-30 ${iconsClassname}`}
+          className={`flex items-center disabled:opacity-30 ${iconsClassname}`}
           onClick={incrementar}
         >
           <span className="material-symbols-outlined">add_circle</span>
