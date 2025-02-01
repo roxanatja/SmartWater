@@ -14,7 +14,7 @@ const TableKardexDetails = ({ data, className }: Props) => {
     const columns: TableColumn<KardexMovement>[] = useMemo<TableColumn<KardexMovement>[]>(() => [
         {
             name: "DETALLE",
-            selector: row => row.detail,
+            selector: row => row.detail
         },
         {
             name: "FECHA",
@@ -29,7 +29,7 @@ const TableKardexDetails = ({ data, className }: Props) => {
             selector: row => row.inputQuantity,
         },
         {
-            name: "P.U",
+            name: "P.U ENTRADA",
             selector: row => row.unitPriceInput,
         },
         {
@@ -41,7 +41,7 @@ const TableKardexDetails = ({ data, className }: Props) => {
             selector: row => row.outputQuantity,
         },
         {
-            name: "P.U",
+            name: "P.U SALIDA",
             selector: row => row.unitPriceOutput,
         },
         {

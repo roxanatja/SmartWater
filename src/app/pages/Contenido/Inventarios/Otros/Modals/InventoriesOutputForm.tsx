@@ -106,7 +106,7 @@ const InventoriesOutputForm = ({ elements, updateDetails, handleDeleteElement, i
                                     })}
                                     className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
                                 >
-                                    <option value={""}>Selccione uno</option>
+                                    <option value={""}>Seleccione uno</option>
                                     {
                                         elements.map((row, index) => (
                                             <option value={row._id} key={index}>
