@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         blue_custom: 'rgb(var(--blue-custom))',
+        blue_custom_hover: 'rgb(var(--blue-custom-hover))',
         blue_bright: 'rgb(var(--blue-bright))',
         customBlue: '#1DB4C5',
         customLightBlue: 'rgba(28, 178, 194, 0.75)',
@@ -17,7 +18,9 @@ module.exports = {
         sidebarBackground: 'rgb(var(--bg-sidebar))',
         "main-background": 'rgb(var(--bg-main))',
         blocks: 'rgb(var(--bg-blocks))',
-        "font-color": 'rgb(var(--font-color))'
+        'blocks-hover': 'rgb(var(--bg-blocks-hover))',
+        "font-color": 'rgb(var(--font-color))',
+        "shadow-color": 'rgba(var(--shadow-color))'
       }
     },
   },

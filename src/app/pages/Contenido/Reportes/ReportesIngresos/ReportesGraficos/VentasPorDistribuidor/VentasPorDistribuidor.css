@@ -1,4 +1,4 @@
-.VentasPorDistribuidor-Fecha{
+.VentasPorDistribuidor-Fecha {
     width: 170px;
     height: 68px;
     border-radius: 15px;
@@ -18,7 +18,7 @@
     line-height: normal;
 }
 
-.VentasPorDistribuidor-btn{
+.VentasPorDistribuidor-btn {
     width: 213px;
     height: 50px;
     flex-shrink: 0;
@@ -36,12 +36,12 @@
     cursor: pointer;
 }
 
-.VentasPorDistribuidor-btn:hover{
+.VentasPorDistribuidor-btn:hover {
     border: 1px solid #368be0;
     background: var(--Azul, #306ddf);
 }
 
-.VentasPorDistribuidor-FechaInput{
+.VentasPorDistribuidor-FechaInput {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -59,7 +59,7 @@
     line-height: normal;
 }
 
-.VentasPorDistribuidor-Productos{
+.VentasPorDistribuidor-Productos {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -67,13 +67,13 @@
     width: 290px;
 }
 
-.VentasPorDistribuidor-ProductosCheck{
+.VentasPorDistribuidor-ProductosCheck {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
 }
 
-.VentasPorDistribuidor-Check{
+.VentasPorDistribuidor-Check {
     display: flex;
     gap: 16px;
     width: 130px;
@@ -90,4 +90,10 @@
     width: 18px;
     height: 18px;
     flex-shrink: 0;
+}
+
+canvas {
+    min-height: 350px !important;
+    max-height: 600px !important;
+    min-width: 300px;
 }

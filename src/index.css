@@ -9,11 +9,14 @@ body {
   --bg-sidebar: 26 61 125;
   --bg-main: 255 255 255;
   --blue-custom: 26 61 125;
+  --blue-custom-hover: 35 85 176;
   --blue-bright: 37 99 235;
 
   --bg-blocks: 255 255 255;
+  --bg-blocks-hover: 235 235 235;
   --font-color: 27 27 27;
-
+  --shadow-color: 27 27 27 / 25%;
+  
   color: rgb(27, 27, 27);
 }
 
@@ -21,10 +24,13 @@ body.dark {
   --bg-sidebar: 17 17 17;
   --bg-main: 34 34 34;
   --blue-custom: 54 125 253;
+  --blue-custom-hover: 65 149 255;
   --blue-bright: 37 99 235;
-
+  
   --bg-blocks: 51 51 51;
+  --bg-blocks-hover: 65 65 65;
   --font-color: 254 254 254;
+  --shadow-color: 254 254 254 / 25%;
 
   color: rgb(254, 254, 254);
 }
@@ -77,7 +83,7 @@ code {
 }
 
 .react-datepicker__triangle::after {
-  @apply !border-t-blocks;
+  @apply  !border-t-blocks;
 }
 
 .react-datepicker__header {
@@ -134,6 +140,7 @@ input[type="datetime-local"].full-selector,
 input[type="date"].full-selector {
   position: relative;
 }
+
 input[type="month"].full-selector::-webkit-calendar-picker-indicator,
 input[type="time"].full-selector::-webkit-calendar-picker-indicator,
 input[type="datetime-local"].full-selector::-webkit-calendar-picker-indicator,
@@ -151,13 +158,15 @@ input[type="date"].full-selector::-webkit-calendar-picker-indicator {
   outline: none;
 }
 
-input[type=number].no-spinner::-webkit-inner-spin-button, 
-input[type=number].no-spinner::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number].no-spinner::-webkit-inner-spin-button,
+input[type=number].no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-input[type=number].no-spinner { -moz-appearance:textfield; }
+input[type=number].no-spinner {
+  -moz-appearance: textfield;
+}
 
 /* React data table */
 .rdt_TableHeadRow,
@@ -168,7 +177,7 @@ input[type=number].no-spinner { -moz-appearance:textfield; }
   color: rgb(var(--font-color)) !important;
 }
 
-.rdt_TableHeadRow  {
+.rdt_TableHeadRow {
   font-weight: 700;
   font-size: 0.875rem;
 }
