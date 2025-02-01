@@ -31,7 +31,8 @@ const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
     } = useForm<IProductBody['data']>({
         defaultValues: selectedProduct._id === "" ? {} : {
             name: selectedProduct.name, description: selectedProduct.description, category: (selectedProduct.category as CategoryProduct)._id,
-            unitMeasure: (selectedProduct.unitMeasure as UnitMeasure)._id, imageUrl: selectedProduct.imageUrl, price: selectedProduct.price, priceBusiness: selectedProduct.priceBusiness
+            unitMeasure: (selectedProduct.unitMeasure as UnitMeasure)._id, imageUrl: selectedProduct.imageUrl, price: selectedProduct.price, priceBusiness: selectedProduct.priceBusiness,
+            canSellAndLend: false
         },
         mode: 'all'
     });
@@ -153,6 +154,16 @@ const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
                     )}
                 </motion.div>
             </div>
+
+            {
+                selectedProduct._id === "" &&
+                <div className="flex gap-2 items-center w-full">
+                    <input type="checkbox" id="lendAndSell" className='accent-blue_custom' checked={watch('canSellAndLend')} onChange={() => {
+                        setValue('canSellAndLend', !watch('canSellAndLend'), { shouldValidate: true })
+                    }} />
+                    <label htmlFor="lendAndSell">Crear también como item</label>
+                </div>
+            }
 
             <ImageUploadField
                 value={watch('imageUrl')}

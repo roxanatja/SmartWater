@@ -40,6 +40,7 @@ export interface ILoanBody {
             quantity: number;
         }[];
         totalItems?: number;
+        forceOut: boolean;
     };
 }
 

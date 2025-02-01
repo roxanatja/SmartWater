@@ -45,6 +45,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
         link: null,
         validUntil: "",
       },
+      forceOut: false
     },
     mode: "all"
   });
@@ -76,12 +77,63 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
     }
 
     if (res) {
-      toast.success(`Prestamo ${selectedLoan ? "editado" : "registrado"}`);
-      reset();
-      setAddedProducts([]);
+      if ('error' in res) {
+        toast.error(
+          (t) => (
+            <div>
+              <p className="mb-4 text-center text-[#888]">
+                No hay saldos suficiente en invenatario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
+              </p>
+              <div className="flex justify-center">
+                <button
+                  className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                  onClick={() => {
+                    toast.dismiss(t.id);
+                    toast.error("Prestamo no registrado");
+                    reset();
+                    setAddedProducts([]);
+                    navigate("/Prestamos", { replace: true })
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                  onClick={async () => {
+                    toast.dismiss(t.id);
+                    let resp2 = await LoansApiConector.create({ data: { ...values, forceOut: true } })
 
-      navigate("/Prestamos", { replace: true })
-      window.location.reload()
+                    if (resp2) {
+                      toast.success(`Prestamo ${selectedLoan ? "editado" : "registrado"}`);
+                      reset();
+                      setAddedProducts([]);
+
+                      navigate("/Prestamos", { replace: true })
+                      window.location.reload()
+                    } else {
+                      toast.error("Upss error al registrar prestamo");
+                    }
+                  }}
+                >
+                  Proceder
+                </button>
+              </div>
+            </div >
+          ),
+          {
+            className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+            icon: null,
+            position: "top-center"
+          }
+        );
+      } else {
+        toast.success(`Prestamo ${selectedLoan ? "editado" : "registrado"}`);
+        reset();
+        setAddedProducts([]);
+
+        navigate("/Prestamos", { replace: true })
+        window.location.reload()
+      }
     } else {
       toast.error("Upss error al registrar prestamo");
     }

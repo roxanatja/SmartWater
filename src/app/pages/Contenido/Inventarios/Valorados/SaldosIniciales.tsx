@@ -33,8 +33,7 @@ const SaldosIniciales = () => {
                     url: "/Finanzas/Inventarios/Valorados/ReporteInventario"
                 },
             ]}
-                add={elements.some(e => !e.hasKardex)}
-                onAdd={() => setShowMiniModal(true)}>
+                add onAdd={() => setShowMiniModal(true)}>
                 <TableValoradosSaldosIniciales data={fisicos_saldos} className='w-full lg:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
@@ -42,7 +41,7 @@ const SaldosIniciales = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Agregar saldos iniciales
                 </h2>
-                <AddEditInitialBalances onCancel={() => setShowMiniModal(false)} elemnts={elements.filter(e => !e.hasKardex)} />
+                <AddEditInitialBalances onCancel={() => setShowMiniModal(false)} elemnts={elements} />
             </Modal>
         </>
     )

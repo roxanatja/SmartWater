@@ -16,6 +16,7 @@ export interface IInitialBalanceBody {
             item?: string;
             quantity: number;
             unitPrice: number;
+            inputImport: number;
         }[];
     }
 }
@@ -43,6 +44,7 @@ export interface IOtherEntryBody extends IOthersBody {
 
 export interface IOtherOutputBody extends IOthersBody {
     outputType: 'production_delivered' | 'adjustment_exit';
+    forceOut: boolean;
 }
 
 export interface IOthersEntryMoreBody {
@@ -75,4 +77,5 @@ export interface IOthersOutputMoreBody {
         outputType: 'production_delivered' | 'adjustment_exit';
     }[]
     registerDate: string;
+    forceOut: boolean;
 }

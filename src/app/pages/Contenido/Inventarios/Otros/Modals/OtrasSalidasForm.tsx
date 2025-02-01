@@ -1,9 +1,6 @@
-import { useContext, useState } from "react"
-import { InventariosOtrosContext } from "../InventariosOtrosProvider"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { IMockInOuts } from "../../mock-data"
 import Input from "../../../../EntryComponents/Inputs";
-import { motion } from "framer-motion"
 import moment from "moment";
 import { MatchedElement, OutputItemBody } from "../../../../../../type/Kardex";
 import { AuthService } from "../../../../../../api/services/AuthService";
@@ -59,6 +56,7 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
         }, {})
 
         const requestBody: IOthersOutputMoreBody = {
+            forceOut: false,
             comment: data.comment,
             documentNumber: data.documentNumber,
             registerDate: data.registerDate,
@@ -72,16 +70,57 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
         let res = null
         setActive(true)
 
-        // if (selectedItem._id !== "") {
-        //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
-        // } else {
         res = await KardexApiConector.registerOutputMore({ data: requestBody });
-        // }
 
         if (res) {
-            // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-            toast.success(`Salida registrada correctamente`, { position: "bottom-center" });
-            window.location.reload();
+            if ('error' in res) {
+                toast.error(
+                    (t) => (
+                        <div>
+                            <p className="mb-4 text-center text-[#888]">
+                                No hay saldos suficiente en invenatario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
+                            </p>
+                            <div className="flex justify-center">
+                                <button
+                                    className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                                    onClick={() => {
+                                        toast.dismiss(t.id);
+                                        toast.error("Upps error al registrar la salida", { position: "bottom-center" });
+                                        setActive(false)
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                                    onClick={async () => {
+                                        toast.dismiss(t.id);
+                                        let resp2 = await KardexApiConector.registerOutputMore({ data: { ...requestBody, forceOut: true } })
+
+                                        if (resp2) {
+                                            toast.success(`Salida registrada correctamente`, { position: "bottom-center" });
+                                            window.location.reload();
+                                        } else {
+                                            toast.error("Upps error al registrar la salida", { position: "bottom-center" });
+                                            setActive(false)
+                                        }
+                                    }}
+                                >
+                                    Proceder
+                                </button>
+                            </div>
+                        </div >
+                    ),
+                    {
+                        className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+                        icon: null,
+                        position: "top-center"
+                    }
+                );
+            } else {
+                toast.success(`Salida registrada correctamente`, { position: "bottom-center" });
+                window.location.reload();
+            }
         } else {
             toast.error("Upps error al registrar la salida", { position: "bottom-center" });
             setActive(false)
@@ -164,7 +203,7 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
                     </button>
                     <button
                         type="submit"
-                        disabled={!isValid || active}
+                        disabled={!isValid || inventories.length === 0 || active}
                         className="disabled:bg-gray-400 w-full bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
                     >
                         {active ? (

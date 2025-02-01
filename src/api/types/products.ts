@@ -16,6 +16,7 @@ export interface IProductBody {
         category: string;
         priceBusiness: number;
         unitMeasure: string;
+        canSellAndLend: boolean;
     }
 }
 
