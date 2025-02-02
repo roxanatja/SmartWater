@@ -1,10 +1,14 @@
 import { createContext, useState } from "react";
 
 type ReportesEgresosContextType = {
-    showModal: boolean;
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-    showMiniModal: boolean;
-    setShowMiniModal: React.Dispatch<React.SetStateAction<boolean>>;
+    proveedores: boolean;
+    setProveedores: React.Dispatch<React.SetStateAction<boolean>>
+    egresosGastos: boolean;
+    setEgresosGastos: React.Dispatch<React.SetStateAction<boolean>>
+    cuentasPorPagar: boolean;
+    setCuentasPorPagar: React.Dispatch<React.SetStateAction<boolean>>
+    pagos: boolean;
+    setpagos: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ReportesEgresosContext = createContext<ReportesEgresosContextType>(
@@ -12,15 +16,21 @@ export const ReportesEgresosContext = createContext<ReportesEgresosContextType>(
 );
 
 export const ReportesEgresosProvider = ({ children }: any) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
-    
+    const [proveedores, setProveedores] = useState<boolean>(false);
+    const [egresosGastos, setEgresosGastos] = useState<boolean>(false);
+    const [cuentasPorPagar, setCuentasPorPagar] = useState<boolean>(false);
+    const [pagos, setpagos] = useState<boolean>(false);
+
     return (
         <ReportesEgresosContext.Provider value={{
-            showModal, 
-            setShowModal,
-            showMiniModal, 
-            setShowMiniModal,
+            egresosGastos,
+            setEgresosGastos,
+            cuentasPorPagar,
+            pagos,
+            proveedores,
+            setCuentasPorPagar,
+            setpagos,
+            setProveedores
         }}>
             {children}
         </ReportesEgresosContext.Provider>

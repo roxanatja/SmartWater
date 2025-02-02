@@ -1,113 +1,330 @@
-import { FC } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./EgresosGastos.css";
 import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { BarChart } from "../../../../../components/Barchart/Barchart";
+import { Account } from "../../../../../../../type/AccountEntry";
+import { Expense } from "../../../../../../../type/Expenses";
+import { useForm } from "react-hook-form";
+import { AccountEntryApiConector, ExpensesApiConector } from "../../../../../../../api/classes";
+import moment from "moment";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
+import { Line } from "react-chartjs-2";
+import datalabels from 'chartjs-plugin-datalabels';
+import 'chartjs-adapter-date-fns';
+import "moment/locale/es";
 
-const EgresosGastos:FC = () => {
+ChartJS.register(
+    LineElement,
+    CategoryScale,
+    LinearScale,
+    TimeScale,
+    LineElement,
+    datalabels,
+    Title,
+    Tooltip,
+    Legend
+);
 
+interface IFormattedReport {
+    product: string;
+    sales: {
+        date: string;
+        amount: number;
+    }[]
+}
+
+const EgresosGastos: FC = () => {
     const navigate = useNavigate();
+    const chartRef = useRef(null);
 
-    const handleClick = () => {
-        navigate('/Reportes/Egresos/Graficos');
+    const [products, setProducts] = useState<Account[]>([])
+    const [productsSelected, setProductsSelected] = useState<Account[]>([])
+
+    const [reports, setReports] = useState<Expense[]>([])
+    const [filters, setFilters] = useState<{ initialDate?: string; finalDate?: string }>({})
+    const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
+
+    useEffect(() => {
+        AccountEntryApiConector.get().then(res => {
+            setProducts(res || [])
+            setProductsSelected(res || [])
+        })
+    }, [])
+
+    const onSubmit = (data: { initialDate?: string; finalDate?: string }) => {
+        setFilters(data)
     };
 
-    return(
+    const range = useMemo<false | TimeUnit>(() => {
+        if (filters.initialDate && filters.finalDate) {
+            const init = moment(filters.initialDate)
+            const end = moment(filters.finalDate)
+            return (init.month() !== end.month() || init.year() !== end.year()) ? 'month' : 'day'
+        } else if (filters.initialDate) {
+            const init = moment(filters.initialDate)
+            const end = moment()
+            return (init.month() !== end.month() || init.year() !== end.year()) ? 'month' : 'day'
+        } else if (filters.finalDate) {
+            const init = moment("2020-01-01")
+            const end = moment(filters.finalDate)
+            return (init.month() !== end.month() || init.year() !== end.year()) ? 'month' : 'day'
+        }
+
+        return 'month'
+    }, [filters])
+
+    const verticalLinePlugin = {
+        id: "verticalLine",
+        afterDraw: (chart: any) => {
+            if (chart.tooltip._active && chart.tooltip._active.length) {
+                const ctx = chart.ctx;
+                const x = chart.tooltip._active[0].element.x;
+                const topY = chart.scales.y.top;
+                const bottomY = chart.scales.y.bottom;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(x, topY);
+                ctx.lineTo(x, bottomY);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+                ctx.stroke();
+                ctx.restore();
+            }
+        },
+    };
+
+    const formatted = useMemo<IFormattedReport[]>(() => {
+        const aux: IFormattedReport[] = []
+
+        let minDateRegistered = moment()
+
+        reports.forEach(r => {
+            let idx = aux.findIndex(a => a.product === r.accountEntry._id)
+            const date = range === 'day' ? moment(r.created) : moment(r.created).startOf('month')
+
+            if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
+
+            if (idx !== -1) {
+                const dateIdx = aux[idx].sales.findIndex(s => s.date === date.format("YYYY-MM-DD"))
+                if (dateIdx !== -1) {
+                    const cpy = { ...aux[idx].sales[dateIdx] }
+                    aux[idx].sales[dateIdx] = { amount: cpy.amount + r.amount, date: cpy.date }
+                } else {
+                    aux[idx].sales.push({ amount: r.amount, date: date.format("YYYY-MM-DD") })
+                }
+            } else {
+                aux.push({
+                    product: r.accountEntry._id,
+                    sales: [{
+                        amount: r.amount,
+                        date: date.format("YYYY-MM-DD")
+                    }]
+                })
+            }
+        })
+
+        const maxDate = range === 'day' ? moment(filters.finalDate) : moment(filters.finalDate || undefined).startOf('month')
+        products.forEach(p => {
+            const idx = aux.findIndex(i => i.product === p._id)
+
+            if (idx === -1) {
+                aux.push({
+                    product: p._id,
+                    sales: [
+                        {
+                            amount: 0,
+                            date: minDateRegistered.format("YYYY-MM-DD")
+                        },
+                        {
+                            amount: 0,
+                            date: maxDate.format("YYYY-MM-DD")
+                        },
+                    ]
+                })
+            } else {
+                if (aux[idx].sales.findIndex(s => s.date === minDateRegistered.format("YYYY-MM-DD")) === -1) {
+                    aux[idx].sales.push({
+                        amount: 0,
+                        date: minDateRegistered.format("YYYY-MM-DD")
+                    })
+                }
+                if (aux[idx].sales.findIndex(s => s.date === maxDate.format("YYYY-MM-DD")) === -1) {
+                    aux[idx].sales.push({
+                        amount: 0,
+                        date: maxDate.format("YYYY-MM-DD")
+                    })
+                }
+            }
+        })
+
+        console.log(aux)
+
+        return aux
+    }, [reports, range, products, filters])
+
+    const colors = useMemo(() => ["#367DFD", "#FF5C00", '#F40101', "#4de119", "#d7c50c"], [])
+
+    const data = useMemo<ChartData<'line', { x: string; y: number }[], string>>(() => {
+        return {
+            datasets: productsSelected.map<ChartData<'line', { x: string; y: number }[], string>['datasets'][0]>((f, index) => {
+                const dat = formatted.find(r => r.product === f._id)
+
+                return {
+                    label: f.name,
+                    tension: 0,
+                    fill: false,
+                    data: dat ? dat.sales
+                        .sort((a, b) => moment(a.date).diff(moment(b.date)))
+                        .map(s => ({ x: s.date, y: s.amount })) : [],
+                    borderColor: colors[index % 4],
+                    pointRadius: 5,
+                    pointBorderColor: colors[index % 4],
+                    pointBackgroundColor: colors[index % 4],
+                }
+            })
+        }
+    }, [formatted, colors, productsSelected])
+
+    const loadData = useCallback(async () => {
+        const res = await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") } })
+        setReports(res?.data || [])
+    }, [filters])
+
+    useEffect(() => { loadData() }, [loadData])
+
+    return (
         <>
-        <div>
-            <div>
-                <button className="btn" onClick={handleClick}>
-                    <span className="material-symbols-outlined">
-                        arrow_back
-                    </span>
-                </button>
-            </div>
-            <PageTitle titulo="Reportes/ Egresos y gastos" icon="../../../Reportes-icon.svg"/>
-            <div style={{width: "100%", display: "flex", justifyContent: "right", marginTop: "50px"}}>
-                <button type="button" className="boton-filtro">
-                    <span style={{marginRight: "5px"}}>Filtrar</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <g clipPath="url(#clip0_35_4995)">
-                        <path d="M0 19.5C0 18.6703 0.670312 18 1.5 18H4.06406C4.64062 16.6734 5.9625 15.75 7.5 15.75C9.0375 15.75 10.3594 16.6734 10.9359 18H22.5C23.3297 18 24 18.6703 24 19.5C24 20.3297 23.3297 21 22.5 21H10.9359C10.3594 22.3266 9.0375 23.25 7.5 23.25C5.9625 23.25 4.64062 22.3266 4.06406 21H1.5C0.670312 21 0 20.3297 0 19.5ZM9 19.5C9 18.6703 8.32969 18 7.5 18C6.67031 18 6 18.6703 6 19.5C6 20.3297 6.67031 21 7.5 21C8.32969 21 9 20.3297 9 19.5ZM18 12C18 11.1703 17.3297 10.5 16.5 10.5C15.6703 10.5 15 11.1703 15 12C15 12.8297 15.6703 13.5 16.5 13.5C17.3297 13.5 18 12.8297 18 12ZM16.5 8.25C18.0375 8.25 19.3594 9.17344 19.9359 10.5H22.5C23.3297 10.5 24 11.1703 24 12C24 12.8297 23.3297 13.5 22.5 13.5H19.9359C19.3594 14.8266 18.0375 15.75 16.5 15.75C14.9625 15.75 13.6406 14.8266 13.0641 13.5H1.5C0.670312 13.5 0 12.8297 0 12C0 11.1703 0.670312 10.5 1.5 10.5H13.0641C13.6406 9.17344 14.9625 8.25 16.5 8.25ZM9 3C8.17031 3 7.5 3.67031 7.5 4.5C7.5 5.32969 8.17031 6 9 6C9.82969 6 10.5 5.32969 10.5 4.5C10.5 3.67031 9.82969 3 9 3ZM12.4359 3H22.5C23.3297 3 24 3.67031 24 4.5C24 5.32969 23.3297 6 22.5 6H12.4359C11.8594 7.32656 10.5375 8.25 9 8.25C7.4625 8.25 6.14062 7.32656 5.56406 6H1.5C0.670312 6 0 5.32969 0 4.5C0 3.67031 0.670312 3 1.5 3H5.56406C6.14062 1.67344 7.4625 0.75 9 0.75C10.5375 0.75 11.8594 1.67344 12.4359 3Z" fill="#1B1B1B"/>
-                        </g>
-                        <defs>
-                        <clipPath id="clip0_35_4995">
-                        <rect width="24" height="24" fill="white"/>
-                        </clipPath>
-                        </defs>
-                    </svg>
-                </button>
-            </div>
-            <div style={{marginTop: "32px"}}>
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start"}}>
-                        <div style={{display: "flex", alignItems: "flex-start", gap: "48px"}}>
-                            <div style={{display: "flex", alignItems: "center", gap: "15px"}}>
-                                <div className="EgresosGastos-Fecha">
-                                    <span style={{textAlign: "left", width: "100%"}}>De</span>
-                                    <div className="EgresosGastos-FechaInput">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="24" viewBox="0 0 22 24" fill="none">
-                                            <path d="M19.2 2.4H18V0H15.6V2.4H6V0H3.6V2.4H2.4C1.068 2.4 0 3.468 0 4.8V21.6C0 22.2365 0.252856 22.847 0.702944 23.2971C1.15303 23.7471 1.76348 24 2.4 24H19.2C20.52 24 21.6 22.92 21.6 21.6V4.8C21.6 4.16348 21.3471 3.55303 20.8971 3.10294C20.447 2.65286 19.8365 2.4 19.2 2.4ZM19.2 21.6H2.4V8.4H19.2V21.6ZM10.8 19.2V16.8H6V13.2H10.8V10.8L15.6 15L10.8 19.2Z" fill="black"/>
-                                        </svg>
-                                        <input type="date" />
-                                    </div>
+            <div className="px-10 h-full overflow-y-auto">
+                <PageTitle titulo="Reportes/ Egresos y gastos" icon="/Reportes-icon.svg" hasBack onBack={() => {
+                    navigate('/Reportes/Egresos/Graficos')
+                }} />
+                <div style={{ marginTop: "32px" }}>
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                        <div className="flex gap-3 w-full items-center flex-wrap justify-between">
+                            <div className="flex gap-3 w-full items-center flex-wrap lg:w-1/2">
+                                <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                                    <span className="text-left text-sm">De</span>
+                                    <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                                    <input
+                                        max={watch('finalDate')?.toString() || moment().format("YYYY-MM-DD")}
+                                        type="date"
+                                        {...register("initialDate")}
+                                        className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
+                                    />
                                 </div>
-                                <div className="EgresosGastos-Fecha">
-                                    <span style={{textAlign: "left", width: "100%"}}>A</span>
-                                    <div className="EgresosGastos-FechaInput">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="24" viewBox="0 0 22 24" fill="none">
-                                            <path d="M19.2 2.4H18V0H15.6V2.4H6V0H3.6V2.4H2.4C1.068 2.4 0 3.468 0 4.8V21.6C0 22.2365 0.252856 22.847 0.702944 23.2971C1.15303 23.7471 1.76348 24 2.4 24H19.2C20.52 24 21.6 22.92 21.6 21.6V4.8C21.6 4.16348 21.3471 3.55303 20.8971 3.10294C20.447 2.65286 19.8365 2.4 19.2 2.4ZM19.2 21.6H2.4V8.4H19.2V21.6ZM10.8 10.8V13.2H15.6V16.8H10.8V19.2L6 15L10.8 10.8Z" fill="black"/>
-                                        </svg>
-                                        <input type="date" />
-                                    </div>
+                                <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                                    <span className="text-left text-sm">A</span>
+                                    <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                                    <input
+                                        min={watch('initialDate')?.toString()}
+                                        max={moment().format("YYYY-MM-DD")}
+                                        type="date"
+                                        {...register("finalDate")}
+                                        className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
+                                    />
                                 </div>
                             </div>
-                            <div className="EgresosGastos-Productos">
-                                <span className="EgresosGastos-Check" style={{color: "#1A3D7D"}}>Producto</span>
-                                <div className="EgresosGastos-ProductosCheck">
-                                    <div className="EgresosGastos-Check">
-                                        <input type="checkbox"/>
-                                        <label>Distribuidor 1</label>
-                                    </div>
-                                    <div className="EgresosGastos-Check">
-                                        <input type="checkbox"/>
-                                        <label>Distribuidor 2</label>
-                                    </div>
-                                    <div className="EgresosGastos-Check">
-                                        <input type="checkbox"/>
-                                        <label>Distribuidor 3</label>
-                                    </div>
-                                    <div className="EgresosGastos-Check">
-                                        <input type="checkbox"/>
-                                        <label>Todos</label>
-                                    </div>
-                                </div>
+                            <div className="flex-1 flex items-center justify-end">
+                                <button type="submit" className="PrestamosVsVentas-btn">
+                                    <span>Generar reporte</span>
+                                </button>
                             </div>
                         </div>
-                        <div>
-                            <button className="EgresosGastos-btn">
-                                <span>Generar reporte</span>
-                            </button>
+
+                        <div className="flex flex-wrap gap-3 px-4 w-full lg:w-3/4 ">
+                            {
+                                products.map(p =>
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" className="accent-blue_custom" checked={productsSelected.some(ps => ps._id === p._id)}
+                                            onChange={() => {
+                                                if (productsSelected.some(ps => ps._id === p._id)) {
+                                                    setProductsSelected(prev => prev.filter(ps => ps._id !== p._id))
+                                                } else {
+                                                    setProductsSelected(prev => [...prev, p])
+                                                }
+                                            }} key={p._id} id={p._id} />
+                                        <label htmlFor={p._id}>{p.name}</label>
+                                    </div>
+                                )
+                            }
+                            <div className="flex items-center gap-2">
+                                <input type="checkbox" className="accent-blue_custom" checked={productsSelected.length === products.length}
+                                    onChange={() => {
+                                        if (productsSelected.length === products.length) {
+                                            setProductsSelected([])
+                                        } else {
+                                            setProductsSelected([...products])
+                                        }
+                                    }} id="all" />
+                                <label htmlFor="all">Todos</label>
+                            </div>
                         </div>
-                    </div>
-                </form>
-                <div style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: "100px"}}>
-                    <BarChart/>
+                    </form>
+
                 </div>
-                <div style={{display: "flex", flexDirection: "column", marginTop: "40px", gap: "18px", alignItems: "start"}}>
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "16px"}}>
-                        <span style={{width: "135px", height: "23px", borderRadius: "5px", background: "#367DFD"}}></span>
-                        <span style={{fontFamily: "'Poppins', sans-serif", fontSize: "16px", fontWeight: "400", fontStyle: "normal"}}>Sueldos</span>
-                    </div>
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "16px"}}>
-                        <span style={{width: "135px", height: "23px", borderRadius: "5px", background: "#1A3D7D"}}></span>
-                        <span style={{fontFamily: "'Poppins', sans-serif", fontSize: "16px", fontWeight: "400", fontStyle: "normal"}}>Tarjetas</span>
-                    </div>
+
+                <div className="my-10">
+                    <Line ref={chartRef} data={data} options={{
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            datalabels: {
+                                formatter(value, context) {
+                                    return ""
+                                },
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title(tooltipItems) {
+                                        return moment(tooltipItems[0].label).format(range === 'month' ? "MMMM YYYY" : "DD-MM-YYYY")
+                                    },
+                                    label(tooltipItem) {
+                                        if ((tooltipItem.raw as any).y === 0) {
+                                            return ""
+                                        } else {
+                                            return `${tooltipItem.dataset.label} - ${(tooltipItem.raw as any).y.toFixed(2)} Bs.`
+                                        }
+                                    },
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: "x",
+                            intersect: false, // Permite que la línea interseque múltiples puntos
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    font: { family: "Poppins" },
+                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                },
+                                type: 'time',
+                                time: {
+                                    unit: range,
+                                    tooltipFormat: "yyyy-MM-dd",
+                                    displayFormats: {
+                                        month: "MM/yyyy",
+                                        day: "dd/MM/yyyy"
+                                    }
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: { family: "Poppins" },
+                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                },
+                            },
+                        },
+                    }} plugins={[verticalLinePlugin]} />
                 </div>
             </div>
-        </div>
         </>
     )
 }
 
-export{EgresosGastos}
+export { EgresosGastos }

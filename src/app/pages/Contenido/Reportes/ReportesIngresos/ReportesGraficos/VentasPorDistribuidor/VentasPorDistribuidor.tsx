@@ -170,7 +170,7 @@ const VentasPorDistribuidor: FC = () => {
                 const dat = formatted.find(r => r.distribuidor === f._id)
 
                 return {
-                    label: f.fullName || "Sin nombre",
+                    label: `${f.fullName || "Sin nombre"} ${f.role === 'admin' ? "(Administrador)" : ""}`,
                     tension: 0,
                     fill: false,
                     data: dat ? dat.sales

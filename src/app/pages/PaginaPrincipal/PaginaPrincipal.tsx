@@ -88,7 +88,6 @@ const PaginaPrincipal: FC = () => {
                   path="/Reportes/Ingresos/Graficos/*"
                   element={<ReportesGraficosWrapper />}
                 />
-                {/* 
                 <Route
                   path="/Reportes/Egresos/*"
                   element={<ReportesEgresosWrapper />}
@@ -101,6 +100,7 @@ const PaginaPrincipal: FC = () => {
                   path="/Reportes/Resultados/*"
                   element={<ReportesResultadosWrapper />}
                 />
+                {/* 
                 <Route
                   path="/MapaClientes/*"
                   element={<MapaClientesWrapper />}
