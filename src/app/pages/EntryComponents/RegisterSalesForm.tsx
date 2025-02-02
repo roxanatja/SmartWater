@@ -79,7 +79,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
           (t) => (
             <div>
               <p className="mb-4 text-center text-[#888]">
-                No hay saldos suficiente en invenatario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
+                No hay saldos suficiente en inventario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
               </p>
               <div className="flex justify-center">
                 <button
@@ -341,18 +341,19 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
             />
           </div>
 
-          <div className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300/25">
+          <button type="button" className="text-2xl rounded-2xl w-full flex flex-col items-center gap-2 text-black pr-2.5 shadow-md border p-2 shadow-zinc-300/25 [&:disabled_.icon]:bg-gray-400"
+            disabled={Number(watch("detail")[0]?.price) === 0}>
             <i
               className={`fa-solid  ${editar !== null
                 ? "fa-pen py-3 hover:animate-pulse"
                 : "fa-plus hover:rotate-90"
-                } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer`}
+                } rounded-full shadow-md shadow-zinc-400 px-3 py-2.5 bg-blue_custom text-white  transition-all cursor-pointer icon`}
               onClick={handleAddProduct}
             ></i>
             <p className="text-base font-semibold text-font-color">
               {editar !== null ? "Editar" : "Agregar"} Producto
             </p>
-          </div>
+          </button>
 
           {/* Display Added Products */}
           {

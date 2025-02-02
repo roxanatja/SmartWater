@@ -7,7 +7,7 @@ import { User } from "../../../../../../type/User";
 import { useForm } from "react-hook-form";
 import moment from "moment";
 import { useGlobalContext } from "../../../../../SmartwaterContext";
-import { exportData, searchDistrict, searchUser, searchZone, setContract, setDetailClient, setDevolutions, setLoans } from "../../../../../../utils/export.utils";
+import { exportData, searchDistrict, searchUser, searchZone, setContract, setContractLoan, setDetailClient, setDevolutions, setLoans } from "../../../../../../utils/export.utils";
 import { ILoansGetParams } from "../../../../../../api/types/loans";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector } from "../../../../../../api/classes";
 import { formatDateTime } from "../../../../../../utils/helpers";
@@ -158,7 +158,10 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                                 "numeric",
                                 "2-digit", false, true
                             ), // Formatear la fecha de registro
-                            CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
+                            CONTRATOS: setContractLoan(!!loan.contract.link, loan.contract.validUntil) || "SIN CONTRATOS", // Estado de contratos
+                            "FECHA VALIDEZ DEL CONTRATO": !!loan.contract.validUntil
+                                ? formatDateTime(loan.contract.validUntil, "numeric", "numeric", "2-digit", false, true)
+                                : "N/A",
                             PRESTAMOS: loanZ ? `${loanZ.quantity} ${loanZ.itemName}` : "SIN MOVIMIENTO", // Detalles de préstamos
                             DEVOLUCIONES: devol ? `${devol.quantity} ${devol.itemName}` : "SIN MOVIMIENTO", // Detalles de devoluciones
                             SALDOS: saldo ? `${saldo.quantity} ${saldo.itemName}` : "SIN SALDOS", // Detalles de saldos

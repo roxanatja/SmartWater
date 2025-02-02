@@ -44,7 +44,7 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                     const cpy: IInitialBalanceBody['data']['elements'][0] = {
                         quantity: parseFloat(String(e.quantity)),
                         unitPrice: parseFloat(String(e.unitPrice)),
-                        inputImport: parseFloat(String(e.unitPrice)) * parseFloat(String(e.quantity))
+                        // inputImport: parseFloat(String(e.unitPrice)) * parseFloat(String(e.quantity))
                     }
                     if (e.product) { cpy.product = e.product }
                     if (e.item) { cpy.item = e.item }

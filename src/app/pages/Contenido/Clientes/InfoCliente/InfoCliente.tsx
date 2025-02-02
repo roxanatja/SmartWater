@@ -221,7 +221,7 @@ const InfoCliente = ({ client, zones }: { client: Client; zones: Zone[] }) => {
             </div>
           </div>
         </div>
-        <a className="infoClientes-footer relative z-10" rel="noreferrer"
+        <a className="infoClientes-footer relative z-10 w-fit mx-auto" rel="noreferrer"
           target="_blank"
           href={url}>
           <img src="./Location-azul-icon.svg" alt="" />
