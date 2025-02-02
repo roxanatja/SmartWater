@@ -96,11 +96,11 @@ const PaginaPrincipal: FC = () => {
                   path="/Reportes/Egresos/Graficos/*"
                   element={<ReportesEgresosGraficosWrapper />}
                 />
-                {/* 
                 <Route
                   path="/Reportes/Resultados/*"
                   element={<ReportesResultadosWrapper />}
                 />
+                {/* 
                 <Route
                   path="/MapaClientes/*"
                   element={<MapaClientesWrapper />}

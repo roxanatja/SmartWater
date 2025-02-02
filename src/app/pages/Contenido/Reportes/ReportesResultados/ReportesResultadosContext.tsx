@@ -1,10 +1,8 @@
 import { createContext, useState } from "react";
 
 type ReportesResultadosContextType = {
-    showModal: boolean;
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-    showMiniModal: boolean;
-    setShowMiniModal: React.Dispatch<React.SetStateAction<boolean>>;
+    resultados: boolean;
+    setResultados: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ReportesResultadosContext = createContext<ReportesResultadosContextType>(
@@ -12,15 +10,12 @@ export const ReportesResultadosContext = createContext<ReportesResultadosContext
 );
 
 export const ReportesResultadosProvider = ({ children }: any) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
-    
+    const [resultados, setResultados] = useState<boolean>(false);
+
     return (
         <ReportesResultadosContext.Provider value={{
-            showModal, 
-            setShowModal,
-            showMiniModal, 
-            setShowMiniModal,
+            resultados,
+            setResultados,
         }}>
             {children}
         </ReportesResultadosContext.Provider>
