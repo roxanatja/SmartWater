@@ -106,7 +106,7 @@ const ReportesIngresos: FC = () => {
             </svg>
             <span>Préstamos</span>
           </button>
-          <button
+          {/* <button
             className="ReportesIngresos-item"
             onClick={() => setEgresosGastos(true)}
           >
@@ -135,7 +135,7 @@ const ReportesIngresos: FC = () => {
               </defs>
             </svg>
             <span>Egresos y gastos</span>
-          </button>
+          </button> */}
           <Link to={"/Reportes/Ingresos/Graficos"}>
             <div className="ReportesIngresos-item">
               <svg

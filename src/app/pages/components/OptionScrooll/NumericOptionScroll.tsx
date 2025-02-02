@@ -70,7 +70,7 @@ const NumericOptionScrooll = memo<CustomSelectProps>(({ options, onOptionChange,
                 className="OptionScrooll-btn"
                 type="button"
                 onClick={handleUpClick}
-                style={{ opacity: selectedOption === 0 ? "0.2" : "" }}
+                style={{ opacity: isNaN(selectedOption) || selectedOption === 0 ? "0.2" : "" }}
             >
                 <span className="material-symbols-outlined">expand_less</span>
             </button>
@@ -78,6 +78,8 @@ const NumericOptionScrooll = memo<CustomSelectProps>(({ options, onOptionChange,
             {/* Animated option */}
             <input
                 type="number"
+                min={Number(localOptions[0])}
+                max={Number(localOptions[localOptions.length - 1])}
                 // key={selectedOption}
                 // initial={{ opacity: 0, y: -10 }}
                 // animate={{ opacity: 1, y: 0 }}
@@ -87,9 +89,23 @@ const NumericOptionScrooll = memo<CustomSelectProps>(({ options, onOptionChange,
                 value={localOptions[selectedOption]}
                 onChange={(e) => {
                     const val = parseInt(e.target.value)
-                    const idx = localOptions.findIndex(o => Number(o) === val)
-                    if (idx !== -1) {
-                        setSelectedOption(idx)
+                    console.log(val)
+
+                    if (isNaN(val)) {
+                        setSelectedOption(NaN)
+                        setActive(true)
+                    } else {
+                        const idx = localOptions.findIndex(o => Number(o) === val)
+                        console.log(idx)
+                        if (idx !== -1) {
+                            setSelectedOption(idx)
+                            setActive(true)
+                        }
+                    }
+                }}
+                onBlur={(e) => {
+                    if (isNaN(selectedOption)) {
+                        setSelectedOption(0)
                         setActive(true)
                     }
                 }}
@@ -117,7 +133,7 @@ const NumericOptionScrooll = memo<CustomSelectProps>(({ options, onOptionChange,
                 type="button"
                 onClick={handleDownClick}
                 style={{
-                    opacity: selectedOption === localOptions.length - 1 ? "0.2" : "",
+                    opacity: isNaN(selectedOption) || selectedOption === localOptions.length - 1 ? "0.2" : "",
                 }}
             >
                 <span className="material-symbols-outlined">expand_more</span>

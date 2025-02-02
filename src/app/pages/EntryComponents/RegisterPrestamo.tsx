@@ -82,7 +82,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
           (t) => (
             <div>
               <p className="mb-4 text-center text-[#888]">
-                No hay saldos suficiente en invenatario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
+                No hay saldos suficiente en inventario para hacer este movimiento, <br /> pulsa <b>Proceder</b> para forzar su registro
               </p>
               <div className="flex justify-center">
                 <button
