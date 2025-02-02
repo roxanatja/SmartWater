@@ -33,7 +33,7 @@ interface IFormattedReport {
     }[]
 }
 
-const VentasPorDistribuidor: FC = () => {
+const CxcPorDistribuidor: FC = () => {
     const navigate = useNavigate();
 
     const chartRef = useRef(null);
@@ -187,7 +187,7 @@ const VentasPorDistribuidor: FC = () => {
 
 
     const loadData = useCallback(async () => {
-        const res = await SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 3000 } })
+        const res = await SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), creditSale: true, pendingBalance: true }, pagination: { page: 1, pageSize: 3000 } })
         setReports(res?.data || [])
     }, [filters])
 
@@ -196,7 +196,7 @@ const VentasPorDistribuidor: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Venta por distribuidor" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Cuentas por Cobrar" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -338,4 +338,4 @@ const VentasPorDistribuidor: FC = () => {
     )
 }
 
-export { VentasPorDistribuidor }
+export { CxcPorDistribuidor }
