@@ -3,7 +3,7 @@ import "./ReportesEgresos.css";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { Link } from "react-router-dom";
 import Modal from "../../../EntryComponents/Modal";
-import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
+import { FiltroEgresosGastos } from "../ReportesIngresos/FiltroEgresosGastos/FiltroEgresosGastos";
 import { Zone } from "../../../../../type/City";
 import { Providers } from "../../../../../type/providers";
 import { Account } from "../../../../../type/AccountEntry";

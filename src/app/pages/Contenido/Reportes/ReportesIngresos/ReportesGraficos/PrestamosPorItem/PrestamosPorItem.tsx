@@ -161,8 +161,6 @@ const PrestamosPorItem: FC = () => {
             }
         })
 
-        console.log(aux)
-
         return aux
     }, [reports, range, products, filters])
 
