@@ -1,17 +1,17 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "./VentasPorProductos.css";
-import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
+import "./VentasPorDistribuidor.css";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import moment from "moment";
-import { ItemsApiConector, LoansApiConector } from "../../../../../../../api/classes";
+import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
 import { Line } from "react-chartjs-2";
 import datalabels from 'chartjs-plugin-datalabels';
+import moment from "moment";
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
-import { Item } from "../../../../../../../type/Item";
-import { Loans } from "../../../../../../../type/Loans/Loans";
+import { User } from "../../../../../../../type/User";
+import { useForm } from "react-hook-form";
+import { ClientsApiConector, UsersApiConector } from "../../../../../../../api/classes";
+import { Client } from "../../../../../../../type/Cliente/Client";
 
 ChartJS.register(
     LineElement,
@@ -26,29 +26,29 @@ ChartJS.register(
 );
 
 interface IFormattedReport {
-    product: string;
+    distribuidor: string;
     sales: {
         date: string;
         amount: number;
     }[]
 }
 
-const PrestamosPorItem: FC = () => {
-
+const ClientesPorDistribuidor: FC = () => {
     const navigate = useNavigate();
+
     const chartRef = useRef(null);
 
-    const [products, setProducts] = useState<Item[]>([])
-    const [productsSelected, setProductsSelected] = useState<Item[]>([])
+    const [distribuidores, setDistribuidores] = useState<User[]>([])
+    const [distribuidoresSelected, setDistribuidoresSelected] = useState<User[]>([])
 
-    const [reports, setReports] = useState<Loans[]>([])
+    const [reports, setReports] = useState<Client[]>([])
     const [filters, setFilters] = useState<{ initialDate?: string; finalDate?: string }>({})
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
-            setProducts(res?.data || [])
-            setProductsSelected(res?.data || [])
+        UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }).then(res => {
+            setDistribuidores(res?.data || [])
+            setDistribuidoresSelected(res?.data || [])
         })
     }, [])
 
@@ -101,39 +101,37 @@ const PrestamosPorItem: FC = () => {
         let minDateRegistered = moment()
 
         reports.forEach(r => {
-            r.detail.forEach(d => {
-                let idx = aux.findIndex(a => a.product === d.item)
-                const date = range === 'day' ? moment(r.created) : moment(r.created).startOf('month')
+            let idx = aux.findIndex(a => a.distribuidor === r.user)
+            const date = range === 'day' ? moment(r.created) : moment(r.created).startOf('month')
 
-                if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
+            if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
 
-                if (idx !== -1) {
-                    const dateIdx = aux[idx].sales.findIndex(s => s.date === date.format("YYYY-MM-DD"))
-                    if (dateIdx !== -1) {
-                        const cpy = { ...aux[idx].sales[dateIdx] }
-                        aux[idx].sales[dateIdx] = { amount: cpy.amount + d.quantity, date: cpy.date }
-                    } else {
-                        aux[idx].sales.push({ amount: d.quantity, date: date.format("YYYY-MM-DD") })
-                    }
+            if (idx !== -1) {
+                const dateIdx = aux[idx].sales.findIndex(s => s.date === date.format("YYYY-MM-DD"))
+                if (dateIdx !== -1) {
+                    const cpy = { ...aux[idx].sales[dateIdx] }
+                    aux[idx].sales[dateIdx] = { amount: cpy.amount + 1, date: cpy.date }
                 } else {
-                    aux.push({
-                        product: d.item,
-                        sales: [{
-                            amount: d.quantity,
-                            date: date.format("YYYY-MM-DD")
-                        }]
-                    })
+                    aux[idx].sales.push({ amount: 1, date: date.format("YYYY-MM-DD") })
                 }
-            })
+            } else {
+                aux.push({
+                    distribuidor: r.user,
+                    sales: [{
+                        amount: 1,
+                        date: date.format("YYYY-MM-DD")
+                    }]
+                })
+            }
         })
 
         const maxDate = range === 'day' ? moment(filters.finalDate) : moment(filters.finalDate || undefined).startOf('month')
-        products.forEach(p => {
-            const idx = aux.findIndex(i => i.product === p._id)
+        distribuidores.forEach(p => {
+            const idx = aux.findIndex(i => i.distribuidor === p._id)
 
             if (idx === -1) {
                 aux.push({
-                    product: p._id,
+                    distribuidor: p._id,
                     sales: [
                         {
                             amount: 0,
@@ -161,20 +159,17 @@ const PrestamosPorItem: FC = () => {
             }
         })
 
-        console.log(aux)
-
         return aux
-    }, [reports, range, products, filters])
+    }, [reports, range, distribuidores, filters])
 
     const colors = useMemo(() => ["#367DFD", "#FF5C00", '#F40101', "#4de119", "#d7c50c"], [])
-
     const data = useMemo<ChartData<'line', { x: string; y: number }[], string>>(() => {
         return {
-            datasets: productsSelected.map<ChartData<'line', { x: string; y: number }[], string>['datasets'][0]>((f, index) => {
-                const dat = formatted.find(r => r.product === f._id)
+            datasets: distribuidoresSelected.map<ChartData<'line', { x: string; y: number }[], string>['datasets'][0]>((f, index) => {
+                const dat = formatted.find(r => r.distribuidor === f._id)
 
                 return {
-                    label: f.name,
+                    label: `${f.fullName || "Sin nombre"} ${f.role === 'admin' ? "(Administrador)" : ""}`,
                     tension: 0,
                     fill: false,
                     data: dat ? dat.sales
@@ -187,10 +182,11 @@ const PrestamosPorItem: FC = () => {
                 }
             })
         }
-    }, [formatted, colors, productsSelected])
+    }, [formatted, colors, distribuidoresSelected])
+
 
     const loadData = useCallback(async () => {
-        const res = await LoansApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") } })
+        const res = await ClientsApiConector.getClients({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 3000 } })
         setReports(res?.data || [])
     }, [filters])
 
@@ -199,7 +195,7 @@ const PrestamosPorItem: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Préstamos por item" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Clientes por distribuidor" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -236,27 +232,27 @@ const PrestamosPorItem: FC = () => {
 
                         <div className="flex flex-wrap gap-3 px-4 w-full lg:w-3/4 ">
                             {
-                                products.map(p =>
+                                distribuidores.map(p =>
                                     <div className="flex items-center gap-2">
-                                        <input type="checkbox" className="accent-blue_custom" checked={productsSelected.some(ps => ps._id === p._id)}
+                                        <input type="checkbox" className="accent-blue_custom" checked={distribuidoresSelected.some(ps => ps._id === p._id)}
                                             onChange={() => {
-                                                if (productsSelected.some(ps => ps._id === p._id)) {
-                                                    setProductsSelected(prev => prev.filter(ps => ps._id !== p._id))
+                                                if (distribuidoresSelected.some(ps => ps._id === p._id)) {
+                                                    setDistribuidoresSelected(prev => prev.filter(ps => ps._id !== p._id))
                                                 } else {
-                                                    setProductsSelected(prev => [...prev, p])
+                                                    setDistribuidoresSelected(prev => [...prev, p])
                                                 }
                                             }} key={p._id} id={p._id} />
-                                        <label htmlFor={p._id}>{p.name}</label>
+                                        <label htmlFor={p._id}>{p.fullName || "Sin nombre"} {p.role === 'admin' ? "(Administrador)" : ""}</label>
                                     </div>
                                 )
                             }
                             <div className="flex items-center gap-2">
-                                <input type="checkbox" className="accent-blue_custom" checked={productsSelected.length === products.length}
+                                <input type="checkbox" className="accent-blue_custom" checked={distribuidoresSelected.length === distribuidores.length}
                                     onChange={() => {
-                                        if (productsSelected.length === products.length) {
-                                            setProductsSelected([])
+                                        if (distribuidoresSelected.length === distribuidores.length) {
+                                            setDistribuidoresSelected([])
                                         } else {
-                                            setProductsSelected([...products])
+                                            setDistribuidoresSelected([...distribuidores])
                                         }
                                     }} id="all" />
                                 <label htmlFor="all">Todos</label>
@@ -322,10 +318,23 @@ const PrestamosPorItem: FC = () => {
                             },
                         },
                     }} plugins={[verticalLinePlugin]} />
+                    {/* <div
+                        id="custom-tooltip"
+                        style={{
+                            position: "absolute",
+                            backgroundColor: "white",
+                            padding: "10px",
+                            borderRadius: "5px",
+                            boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+                            pointerEvents: "none",
+                            opacity: 0,
+                            transition: "opacity 0.2s",
+                        }}
+                    /> */}
                 </div>
-            </div >
+            </div>
         </>
     )
 }
 
-export { PrestamosPorItem }
+export { ClientesPorDistribuidor }

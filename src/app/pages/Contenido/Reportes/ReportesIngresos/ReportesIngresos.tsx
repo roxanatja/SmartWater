@@ -6,21 +6,16 @@ import { ReportesIngresosContext } from "./ReportesIngresosContext";
 import { FiltroVenta } from "./FiltroVenta/FiltroVenta";
 import { FiltroCuentasPorCobrar } from "./FiltroCuentasPorCobrar/FiltroCuentasPorCobrar";
 import { FiltroPrestamos } from "./FiltroPrestamos/FiltroPrestamos";
-import { FiltroEgresosGastos } from "./FiltroEgresosGastos/FiltroEgresosGastos";
 import Modal from "../../../EntryComponents/Modal";
 import FiltroClientes from "./FiltroClientes/FiltroClientes";
 import { Zone } from "../../../../../type/City";
 import { User } from "../../../../../type/User";
-import { AccountEntryApiConector, ProvidersApiConector, UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
-import { Account } from "../../../../../type/AccountEntry";
-import { Providers } from "../../../../../type/providers";
+import { UsersApiConector, ZonesApiConector } from "../../../../../api/classes";
 
 const ReportesIngresos: FC = () => {
   const {
     clientes,
     setClientes,
-    egresosGastos,
-    setEgresosGastos,
     prestamos,
     setPrestamos,
     cuentasPorCobrarCobros,
@@ -30,15 +25,11 @@ const ReportesIngresos: FC = () => {
   } = useContext(ReportesIngresosContext);
 
   const [zones, setZones] = useState<Zone[]>([])
-  const [providers, setProviders] = useState<Providers[]>([])
-  const [accounts, setAccounts] = useState<Account[]>([])
   const [distribuidores, setDistribuidores] = useState<User[]>([])
 
   useEffect(() => {
     ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setZones(res?.data || []))
     UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }).then(res => setDistribuidores(res?.data || []))
-    ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setProviders(res?.data || []))
-    AccountEntryApiConector.get().then(res => setAccounts(res || []))
   }, [])
 
   return (
@@ -166,9 +157,6 @@ const ReportesIngresos: FC = () => {
       </Modal>
       <Modal isOpen={prestamos} onClose={() => setPrestamos(false)}>
         <FiltroPrestamos distribuidores={distribuidores} zones={zones} />
-      </Modal>
-      <Modal isOpen={egresosGastos} onClose={() => setEgresosGastos(false)}>
-        <FiltroEgresosGastos distribuidores={distribuidores} zones={zones} accounts={accounts} providers={providers} />
       </Modal>
     </>
   );

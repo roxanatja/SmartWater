@@ -56,7 +56,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
     const onSubmit = async (data: any) => {
         setLoading(true)
 
-        const fileName = "ReporteClientes.xlsx";
+        const fileName = "ReportePrestamos.xlsx";
         const dat = await getDataClients(filterClients(data));
         exportData(fileName, dat);
 

@@ -13,8 +13,6 @@ type ReportesIngresosContextType = {
     setCuentasPorCobrarCobros: React.Dispatch<React.SetStateAction<boolean>>
     prestamos: boolean;
     setPrestamos: React.Dispatch<React.SetStateAction<boolean>>
-    egresosGastos: boolean;
-    setEgresosGastos: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ReportesIngresosContext = createContext<ReportesIngresosContextType>(
@@ -28,7 +26,6 @@ export const ReportesIngresosProvider = ({ children }: any) => {
     const [ ventas, setVentas ] = useState<boolean>(false);
     const [ cuentasPorCobrarCobros, setCuentasPorCobrarCobros ] = useState<boolean>(false);
     const [ prestamos, setPrestamos ] = useState<boolean>(false);
-    const [ egresosGastos, setEgresosGastos ] = useState<boolean>(false);
 
     
     return (
@@ -45,8 +42,6 @@ export const ReportesIngresosProvider = ({ children }: any) => {
             setCuentasPorCobrarCobros,
             prestamos, 
             setPrestamos,
-            egresosGastos,
-            setEgresosGastos,
         }}>
             {children}
         </ReportesIngresosContext.Provider>

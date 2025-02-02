@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import "./FiltroEgresosGastos.css";
-import { ReportesIngresosContext } from "../ReportesIngresosContext";
 import { Providers } from "../../../../../../type/providers";
 import { Account } from "../../../../../../type/AccountEntry";
 import { User } from "../../../../../../type/User";
@@ -13,6 +12,7 @@ import { motion } from "framer-motion";
 import { exportData } from "../../../../../../utils/export.utils";
 import { ExpensesApiConector } from "../../../../../../api/classes";
 import { formatDateTime } from "../../../../../../utils/helpers";
+import { ReportesEgresosContext } from "../ReportesEgresosContext";
 
 interface IExpenseFilter {
     cash: boolean;
@@ -53,7 +53,7 @@ const FiltroEgresosGastos = ({ accounts, distribuidores, providers, zones }: {
     zones: Zone[];
 }) => {
 
-    const { setEgresosGastos } = useContext(ReportesIngresosContext);
+    const { setEgresosGastos } = useContext(ReportesEgresosContext);
     const { setLoading } = useGlobalContext()
 
     const { register, handleSubmit, setValue, watch } = useForm<IExpenseFilter>({
@@ -94,7 +94,7 @@ const FiltroEgresosGastos = ({ accounts, distribuidores, providers, zones }: {
     const onSubmit = async (data: any) => {
         setLoading(true)
 
-        const fileName = "ReporteClientes.xlsx";
+        const fileName = "ReporteEgresosYGastos.xlsx";
         const dat = await getDataWithClientNames(filterClients(data));
         exportData(fileName, dat);
 
@@ -114,7 +114,7 @@ const FiltroEgresosGastos = ({ accounts, distribuidores, providers, zones }: {
 
             const typeDataToExport = {
                 NRO: `${idx + 1}`,
-                USUARIO: `${expense.user.fullName} ${expense.user.role === 'admin' ? "(Administrador)" : ""}`,
+                USUARIO: `${expense.user?.fullName || "Usuario desconocido"} ${expense.user?.role === 'admin' ? "(Administrador)" : ""}`,
                 "NOMBRE PROVEEDOR": expense.provider?.fullName || "Proveedor desconocido",
                 "TELEFONO": expense.provider?.phoneNumber || "N/A",
                 "CORREO ELECTRONICO": expense.provider?.email || "N/A",
