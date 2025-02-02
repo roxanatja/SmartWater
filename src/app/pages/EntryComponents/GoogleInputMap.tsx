@@ -111,11 +111,11 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
         setMarker(centerMarker);
 
         if (latitude && !isNaN(latitude) && longitude && !isNaN(longitude)) {
-          console.log(latitude, longitude)
           centerMarker.setPosition({ lat: latitude, lng: longitude })
+          onChange({ lat: latitude, lng: longitude });
         } else {
-          console.log(initialPosition)
           centerMarker.setPosition({ lat: initialPosition.lat, lng: initialPosition.lng })
+          onChange(initialPosition);
         }
 
         mapInstance.addListener("click", (e: any) => {
@@ -126,6 +126,14 @@ const GoogleMapWithSelection: React.FC<GoogleMapWithSelectionProps> = ({
           centerMarker.setPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
           onChange(newPosition);
         });
+
+        centerMarker.addListener('dragend', (e: any) => {
+          const newPosition = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          };
+          onChange(newPosition);
+        })
 
         const locationButton = document.createElement("button");
         locationButton.classList.add("custom-map-control-button");

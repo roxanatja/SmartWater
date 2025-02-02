@@ -576,10 +576,14 @@ const ClientForm = ({
             latitude={Number(watch("location.latitude"))}
             longitude={Number(watch("location.longitude"))}
             onChange={(coordinates: { lat: number; lng: number }) => {
-              setValue("location.latitude", `${coordinates.lat}`);
-              setValue("location.longitude", `${coordinates.lng}`);
+              setValue("location.latitude", `${coordinates.lat}`, { shouldValidate: true });
+              setValue("location.longitude", `${coordinates.lng}`, { shouldValidate: true });
             }}
           />
+
+          <input type="text" {...register('location.latitude', { required: true })} className="bg-transparent" />
+          <input type="text" {...register('location.longitude', { required: true })} className="bg-transparent" />
+
           <button
             type="button"
             onClick={() => setMapinteration(!mapinteration)}
@@ -587,6 +591,14 @@ const ClientForm = ({
           >
             {mapinteration ? "Editar" : "Bloquear"}
           </button>
+
+          {
+            (errors.location?.latitude || errors.location?.longitude) &&
+            <span className="text-red-500 font-normal text-sm">
+              <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+              Ubicación no definida
+            </span>
+          }
         </div>
         <motion.div
           initial={{ opacity: 0 }}
@@ -601,15 +613,15 @@ const ClientForm = ({
                 onClick={() => {
                   handleCheckboxChangeReno("dayrenew");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${watch("renewInDays") === 0
-                  ? `text-zinc-300 hover:text-blue-900`
-                  : "text-blue-900"
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer  ${!watch("dayrenew")
+                  ? `text-zinc-300 hover:text-blue_custom`
+                  : "text-blue_custom"
                   }`}
               ></i>
 
               {date ? (
                 <div className="bg-main-background z-10 relative w-full">
-                  <p className={`transition-all absolute top-0 left-1 w-fit -translate-y-1/2 h-fit text-sm bg-main-background z-[20] px-2`}>
+                  <p className={`transition-all absolute top-0 left-1 w-fit -translate-y-1/2 h-fit text-sm bg-main-background z-[20] px-2 ${!watch("dayrenew") ? "!text-zinc-300" : "!text-blue_custom"}`}>
                     Periodo de Renovacion
                   </p>
                   <Input
@@ -623,10 +635,11 @@ const ClientForm = ({
                     className="w-full"
                     errors={errors.renewInDays}
                     required={date}
+                    validateAmount={(val: number) => date ? val <= 0 ? "Indique un valor" : true : true}
                   />
                 </div>
               ) : <p
-                className={`${!watch("dayrenew") ? "text-zinc-300" : ""} ${date && "text-transparent"
+                className={`${!watch("dayrenew") ? "text-zinc-300" : "text-blue_custom"} ${date && "text-transparent"
                   }`}
               >
                 Periodo de Renovacion
@@ -646,11 +659,11 @@ const ClientForm = ({
                   readOnly
                   onClick={() => handleCheckboxChangeReno("dayrenew")}
                   checked={watch("dayrenew")}
-                  className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
+                  className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue_custom cursor-pointer transition-colors duration-300"
                 />
                 <label
                   htmlFor="switch-component"
-                  className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
+                  className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue_custom cursor-pointer"
                 ></label>
               </div>
             </div>
@@ -667,14 +680,14 @@ const ClientForm = ({
             <div className="flex gap-4 items-center justify-center font-semibold">
               <i
                 onClick={() => {
-                  handleCheckboxChangeReno("dayrenew");
+                  handleCheckboxChangeReno("hasOrder");
                 }}
-                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("renewInDays") === 0
-                  ? `text-zinc-300 hover:text-blue-900`
-                  : "text-blue-900"
+                className={`fa-solid fa-calendar-days text-3xl cursor-pointer ${watch("dayrenew")
+                  ? `text-zinc-300 hover:text-blue_custom`
+                  : "text-blue_custom"
                   }`}
               ></i>
-              <p className={`${watch("dayrenew") ? "text-zinc-300" : ""}`}>
+              <p className={`${watch("dayrenew") ? "text-zinc-300" : "text-blue_custom"}`}>
                 Renovacion Promedio
               </p>
             </div>
@@ -692,11 +705,11 @@ const ClientForm = ({
                   onClick={() => handleCheckboxChangeReno("hasOrder")}
                   readOnly
                   checked={!watch("dayrenew")}
-                  className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue-900 cursor-pointer transition-colors duration-300"
+                  className="peer appearance-none w-16 h-5 bg-slate-300 rounded-full checked:bg-blue_custom cursor-pointer transition-colors duration-300"
                 />
                 <label
                   htmlFor="switch-component-2"
-                  className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue-900 cursor-pointer"
+                  className="absolute top-0 left-0 w-5 h-5 bg-white rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-12 peer-checked:border-blue_custom cursor-pointer"
                 ></label>
               </div>
             </div>
