@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "./Inputs";
 import { Loans } from "../../../type/Loans/Loans";
 import { useGlobalContext } from "../../SmartwaterContext";
-import moment from "moment";
+import moment from "moment-timezone";
 import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionScroll";
 import { SelectableOptionScrooll } from "../components/OptionScrooll/SelectableOptionScrooll";
 
@@ -57,6 +57,14 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
     }
     setActive(true);
     const userData: UserData | null = AuthService.getUser();
+
+    if (!!data.contract.validUntil) {
+      const selected = moment(data.contract.validUntil)
+      const now = moment().set({ day: selected.day(), month: selected.month(), year: selected.year() }).add(1.5, 'hour')
+      data.contract.validUntil = now.format("YYYY-MM-DDTHH:mm")
+    }
+
+    console.log(data.contract.validUntil)
 
     const values: ILoanBody['data'] = {
       ...data,
@@ -345,6 +353,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
             iconContainerClassName="!border-0 !ps-1"
             name="contract.validUntil"
             register={register}
+            required={!!watch('contract.link')}
             errors={errors.contract?.validUntil}
             className="full-selector bg-transparent text-blue_custom font-medium !outline-0 border-b-2 rounded-none border-blue_custom focus:outline-0 w-full"
             icon={<img className="w-6 h-6" src="/valid.svg" alt="" />}
@@ -374,7 +383,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
 
         <button
           type="submit"
-          disabled={addedProducts.length === 0 || ((!!watch('contract.validUntil') && !watch('contract.link')))}
+          disabled={addedProducts.length === 0 || ((!!watch('contract.validUntil') && !watch('contract.link'))) || ((!watch('contract.validUntil') && !!watch('contract.link')))}
           className="disabled:bg-gray-400 bg-blue-500 py-2  text-xl px-6 rounded-full text-white font-medium shadow-xl hover:bg-blue-600 fixed bottom-5 right-5 z-50 p-10 w-2/12"
         >
           {

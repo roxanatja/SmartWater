@@ -18,7 +18,7 @@ export const ProveedoresContext = createContext<ProveedoresContextType>(
   {} as ProveedoresContextType
 );
 
-export const providerBlank: Providers = { _id: "", address: "", created: "", email: "", fullName: "", NIT: "", phoneNumber: "", updated: "" }
+export const providerBlank: Providers = { _id: "", address: "", created: "", email: "", fullName: "", NIT: "", phoneNumber: "", updated: "", user: "" }
 
 export const ProveedoresProvider = ({ children }: any) => {
   const [showModal, setShowModal] = useState<boolean>(false);

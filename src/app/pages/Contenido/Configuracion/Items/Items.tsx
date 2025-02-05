@@ -21,6 +21,7 @@ const Items: FC = () => {
     const [searchParam, setSearchParam] = useState<string>('');
 
     const [page, setPage] = useState<number>(1);
+    const [sort, setSort] = useState<'asc' | 'desc'>('desc');
     const [totalPages, setTotalPages] = useState<number>(1);
     const ITEMS_PER_PAGE = 15
 
@@ -37,7 +38,7 @@ const Items: FC = () => {
     const fetchData = useCallback(async () => {
         setLoading(true)
 
-        const res = await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const res = await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort } })
         const prods = res?.data || []
         setItems(prods)
         setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
@@ -49,7 +50,7 @@ const Items: FC = () => {
         setUnits(resU || [])
 
         setLoading(false)
-    }, [setLoading])
+    }, [setLoading, sort])
 
     useEffect(() => {
         fetchData()
@@ -71,6 +72,14 @@ const Items: FC = () => {
             setItemsToShow(filteredItems.slice((page - 1) * ITEMS_PER_PAGE, (page * ITEMS_PER_PAGE)))
         }
     }, [filteredItems, page])
+
+    const order = (orden: string) => {
+        if (orden === "new") {
+            setSort('desc')
+        } else if (orden === "older") {
+            setSort('asc')
+        }
+    };
 
     const handleCheckbox1Change = (categoryId: string) => {
         if (checkedCategories.includes(categoryId)) {
@@ -101,7 +110,7 @@ const Items: FC = () => {
             <div className="px-10">
                 <PageTitle titulo="Configuración / Items" icon="../../../Configuracion-icon.svg" />
                 <FiltroPaginado add={true} paginacion={totalPages > 1} totalPage={totalPages} currentPage={page} handlePageChange={setPage}
-                    onAdd={() => setShowModal(true)} resultados order={false} total={filteredItems.length} search={setSearchParam}
+                    onAdd={() => setShowModal(true)} resultados total={filteredItems.length} search={setSearchParam} orderArray={order}
                     filtro={true} hasFilter={checkedCategories.length > 0} onFilter={() => setFiltro(true)}
                     filterInject={<>
                         {

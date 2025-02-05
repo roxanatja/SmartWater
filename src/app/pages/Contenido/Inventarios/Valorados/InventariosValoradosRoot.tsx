@@ -15,7 +15,7 @@ const InventariosValoradosRoot = () => {
         <>
             <div className="px-10 h-full">
                 <PageTitle
-                    titulo="Invetarios / Físicos valorados"
+                    titulo="Inventarios / Físicos valorados"
                     icon="/Finanzas-icon.svg"
                 />
                 {params.section === "Saldos" ? (

@@ -2,10 +2,8 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./PagoProveedores.css";
 import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { Account } from "../../../../../../../type/AccountEntry";
-import { Expense } from "../../../../../../../type/Expenses";
 import { useForm } from "react-hook-form";
-import { AccountEntryApiConector, ExpensesApiConector, InvoiceExpensesApiConector } from "../../../../../../../api/classes";
+import { InvoiceExpensesApiConector, ProvidersApiConector } from "../../../../../../../api/classes";
 import moment from "moment";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
 import { Line } from "react-chartjs-2";
@@ -13,6 +11,8 @@ import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
 import { InvoceExpense } from "../../../../../../../type/InvoceExpense";
+import { Providers } from "../../../../../../../type/providers";
+import { verticalLinePlugin } from "../../../../../../../utils/charts.utils";
 
 ChartJS.register(
     LineElement,
@@ -38,21 +38,17 @@ const PagoProveedores: FC = () => {
     const navigate = useNavigate();
     const chartRef = useRef(null);
 
-    const [expenses, setExpenses] = useState<Expense[]>([])
-    const [products, setProducts] = useState<Account[]>([])
-    const [productsSelected, setProductsSelected] = useState<Account[]>([])
+    const [products, setProducts] = useState<Providers[]>([])
+    const [productsSelected, setProductsSelected] = useState<Providers[]>([])
 
     const [reports, setReports] = useState<InvoceExpense[]>([])
     const [filters, setFilters] = useState<{ initialDate?: string; finalDate?: string }>({})
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        AccountEntryApiConector.get().then(res => {
-            setProducts(res || [])
-            setProductsSelected(res || [])
-        })
-        ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
-            setExpenses(res?.data || [])
+        ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
+            setProducts(res?.data || [])
+            setProductsSelected(res?.data || [])
         })
     }, [])
 
@@ -78,102 +74,74 @@ const PagoProveedores: FC = () => {
         return 'month'
     }, [filters])
 
-    const verticalLinePlugin = {
-        id: "verticalLine",
-        afterDraw: (chart: any) => {
-            if (chart.tooltip._active && chart.tooltip._active.length) {
-                const ctx = chart.ctx;
-                const x = chart.tooltip._active[0].element.x;
-                const topY = chart.scales.y.top;
-                const bottomY = chart.scales.y.bottom;
-
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(x, topY);
-                ctx.lineTo(x, bottomY);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-                ctx.stroke();
-                ctx.restore();
-            }
-        },
-    };
-
     const formatted = useMemo<IFormattedReport[]>(() => {
         const aux: IFormattedReport[] = []
 
-        if (expenses.length > 0) {
-            let minDateRegistered = moment()
+        let minDateRegistered = moment()
 
-            reports.forEach(r => {
-                const exp = expenses.find(e => e._id === r.expense)
+        reports.forEach(r => {
+            let idx = aux.findIndex(a => a.product === r.provider)
+            const date = range === 'day' ? moment(r.date) : moment(r.date).startOf('month')
 
-                if (exp) {
-                    let idx = aux.findIndex(a => a.product === exp.accountEntry._id)
-                    const date = range === 'day' ? moment(r.date) : moment(r.date).startOf('month')
+            if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
 
-                    if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
-
-                    if (idx !== -1) {
-                        const dateIdx = aux[idx].sales.findIndex(s => s.date === date.format("YYYY-MM-DD"))
-                        if (dateIdx !== -1) {
-                            const cpy = { ...aux[idx].sales[dateIdx] }
-                            aux[idx].sales[dateIdx] = { amount: cpy.amount + r.amount, date: cpy.date }
-                        } else {
-                            aux[idx].sales.push({ amount: r.amount, date: date.format("YYYY-MM-DD") })
-                        }
-                    } else {
-                        aux.push({
-                            product: exp.accountEntry._id,
-                            sales: [{
-                                amount: r.amount,
-                                date: date.format("YYYY-MM-DD")
-                            }]
-                        })
-                    }
-                }
-
-            })
-
-            const maxDate = range === 'day' ? moment(filters.finalDate) : moment(filters.finalDate || undefined).startOf('month')
-            products.forEach(p => {
-                const idx = aux.findIndex(i => i.product === p._id)
-
-                if (idx === -1) {
-                    aux.push({
-                        product: p._id,
-                        sales: [
-                            {
-                                amount: 0,
-                                date: minDateRegistered.format("YYYY-MM-DD")
-                            },
-                            {
-                                amount: 0,
-                                date: maxDate.format("YYYY-MM-DD")
-                            },
-                        ]
-                    })
+            if (idx !== -1) {
+                const dateIdx = aux[idx].sales.findIndex(s => s.date === date.format("YYYY-MM-DD"))
+                if (dateIdx !== -1) {
+                    const cpy = { ...aux[idx].sales[dateIdx] }
+                    aux[idx].sales[dateIdx] = { amount: cpy.amount + r.amount, date: cpy.date }
                 } else {
-                    if (aux[idx].sales.findIndex(s => s.date === minDateRegistered.format("YYYY-MM-DD")) === -1) {
-                        aux[idx].sales.push({
+                    aux[idx].sales.push({ amount: r.amount, date: date.format("YYYY-MM-DD") })
+                }
+            } else {
+                aux.push({
+                    product: r.provider,
+                    sales: [{
+                        amount: r.amount,
+                        date: date.format("YYYY-MM-DD")
+                    }]
+                })
+            }
+        })
+
+        const maxDate = range === 'day' ? moment(filters.finalDate) : moment(filters.finalDate || undefined).startOf('month')
+        products.forEach(p => {
+            const idx = aux.findIndex(i => i.product === p._id)
+
+            if (idx === -1) {
+                aux.push({
+                    product: p._id,
+                    sales: [
+                        {
                             amount: 0,
                             date: minDateRegistered.format("YYYY-MM-DD")
-                        })
-                    }
-                    if (aux[idx].sales.findIndex(s => s.date === maxDate.format("YYYY-MM-DD")) === -1) {
-                        aux[idx].sales.push({
+                        },
+                        {
                             amount: 0,
                             date: maxDate.format("YYYY-MM-DD")
-                        })
-                    }
+                        },
+                    ]
+                })
+            } else {
+                if (aux[idx].sales.findIndex(s => s.date === minDateRegistered.format("YYYY-MM-DD")) === -1) {
+                    aux[idx].sales.push({
+                        amount: 0,
+                        date: minDateRegistered.format("YYYY-MM-DD")
+                    })
                 }
-            })
-        }
+                if (aux[idx].sales.findIndex(s => s.date === maxDate.format("YYYY-MM-DD")) === -1) {
+                    aux[idx].sales.push({
+                        amount: 0,
+                        date: maxDate.format("YYYY-MM-DD")
+                    })
+                }
+            }
+        })
 
         console.log(aux)
 
         return aux
-    }, [reports, range, products, filters, expenses])
+    }, [reports, range, products, filters])
 
     const colors = useMemo(() => ["#367DFD", "#FF5C00", '#F40101', "#4de119", "#d7c50c"], [])
 
@@ -183,7 +151,7 @@ const PagoProveedores: FC = () => {
                 const dat = formatted.find(r => r.product === f._id)
 
                 return {
-                    label: f.name,
+                    label: f.fullName || "Sin nombre",
                     tension: 0,
                     fill: false,
                     data: dat ? dat.sales
@@ -256,7 +224,7 @@ const PagoProveedores: FC = () => {
                                                     setProductsSelected(prev => [...prev, p])
                                                 }
                                             }} key={p._id} id={p._id} />
-                                        <label htmlFor={p._id}>{p.name}</label>
+                                        <label htmlFor={p._id}>{p.fullName || "Sin nombre"}</label>
                                     </div>
                                 )
                             }

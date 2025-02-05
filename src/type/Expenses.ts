@@ -5,6 +5,7 @@ import { User } from "./User";
 export type Expense = {
     _id: string;
     amount: number;
+    amountStatic: number;
     accountEntry: Account;
     user: User;
     provider?: Providers;

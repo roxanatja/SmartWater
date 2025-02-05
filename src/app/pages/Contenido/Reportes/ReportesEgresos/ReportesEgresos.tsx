@@ -161,7 +161,7 @@ const ReportesEgresos: FC = () => {
                 <FiltroPagoProveedores expenses={expenses} distribuidores={distribuidores} zones={zones} providers={providers} />
             </Modal>
             <Modal isOpen={proveedores} onClose={() => setProveedores(false)}>
-                <FiltrosProveedores providers={providers} />
+                <FiltrosProveedores providers={providers} distribuidores={distribuidores} />
             </Modal>
         </>
     )

@@ -116,6 +116,12 @@ const FiltroClientes = ({ distribuidores, zones }: {
   };
 
   const getDataClients = async (filters: IClientGetParams['filters']) => {
+    if (!filters?.finalDate && !!filters?.initialDate) {
+      filters.finalDate = moment().format("YYYY-MM-DD")
+    }
+    if (!!filters?.finalDate && !filters?.initialDate) {
+      filters.initialDate = "2020-01-01"
+    }
 
     let datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 }, filters });
 
@@ -128,7 +134,8 @@ const FiltroClientes = ({ distribuidores, zones }: {
     // Mapeo de datos
     const dataClientToExport: any[] = [];
 
-    for (const client of data) {
+    for (let idx = 0; idx < data.length; idx++) {
+      const client = data[idx]
       const filteredLoans = loans.filter(l => l.client.some(c => c._id === client._id))
       const zone = searchZone(client.zone, zones)
 
@@ -149,6 +156,7 @@ const FiltroClientes = ({ distribuidores, zones }: {
           const saldo = saldosStr.find(l => l.itemId === item._id)
 
           const typeDataToExport = {
+            NRO: `${idx + 1}`,
             NOMBRE: client.fullName || "Sin nombre",
             "TIPO DE CLIENTE":
               client.isAgency
@@ -204,6 +212,7 @@ const FiltroClientes = ({ distribuidores, zones }: {
         })
       } else {
         const typeDataToExport = {
+          NRO: `${idx + 1}`,
           NOMBRE: client.fullName || "Sin nombre",
           "TIPO DE CLIENTE":
             client.isAgency

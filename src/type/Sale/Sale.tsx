@@ -2,7 +2,7 @@ import { Client } from "../Cliente/Client";
 
 type Sale = {
   _id: string;
-  client: Client[];
+  client: Client;
   user: string;
   zone: string;
   comment: string;

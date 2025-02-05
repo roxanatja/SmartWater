@@ -122,7 +122,7 @@ const FiltroEgresosGastos = ({ accounts, distribuidores, providers, zones }: {
                 "NIT": expense.provider?.NIT || "N/A",
                 "FECHA REGISTRO DEL GASTO": formatDateTime(expense.created, "numeric", "2-digit", "2-digit", false, true),
                 "TIPO DE GASTO O EGRESO": expense.accountEntry.name || "N/A",
-                "IMPORTE EGRESO": expense.amount || "N/A",
+                "IMPORTE EGRESO": expense.amountStatic || "N/A",
                 "MEDIO DE PAGO": expense.creditBuy ? "A CREDITO" : expense.paymentMethodCurrentAccount ? "CTA. CTE." : "EFECTIVO",
                 "FAC/REC/SIN DOC": expense.hasInVoice ? "FACTURA" : expense.hasReceipt ? "RECIBO" : "SIN DOCUMENTO",
                 "NRO. DOCUMENTO": expense.documentNumber || "Sin número",

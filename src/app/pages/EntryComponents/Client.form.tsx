@@ -581,8 +581,8 @@ const ClientForm = ({
             }}
           />
 
-          <input type="text" {...register('location.latitude', { required: true })} className="bg-transparent" />
-          <input type="text" {...register('location.longitude', { required: true })} className="bg-transparent" />
+          <input type="hidden" {...register('location.latitude', { required: true })} className="bg-transparent" />
+          <input type="hidden" {...register('location.longitude', { required: true })} className="bg-transparent" />
 
           <button
             type="button"

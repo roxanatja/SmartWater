@@ -28,7 +28,7 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
   useEffect(() => {
     if (sale) {
       var date = formatDateTime(sale.created, "numeric", "2-digit", "2-digit");
-      setClient(sale.client[0]);
+      setClient(sale.client);
       setDate(date);
     }
   }, [sale]);

@@ -15,6 +15,7 @@ export interface IProvidersGetParams extends Search {
 
 export interface IProviderBody {
     data: {
+        user: string;
         fullName: string;
         phoneNumber: string;
         address: string;

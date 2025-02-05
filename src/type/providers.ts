@@ -7,6 +7,7 @@ export type Providers = {
   NIT: string;
   created: string;
   updated: string;
+  user: string;
 };
 
 export type ProvidersBody = {

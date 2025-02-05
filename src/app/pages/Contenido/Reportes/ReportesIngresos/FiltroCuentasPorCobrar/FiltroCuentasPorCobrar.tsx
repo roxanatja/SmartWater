@@ -118,7 +118,7 @@ const FiltroCuentasPorCobrar = ({ distribuidores, zones }: {
         for (let index = 0; index < datCuentas.length; index++) {
             const sale = datCuentas[index]
 
-            const client: Client | null = sale.client?.[0]
+            const client: Client | null = sale.client
             const zone = searchZone(sale.zone, zones)
 
             const filteredLoans = loans.filter(l => l.client.some(c => c._id === client._id))

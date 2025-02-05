@@ -12,6 +12,7 @@ import { User } from "../../../../../../../type/User";
 import { Sale } from "../../../../../../../type/Sale/Sale";
 import { useForm } from "react-hook-form";
 import { SalesApiConector, UsersApiConector } from "../../../../../../../api/classes";
+import { verticalLinePlugin } from "../../../../../../../utils/charts.utils";
 
 ChartJS.register(
     LineElement,
@@ -73,27 +74,6 @@ const VentasPorDistribuidor: FC = () => {
 
         return 'month'
     }, [filters])
-
-    const verticalLinePlugin = {
-        id: "verticalLine",
-        afterDraw: (chart: any) => {
-            if (chart.tooltip._active && chart.tooltip._active.length) {
-                const ctx = chart.ctx;
-                const x = chart.tooltip._active[0].element.x;
-                const topY = chart.scales.y.top;
-                const bottomY = chart.scales.y.bottom;
-
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(x, topY);
-                ctx.lineTo(x, bottomY);
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
-                ctx.stroke();
-                ctx.restore();
-            }
-        },
-    };
 
     const formatted = useMemo<IFormattedReport[]>(() => {
         const aux: IFormattedReport[] = []
@@ -319,19 +299,6 @@ const VentasPorDistribuidor: FC = () => {
                             },
                         },
                     }} plugins={[verticalLinePlugin]} />
-                    {/* <div
-                        id="custom-tooltip"
-                        style={{
-                            position: "absolute",
-                            backgroundColor: "white",
-                            padding: "10px",
-                            borderRadius: "5px",
-                            boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
-                            pointerEvents: "none",
-                            opacity: 0,
-                            transition: "opacity 0.2s",
-                        }}
-                    /> */}
                 </div>
             </div>
         </>

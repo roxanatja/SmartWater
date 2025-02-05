@@ -9,6 +9,7 @@ import { IProviderBody } from "../../../../../../api/types/providers";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import * as Yup from "yup";
 import { Providers } from "../../../../../../type/providers";
+import { AuthService } from "../../../../../../api/services/AuthService";
 
 const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allProviders: Providers[] }) => {
   const { provider } = useContext(ProveedoresContext);
@@ -26,6 +27,7 @@ const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allP
 
   const onSubmit: SubmitHandler<IProviderBody['data']> = async (data) => {
     setActive(true)
+    const user = AuthService.getUser()
 
     if (exists) {
       toast.error(
@@ -48,9 +50,9 @@ const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allP
                   let res = null
 
                   if (provider._id !== "") {
-                    res = await ProvidersApiConector.update({ providerId: provider._id, data })
+                    res = await ProvidersApiConector.update({ providerId: provider._id, data: { ...data, user: user?._id || "" } })
                   } else {
-                    res = await ProvidersApiConector.create({ data })
+                    res = await ProvidersApiConector.create({ data: { ...data, user: user?._id || "" } })
                   }
 
                   if (res) {
@@ -78,9 +80,9 @@ const AgregarProveedor = ({ onClose, allProviders }: { onClose: () => void; allP
       let res = null
 
       if (provider._id !== "") {
-        res = await ProvidersApiConector.update({ providerId: provider._id, data })
+        res = await ProvidersApiConector.update({ providerId: provider._id, data: { ...data, user: user?._id || "" } })
       } else {
-        res = await ProvidersApiConector.create({ data })
+        res = await ProvidersApiConector.create({ data: { ...data, user: user?._id || "" } })
       }
 
       if (res) {
