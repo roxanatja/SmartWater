@@ -115,8 +115,8 @@ const TableOtrasSalidas = ({ data, className, tableClassName, pageSize, totalRow
 
     return (
         <>
-            <div className="text-font-color">
-                <DataTable columns={columns} className={className}
+            <div className={`text-font-color ${className}`}>
+                <DataTable columns={columns} className={tableClassName}
                     data={data}
                     progressPending={loading}
                     pagination={totalRows > pageSize}
