@@ -350,7 +350,7 @@ const InfoClient = ({ client }: { client: Client }) => {
             }
             {
               (client.hasContract || client.hasExpiredContract) && (
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-x-8 gap-y-4">
                   {
                     client.contracts.map(cont => <>
                       <div className="flex flex-col gap-2 items-center">
@@ -360,7 +360,12 @@ const InfoClient = ({ client }: { client: Client }) => {
                           className="w-80 h-44 rounded-md flex-1 cursor-pointer "
                           alt={client.ciFrontImage}
                         />
-                        <small className="text-gray-500 w-fit">Válido hasta: {formatDateTime(cont.validUntil, 'numeric', '2-digit', '2-digit')}</small>
+                        <div className="text-gray-500 w-full text-xs flex justify-between items-center px-1">
+                          <span>{cont.code || "Sin código"}</span>
+                          <span>
+                            Válido hasta: {formatDateTime(cont.validUntil, 'numeric', '2-digit', '2-digit', false, true)}
+                          </span>
+                        </div>
                       </div>
                     </>)
                   }
@@ -384,21 +389,21 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <div key={devolution._id} className="flex-shrink-0 rounded-[20px] border border-[#f0f4fd] dark:border-blocks bg-blocks shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] dark:shadow-slate-200/25 p-[15px] flex flex-col gap-2 text-sm">
                     <p className="font-semibold">Devolución #{city.devolu!.length - index}</p>
                     <p>
-                      <b>ID de Préstamo:</b> {devolution.loan}
+                      <b>Código de préstamo:</b> {devolution.code || "Sin código"}
                     </p>
                     <p>
                       <b>Fecha de creación:</b>{" "}
-                      {new Date(devolution.created).toLocaleDateString()}
+                      {formatDateTime(devolution.created, 'numeric', '2-digit', '2-digit', false, true)}
                     </p>
                     <p>
                       <b>Comentario:</b> {devolution.comment && devolution.comment !== "" ? devolution.comment : "Sin comentario"}
                     </p>
                     {/* <p className="font-semibold">Detalles:</p> */}
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="font-bold text-left sticky top-0 col-span-2">
+                      <div className="font-bold text-left col-span-2">
                         <span>Productos</span>
                       </div>
-                      <div className="font-bold sticky top-0 text-center">
+                      <div className="font-bold text-center">
                         <span>Cantidad</span>
                       </div>
                       {devolution.detail.map((detail: any, index: number) => {
@@ -421,7 +426,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                                 {item ? item.name : "Producto no encontrado"}
                               </span>
                             </div>
-                            <div className="CuadroVentaCliente-TextContainer font-semibold text-center">
+                            <div className="CuadroVentaCliente-TextContainer font-semibold text-center justify-self-center">
                               <span className="CuadroVentaCliente-text">
                                 {detail.quantity}
                               </span>

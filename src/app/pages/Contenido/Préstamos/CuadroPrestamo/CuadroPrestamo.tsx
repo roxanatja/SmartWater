@@ -195,6 +195,11 @@ const CuadroPrestamo: FC<Prestamo> = ({
               No. Cliente:{" "}
               <span className="text-blue_custom">{loan.client[0]?.code || "Sin código"}</span>
             </span>
+            <br />
+            <span>
+              Código:{" "}
+              <span className="text-blue_custom">{loan.code || "Sin código"}</span>
+            </span>
           </div>
         </div>
         <div className="flex flex-wrap CuadroVentaCliente-productos items-end justify-end">

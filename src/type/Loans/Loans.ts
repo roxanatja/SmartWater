@@ -17,6 +17,7 @@ export type Loans = {
   status: string;
   created: string;
   updated: string;
+  code: string;
   __v: number;
   hasContract: boolean;
   hasExpiredContract: boolean;

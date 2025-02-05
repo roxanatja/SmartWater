@@ -1,9 +1,22 @@
-import { FilteredSearch } from "./common";
+import { BalanceReport, EntrysReport, OtherEntry, OtherOutput, OutputsReport } from "../../type/Kardex";
+import { FilteredSearch, Search } from "./common";
 
 export interface IKardexDetailGetParams extends FilteredSearch {
     filters?: {
         elementId: string;
     }
+}
+
+export interface IKardexReportsParams extends FilteredSearch {
+    filters?: {
+        toDate: string;
+    }
+}
+
+export type KardexReportReturnMap = {
+    balance: { balances: BalanceReport };
+    entrys: { balances: EntrysReport };
+    outputs: { balances: OutputsReport };
 }
 
 export interface IInitialBalanceBody {
@@ -78,4 +91,18 @@ export interface IOthersOutputMoreBody {
     }[]
     registerDate: string;
     forceOut: boolean;
+}
+
+export interface IKardexOthersGetParams extends Search {
+    filters?: {
+        initialDate?: string;
+        finalDate?: string;
+        inputType?: 'production_received' | 'adjustment_entry'
+        outputType?: 'production_delivered' | 'adjustment_exit';
+    }
+}
+
+export type KardexOthersReturnMap = {
+    income: { data: OtherEntry[] };
+    exits: { balances: OtherOutput[] };
 }

@@ -19,7 +19,7 @@ const BalancesReportModal = ({ toDate }: Props) => {
     useEffect(() => {
         setLoadingLocal(true)
 
-        KardexApiConector.reportBalance().then(res => {
+        KardexApiConector.kardexReports({ type: "balance", filters: { toDate } }).then(res => {
             if (res) {
                 setBalanceReport(res.balances)
             } else {
@@ -29,7 +29,7 @@ const BalancesReportModal = ({ toDate }: Props) => {
             setLoadingLocal(false)
         })
 
-    }, [])
+    }, [toDate])
 
     const report = async () => {
         if (balanceReport) {
