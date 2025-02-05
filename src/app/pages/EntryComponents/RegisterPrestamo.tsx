@@ -344,7 +344,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
           </div>
 
           <Input
-            min={moment().format("YYYY-MM-DD")}
+            min={moment().add(1, 'day').format("YYYY-MM-DD")}
             type="date"
             label="Valido hasta"
             labelClassName="text-blue_custom text-md font-semibold"
