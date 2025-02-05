@@ -1,31 +1,33 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import InventariosLayout from '../InventariosLayout/InventariosLayout'
-import { InventariosOtrosContext, otroInventario } from './InventariosOtrosProvider';
+import { InventariosOtrosContext, otroOutput } from './InventariosOtrosProvider';
 import Modal from '../../../EntryComponents/Modal';
 import FiltrosSalidas from './Filtros/FiltrosSalidas';
 import TableOtrasSalidas from './Tables/TableOtrasSalidas';
-import { otros_invetarios } from '../mock-data';
-import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
 import OtrasSalidasForm from './Modals/OtrasSalidasForm';
 import { KardexApiConector } from '../../../../../api/classes/kardex';
-import { MatchedElement } from '../../../../../type/Kardex';
+import { MatchedElement, OtherOutput } from '../../../../../type/Kardex';
+import { IKardexOthersGetParams } from '../../../../../api/types/kardex';
+import { useGlobalContext } from '../../../../SmartwaterContext';
+import OtrasSalidasDetails from './Modals/OtrasSalidasDetails';
 
 const Salidas = () => {
     const {
         setShowFiltro, showFiltro,
         setShowModal, showModal,
         showMiniModal, setShowMiniModal,
-        selectedInventario, setSelectedInvetario,
+        selectedOutput, setSelectedOutput,
         selectedOption, setSelectedOption
     } = useContext(InventariosOtrosContext)
-    const [elements, setElements] = useState<MatchedElement[]>([]);
+    const { setLoading } = useGlobalContext()
 
-    const itemsPerPage: number = 12;
+    const pageSize = 10;
+    const [currentData, setCurrentData] = useState<OtherOutput[]>([])
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalPage, setTotalPage] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
 
-    const [savedFilters, setSavedFilters] = useState<any>({})
+    const [elements, setElements] = useState<MatchedElement[]>([]);
+    const [savedFilters, setSavedFilters] = useState<IKardexOthersGetParams['filters']>({})
 
     const handleFilterChange = (filters: any) => {
         setCurrentPage(1);
@@ -35,6 +37,21 @@ const Salidas = () => {
     useEffect(() => {
         KardexApiConector.getKardexElements().then(res => setElements(res?.elements || []));
     }, [])
+
+    const getData = useCallback(async () => {
+        setLoading(true)
+
+        const res = await KardexApiConector.getOthers({ type: 'exits', filters: savedFilters, pagination: { page: currentPage, pageSize } })
+
+        setCurrentData(res?.data || [])
+        setTotal(res?.metadata?.total || 0)
+
+        setLoading(false)
+    }, [currentPage, savedFilters, setLoading])
+
+    useEffect(() => {
+        getData()
+    }, [getData])
 
     return (
         <>
@@ -53,7 +70,7 @@ const Salidas = () => {
                         url: "/Finanzas/Inventarios/Otros/Salidas"
                     },
                 ]} add onAdd={() => setShowMiniModal(true)}>
-                <TableOtrasSalidas data={otros_invetarios} className='w-full xl:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                <TableOtrasSalidas data={currentData} tableClassName='no-inner-border border !border-font-color/20 !rounded-[10px]' className='w-full xl:!w-3/4' handleChangePage={setCurrentPage} totalRows={total} pageSize={pageSize} />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
@@ -68,24 +85,24 @@ const Salidas = () => {
             </Modal>
 
             <Modal className='!w-3/4 md:!w-1/2 xl:!w-1/3'
-                isOpen={selectedInventario._id !== "" && showModal}
-                onClose={() => { setSelectedInvetario(otroInventario); setShowModal(false) }}
+                isOpen={selectedOutput._id !== "" && showModal}
+                onClose={() => { setSelectedOutput(otroOutput); setShowModal(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar otras salidas
                 </h2>
-                <OtrasSalidasForm onCancel={() => { setSelectedInvetario(otroInventario); setShowModal(false) }} elements={elements} />
+                <OtrasSalidasForm onCancel={() => { setSelectedOutput(otroOutput); setShowModal(false) }} elements={elements} />
             </Modal>
 
-            {/* <Modal
-                isOpen={selectedInventario._id !== "" && selectedOption}
-                onClose={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }}
+            <Modal
+                isOpen={selectedOutput._id !== "" && selectedOption}
+                onClose={() => { setSelectedOutput(otroOutput); setSelectedOption(false) }}
             >
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
-                    Otras salidas
+                    Otros ingresos
                 </h2>
-                <OtrosIgresosDetails type='out' onCancel={() => { setSelectedInvetario(otroInventario); setSelectedOption(false) }} products={products} items={items} />
-            </Modal> */}
+                <OtrasSalidasDetails onCancel={() => { setSelectedOutput(otroOutput); setSelectedOption(false) }} elements={elements} />
+            </Modal>
         </>
     )
 }

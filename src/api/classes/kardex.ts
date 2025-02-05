@@ -32,7 +32,7 @@ export abstract class KardexApiConector {
 
         try {
             const res = await ApiConnector.getInstance().get(`${this.root_path}/other-${params.type}${query ? `?${query}` : ''}`)
-            return res.data
+            return res.data.data
         } catch (error) {
             return null
         }

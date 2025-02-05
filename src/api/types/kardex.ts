@@ -104,5 +104,5 @@ export interface IKardexOthersGetParams extends Search {
 
 export type KardexOthersReturnMap = {
     income: { data: OtherEntry[] };
-    exits: { balances: OtherOutput[] };
+    exits: { data: OtherOutput[] };
 }

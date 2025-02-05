@@ -14,6 +14,7 @@ export type Search = FilteredSearch & PaginatedSearch
 
 export type QueryMetadata = {
     metadata: {
+        total?: number;
         totalCount?: number;
         page: number;
         pageSize: number;
