@@ -60,7 +60,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
 
     if (!!data.contract.validUntil) {
       const selected = moment(data.contract.validUntil)
-      const now = moment().set({ day: selected.day(), month: selected.month(), year: selected.year() }).add(1.5, 'hour')
+      const now = moment().set({ day: selected.day(), month: selected.month(), year: selected.year() }).add(3, 'hour')
       data.contract.validUntil = now.format("YYYY-MM-DDTHH:mm")
     }
 

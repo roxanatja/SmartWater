@@ -3,6 +3,7 @@ export type Devolution = {
   user: string;
   loan: string;
   client: string;
+  code: string;
   comment: string;
   detail: {
     item: string;

@@ -34,7 +34,8 @@ export const loan: Loans = {
     hasExpiredContract: false,
     status: "",
     updated: "",
-    user: ""
+    user: "",
+    code: ""
 }
 
 export const PrestamosProvider = ({ children }: any) => {

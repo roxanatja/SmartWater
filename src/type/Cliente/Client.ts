@@ -34,6 +34,7 @@ export interface Client {
   contracts: {
     link: string;
     validUntil: string;
+    code: string;
     _id: string;
   }[];
   created: string;
