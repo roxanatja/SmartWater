@@ -16,7 +16,7 @@ const PedidosResumido = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsData = await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } });
+        const productsData = await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
         const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 4 } });
 
         const ordersPopulated: Order[] = []

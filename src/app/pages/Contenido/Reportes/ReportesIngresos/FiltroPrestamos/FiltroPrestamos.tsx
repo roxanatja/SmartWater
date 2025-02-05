@@ -96,12 +96,12 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
 
     const getDataClients = async (filters: ILoansGetParams['filters']) => {
 
-        let datClients = await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: filters })
+        let datClients = await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: filters })
 
         // Cargar datos
         const data = datClients?.data || [];
-        const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-        const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
+        const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+        const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
 
         // Mapeo de datos
         const dataClientToExport: any[] = [];

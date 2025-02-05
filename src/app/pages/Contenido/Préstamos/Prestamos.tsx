@@ -78,7 +78,7 @@ const Prestamos: FC = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(LoansApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+          promises.push(LoansApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
         )
       } else {
         promises.push(LoansApiConector.get({ pagination: queryData.pagination, filters: filters }))
@@ -137,9 +137,9 @@ const Prestamos: FC = () => {
 
   useEffect(() => {
     const fetchZones = async () => {
-      setProducts((await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
+      setProducts((await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+      setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])

@@ -35,7 +35,10 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
         let res = null
         setActive(true)
         const userData = AuthService.getUser()
-        console.log(userData)
+
+        const selected = moment(data.openingDate)
+        const now = moment.tz("America/La_Paz").set({ date: selected.date(), month: selected.month(), year: selected.year() })
+        data.openingDate = now.format("YYYY-MM-DDTHH:mm")
 
         res = await KardexApiConector.initialBalance({
             data: {

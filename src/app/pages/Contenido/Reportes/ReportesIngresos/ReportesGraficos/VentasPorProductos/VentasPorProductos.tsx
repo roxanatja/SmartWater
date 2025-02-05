@@ -47,7 +47,7 @@ const VentasPorProductos: FC = () => {
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
+        ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => {
             setProducts(res?.data || [])
             setProductsSelected(res?.data || [])
         })

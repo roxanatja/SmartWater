@@ -144,7 +144,7 @@ const RegisterSalesForm = ({ selectedClient, selectedSale }: {
   };
 
   const getProduct = useCallback(async () => {
-    const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
     setProducts(res);
   }, []);
 

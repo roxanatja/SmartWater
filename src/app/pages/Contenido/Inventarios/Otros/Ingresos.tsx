@@ -6,10 +6,6 @@ import FiltrosEntradas from './Filtros/FiltrosEntradas';
 import TableOtrosIngresos from './Tables/TableOtrosIngresos';
 import { otros_invetarios } from '../mock-data';
 import OtrosIngresosForm from './Modals/OtrosIngresosForm';
-import Product from '../../../../../type/Products/Products';
-import { Item } from '../../../../../type/Item';
-import { ItemsApiConector, ProductsApiConector } from '../../../../../api/classes';
-import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
 import { MatchedElement } from '../../../../../type/Kardex';
 import { KardexApiConector } from '../../../../../api/classes/kardex';
 

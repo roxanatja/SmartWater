@@ -105,7 +105,7 @@ const FiltroEgresosGastos = ({ accounts, distribuidores, providers, zones }: {
     const getDataWithClientNames = async (filtersParam: IExpensesGetParams['filters']) => {
         const filters = filtersParam || {}
 
-        const data = (await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters }))?.data || []
+        const data = (await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters }))?.data || []
 
         const dataWithClientNames: any[] = []
 

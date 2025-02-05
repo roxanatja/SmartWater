@@ -107,12 +107,12 @@ const FiltroCuentasPorCobrar = ({ distribuidores, zones }: {
             filters.finalDate = moment().format("YYYY-MM-DD")
         }
 
-        const datCuentas = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, pendingBalance: true } }))?.data || []
+        const datCuentas = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, creditSale: true, pendingBalance: true } }))?.data || []
         const dataClientToExport: any[] = [];
 
-        const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-        const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
-        const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
+        const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+        const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
+        const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
 
 
         for (let index = 0; index < datCuentas.length; index++) {

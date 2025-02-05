@@ -39,7 +39,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } });
+        const response = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } });
         setClientes(response?.data || []);
       } catch (error) {
         console.log("Error fetching clients:", error);
@@ -48,7 +48,7 @@ const CuadroRealizarPedido = ({ onClose }: { onClose?: () => void }) => {
 
     const fetchProducts = async () => {
       try {
-        const response = await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } });
+        const response = await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
         setProductos(response?.data || []);
       } catch (error) {
         console.log("Error fetching products:", error);

@@ -4,6 +4,8 @@ import FiltrosReportesInventarios, { IInitialBalancesFilters } from './Filtros/F
 import Modal from '../../../EntryComponents/Modal';
 import BalancesReportModal from './Modals/BalancesReportModal';
 import moment from 'moment';
+import EntriesReportModal from './Modals/EntriesReportModal';
+import OutputsReportModal from './Modals/OutputsReportModal';
 
 const ReportesInventarios = () => {
     const [showBalancesReport, setShowBalancesReport] = useState<boolean>(false)
@@ -56,6 +58,18 @@ const ReportesInventarios = () => {
                     Reporte saldos físicos valorados
                 </h2>
                 <BalancesReportModal toDate={selectedDate} />
+            </Modal>
+            <Modal isOpen={showEntriesReport} onClose={() => { setShowEntriesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
+                    Reporte entradas físicos valorados
+                </h2>
+                <EntriesReportModal toDate={selectedDate} />
+            </Modal>
+            <Modal isOpen={showOutputsReport} onClose={() => { setShowOutputsReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
+                    Reporte salidas físicos valorados
+                </h2>
+                <OutputsReportModal toDate={selectedDate} />
             </Modal>
         </>
     )

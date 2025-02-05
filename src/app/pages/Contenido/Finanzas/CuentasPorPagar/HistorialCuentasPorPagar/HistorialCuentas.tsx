@@ -120,8 +120,8 @@ const HistorialCuentas = ({ provider }: Props) => {
     useEffect(() => {
         const fetchZones = async () => {
             setZones((await ZonesApiConector.get({}))?.data || []);
-            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
-            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
             setAccounts((await AccountEntryApiConector.get() || []));
         }
         fetchZones()
@@ -158,7 +158,7 @@ const HistorialCuentas = ({ provider }: Props) => {
             }
 
 
-            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, creditBuy: true, provider } }))
+            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, creditBuy: true, provider } }))
         }
 
         Promise.all(promises).then(responses => {

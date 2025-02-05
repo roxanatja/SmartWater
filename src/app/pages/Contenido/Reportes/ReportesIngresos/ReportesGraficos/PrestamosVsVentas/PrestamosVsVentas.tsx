@@ -46,8 +46,8 @@ const PrestamosVsVentas: FC = () => {
 
     const loadData = useCallback(async () => {
         const promises = [
-            SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), hasClientLoan: true }, pagination: { page: 1, pageSize: 3000 } }),
-            SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), hasClientLoan: false }, pagination: { page: 1, pageSize: 3000 } })
+            SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), hasClientLoan: true }, pagination: { page: 1, pageSize: 30000 } }),
+            SalesApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), hasClientLoan: false }, pagination: { page: 1, pageSize: 30000 } })
         ]
 
         const res = await Promise.all(promises)

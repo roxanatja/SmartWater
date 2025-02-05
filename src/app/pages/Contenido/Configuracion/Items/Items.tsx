@@ -38,7 +38,7 @@ const Items: FC = () => {
     const fetchData = useCallback(async () => {
         setLoading(true)
 
-        const res = await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort } })
+        const res = await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000, sort } })
         const prods = res?.data || []
         setItems(prods)
         setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))
@@ -46,7 +46,7 @@ const Items: FC = () => {
         const resC = await CategoryProductApiConector.get()
         setCategories(resC || [])
 
-        const resU = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const resU = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 30000 } })
         setUnits(resU || [])
 
         setLoading(false)

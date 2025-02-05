@@ -167,9 +167,9 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
 
   const getProduct = useCallback(async () => {
     if (selectedClient._id) {
-      const res = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { client: selectedClient._id } }))?.data || []
-      const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-      const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+      const res = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { client: selectedClient._id } }))?.data || []
+      const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+      const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
 
       const loansWithProductNames = res
         .filter(l => l.detail.reduce((cont, d) => cont += d.quantity, 0) > 0)

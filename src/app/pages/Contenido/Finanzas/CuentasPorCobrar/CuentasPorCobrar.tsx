@@ -89,7 +89,7 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
         )
       } else {
         promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
@@ -145,7 +145,7 @@ const CuentasPorCobrar = () => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -188,10 +188,10 @@ const CuentasPorCobrar = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, client: cf, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
         )
       } else {
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, creditSale: true, pendingBalance: queryData.showAll ? undefined : true } }))
       }
     }
 

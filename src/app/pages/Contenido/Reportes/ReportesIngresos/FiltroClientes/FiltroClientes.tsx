@@ -123,13 +123,13 @@ const FiltroClientes = ({ distribuidores, zones }: {
       filters.initialDate = "2020-01-01"
     }
 
-    let datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 }, filters });
+    let datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters });
 
     // Cargar datos
     const data = datClients?.data || [];
-    const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
-    const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
+    const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
+    const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
 
     // Mapeo de datos
     const dataClientToExport: any[] = [];

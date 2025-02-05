@@ -40,7 +40,7 @@ const ArqueoDeCaja: FC = () => {
   }, [getData]);
 
   useEffect(() => {
-    UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setDist(res?.data || []))
+    UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setDist(res?.data || []))
   }, [])
 
   const {

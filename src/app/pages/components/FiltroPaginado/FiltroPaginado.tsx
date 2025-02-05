@@ -390,10 +390,10 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     const promises: Promise<{ data: Sale[] } & QueryMetadata | null>[] = []
     if (filters.clients) {
       filters.clients.forEach((cf: string) =>
-        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
+        promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, client: cf } }))
       )
     } else {
-      promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters }))
+      promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters }))
     }
 
     const responses = await Promise.all(promises)
@@ -402,9 +402,9 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       data.push(...(r?.data || []))
     })
 
-    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
 
     const dataWithClientNames: any[] = []
 
@@ -458,7 +458,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     let datClients: { data: Client[] } & QueryMetadata | null = null
     if (filters) {
       if (filters.hasOwnProperty('text')) {
-        datClients = await ClientsApiConector.searchClients({ pagination: { page: 1, pageSize: 3000 }, filters });
+        datClients = await ClientsApiConector.searchClients({ pagination: { page: 1, pageSize: 30000 }, filters });
       } else {
         if (!filters?.finalDate && !!filters?.initialDate) {
           filters.finalDate = moment().format("YYYY-MM-DD")
@@ -467,17 +467,17 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           filters.initialDate = "2020-01-01"
         }
 
-        datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 }, filters });
+        datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters });
       }
     }
 
     // Cargar datos
     const data = datClients?.data || [];
-    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-    const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
-    const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []
+    const userList = (await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const zones = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+    const loans = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
+    const devolutions = (await DevolutionsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []
 
     // Mapeo de datos
     const dataClientToExport: any[] = [];

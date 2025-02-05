@@ -28,7 +28,7 @@ const MapaClientes: React.FC = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } });
+        const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } });
         setClients(clientsData?.data || []);
       } catch (error) {
         console.error("Error fetching clients:", error);

@@ -94,7 +94,7 @@ const Ventas: FC = () => {
 
       if (queryData.clients) {
         queryData.clients.forEach(cf =>
-          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+          promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
         )
       } else {
         promises.push(SalesApiConector.get({ pagination: queryData.pagination, filters }))
@@ -156,8 +156,8 @@ const Ventas: FC = () => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
-      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
+      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
     }
     fetchZones()
   }, [])

@@ -60,11 +60,9 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
 
     if (!!data.contract.validUntil) {
       const selected = moment(data.contract.validUntil)
-      const now = moment.tz("America/La_Paz").set({ day: selected.day(), month: selected.month(), year: selected.year() }).add(1, 'hour')
+      const now = moment.tz("America/La_Paz").set({ date: selected.date(), month: selected.month(), year: selected.year() }).add(1, 'hour')
       data.contract.validUntil = now.format("YYYY-MM-DDTHH:mm")
     }
-
-    console.log(data.contract.validUntil)
 
     const values: ILoanBody['data'] = {
       ...data,
@@ -150,7 +148,7 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
   };
 
   const getProduct = useCallback(async () => {
-    const res = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const res = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
     setProducts(res);
   }, []);
 

@@ -47,7 +47,7 @@ const PrestamosPorItem: FC = () => {
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => {
+        ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => {
             setProducts(res?.data || [])
             setProductsSelected(res?.data || [])
         })

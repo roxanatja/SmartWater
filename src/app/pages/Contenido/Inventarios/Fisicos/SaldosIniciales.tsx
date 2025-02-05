@@ -21,7 +21,7 @@ const SaldosIniciales = () => {
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
-        UsersApiConector.get({ filters: { desactivated: false }, pagination: { page: 1, pageSize: 3000 } }).then(res => setDistribuidores(res?.data || []))
+        UsersApiConector.get({ filters: { desactivated: false }, pagination: { page: 1, pageSize: 30000 } }).then(res => setDistribuidores(res?.data || []))
     }, [])
 
     const handleFilterChange = (filters: any) => {

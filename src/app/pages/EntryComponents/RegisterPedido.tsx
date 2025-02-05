@@ -49,10 +49,10 @@ const RegisterPedidoForm = ({
   const [dist, setDist] = useState<User[]>([]);
 
   const getProduct = useCallback(async () => {
-    const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const res = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
     setProducts(res);
 
-    setDist((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: "user" } }))?.data || []);
+    setDist((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { role: "user" } }))?.data || []);
   }, []);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const RegisterPedidoForm = ({
   });
 
   const getCitys = useCallback(async () => {
-    const data = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const data = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
     setCity(data);
     let d = data[0];
     setDisti(d.districts);

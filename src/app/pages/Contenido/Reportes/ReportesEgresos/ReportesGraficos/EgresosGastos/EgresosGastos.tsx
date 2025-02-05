@@ -167,7 +167,7 @@ const EgresosGastos: FC = () => {
     }, [formatted, colors, productsSelected])
 
     const loadData = useCallback(async () => {
-        const res = await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") } })
+        const res = await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") } })
         setReports(res?.data || [])
     }, [filters])
 

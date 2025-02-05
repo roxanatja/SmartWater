@@ -84,7 +84,7 @@ const CobrosAClientes = ({ client }: Props) => {
       } else {
         if (queryData.clients) {
           queryData.clients.forEach(cf =>
-            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
+            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
           )
         } else {
           promises.push(BillsApiConector.get({ pagination: queryData.pagination, filters: { ...filters } }))
@@ -141,8 +141,8 @@ const CobrosAClientes = ({ client }: Props) => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
-      setClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
+      setClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -170,14 +170,14 @@ const CobrosAClientes = ({ client }: Props) => {
       filters = { ...queryData.filters }
 
       if (client) {
-        promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client } }))
+        promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, client } }))
       } else {
         if (queryData.clients) {
           queryData.clients.forEach(cf =>
-            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, client: cf } }))
+            promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, client: cf } }))
           )
         } else {
-          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters } }))
+          promises.push(BillsApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters } }))
         }
       }
     }

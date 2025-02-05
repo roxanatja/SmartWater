@@ -66,9 +66,9 @@ const RegistroEyG = () => {
         const promises: Promise<{ data: Expense[] } & QueryMetadata | null>[] = []
 
         if (usersFilter) {
-            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters, user: usersFilter.join(",") } }))
+            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort }, filters: { ...savedFilters, user: usersFilter.join(",") } }))
         } else {
-            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: savedFilters }))
+            promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort }, filters: savedFilters }))
         }
 
         const responses = await Promise.all(promises)
@@ -118,10 +118,10 @@ const RegistroEyG = () => {
 
     useEffect(() => {
         const fetchZones = async () => {
-            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setUsers((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
             setAccounts((await AccountEntryApiConector.get()) || []);
-            setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setZones((await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
             setElements((await KardexApiConector.getKardexElements())?.elements || []);
         }
         fetchZones()

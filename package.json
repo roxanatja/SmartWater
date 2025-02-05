@@ -9,6 +9,7 @@
     "@pdfme/common": "^5.2.16",
     "@pdfme/generator": "^5.2.16",
     "@react-google-maps/api": "^2.19.2",
+    "@tanstack/react-table": "^8.20.6",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^13.5.0",

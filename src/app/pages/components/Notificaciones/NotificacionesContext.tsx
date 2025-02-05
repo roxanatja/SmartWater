@@ -38,7 +38,7 @@ const NotificacionesProvider = ({ children }: PropsWithChildren) => {
 
     const loadNotifications = useCallback(async () => {
         console.log("Cargando notificaciones...")
-        const nots = await NotificationsApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: 'desc' } })
+        const nots = await NotificationsApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: 'desc' } })
         console.log(nots?.data)
         setNotifications(nots?.data || [])
         console.log("Notificaciones cargadas!")
