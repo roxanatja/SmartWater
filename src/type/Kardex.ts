@@ -1,9 +1,68 @@
 import { CategoryProduct } from "./Products/Category";
 import { UnitMeasure } from "./Products/UnitMeasure";
+import { User } from "./User";
 
 export type BalanceReport = {
     elements: KardexElement[];
     totalGeneral: string;
+}
+
+export type EntrysReport = {
+    count: number;
+    data: {
+        _id: string;
+        elementName: string;
+        unitMeasure: string,
+        totalQuantitys: number;
+        totalImports: number;
+        initialBalance: {
+            quantity: number;
+            import: number;
+        },
+        inputReturnClients: {
+            quantity: number;
+            import: number;
+        },
+        inputReceivedProvider: {
+            quantity: number;
+            import: number;
+        },
+        inputReceivedProduction: {
+            quantity: number;
+            import: number;
+        },
+        inputAdjustment: {
+            quantity: number;
+            import: number;
+        }
+    }[];
+}
+
+export type OutputsReport = {
+    count: number;
+    data: {
+        _id: string;
+        elementName: string;
+        unitMeasure: string,
+        totalQuantitys: number;
+        totalImports: number;
+        outputProduction: {
+            quantity: number;
+            import: number;
+        },
+        outputSales: {
+            quantity: number;
+            import: number;
+        },
+        outputLoans: {
+            quantity: number;
+            import: number;
+        },
+        outputAdjustment: {
+            quantity: number;
+            import: number;
+        }
+    }[];
 }
 
 export type KardexElement = {
@@ -123,4 +182,40 @@ export type OutputItemBody = {
     quantity: number;
     // unitPrice: number;
     outputType: 'production_delivered' | 'adjustment_exit';
+}
+
+export type OtherEntry = {
+    _id: string;
+    user: User;
+    quantity: number;
+    balance: {
+        inputQuantity: number;
+        inputImport: number;
+        balanceAmount: number;
+        cpp: number;
+        balanceImport: number;
+    };
+    registerDate: string;
+    documentNumber: string;
+    type: 'production_received' | 'adjustment_entry';
+    detail: string,
+    elementName: string;
+}
+
+export type OtherOutput = {
+    _id: string;
+    user: User;
+    quantity: number;
+    balance: {
+        inputQuantity: number;
+        inputImport: number;
+        balanceAmount: number;
+        cpp: number;
+        balanceImport: number;
+    };
+    registerDate: string;
+    documentNumber: string;
+    type: 'production_delivered' | 'adjustment_exit';
+    detail: string,
+    elementName: string;
 }

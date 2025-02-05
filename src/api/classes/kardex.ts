@@ -1,5 +1,6 @@
-import { BalanceReport, KardexDetail, MatchedElement } from "../../type/Kardex";
-import { IInitialBalanceBody, IKardexDetailGetParams, IOtherEntryBody, IOtherOutputBody, IOthersEntryMoreBody, IOthersOutputMoreBody } from "../types/kardex";
+import { KardexDetail, MatchedElement } from "../../type/Kardex";
+import { QueryMetadata } from "../types/common";
+import { IInitialBalanceBody, IKardexDetailGetParams, IKardexOthersGetParams, IKardexReportsParams, IOtherEntryBody, IOtherOutputBody, IOthersEntryMoreBody, IOthersOutputMoreBody, KardexOthersReturnMap, KardexReportReturnMap } from "../types/kardex";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
 
@@ -15,9 +16,22 @@ export abstract class KardexApiConector {
         }
     }
 
-    static async reportBalance(): Promise<{ balances: BalanceReport } | null> {
+    static async kardexReports<T extends keyof KardexReportReturnMap>(params: IKardexReportsParams & { type: T }): Promise<KardexReportReturnMap[T] | null> {
+        const query = generateQueryString(params)
+
         try {
-            const res = await ApiConnector.getInstance().get(`${this.root_path}/report-balance`)
+            const res = await ApiConnector.getInstance().get(`${this.root_path}/report-${params.type}${query ? `?${query}` : ''}`)
+            return res.data
+        } catch (error) {
+            return null
+        }
+    }
+
+    static async getOthers<T extends keyof KardexOthersReturnMap>(params: IKardexOthersGetParams & { type: T }): Promise<KardexOthersReturnMap[T] & QueryMetadata | null> {
+        const query = generateQueryString(params)
+
+        try {
+            const res = await ApiConnector.getInstance().get(`${this.root_path}/other-${params.type}${query ? `?${query}` : ''}`)
             return res.data
         } catch (error) {
             return null
