@@ -53,19 +53,19 @@ const ReportesInventarios = () => {
                 <FiltrosReportesInventarios initialFilters={{}} onChange={handleFilterChange} />
             </InventariosLayout>
 
-            <Modal isOpen={showBalancesReport} onClose={() => { setShowBalancesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+            <Modal isOpen={showBalancesReport} onClose={() => { setShowBalancesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-10/12'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
                     Reporte saldos físicos valorados
                 </h2>
                 <BalancesReportModal toDate={selectedDate} />
             </Modal>
-            <Modal isOpen={showEntriesReport} onClose={() => { setShowEntriesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+            <Modal isOpen={showEntriesReport} onClose={() => { setShowEntriesReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-10/12'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
                     Reporte entradas físicos valorados
                 </h2>
                 <EntriesReportModal toDate={selectedDate} />
             </Modal>
-            <Modal isOpen={showOutputsReport} onClose={() => { setShowOutputsReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-3/4'>
+            <Modal isOpen={showOutputsReport} onClose={() => { setShowOutputsReport(false); setSelectedDate(moment().format("YYYY-MM-DD")) }} className='!w-[95%] sm:!w-10/12'>
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
                     Reporte salidas físicos valorados
                 </h2>

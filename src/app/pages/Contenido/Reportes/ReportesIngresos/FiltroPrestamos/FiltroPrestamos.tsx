@@ -152,6 +152,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                             "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
                             "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
                             "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
+                            "CODIGO DEL PRESTAMO": loan.code ? loan.code : "SIN CODIGO", // Código del cliente
                             "FECHA DE REGISTRO DEL PRESTAMO": formatDateTime(
                                 loan.created,
                                 "numeric",
@@ -210,6 +211,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                         "TIEMPO DE RENOVACION": client.renewInDays !== null ? client.renewInDays : "", // Tiempo de renovación
                         "RENOVACION PROMEDIO": client.averageRenewal ? "SI" : "NO", // Tiempo de renovación
                         "DIAS RENOVACION PROMEDIO": (client.averageRenewal && client.lastSale && client.renewDate) ? Math.abs(moment(new Date(client.lastSale).toISOString().split("T")[0]).diff(new Date(client.renewDate).toISOString().split("T")[0], 'days')) : "", // Tiempo de renovación
+                        "CODIGO DEL PRESTAMO": loan.code ? loan.code : "SIN CODIGO", // Código del cliente
                         "FECHA DE REGISTRO DEL PRESTAMO": formatDateTime(
                             loan.created,
                             "numeric",

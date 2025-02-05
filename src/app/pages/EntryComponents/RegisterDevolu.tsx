@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { OptionScrooll } from "../components/OptionScrooll/OptionScrooll";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -170,6 +169,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
       const res = (await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { client: selectedClient._id } }))?.data || []
       const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
       const items = (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+      console.log(res)
 
       const loansWithProductNames = res
         .filter(l => l.detail.reduce((cont, d) => cont += d.quantity, 0) > 0)
@@ -192,6 +192,7 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
           };
         });
 
+      console.log(loansWithProductNames)
       setLoans(loansWithProductNames);
     }
   }, [selectedClient._id]);
@@ -351,12 +352,13 @@ const RegisterDevoluForm = ({ selectedClient }: { selectedClient: Client }) => {
               }}
             >
               <div key={index} className="flex-[6]">
+                <p className="mb-2 font-semibold">Código: {row.code || "Sin código"}</p>
                 {row.detail.map((item: Loans['detail'][0], index: number) => (
                   <div
                     key={index}
                     className="flex w-full justify-between items-start gap-2"
                   >
-                    <p className="font-medium"> {item.name}</p>
+                    <p className=""> {item.name}</p>
                     <p className="whitespace-nowrap">{item.quantity} Unidades</p>
                   </div>
                 ))}

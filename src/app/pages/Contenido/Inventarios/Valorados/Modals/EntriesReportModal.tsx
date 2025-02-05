@@ -4,6 +4,8 @@ import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import { EntrysReport } from "../../../../../../type/Kardex";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import TableEntriesReport from "../Tables/TableEntriesReport";
+import { entriesReport } from "./pdfTemplates";
+import { showGeneratePDF } from "../../../../../../utils/pdfHelper";
 
 interface Props {
     toDate: string;
@@ -30,20 +32,51 @@ const EntriesReportModal = ({ toDate }: Props) => {
     }, [toDate])
 
     const report = async () => {
-        // if (balanceReport) {
-        //     const inputs = [
-        //         {
-        //             subtitle: JSON.stringify({ date: formatDateTime(toDate, 'numeric', '2-digit', '2-digit', false, true) }),
-        //             total: JSON.stringify({ total: balanceReport.totalGeneral }),
-        //             table: balanceReport.elements.map(row => {
-        //                 return [`${row.nro}`, `${row.name}`, `${row.unit}`, `${row.quantity}`, `${row.weightedAverageCost}`, `${row.totalAmount}`]
-        //             }),
+        if (balanceReport) {
+            const table: string[][] = balanceReport.data.map(row => {
+                return [
+                    `${row.elementName}`,
+                    `${row.unitMeasure}`,
+                    `${row.initialBalance.quantity}`,
+                    `${row.initialBalance.import.toFixed(2)}`,
+                    `${row.inputReceivedProduction.quantity}`,
+                    `${row.inputReceivedProduction.import.toFixed(2)}`,
+                    `${row.inputReceivedProduction.quantity}`,
+                    `${row.inputReceivedProduction.import.toFixed(2)}`,
+                    `${row.inputReturnClients.quantity}`,
+                    `${row.inputReturnClients.import.toFixed(2)}`,
+                    `${row.inputAdjustment.quantity}`,
+                    `${row.inputAdjustment.import.toFixed(2)}`,
+                    `${row.totalQuantitys}`,
+                    `${row.totalImports.toFixed(2)}`
+                ]
+            });
 
-        //         }
-        //     ]
+            table.push([
+                "TOTALES", "",
+                `${balanceReport.data.reduce((sum, r) => sum += r.initialBalance.quantity, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.initialBalance.import, 0).toFixed(2)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReceivedProduction.quantity, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReceivedProduction.import, 0).toFixed(2)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReceivedProduction.quantity, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReceivedProduction.import, 0).toFixed(2)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReturnClients.quantity, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputReturnClients.import, 0).toFixed(2)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputAdjustment.quantity, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.inputAdjustment.import, 0).toFixed(2)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.totalQuantitys, 0)}`,
+                `${balanceReport.data.reduce((sum, r) => sum += r.totalImports, 0).toFixed(2)}`,
+            ])
 
-        //     showGeneratePDF(setLoading, reportTemplate, inputs)
-        // }
+            const inputs = [
+                {
+                    subtitle: JSON.stringify({ date: formatDateTime(toDate, 'numeric', '2-digit', '2-digit', false, true) }),
+                    table,
+                }
+            ]
+
+            showGeneratePDF(setLoading, entriesReport, inputs)
+        }
     }
 
     return (
