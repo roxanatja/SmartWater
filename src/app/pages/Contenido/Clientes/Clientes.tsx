@@ -15,6 +15,7 @@ import { IClientGetParams, ISearchGetParams } from "../../../../api/types/client
 import { QueryMetadata } from "../../../../api/types/common";
 import { useSearchParams } from "react-router-dom";
 import { User } from "../../../../type/User";
+import moment from "moment";
 
 const Clientes: FC = () => {
   const {
@@ -90,7 +91,17 @@ const Clientes: FC = () => {
       if (queryData?.filters?.hasOwnProperty('text')) {
         datClients = await ClientsApiConector.searchClients(queryData as ISearchGetParams);
       } else {
-        datClients = await ClientsApiConector.getClients(queryData as IClientGetParams);
+        const qd = { ...queryData as IClientGetParams }
+        const extraFilters: IClientGetParams['filters'] = {}
+
+        if (!!qd.filters?.initialDate && !qd.filters?.finalDate) {
+          extraFilters.finalDate = moment().format("YYYY-MM-DD")
+        }
+        if (!qd.filters?.initialDate && !!qd.filters?.finalDate) {
+          extraFilters.initialDate = "2020-01-01"
+        }
+
+        datClients = await ClientsApiConector.getClients({ pagination: qd.pagination, filters: { ...qd.filters, ...extraFilters } });
       }
     }
 

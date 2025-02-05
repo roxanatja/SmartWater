@@ -82,8 +82,8 @@ const InventoriesOutputForm = ({ elements, updateDetails, handleDeleteElement, i
                                     })}
                                     className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
                                 >
-                                    <option value="production_received">Salida a producción</option>
-                                    <option value="adjustment_entry">Salida por ajuste</option>
+                                    <option value="production_delivered">Salida a producción</option>
+                                    <option value="adjustment_exit">Salida por ajuste</option>
                                 </select>
                                 {errors.outputType && (
                                     <span className="text-red-500 font-normal text-sm font-pricedown">

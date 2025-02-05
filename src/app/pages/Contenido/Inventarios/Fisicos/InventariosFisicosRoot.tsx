@@ -15,7 +15,7 @@ const InventariosFisicosRoot = () => {
         <>
             <div className="px-10 h-full">
                 <PageTitle
-                    titulo="Invetarios / Físicos"
+                    titulo="Inventarios / Físicos"
                     icon="/Finanzas-icon.svg"
                 />
                 {params.section === "Saldos" ? (

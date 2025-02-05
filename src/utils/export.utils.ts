@@ -1,4 +1,3 @@
-import moment from "moment";
 import { District, Zone } from "../type/City";
 import { Client } from "../type/Cliente/Client";
 import { Devolution } from "../type/Devolution/devolution";
@@ -51,9 +50,9 @@ export const setContract = (client: Client) => {
     }
 };
 
-export const setContractLoan = (hasContract: boolean, dateValid: string | null) => {
-    if (hasContract && dateValid) {
-        if (moment(dateValid).isBefore(moment())) {
+export const setContractLoan = (hasContract: boolean, hasExpiredContract: boolean) => {
+    if (hasContract) {
+        if (hasExpiredContract) {
             return "CONTRATO VENCIDO";
         } else {
             return "CONTRATO VIGENTE";
@@ -246,10 +245,14 @@ export const getSaleClientContract = (client: Client | null) => {
         if (!client.hasLoan) {
             return "SIN PRESTAMO"
         } else {
-            if (client.hasExpiredContract) {
-                return "PRESTAMO CON CONTRATO VENCIDO"
+            if (client.hasContract) {
+                if (client.hasExpiredContract) {
+                    return "PRESTAMO CON CONTRATO VENCIDO";
+                } else {
+                    return "PRESTAMO CON CONTRATO VIGENTE";
+                }
             } else {
-                return client.hasContract ? "PRESTAMO CON CONTRATO VIGENTE" : "PRESTAMO SIN CONTRATO"
+                return "PRESTAMO SIN CONTRATO";
             }
         }
     } else {

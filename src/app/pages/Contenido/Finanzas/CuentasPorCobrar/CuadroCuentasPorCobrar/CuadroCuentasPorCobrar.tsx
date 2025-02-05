@@ -39,7 +39,7 @@ const CuadroCuentasPorCobrar = ({
 
   const onSubmit: SubmitHandler<IBillsBody['data']> = async (data) => {
     const userData: UserData | null = AuthService.getUser();
-    const client = sale.client[0]
+    const client = sale.client
 
     const response = await BillsApiConector.create({
       data: {
@@ -82,9 +82,9 @@ const CuadroCuentasPorCobrar = ({
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="CuadroVentaCliente-header">
-              {sale?.client?.[0]?.clientImage ? (
+              {sale?.client?.clientImage ? (
                 <img
-                  src={sale?.client?.[0]?.clientImage}
+                  src={sale?.client?.clientImage}
                   alt=""
                   className="infoClientes-imgStore"
                 />
@@ -92,11 +92,11 @@ const CuadroCuentasPorCobrar = ({
                 <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
                   <div className="opacity-0">.</div>
                   <p className="absolute font-extrabold whitespace-nowrap">
-                    {sale?.client?.[0]?.fullName?.[0] || "S"}
+                    {sale?.client?.fullName?.[0] || "S"}
                   </p>
                 </div>
               )}
-              <span>{sale?.client?.[0]?.fullName || "N/A"}</span>
+              <span>{sale?.client?.fullName || "N/A"}</span>
             </div>
             <div className="flex items-center">
               <button
@@ -104,14 +104,14 @@ const CuadroCuentasPorCobrar = ({
                 className="btn"
                 onClick={() => {
                   setShowMiniModal(true);
-                  setClientSelect(sale.client[0] as unknown as Client);
+                  setClientSelect(sale.client as unknown as Client);
                 }}
               >
                 <img src="/Opciones-icon.svg" alt="" className="invert-0 dark:invert" />
               </button>
             </div>
             <div className="CuadroCuentasPorCobrar-header text-blue_custom text-end">
-              <span>{!!sale?.client?.[0]?.hasLoan ? "Prestamos activos" : "Sin prestamos activos"}</span>
+              <span>{!!sale?.client?.hasLoan ? "Prestamos activos" : "Sin prestamos activos"}</span>
             </div>
           </div>
           <div className="flex justify-between items-start">
@@ -119,7 +119,7 @@ const CuadroCuentasPorCobrar = ({
               <span>
                 No. Cliente:{" "}
                 <span className="text-blue_custom">
-                  {sale?.client?.[0]?.code || "N/A"}
+                  {sale?.client?.code || "N/A"}
                 </span>
               </span>
             </div>

@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import { IProvidersGetParams } from '../../../../../../api/types/providers';
 import { useGlobalContext } from '../../../../../SmartwaterContext';
 import { ReportesEgresosContext } from '../ReportesEgresosContext';
-import { exportData } from '../../../../../../utils/export.utils';
+import { exportData, searchUser } from '../../../../../../utils/export.utils';
 import moment from 'moment';
 import { ProvidersApiConector } from '../../../../../../api/classes';
 import { formatDateTime } from '../../../../../../utils/helpers';
+import { User } from '../../../../../../type/User';
 
 interface IProviderFilter {
     fromDate: string | null;
@@ -24,8 +25,9 @@ const initialState: IProviderFilter = {
     nit: null
 }
 
-const FiltrosProveedores = ({ providers }: {
+const FiltrosProveedores = ({ providers, distribuidores }: {
     providers: Providers[]
+    distribuidores: User[]
 }) => {
     const { setProveedores } = useContext(ReportesEgresosContext)
     const { setLoading } = useGlobalContext()
@@ -73,6 +75,7 @@ const FiltrosProveedores = ({ providers }: {
 
             const typeDataToExport = {
                 NRO: `${idx + 1}`,
+                USUARIO: provider.user ? searchUser(provider.user, distribuidores) : "Usuario desconocido",
                 "NOMBRE PROVEEDOR": provider?.fullName || "Proveedor desconocido",
                 "TELEFONO": provider?.phoneNumber || "N/A",
                 "CORREO ELECTRONICO": provider?.email || "N/A",

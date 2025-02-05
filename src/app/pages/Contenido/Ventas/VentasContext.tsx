@@ -23,7 +23,7 @@ export const VentasContext = createContext<VentasContextType>(
 );
 
 const sale: Sale = {
-  _id: "", client: [], comment: "", created: "", creditSale: false, detail: [], total: 0, updated: "", user: "", zone: "", hasInvoice: false
+  _id: "", client, comment: "", created: "", creditSale: false, detail: [], total: 0, updated: "", user: "", zone: "", hasInvoice: false
 }
 
 export const VentasProvider = ({ children }: any) => {

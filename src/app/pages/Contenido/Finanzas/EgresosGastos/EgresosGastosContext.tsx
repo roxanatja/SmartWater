@@ -29,6 +29,7 @@ export const expense: Expense = {
     created: "",
     accountEntry: account,
     amount: 0,
+    amountStatic: 0,
     comment: "",
     creditBuy: false,
     documentNumber: "",

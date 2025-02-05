@@ -7,7 +7,7 @@ import { User } from "../../../../../../type/User";
 import { useForm } from "react-hook-form";
 import moment from "moment";
 import { useGlobalContext } from "../../../../../SmartwaterContext";
-import { exportData, searchDistrict, searchUser, searchZone, setContract, setContractLoan, setDetailClient, setDevolutions, setLoans } from "../../../../../../utils/export.utils";
+import { exportData, searchDistrict, searchUser, searchZone, setContractLoan, setDetailClient, setDevolutions, setLoans } from "../../../../../../utils/export.utils";
 import { ILoansGetParams } from "../../../../../../api/types/loans";
 import { DevolutionsApiConector, ItemsApiConector, LoansApiConector } from "../../../../../../api/classes";
 import { formatDateTime } from "../../../../../../utils/helpers";
@@ -131,7 +131,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
 
                         const typeDataToExport = {
                             NRO: `${idx + 1}`,
-                            USUARIO: searchUser(client.user, distribuidores), // Buscar usuario asociado
+                            USUARIO: searchUser(loan.user, distribuidores), // Buscar usuario asociado
                             "CODIGO CLIENTE": client.code ? client.code : "Sin codigo", // Código del cliente
                             "NOMBRE CLIENTE": client.fullName || "Sin nombre",
                             "TIPO DE CLIENTE":
@@ -158,7 +158,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                                 "numeric",
                                 "2-digit", false, true
                             ), // Formatear la fecha de registro
-                            CONTRATOS: setContractLoan(!!loan.contract.link, loan.contract.validUntil) || "SIN CONTRATOS", // Estado de contratos
+                            CONTRATOS: setContractLoan(loan.hasContract, loan.hasExpiredContract) || "SIN CONTRATOS", // Estado de contratos
                             "FECHA VALIDEZ DEL CONTRATO": !!loan.contract.validUntil
                                 ? formatDateTime(loan.contract.validUntil, "numeric", "numeric", "2-digit", false, true)
                                 : "N/A",
@@ -189,7 +189,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                 } else {
                     const typeDataToExport = {
                         NRO: `${idx + 1}`,
-                        USUARIO: searchUser(client.user, distribuidores), // Buscar usuario asociado
+                        USUARIO: searchUser(loan.user, distribuidores), // Buscar usuario asociado
                         "CODIGO CLIENTE": client.code ? client.code : "Sin codigo", // Código del cliente
                         "NOMBRE CLIENTE": client.fullName || "Sin nombre",
                         "TIPO DE CLIENTE":
@@ -216,7 +216,7 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
                             "numeric",
                             "2-digit", false, true
                         ), // Formatear la fecha de registro
-                        CONTRATOS: setContract(client) || "SIN CONTRATOS", // Estado de contratos
+                        CONTRATOS: setContractLoan(loan.hasContract, loan.hasExpiredContract) || "SIN CONTRATOS", // Estado de contratos
                         PRESTAMOS: "SIN MOVIMIENTO", // Detalles de préstamos
                         DEVOLUCIONES: "SIN MOVIMIENTO", // Detalles de devoluciones
                         SALDOS: "SIN SALDOS", // Detalles de saldos
@@ -233,6 +233,41 @@ const FiltroPrestamos = ({ distribuidores, zones }: {
 
                     dataClientToExport.push(typeDataToExport)
                 }
+            } else {
+                const typeDataToExport = {
+                    NRO: `${idx + 1}`,
+                    USUARIO: searchUser(loan.user, distribuidores), // Buscar usuario asociado
+                    "CODIGO CLIENTE": "N/A", // Código del cliente
+                    "NOMBRE CLIENTE": "N/A",
+                    "TIPO DE CLIENTE": "N/A", // Define el tipo de cliente
+                    WHATSAPP: "N/A", // Si tiene número de WhatsApp
+                    "TELEFONO FIJO": "N/A", // Número de teléfono
+                    "DATOS DE FACTURACION": "N/A",
+                    "CORREO ELECTRONICO": "N/A",
+                    NIT: "N/A", // Código del cliente
+                    DIRECCION: "N/A", // Dirección
+                    REFERENCIA: "N/A", // Comentario o referencia
+                    ZONA: "N/A", // Buscar la zona
+                    BARRIO: "N/A", // Buscar barrio
+                    "TIEMPO DE RENOVACION": "N/A", // Tiempo de renovación
+                    "RENOVACION PROMEDIO": "N/A", // Tiempo de renovación
+                    "DIAS RENOVACION PROMEDIO": "N/A", // Tiempo de renovación
+                    "FECHA DE REGISTRO DEL PRESTAMO": formatDateTime(
+                        loan.created,
+                        "numeric",
+                        "numeric",
+                        "2-digit", false, true
+                    ), // Formatear la fecha de registro
+                    CONTRATOS: setContractLoan(loan.hasContract, loan.hasExpiredContract) || "SIN CONTRATOS", // Estado de contratos
+                    PRESTAMOS: "SIN MOVIMIENTO", // Detalles de préstamos
+                    DEVOLUCIONES: "SIN MOVIMIENTO", // Detalles de devoluciones
+                    SALDOS: "SIN SALDOS", // Detalles de saldos
+                    "FECHA DE ULTIMA VENTA": "N/A", // Fecha de la última venta
+                    "ULTIMA FECHA POSPUESTO": "N/A", // Fecha de la última venta
+                    "PROXIMA FECHA DE RENOVACION": "N/A", // Fecha de la última venta
+                };
+
+                dataClientToExport.push(typeDataToExport)
             }
         }
 

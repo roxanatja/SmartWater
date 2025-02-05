@@ -408,8 +408,9 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
     const dataWithClientNames: any[] = []
 
-    for (const sale of data) {
-      const client: Client | null = sale.client?.[0]
+    for (let idx = 0; idx < data.length; idx++) {
+      const sale = data[idx]
+      const client: Client | null = sale.client
 
       const zone = await searchZone(sale.zone, zones)
 
@@ -417,6 +418,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         const product = products.find((product: any) => product._id === det.product);
 
         const typeDataToExport = {
+          NRO: `${idx + 1}`,
           FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit", false, true),
           USUARIO: searchUser(sale.user, userList),
           "CODIGO CLIENTE": client?.code || "N/A",
@@ -429,7 +431,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           CANTIDAD: det.quantity,
           PRECIO: det.price,
           SUBTOTAL: det.price * det.quantity,
-          PAGO: sale.creditSale ? "Credito" : "Al contado",
+          PAGO: sale.creditSale ? "Credito" : sale.paymentMethodCash ? "Efectivo" : sale.paymentMethodCurrentAccount ? "Cta. Cte." : "Sin definir",
           "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
           "DE CLIENTES": getSaleClientContract(client)
         };
@@ -458,6 +460,13 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
       if (filters.hasOwnProperty('text')) {
         datClients = await ClientsApiConector.searchClients({ pagination: { page: 1, pageSize: 3000 }, filters });
       } else {
+        if (!filters?.finalDate && !!filters?.initialDate) {
+          filters.finalDate = moment().format("YYYY-MM-DD")
+        }
+        if (!!filters?.finalDate && !filters?.initialDate) {
+          filters.initialDate = "2020-01-01"
+        }
+
         datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 3000 }, filters });
       }
     }
@@ -473,7 +482,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     // Mapeo de datos
     const dataClientToExport: any[] = [];
 
-    for (const client of data) {
+    for (let idx = 0; idx < data.length; idx++) {
+      const client = data[idx]
       const filteredLoans = loans.filter(l => l.client.some(c => c._id === client._id))
       const zone = await searchZone(client.zone, zones)
 
@@ -494,6 +504,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
           const saldo = saldosStr.find(l => l.itemId === item._id)
 
           const typeDataToExport = {
+            NRO: `${idx + 1}`,
             NOMBRE: client.fullName || "Sin nombre",
             "TIPO DE CLIENTE":
               client.isAgency
@@ -549,6 +560,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         })
       } else {
         const typeDataToExport = {
+          NRO: `${idx + 1}`,
           NOMBRE: client.fullName || "Sin nombre",
           "TIPO DE CLIENTE":
             client.isAgency

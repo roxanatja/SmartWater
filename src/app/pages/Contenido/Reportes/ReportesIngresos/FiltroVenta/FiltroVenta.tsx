@@ -129,14 +129,16 @@ const FiltroVenta = ({ distribuidores, zones }: {
 
     const dataWithClientNames: any[] = []
 
-    for (const sale of data) {
-      const client: Client | null = sale.client?.[0]
+    for (let idx = 0; idx < data.length; idx++) {
+      const sale = data[idx]
+      const client: Client | null = sale.client
       const zone = searchZone(sale.zone, zones)
 
       sale.detail.forEach((det, index) => {
         const product = products.find((product: any) => product._id === det.product);
 
         const typeDataToExport = {
+          NRO: `${idx + 1}`,
           FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit", false, true),
           USUARIO: searchUser(sale.user, distribuidores),
           "CODIGO CLIENTE": client?.code || "N/A",
@@ -149,7 +151,7 @@ const FiltroVenta = ({ distribuidores, zones }: {
           CANTIDAD: det.quantity,
           PRECIO: det.price,
           SUBTOTAL: det.price * det.quantity,
-          PAGO: sale.creditSale ? "Credito" : "Al contado",
+          PAGO: sale.creditSale ? "Credito" : sale.paymentMethodCash ? "Efectivo" : sale.paymentMethodCurrentAccount ? "Cta. Cte." : "Sin definir",
           "FACTURA/SIN FACTURA": sale.hasInvoice ? "FACTURA" : "SIN FACTURA",
           "DE CLIENTES": getSaleClientContract(client)
         };
