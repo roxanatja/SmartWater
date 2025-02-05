@@ -1,17 +1,23 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import { IMockInOuts } from '../../mock-data'
 import toast from 'react-hot-toast'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
 import { InventariosOtrosContext } from '../InventariosOtrosProvider'
+import { OtherOutput } from '../../../../../../type/Kardex'
+import { useGlobalContext } from '../../../../../SmartwaterContext'
 
 interface Props {
-    data: IMockInOuts[];
+    data: OtherOutput[];
+    totalRows: number;
+    pageSize: number;
+    handleChangePage: React.Dispatch<React.SetStateAction<number>>
     className?: string;
+    tableClassName?: string;
 }
 
-const TableOtrasSalidas = ({ data, className }: Props) => {
-    const { setSelectedInvetario, setSelectedOption, setShowModal } = useContext(InventariosOtrosContext)
+const TableOtrasSalidas = ({ data, className, tableClassName, pageSize, totalRows, handleChangePage }: Props) => {
+    const { setSelectedOutput, setSelectedOption, setShowModal } = useContext(InventariosOtrosContext)
+    const { loading } = useGlobalContext()
 
     const deleteRegistry = useCallback((id: string) => {
         toast.error(
@@ -72,18 +78,18 @@ const TableOtrasSalidas = ({ data, className }: Props) => {
     }, [])
 
 
-    const columns: TableColumn<IMockInOuts>[] = useMemo<TableColumn<IMockInOuts>[]>(() => [
+    const columns: TableColumn<OtherOutput>[] = useMemo<TableColumn<OtherOutput>[]>(() => [
         {
             name: "Fecha y hora",
-            selector: row => (row.initialDate ? formatDateTime(row.initialDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+            selector: row => (row.registerDate ? formatDateTime(row.registerDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
         {
             name: "Tipo de salida",
-            selector: row => row.type === 'production' ? "De producción" : "Por ajuste",
+            selector: row => row.type === 'production_delivered' ? "De producción" : "Por ajuste",
         },
         {
             name: "Comentario",
-            selector: row => row.comment || "Sin comentario",
+            selector: row => row.detail || "Sin comentario",
         },
         {
             name: "Cantidad",
@@ -94,10 +100,10 @@ const TableOtrasSalidas = ({ data, className }: Props) => {
             width: "10%",
             cell: (row) =>
                 <div className="flex items-center justify-end w-full gap-6 pr-3">
-                    <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
+                    <button onClick={() => { setSelectedOutput(row); setSelectedOption(true) }}>
                         <i className="fa fa-eye text-blue_bright" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => { setSelectedInvetario(row); setShowModal(true) }}>
+                    <button onClick={() => { setSelectedOutput(row); setShowModal(true) }}>
                         <i className="fa-solid fa-pen-to-square text-blue_bright" aria-hidden="true"></i>
                     </button>
                     <button onClick={() => deleteRegistry(row._id)}>
@@ -105,15 +111,19 @@ const TableOtrasSalidas = ({ data, className }: Props) => {
                     </button>
                 </div>
         }
-    ], [deleteRegistry, setSelectedInvetario, setSelectedOption, setShowModal])
+    ], [deleteRegistry, setSelectedOutput, setSelectedOption, setShowModal])
 
     return (
         <>
-            <div className="text-font-color">
-                <DataTable columns={columns} className={className}
+            <div className={`text-font-color ${className}`}>
+                <DataTable columns={columns} className={tableClassName}
                     data={data}
-                    pagination={data.length > 10}
-                    paginationPerPage={5}
+                    progressPending={loading}
+                    pagination={totalRows > pageSize}
+                    paginationServer={totalRows > pageSize}
+                    paginationPerPage={pageSize}
+                    paginationTotalRows={totalRows}
+                    onChangePage={(page, total) => { handleChangePage(page) }}
                     noDataComponent={<div className="min-h-[150px] flex items-center justify-center">Sin registros</div>}
                     paginationComponent={({ currentPage, onChangePage, rowCount, rowsPerPage }) => (<>
                         <div className="flex gap-2 w-full justify-end mt-2">

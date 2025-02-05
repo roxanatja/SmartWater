@@ -1,0 +1,95 @@
+.table-container {
+    position: relative;
+    width: 100%;
+    border-radius: inherit;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-height: 0;
+}
+
+.table-container .table-wrapper {
+    position: relative;
+    width: 100%;
+    display: table;
+}
+
+.table-container div[role="table"] {
+    position: relative;
+    width: 100%;
+    border-radius: inherit;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-height: 0;
+}
+
+.table-container div[role="rowgroup"] {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.table-container .rdt_TableHeadRow {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    align-items: stretch;
+    background-color: #FFFFFF;
+    min-height: 52px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, .12);
+    border-bottom-style: solid;
+}
+
+.table-container .rdt_TableHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #FFFFFF;
+    min-height: 52px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, .12);
+    border-bottom-style: solid;
+}
+
+.table-container div[role="row"] {
+    display: flex;
+    align-items: stretch;
+    align-content: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: #FFFFFF;
+    min-height: 48px;
+}
+
+.table-container .rdt_TableRow:not(:last-of-type) {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, .12);
+}
+
+.table-container .rdt_TableFooterRow {
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-top-color: rgba(0, 0, 0, .12);
+}
+
+
+.table-container div[role="cell"] {
+    flex: 1 1 0;
+    max-width: 100%;
+    min-width: 100px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    line-height: normal;
+    padding-left: 16px;
+    padding-right: 16px;
+    word-break: break-word;
+}

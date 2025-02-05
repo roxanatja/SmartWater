@@ -187,7 +187,12 @@ input[type=number].no-spinner {
   @apply !border-b-font-color/20;
 }
 
+.rdt_TableFooterRow {
+  @apply !border-t-font-color/20;
+}
+
 .no-border .rdt_TableHeadRow,
+.no-border .rdt_TableFooterRow,
 .no-border .rdt_TableRow:not(:last-of-type) {
   border: none !important;
 }
@@ -197,6 +202,7 @@ input[type=number].no-spinner {
 }
 
 .with-vertical-border .rdt_TableHeadRow .rdt_TableCol:not(:last-of-type),
+.with-vertical-border .rdt_TableFooterRow .rdt_TableCol:not(:last-of-type),
 .with-vertical-border .rdt_TableRow td[role="cell"]:not(:last-of-type),
 .with-vertical-border .rdt_TableRow div[role="cell"]:not(:last-of-type) {
   @apply border-r border-r-font-color/10;
