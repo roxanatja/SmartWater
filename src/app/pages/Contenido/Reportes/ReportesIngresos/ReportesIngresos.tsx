@@ -28,8 +28,8 @@ const ReportesIngresos: FC = () => {
   const [distribuidores, setDistribuidores] = useState<User[]>([])
 
   useEffect(() => {
-    ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setZones(res?.data || []))
-    UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }).then(res => setDistribuidores(res?.data || []))
+    ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setZones(res?.data || []))
+    UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }).then(res => setDistribuidores(res?.data || []))
   }, [])
 
   return (

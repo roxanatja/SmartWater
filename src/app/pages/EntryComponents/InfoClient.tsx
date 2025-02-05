@@ -37,11 +37,11 @@ const InfoClient = ({ client }: { client: Client }) => {
   const getZone = useCallback(
     async (zone: string, disc: string, client?: string) => {
       let resload: Loans[] = []; let devo: Devolution[] = [];
-      const zones: Zone[] = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+      const zones: Zone[] = (await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
 
       if (client) {
-        resload = (await LoansApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
-        devo = (await DevolutionsApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+        resload = (await LoansApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 30000 } }))?.data || [];
+        devo = (await DevolutionsApiConector.get({ filters: { client: client }, pagination: { page: 1, pageSize: 30000 } }))?.data || [];
       }
 
       const zoneData = zones.find((x) => x._id === zone);
@@ -49,8 +49,8 @@ const InfoClient = ({ client }: { client: Client }) => {
         zone: zoneData?.name,
         district: zoneData?.districts.find((x) => x._id === disc)?.name,
         loans: resload,
-        product: (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
-        items: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [],
+        product: (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [],
+        items: (await ItemsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [],
         devolu: devo
       });
     },

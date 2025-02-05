@@ -124,8 +124,8 @@ const FiltroVenta = ({ distribuidores, zones }: {
       filters.finalDate = moment().format("YYYY-MM-DD")
     }
 
-    const data = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters }))?.data || []
-    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || [];
+    const data = (await SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters }))?.data || []
+    const products = (await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || [];
 
     const dataWithClientNames: any[] = []
 

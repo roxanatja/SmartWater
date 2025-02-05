@@ -66,7 +66,7 @@ const FiltrosProveedores = ({ providers, distribuidores }: {
     const getDataWithClientNames = async (filtersParam: IProvidersGetParams['filters']) => {
         const filters = filtersParam || {}
 
-        const data = (await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters }))?.data || []
+        const data = (await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters }))?.data || []
 
         const dataWithClientNames: any[] = []
 

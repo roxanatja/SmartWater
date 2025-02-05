@@ -35,10 +35,10 @@ const ReportesEgresos: FC = () => {
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
-        ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setExpenses(res?.data || []))
-        ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setZones(res?.data || []))
-        UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }).then(res => setDistribuidores(res?.data || []))
-        ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setProviders(res?.data || []))
+        ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setExpenses(res?.data || []))
+        ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setZones(res?.data || []))
+        UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }).then(res => setDistribuidores(res?.data || []))
+        ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setProviders(res?.data || []))
         AccountEntryApiConector.get().then(res => setAccounts(res || []))
     }, [])
 

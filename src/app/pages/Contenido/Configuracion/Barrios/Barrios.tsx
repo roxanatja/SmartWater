@@ -33,10 +33,10 @@ const Barrios: FC = () => {
     const fetchZones = useCallback(async () => {
         setLoading(true)
 
-        const res = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const res = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } })
         setZones(res?.data || [])
 
-        const resD = await DistrictsApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const resD = await DistrictsApiConector.get({ pagination: { page: 1, pageSize: 30000 } })
         const dists = resD?.data || []
         setDistricts(dists)
         setTotalPages(Math.ceil(dists.length / ITEMS_PER_PAGE))

@@ -28,7 +28,7 @@ const Zonas: FC = () => {
     const fetchZones = useCallback(async () => {
         setLoading(true)
 
-        const res = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const res = await ZonesApiConector.get({ pagination: { page: 1, pageSize: 30000 } })
         setZonas(res?.data || [])
         setTotalPages(Math.ceil((res?.data || []).length / ITEMS_PER_PAGE))
 

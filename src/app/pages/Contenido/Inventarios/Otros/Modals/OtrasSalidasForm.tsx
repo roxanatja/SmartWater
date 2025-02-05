@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import Input from "../../../../EntryComponents/Inputs";
-import moment from "moment";
+import moment from "moment-timezone";
 import { MatchedElement, OutputItemBody } from "../../../../../../type/Kardex";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { IOthersOutputMoreBody } from "../../../../../../api/types/kardex";
@@ -54,6 +54,10 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
 
             return acc
         }, {})
+
+        const selected = moment(data.registerDate)
+        const now = moment.tz("America/La_Paz").set({ date: selected.date(), month: selected.month(), year: selected.year() })
+        data.registerDate = now.format("YYYY-MM-DDTHH:mm")
 
         const requestBody: IOthersOutputMoreBody = {
             forceOut: false,

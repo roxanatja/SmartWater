@@ -118,8 +118,8 @@ const HistorialCuentasPorCobrar = ({ client }: Props) => {
   useEffect(() => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
-      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
-      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
+      setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+      setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { role: 'user', desactivated: false } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -154,7 +154,7 @@ const HistorialCuentasPorCobrar = ({ client }: Props) => {
         filters.finalDate = moment().format("YYYY-MM-DD")
       }
 
-      promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { ...filters, creditSale: true, client } }))
+      promises.push(SalesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, creditSale: true, client } }))
     }
 
     Promise.all(promises).then(responses => {

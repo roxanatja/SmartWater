@@ -91,7 +91,7 @@ const CuentasPorPagar = () => {
 
             if (queryData.clients) {
                 queryData.clients.forEach(cf =>
-                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
+                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
                 )
             } else {
                 promises.push(ExpensesApiConector.get({ pagination: queryData.pagination, filters: { ...filters, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
@@ -146,8 +146,8 @@ const CuentasPorPagar = () => {
     useEffect(() => {
         const fetchZones = async () => {
             setZones((await ZonesApiConector.get({}))?.data || []);
-            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }))?.data || []);
-            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }))?.data || []);
+            setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
+            setProviders((await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
         }
         fetchZones()
     }, [])
@@ -190,10 +190,10 @@ const CuentasPorPagar = () => {
 
             if (queryData.clients) {
                 queryData.clients.forEach(cf =>
-                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
+                    promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, provider: cf, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
                 )
             } else {
-                promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 3000, sort: queryData.pagination?.sort }, filters: { ...filters, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
+                promises.push(ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, creditBuy: true, pendingBalance: queryData.showAll ? undefined : true } }))
             }
         }
 

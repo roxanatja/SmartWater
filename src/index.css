@@ -197,6 +197,7 @@ input[type=number].no-spinner {
 }
 
 .with-vertical-border .rdt_TableHeadRow .rdt_TableCol:not(:last-of-type),
+.with-vertical-border .rdt_TableRow td[role="cell"]:not(:last-of-type),
 .with-vertical-border .rdt_TableRow div[role="cell"]:not(:last-of-type) {
   @apply border-r border-r-font-color/10;
 }

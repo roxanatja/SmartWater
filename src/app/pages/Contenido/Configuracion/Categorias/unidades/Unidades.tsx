@@ -31,7 +31,7 @@ const Unidades: FC = () => {
     const fetchData = useCallback(async () => {
         setLoading(true)
 
-        const res = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 3000 } })
+        const res = await UnitMeasureApiConector.get({ pagination: { page: 1, pageSize: 30000 } })
         const prods = res || []
         setItems(prods)
         setTotalPages(Math.ceil(prods.length / ITEMS_PER_PAGE))

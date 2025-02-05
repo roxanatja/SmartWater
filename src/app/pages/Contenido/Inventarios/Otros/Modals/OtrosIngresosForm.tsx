@@ -34,6 +34,10 @@ const OtrosIngresosForm = ({ elements, onCancel }: Props) => {
     const onSubmit = async (data: FormType) => {
         const userData = AuthService.getUser()
 
+        const selected = moment(data.registerDate)
+        const now = moment.tz("America/La_Paz").set({ date: selected.date(), month: selected.month(), year: selected.year() })
+        data.registerDate = now.format("YYYY-MM-DDTHH:mm")
+
         const reduced = inventories.reduce<{ [key: string]: IOthersEntryMoreBody['elementsDetails'][0]['elements'] }>((acc, prev) => {
             const entity: IOthersEntryMoreBody['elementsDetails'][0]['elements'][0] = {
                 quantity: prev.quantity,

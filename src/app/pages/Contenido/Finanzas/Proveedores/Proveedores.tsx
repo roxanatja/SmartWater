@@ -36,7 +36,7 @@ const Proveedores: FC = () => {
   const getData = useCallback(async () => {
     setLoading(true)
 
-    let datProvs = await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000, sort }, filters: { ...savedFilters } });
+    let datProvs = await ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000, sort }, filters: { ...savedFilters } });
     const provs = datProvs?.data || []
     setUsers(provs);
     setTotalPage(Math.ceil((provs.length || 0) / itemsPerPage)); // Update total pages
@@ -45,7 +45,7 @@ const Proveedores: FC = () => {
   }, [setLoading, sort, savedFilters]);
 
   useEffect(() => {
-    ProvidersApiConector.get({ pagination: { page: 1, pageSize: 3000 } }).then(res => setAllProviders(res?.data || []))
+    ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => setAllProviders(res?.data || []))
   }, [])
 
   useEffect(() => {

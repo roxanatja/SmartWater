@@ -47,7 +47,7 @@ const ClientesPorDistribuidor: FC = () => {
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        UsersApiConector.get({ pagination: { page: 1, pageSize: 3000 }, filters: { desactivated: false } }).then(res => {
+        UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }).then(res => {
             setDistribuidores(res?.data || [])
             setDistribuidoresSelected(res?.data || [])
         })
@@ -166,7 +166,7 @@ const ClientesPorDistribuidor: FC = () => {
 
 
     const loadData = useCallback(async () => {
-        const res = await ClientsApiConector.getClients({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 3000 } })
+        const res = await ClientsApiConector.getClients({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 30000 } })
         setReports(res?.data || [])
     }, [filters])
 
