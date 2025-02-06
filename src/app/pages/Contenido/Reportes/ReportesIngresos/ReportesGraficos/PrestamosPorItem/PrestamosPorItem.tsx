@@ -290,6 +290,9 @@ const PrestamosPorItem: FC = () => {
                                         day: "dd/MM/yyyy"
                                     }
                                 },
+                                grid: {
+                                    color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+                                }
                             },
                             y: {
                                 beginAtZero: true,
@@ -297,6 +300,9 @@ const PrestamosPorItem: FC = () => {
                                     font: { family: "Poppins" },
                                     color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
                                 },
+                                grid: {
+                                    color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+                                }
                             },
                         },
                     }} plugins={[verticalLinePlugin]} />

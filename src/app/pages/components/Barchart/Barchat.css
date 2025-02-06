@@ -11,7 +11,7 @@
     font-family: "Poppins";
 }
 
-canvas {
+.BarContainer canvas {
     min-height: 350px;
     min-width: 300px;
 }
