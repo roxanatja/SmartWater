@@ -3,11 +3,12 @@ import { useContext, useEffect } from "react";
 import moment from "moment";
 import { motion } from "framer-motion";
 import { InventariosOtrosContext } from "../InventariosOtrosProvider";
+import { IKardexOthersGetParams } from "../../../../../../api/types/kardex";
 
 interface IInitialBalancesFilters {
     fromDate: string | null;
     toDate: string | null;
-    type: string | null
+    type: 'production_received' | 'adjustment_entry' | null
 }
 
 const initialState: IInitialBalancesFilters = {
@@ -20,8 +21,8 @@ const FiltrosEntradas = ({
     onChange,
     initialFilters
 }: {
-    onChange: (filters: any) => void;
-    initialFilters: any;
+    onChange: (filters: IKardexOthersGetParams['filters']) => void;
+    initialFilters: IKardexOthersGetParams['filters'];
 }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IInitialBalancesFilters>({
         defaultValues: initialState || {},
@@ -32,8 +33,11 @@ const FiltrosEntradas = ({
             if (initialFilters.finalDate) {
                 setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
             }
-            if (initialFilters.type) {
-                setValue('type', initialFilters.type, { shouldValidate: true })
+            if (initialFilters.initialDate) {
+                setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
+            }
+            if (initialFilters.inputType) {
+                setValue('type', initialFilters.inputType, { shouldValidate: true })
             }
         }
     }, [initialFilters, setValue])
@@ -46,11 +50,12 @@ const FiltrosEntradas = ({
         setShowFiltro(false);
     };
 
-    const filterClients = (filters: IInitialBalancesFilters): any => {
-        const result: any = {}
+    const filterClients = (filters: IInitialBalancesFilters): IKardexOthersGetParams['filters'] => {
+        const result: IKardexOthersGetParams['filters'] = {}
 
         if (filters.toDate) { result.finalDate = filters.toDate.toString() }
-        if (filters.type) { result.type = filters.type }
+        if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
+        if (filters.type) { result.inputType = filters.type }
 
         return result
     };
@@ -88,7 +93,6 @@ const FiltrosEntradas = ({
                 </div>
             </div>
 
-            {/* TODO: Change to checkboxes */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -99,8 +103,8 @@ const FiltrosEntradas = ({
                 <label>Tipo de salida</label>
                 <select {...register("type")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
                     <option value="">Seleccione un tipo</option>
-                    <option value="production">De producción</option>
-                    <option value="fixing">Por ajuste</option>
+                    <option value="production_received">De producción</option>
+                    <option value="adjustment_entry">Por ajuste</option>
                 </select>
             </motion.div>
 

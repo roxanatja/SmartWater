@@ -164,8 +164,7 @@ const CuadroRegistrarEyG = ({
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Importe</span>
-            {/* TODO: Check - 100% */}
-            <span>{((expense.creditBuy ? expense.amountStatic : expense.amount) || 0).toString().toLocaleString()} Bs.</span>
+            <span>{((expense.creditBuy ? expense.amountStatic ? expense.amountStatic : expense.amount : expense.amount) || 0).toString().toLocaleString()} Bs.</span>
           </div>
           <div className="RegistrosEyG-Cuadro1-text">
             <span>Formas de pago</span>

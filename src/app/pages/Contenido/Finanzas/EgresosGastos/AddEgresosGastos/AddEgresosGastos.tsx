@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { Providers } from '../../../../../../type/providers';
 import { Account } from '../../../../../../type/AccountEntry';
 import { IExpenseDetailsBody } from '../../../../../../api/types/expenses';
@@ -11,6 +11,7 @@ import { MatchedElement } from '../../../../../../type/Kardex';
 import InventoriesForm from './InventoriesForm';
 import { AuthService } from '../../../../../../api/services/AuthService';
 import moment from 'moment-timezone';
+import { EgresosGastosContext } from '../EgresosGastosContext';
 
 interface Props {
   onCancel?: () => void;
@@ -21,13 +22,25 @@ interface Props {
 
 const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => {
   const [active, setActive] = useState(false);
+  const { selectedExpense } = useContext(EgresosGastosContext)
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid }, watch, setValue
   } = useForm<IExpenseDetailsBody['data']>({
-    defaultValues: {},
+    defaultValues: selectedExpense._id !== "" ? {
+      accountEntry: selectedExpense.accountEntry._id,
+      amount: selectedExpense.amount,
+      comment: selectedExpense.comment,
+      creditBuy: selectedExpense.creditBuy,
+      documentNumber: selectedExpense.documentNumber,
+      hasInVoice: selectedExpense.hasInVoice,
+      hasReceipt: selectedExpense.hasReceipt,
+      paymentMethodCurrentAccount: selectedExpense.paymentMethodCurrentAccount,
+      provider: selectedExpense.provider?._id || "",
+      user: selectedExpense.user._id
+    } : {},
     mode: 'all'
   });
 
@@ -40,26 +53,78 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
 
     const userData = AuthService.getUser()
 
-    res = await ExpensesApiConector.createWithDetails({
-      data: {
-        ...data,
-        user: userData?._id || "",
-        details: inventories.map(i => ({
-          ...i,
-          inputImport: i.inputImport * i.quantity
-        })),
-        registerDate: moment.tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss")
-      }
-    })
+    if (selectedExpense._id !== "") {
+      res = await ExpensesApiConector.update({
+        expenseId: selectedExpense._id,
+        data: {
+          ...data,
+          user: userData?._id || "",
+          details: inventories.map(i => ({
+            ...i,
+            inputImport: i.inputImport * i.quantity
+          }))
+        }
+      })
+    } else {
+      res = await ExpensesApiConector.createWithDetails({
+        data: {
+          ...data,
+          user: userData?._id || "",
+          details: inventories.map(i => ({
+            ...i,
+            inputImport: i.inputImport * i.quantity
+          })),
+          registerDate: moment.tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss")
+        }
+      })
+    }
 
     if (res) {
-      toast.success("Gasto registrado correctamente", { position: "bottom-center" });
+      toast.success(`Item ${selectedExpense._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
       window.location.reload();
     } else {
       toast.error("Upps error al crear el gasto", { position: "bottom-center" });
       setActive(false)
     }
   };
+
+  useEffect(() => {
+    if (selectedExpense._id !== "") {
+      const aux: IExpenseDetailsBody['data']['details'] = []
+      console.log(selectedExpense)
+
+      aux.push(...selectedExpense.items.map(i => {
+        console.log(i.item._id)
+        const el = elements.find(e => e._id === i.item._id || (e.matchingItems && e.matchingItems.some(mi => mi._id === i.item._id)))
+        console.log(el)
+        const res: IExpenseDetailsBody['data']['details'][0] = {
+          inputImport: i.unitPrice,
+          quantity: i.quantity
+        }
+
+        if (el?.isProduct) { res.product = el._id }
+        else if (el?.isItem) { res.item = el._id }
+
+        return res
+      }))
+      aux.push(...selectedExpense.products.map(i => {
+        const el = elements.find(e => e._id === i.product._id || (e.matchingItems && e.matchingItems.some(mi => mi._id === i.product._id)))
+        const res: IExpenseDetailsBody['data']['details'][0] = {
+          inputImport: i.unitPrice,
+          quantity: i.quantity
+        }
+
+        if (el?.isProduct) { res.product = el._id }
+        else if (el?.isItem) { res.item = el._id }
+
+        return res
+      }))
+
+      console.log(aux)
+
+      setInventories(aux)
+    }
+  }, [selectedExpense, elements])
 
   const handleChangePayment = (e: ChangeEvent<HTMLSelectElement>) => {
     const selection = e.target.value as typeof selectedPayment
@@ -276,7 +341,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
               <i className="fa-solid fa-spinner animate-spin"></i>
             ) : (
               <>
-                Registrar
+                {selectedExpense._id !== "" ? "Editar" : "Registrar"}
               </>
             )}
           </button>

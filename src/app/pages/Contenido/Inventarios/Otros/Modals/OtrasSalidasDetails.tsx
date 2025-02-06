@@ -5,6 +5,9 @@ import { InventariosOtrosContext } from "../InventariosOtrosProvider";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import { UnitMeasure } from "../../../../../../type/Products/UnitMeasure";
 import { MatchedElement } from "../../../../../../type/Kardex";
+import { detailsTemplate } from "./pdfTemplates";
+import { showGeneratePDF } from "../../../../../../utils/pdfHelper";
+import { useGlobalContext } from "../../../../../SmartwaterContext";
 
 
 interface Props {
@@ -14,6 +17,7 @@ interface Props {
 
 const OtrasSalidasDetails = ({ elements, onCancel }: Props) => {
     const { selectedOutput } = useContext(InventariosOtrosContext)
+    const { setLoading } = useGlobalContext()
 
     useEffect(() => {
         if (selectedOutput._id === "" && onCancel) { onCancel() }
@@ -24,11 +28,30 @@ const OtrasSalidasDetails = ({ elements, onCancel }: Props) => {
         return product || null
     }, [elements, selectedOutput])
 
+
+    const report = async () => {
+        if (selectedOutput._id !== "") {
+            const inputs = [
+                {
+                    title: "Otras salidas",
+                    date: formatDateTime(selectedOutput.registerDate, 'numeric', '2-digit', '2-digit'),
+                    comment: selectedOutput.detail || "Sin comentario",
+                    type: JSON.stringify({ type: selectedOutput.type === 'production_delivered' ? `Salida a producción` : `Salida por ajuste` }),
+                    quantity: JSON.stringify({ quantity: `${selectedOutput.quantity.toLocaleString()} ${(product?.unitMeasure as UnitMeasure)?.name || ""}` }),
+                    product: JSON.stringify({ product: product?.name || "Producto desconocido" }),
+                    field6: "Comentario"
+                }
+            ]
+
+            showGeneratePDF(setLoading, detailsTemplate, inputs)
+        }
+    }
+
     return (
         <div className="flex flex-col gap-6 w-full p-6 relative text-sm">
             <div className="flex gap-4 items-center justify-end absolute top-4 right-4 print:hidden">
-                <button type="button" className="border border-blue_bright w-20 h-12 flex items-center justify-center rounded-[30px]" onClick={() => alert("print")}>
-                    <img src="/print.svg" alt="" />
+                <button type="button" className="bg-blue_bright w-20 h-12 flex items-center justify-center rounded-[30px]" onClick={() => report()}>
+                    <img src="/document.svg" alt="" />
                 </button>
             </div>
 

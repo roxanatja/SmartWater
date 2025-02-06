@@ -28,7 +28,7 @@ export type Expense = {
 export type EgresoProductItem = {
     product: {
         name: string;
-        id: string;
+        _id: string;
     },
     quantity: number;
     subtotal: number;
@@ -37,7 +37,7 @@ export type EgresoProductItem = {
 export type EgresoItemItem = {
     item: {
         name: string;
-        id: string;
+        _id: string;
     },
     quantity: number;
     subtotal: number;
