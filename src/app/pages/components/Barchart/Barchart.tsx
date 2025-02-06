@@ -88,8 +88,10 @@ const BarChart = () => {
             },
             datalabels: {
               font: { family: "Poppins" },
-              anchor: 'center',
               align: 'top',
+              anchor: 'end',
+              clip: true,
+              rotation: 65,
               formatter: (value: number) => `${value} Bs.`,
               color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
             },
@@ -105,12 +107,18 @@ const BarChart = () => {
                 color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
                 stepSize: 500, // Establece el espaciado entre las etiquetas
               },
+              grid: {
+                color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+              }
             },
             x: {
               ticks: {
                 font: { family: "Poppins" },
                 color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
               },
+              grid: {
+                color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+              }
             },
           },
           maintainAspectRatio: false, // Esto evita que el gráfico mantenga el aspect ratio
