@@ -74,3 +74,25 @@ export type CashReport = {
     expensesToPayPending: number;
   }
 };
+
+export type ResultsReport = {
+  count: string;
+  dailyReports: {
+    date: string,
+    startDate: string,
+    endDate: string,
+    cashSales: number;
+    creditBillsSales: number;
+    incomeCashTotal: number;
+    cashCurrentAccount: number;
+    creditBillsSalesCurrentAccount: number;
+    incomeCurrentAccountTotal: number;
+    cashExpenses: number;
+    paymentObligations: number;
+    expenseCashTotal: number;
+    expensePayCurrentAccount: number;
+    expenseCurrentPayObligations: number;
+    expenseCurrentAccountTotal: number;
+    profitOrLoss: number;
+  }[]
+}

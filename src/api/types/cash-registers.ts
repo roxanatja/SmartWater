@@ -48,6 +48,13 @@ export interface IRegistersCloseBody {
     }
 }
 
+export interface IReportDailyBody {
+    data: {
+        startDate: string;
+        endDate: string;
+    }
+}
+
 export interface IRegistersFilter {
     registryId: string;
 }

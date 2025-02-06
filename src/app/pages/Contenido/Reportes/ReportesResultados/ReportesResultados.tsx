@@ -3,6 +3,8 @@ import "./ReportesResultados.css";
 import { Link } from "react-router-dom";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { ReportesResultadosContext } from "./ReportesResultadosContext";
+import Modal from "../../../EntryComponents/Modal";
+import FilterResultados from "./FilterResultados";
 
 const ReportesResultados: FC = () => {
     const { resultados, setResultados } = useContext(ReportesResultadosContext)
@@ -34,6 +36,9 @@ const ReportesResultados: FC = () => {
                     </Link>
                 </div>
             </div>
+            <Modal isOpen={resultados} onClose={() => setResultados(false)}>
+                <FilterResultados />
+            </Modal>
         </>
     )
 }
