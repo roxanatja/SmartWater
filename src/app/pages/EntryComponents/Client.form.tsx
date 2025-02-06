@@ -41,6 +41,7 @@ const ClientForm = ({
     {
       defaultValues: {
         ...selectedClient,
+        fullName: (!selectedClient || selectedClient.fullName === "Sin nombre") ? "" : selectedClient.fullName,
         zone: selectedClient.zone, district: selectedClient.district,
         phoneLandLine: selectedClient.phoneLandLine ? formatNumber(selectedClient.phoneLandLine, "BO", "NATIONAL").replaceAll(" ", "") : undefined,
         phoneNumber: formatNumber(selectedClient.phoneNumber, "BO", "NATIONAL").replaceAll(" ", ""),
@@ -122,7 +123,7 @@ const ClientForm = ({
           ciFrontImage: data.ciFrontImage,
           comment: "",
           district: data.district,
-          fullName: data.fullName,
+          fullName: data.fullName || "Sin nombre",
           location: data.location,
           reference: data.reference,
           clientImage: data.clientImage,
@@ -148,7 +149,7 @@ const ClientForm = ({
           reference: data.reference || "",
           credit: 0,
           district: data.district,
-          fullName: data.fullName,
+          fullName: data.fullName || "Sin nombre",
           hasContract: data.hasContract,
           hasLoan: data.hasLoan,
           hasOrder: data.hasOrder,
