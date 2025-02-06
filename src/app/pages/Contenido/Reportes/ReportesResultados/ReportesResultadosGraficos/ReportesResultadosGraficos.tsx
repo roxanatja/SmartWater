@@ -125,7 +125,7 @@ const ReportesResultadosGraficos: FC = () => {
                 <FiltersResultadosGrafico onConfirm={setFilters} />
                 {
                     reports.length > 0 &&
-                    <div className="pb-16 pt-8 px-8 flex flex-col gap-12">
+                    <div className="pb-16 pt-8 px-8 flex flex-col gap-12 Result-Report">
                         <div>
                             <TablaReporteResultados mode={mode || 'month'} className="no-border results-table" data={formattedReports} headers={headers} />
                         </div>

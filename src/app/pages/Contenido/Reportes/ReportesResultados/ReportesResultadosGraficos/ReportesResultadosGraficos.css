@@ -171,7 +171,7 @@
     border-top-right-radius: 10px;
 }
 
-canvas {
+.Result-Report canvas {
     min-height: 250px !important;
     max-height: 400px !important;
     min-width: 300px;
