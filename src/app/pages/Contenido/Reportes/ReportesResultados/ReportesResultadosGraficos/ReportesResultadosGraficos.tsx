@@ -96,13 +96,13 @@ const ReportesResultadosGraficos: FC = () => {
     const formattedReports = useMemo<IFormattedResults[]>(() => {
         return [
             {
-                title: "Ingresos", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: r.incomeCashTotal + r.incomeCurrentAccountTotal }))
+                title: "Ingresos", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: Number((r.incomeCashTotal + r.incomeCurrentAccountTotal).toFixed(2)) }))
             },
             {
-                title: "Egresos", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: r.expenseCashTotal + r.expenseCurrentAccountTotal }))
+                title: "Egresos", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: Number((r.expenseCashTotal + r.expenseCurrentAccountTotal).toFixed(2)) }))
             },
             {
-                title: "Resultados", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: r.profitOrLoss }))
+                title: "Resultados", values: reports.map(r => ({ date: moment.utc(r.date).format(mode === 'month' ? "MMM YYYY" : "DD/MM/YYYY"), value: Number((r.profitOrLoss).toFixed(2)) }))
             },
         ]
     }, [reports, mode])
