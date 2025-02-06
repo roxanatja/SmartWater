@@ -1,194 +1,67 @@
-import { FC } from "react";
+import { useMemo } from "react";
+import DataTable, { TableColumn } from "react-data-table-component";
+import { IFormattedResults } from "../ReportesResultadosGraficos";
 
-const TablaReporteResultados: FC = () => {
+const TablaReporteResultados = ({ mode, data, headers, className }: {
+    mode: 'range' | 'month';
+    data: IFormattedResults[];
+    headers: string[];
+    className?: string;
+}) => {
+    console.log(data)
+
+    const columns: TableColumn<IFormattedResults>[] = useMemo<TableColumn<IFormattedResults>[]>(() => {
+        return headers.map<TableColumn<IFormattedResults>>(h => ({
+            name: h,
+            selector: row => {
+                if (h === "") { return row.title }
+                else { return row.values.find(v => v.date === h)?.value || 0 }
+            }
+        }))
+    }, [headers])
+
     return (
         <>
-        <div style={{ width: "100%", marginTop: "25px" }}>
-            <table style={{ width: "100%", borderSpacing: "0px" }}>
-            <thead>
-                <tr>
-                    <th></th>
-                    <div className="ReportesResultadosGraficos-TablaTitulo">
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Enero</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Febrero</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Marzo</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Abril</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Mayo</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Junio</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Julio</span>
-                        </th>
-                        <th style={{ fontWeight: "500" }}>
-                            <span>Agosto</span>
-                        </th>
-                    </div>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <th>
-                    <div className="ReportesResultadosGraficos-TablaBody-item">
-                        <span>Ingresos</span>
-                    </div>
-                </th>
-                <div className="ReportesResultadosGraficos-TablaBody">
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
+            <div className="text-font-color">
+                <DataTable columns={columns} className={className}
+                    striped
+                    data={data}
+                    pagination={data.length > 10}
+                    paginationPerPage={5}
+                    noDataComponent={<div className="min-h-[150px] flex items-center justify-center">Sin registros</div>}
+                    paginationComponent={({ currentPage, onChangePage, rowCount, rowsPerPage }) => (<>
+                        <div className="flex gap-2 w-full justify-end mt-2">
+                            <>
+                                {/* Probably manage the pagination in the route */}
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
+                                        onClick={() => onChangePage(currentPage - 1, rowCount)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        <i className="fa-solid fa-angle-left text-white"></i>
+                                    </button>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="text-paginado">{`${currentPage} de ${Math.ceil(rowCount / rowsPerPage)} `}</span>
+                                </div>
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
+                                        onClick={() => onChangePage(currentPage + 1, rowCount)}
+                                        disabled={currentPage === Math.ceil(rowCount / rowsPerPage)}
+                                    >
+                                        <i className="fa-solid fa-angle-right text-white"></i>
+                                    </button>
+                                </div>
+                            </>
                         </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <span>50 Bs</span>
-                        </div>
-                    </td>
-                </div>
-                </tr>
-                <tr>
-                    <th>
-                        <div className="ReportesResultadosGraficos-TablaBody-item2">
-                        <span>Egresos</span>
-                        </div>
-                    </th>
-                    <div className="ReportesResultadosGraficos-TablaBody" style={{ background: "#F3F3F3" }}>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div>
-                                <span>80 Bs</span>
-                            </div>
-                        </td>
-                    </div>
-                </tr>
-                <tr>
-                    <th>
-                        <div className="ReportesResultadosGraficos-TablaBody-item3">
-                            <span>Resultados</span>
-                        </div>
-                    </th>
-                    <div className="ReportesResultadosGraficos-TablaBody">
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span>20 Bs</span>
-                        </div>
-                        </td>
-                    </div>
-                </tr>
-            </tbody>
-            </table>
-        </div>
+                    </>)} />
+            </div>
         </>
     );
 };
 
-export{TablaReporteResultados}
+export { TablaReporteResultados }

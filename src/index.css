@@ -170,6 +170,7 @@ input[type=number].no-spinner {
 
 /* React data table */
 .rdt_TableHeadRow,
+.rdt_TableBody,
 .rdt_TableRow,
 .rdt_TableHeader,
 .sc-gBoluC {
