@@ -21,7 +21,6 @@ export const showGeneratePDF = async (
         try {
             const url = window.URL.createObjectURL(blob);
             const w = window.open(url, "Resumen de arqueo", "popup,height=1080,width=900")
-            console.log(w)
             if (w) {
                 let timer = setInterval(function () {
                     if (w.closed) {

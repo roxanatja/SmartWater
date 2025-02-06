@@ -44,7 +44,6 @@ const ReportesGraficos: FC = () => {
                             <span>Ventas por distribuidor</span>
                         </div>
                     </Link>
-                    {/* TODO */}
                     <Link to={"/Reportes/Ingresos/Graficos/CuentasPorCobrar"}>
                         <div className="ReportesGraficos-item">
                             <svg xmlns="http://www.w3.org/2000/svg" width="44" height="52" viewBox="0 0 44 52" fill="none"                            >

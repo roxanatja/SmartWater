@@ -10,6 +10,7 @@ import { KardexApiConector } from '../../../../../api/classes/kardex';
 import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
 import { useGlobalContext } from '../../../../SmartwaterContext';
 import { IKardexOthersGetParams } from '../../../../../api/types/kardex';
+import moment from 'moment-timezone';
 
 const Ingresos = () => {
     const {
@@ -41,7 +42,16 @@ const Ingresos = () => {
     const getData = useCallback(async () => {
         setLoading(true)
 
-        const res = await KardexApiConector.getOthers({ type: 'income', filters: savedFilters, pagination: { page: currentPage, pageSize } })
+        const filters = savedFilters ? { ...savedFilters } : {}
+        if (!!filters.initialDate && !filters.finalDate) {
+            filters.finalDate = moment().format("YYYY-MM-DD")
+        }
+
+        if (!filters.initialDate && !!filters.finalDate) {
+            filters.initialDate = "2020-01-01"
+        }
+
+        const res = await KardexApiConector.getOthers({ type: 'income', filters, pagination: { page: currentPage, pageSize } })
 
         console.log(res)
 

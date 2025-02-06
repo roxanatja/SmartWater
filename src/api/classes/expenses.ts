@@ -36,7 +36,7 @@ export abstract class ExpensesApiConector {
         }
     }
 
-    static async update(params: IExpenseBody & IExpenseFilter): Promise<{ mensaje: string } | null> {
+    static async update(params: IExpenseDetailsBody & IExpenseFilter): Promise<{ mensaje: string } | null> {
         try {
             const res = await ApiConnector.getInstance().put(`${this.root_path}/${params.expenseId}/update`, params.data)
             return res.data

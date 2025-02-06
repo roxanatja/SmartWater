@@ -52,7 +52,7 @@ export interface IExpenseDetailsBody {
             quantity: number;
             inputImport: number;
         }[];
-        registerDate: string;
+        registerDate?: string;
     }
 }
 

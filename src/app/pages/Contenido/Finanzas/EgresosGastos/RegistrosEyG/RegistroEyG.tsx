@@ -16,7 +16,6 @@ import Modal from '../../../../EntryComponents/Modal'
 import { FiltroEgresosGastos } from '../FiltroEgresosGastos/FiltroEgresosGastos'
 import millify from 'millify'
 import { Zone } from '../../../../../../type/City'
-import EditEgresosGastos from '../EditEgresosGastos/EditEgresosGastos'
 import AddEgresosGastos from '../AddEgresosGastos/AddEgresosGastos'
 import { MatchedElement } from '../../../../../../type/Kardex'
 import { KardexApiConector } from '../../../../../../api/classes/kardex'
@@ -254,8 +253,7 @@ const RegistroEyG = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Editar egresos y gastos
                 </h2>
-                <EditEgresosGastos accounts={accounts} provider={providers}
-                    onCancel={() => { setSelectedExpense(expense); setSelectedOption(false) }} />
+                <AddEgresosGastos onCancel={() => { setSelectedExpense(expense); setSelectedOption(false) }} accounts={accounts} provider={providers} elements={elements} />
             </Modal> F
 
             <Modal

@@ -43,12 +43,14 @@ const InventoriesForm = ({ elements, updateDetails, handleDeleteElement, invento
 
         const elem = getValues('element')
         const el = elements.find(e => e._id === elem)
+        console.log(el)
 
         if (el?.isProduct) {
             res.product = elem
         } else {
             res.item = elem
         }
+        console.log(res)
 
         updateDetails(res, edit)
         if (edit !== -1) { setEdit(-1) }
