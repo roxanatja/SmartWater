@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { AccountEntryApiConector, ExpensesApiConector } from "../../../../../../../api/classes";
 import moment from "moment";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
-import { Line } from "react-chartjs-2";
+import { Line, Pie } from "react-chartjs-2";
 import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
@@ -37,6 +37,8 @@ interface IFormattedReport {
 const EgresosGastos: FC = () => {
     const navigate = useNavigate();
     const chartRef = useRef(null);
+
+    const [type, setType] = useState<string>('line')
 
     const [products, setProducts] = useState<Account[]>([])
     const [productsSelected, setProductsSelected] = useState<Account[]>([])
@@ -157,12 +159,24 @@ const EgresosGastos: FC = () => {
                     data: dat ? dat.sales
                         .sort((a, b) => moment(a.date).diff(moment(b.date)))
                         .map(s => ({ x: s.date, y: s.amount })) : [],
-                    borderColor: colors[index % 4],
+                    borderColor: colors[index % colors.length],
                     pointRadius: 5,
-                    pointBorderColor: colors[index % 4],
-                    pointBackgroundColor: colors[index % 4],
+                    pointBorderColor: colors[index % colors.length],
+                    pointBackgroundColor: colors[index % colors.length],
                 }
             })
+        }
+    }, [formatted, colors, productsSelected])
+
+    const dataPie = useMemo<ChartData<'pie', number[], string>>(() => {
+        return {
+            labels: productsSelected.map(p => `${p.name || "Sin nombre"}`),
+            datasets: [{
+                data: productsSelected.map(p => (formatted.find(f => f.product === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)),
+                backgroundColor(ctx, options) {
+                    return colors[ctx.dataIndex % colors.length]
+                },
+            }]
         }
     }, [formatted, colors, productsSelected])
 
@@ -203,6 +217,13 @@ const EgresosGastos: FC = () => {
                                         {...register("finalDate")}
                                         className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10"
                                     />
+                                </div>
+                                <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                                    <span className="text-left text-sm">Tipo de gráfico</span>
+                                    <select value={type} onChange={(e) => setType(e.target.value || "line")} className="border-0 rounded outline-none font-semibold w-full bg-main-background text-sm full-selector">
+                                        <option value="line">Líneas</option>
+                                        <option value="pie">Torta</option>
+                                    </select>
                                 </div>
                             </div>
                             <div className="flex-1 flex items-center justify-end">
@@ -245,68 +266,96 @@ const EgresosGastos: FC = () => {
                 </div>
 
                 <div className="my-10">
-                    <Line ref={chartRef} data={data} options={{
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            datalabels: {
-                                formatter(value, context) {
-                                    return ""
+                    {
+                        type === 'pie' &&
+                        <Pie data={dataPie} options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            font: { family: "Poppins" },
+                            plugins: {
+                                legend: {
+                                    display: false,
                                 },
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title(tooltipItems) {
-                                        return moment(tooltipItems[0].label).format(range === 'month' ? "MMMM YYYY" : "DD-MM-YYYY")
-                                    },
-                                    label(tooltipItem) {
-                                        if ((tooltipItem.raw as any).y === 0) {
-                                            return ""
-                                        } else {
-                                            return `${tooltipItem.dataset.label} - ${(tooltipItem.raw as any).y.toFixed(2)} Bs.`
-                                        }
-                                    },
+                                datalabels: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    titleFont: { family: "Poppins" },
+                                    bodyFont: { family: "Poppins" },
+                                    callbacks: {
+                                        label(tooltipItem) {
+                                            return `${Number((tooltipItem.raw as number).toFixed(2)).toLocaleString()} Bs.`
+                                        },
+                                    }
                                 }
                             }
-                        },
-                        interaction: {
-                            mode: "x",
-                            intersect: false, // Permite que la línea interseque múltiples puntos
-                        },
-                        scales: {
-                            x: {
-                                ticks: {
-                                    font: { family: "Poppins" },
-                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                        }} />
+                    }
+
+                    {
+                        type === 'line' && <Line ref={chartRef} data={data} options={{
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 },
-                                type: 'time',
-                                time: {
-                                    unit: range,
-                                    tooltipFormat: "yyyy-MM-dd",
-                                    displayFormats: {
-                                        month: "MM/yyyy",
-                                        day: "dd/MM/yyyy"
+                                datalabels: {
+                                    formatter(value, context) {
+                                        return ""
+                                    },
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title(tooltipItems) {
+                                            return moment(tooltipItems[0].label).format(range === 'month' ? "MMMM YYYY" : "DD-MM-YYYY")
+                                        },
+                                        label(tooltipItem) {
+                                            if ((tooltipItem.raw as any).y === 0) {
+                                                return ""
+                                            } else {
+                                                return `${tooltipItem.dataset.label} - ${(tooltipItem.raw as any).y.toFixed(2)} Bs.`
+                                            }
+                                        },
+                                    }
+                                }
+                            },
+                            interaction: {
+                                mode: "x",
+                                intersect: false, // Permite que la línea interseque múltiples puntos
+                            },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    type: 'time',
+                                    time: {
+                                        unit: range,
+                                        tooltipFormat: "yyyy-MM-dd",
+                                        displayFormats: {
+                                            month: "MM/yyyy",
+                                            day: "dd/MM/yyyy"
+                                        }
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
                                     }
                                 },
-                                grid: {
-                                    color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    font: { family: "Poppins" },
-                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+                                    }
                                 },
-                                grid: {
-                                    color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
-                                }
                             },
-                        },
-                    }} plugins={[verticalLinePlugin]} />
+                        }} plugins={[verticalLinePlugin]} />
+                    }
                 </div>
             </div>
         </>
