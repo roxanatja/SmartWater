@@ -6,7 +6,7 @@ export const kardexTemplate: Template = {
     "schemas": [
         [
             {
-                "name": "title", "type": "multiVariableText", "content": "{\"element\":\"Exhibidor\"}", "position": { "x": 10.59, "y": 21 }, "width": 105.56, "height": 6.8, "rotate": 0, "alignment": "left", "verticalAlignment": "top", "fontSize": 12, "lineHeight": 1, "characterSpacing": 0, "fontColor": "#1a3d7d", "fontName": "Roboto", "backgroundColor": "", "opacity": 1, "strikethrough": false, "underline": false, "readOnly": false, "text": "Kardex físico valorado - {element}", "variables": ["element"], "required": false
+                "name": "title", "type": "multiVariableText", "content": "{\"element\":\"Exhibidor\"}", "position": { "x": 10.59, "y": 21 }, "width": 258.74, "height": 6.8, "rotate": 0, "alignment": "left", "verticalAlignment": "top", "fontSize": 12, "lineHeight": 1, "characterSpacing": 0, "fontColor": "#1a3d7d", "fontName": "Roboto", "backgroundColor": "", "opacity": 1, "strikethrough": false, "underline": false, "readOnly": false, "text": "Kardex físico valorado - {element}", "variables": ["element"], "required": false
             }, {
                 "name": "table", "type": "table", "position": { "x": 10.259999999999991, "y": 30.69 }, "width": 258.74, "height": 13.7616,
                 "content": "[]", "showHead": true,

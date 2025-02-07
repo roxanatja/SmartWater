@@ -4,6 +4,7 @@ import { FilteredSearch, Search } from "./common";
 export interface IKardexDetailGetParams extends FilteredSearch {
     filters?: {
         elementId: string;
+        toDate: string;
     }
 }
 
