@@ -8,7 +8,6 @@
     "@hookform/resolvers": "github:react-hook-form/resolvers",
     "@pdfme/common": "^5.2.16",
     "@pdfme/generator": "^5.2.16",
-    "@react-google-maps/api": "^2.19.2",
     "@tanstack/react-table": "^8.20.6",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^16.0.1",
@@ -74,6 +73,7 @@
     ]
   },
   "devDependencies": {
+    "@types/google.maps": "^3.58.1",
     "@types/js-cookie": "^3.0.6",
     "@types/react-datepicker": "^4.19.5",
     "tailwindcss": "^3.4.11"

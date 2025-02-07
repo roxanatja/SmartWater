@@ -48,6 +48,7 @@ type Componentes = {
   search?: (e: string) => void;
   suggestions?: string[];
   hasFilter?: boolean;
+  noContent?: boolean;
   filterInject?: ReactNode;
   otherResults?: { text: string; value: string; }[];
   sorted?: "new" | "older";
@@ -61,6 +62,7 @@ export interface IFiltroPaginadoReference {
 const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   order = true,
   hasSearch = true,
+  noContent,
   searchPlaceholder = "Buscar",
   exportar,
   typeDataToExport,
@@ -839,8 +841,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             <div className="Mapaclientes-ubicacion">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="31"
-                height="47"
+                width="20"
+                height="30"
                 viewBox="0 0 31 47"
                 fill="#DD0000"
               >
@@ -851,8 +853,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             <div className="Mapaclientes-ubicacion">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="31"
-                height="47"
+                width="20"
+                height="30"
                 viewBox="0 0 31 47"
                 fill="#FF5C00"
               >
@@ -863,8 +865,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             <div className="Mapaclientes-ubicacion">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="31"
-                height="47"
+                width="20"
+                height="30"
                 viewBox="0 0 31 47"
                 fill="#960090"
               >
@@ -875,8 +877,8 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             <div className="Mapaclientes-ubicacion">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="31"
-                height="47"
+                width="20"
+                height="30"
                 viewBox="0 0 31 47"
                 fill="#1FAF38"
               >
@@ -927,76 +929,83 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             </div>
           </div>
         )}
-        <div
-          className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[140px]"
-            } `}
-        >
-          {children}
-        </div>
-        <div className="flex justify-between sticky right-0 bottom-0 px-5 w-full h-[130px] bg-main-background z-[40]">
-          {exportar ? (
-            <div className="flex flex-col justify-center items-center">
-              <button
-                type="button"
-                className="flex justify-center items-center bg-blue_custom hover:bg-blue-800 p-4 rounded-full"
-                onClick={exportToExcel}
-              >
-                <img src="./IconDocumento.svg" className="w-8" alt="" />
-              </button>
-              <span className="text-center text-sm">Exportar</span>
-            </div>
-          ) : <div></div>}
-          <div className="flex flex-col-reverse gap-4 justify-center items-end">
-            {add && onAdd && (
-              <div style={{ marginBottom: "1em" }}>
-                <button type="button" className="btn-agregar bg-blue_custom -translate-x-3" onClick={onAdd}>
-                  <span className="material-symbols-outlined">add</span>
+
+        {
+          !noContent &&
+          <div
+            className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[140px]"
+              } `}
+          >
+            {children}
+          </div>
+        }
+        {
+          !noContent &&
+          <div className="flex justify-between sticky right-0 bottom-0 px-5 w-full h-[130px] bg-main-background z-[40]">
+            {exportar ? (
+              <div className="flex flex-col justify-center items-center">
+                <button
+                  type="button"
+                  className="flex justify-center items-center bg-blue_custom hover:bg-blue-800 p-4 rounded-full"
+                  onClick={exportToExcel}
+                >
+                  <img src="./IconDocumento.svg" className="w-8" alt="" />
                 </button>
-              </div>
-            )}
-            {(paginacion && totalPage && currentPage && !resultadosPrestamo) ? (
-              <div
-                style={{
-                  display: "flex",
-                  gap: "15px",
-                  width: "145px",
-                  minWidth: "145px",
-                }}
-                className="py-2"
-              >
-                <>
-                  <div>
-                    <button
-                      type="button"
-                      className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
-                      onClick={() =>
-                        handlePageChange && handlePageChange(currentPage - 1)
-                      }
-                      disabled={currentPage === 1}
-                    >
-                      <i className="fa-solid fa-angle-left text-white"></i>
-                    </button>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <span className="text-paginado">{`${currentPage} de ${totalPage} `}</span>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
-                      onClick={() =>
-                        handlePageChange && handlePageChange(currentPage + 1)
-                      }
-                      disabled={currentPage === totalPage}
-                    >
-                      <i className="fa-solid fa-angle-right text-white"></i>
-                    </button>
-                  </div>
-                </>
+                <span className="text-center text-sm">Exportar</span>
               </div>
             ) : <div></div>}
+            <div className="flex flex-col-reverse gap-4 justify-center items-end">
+              {add && onAdd && (
+                <div style={{ marginBottom: "1em" }}>
+                  <button type="button" className="btn-agregar bg-blue_custom -translate-x-3" onClick={onAdd}>
+                    <span className="material-symbols-outlined">add</span>
+                  </button>
+                </div>
+              )}
+              {(paginacion && totalPage && currentPage && !resultadosPrestamo) ? (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "15px",
+                    width: "145px",
+                    minWidth: "145px",
+                  }}
+                  className="py-2"
+                >
+                  <>
+                    <div>
+                      <button
+                        type="button"
+                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
+                        onClick={() =>
+                          handlePageChange && handlePageChange(currentPage - 1)
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        <i className="fa-solid fa-angle-left text-white"></i>
+                      </button>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <span className="text-paginado">{`${currentPage} de ${totalPage} `}</span>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        className="bg-blue-600 shadow-xl disabled:bg-gray-500 disabled:cursor-not-allowed px-2 py-0.5 rounded-sm"
+                        onClick={() =>
+                          handlePageChange && handlePageChange(currentPage + 1)
+                        }
+                        disabled={currentPage === totalPage}
+                      >
+                        <i className="fa-solid fa-angle-right text-white"></i>
+                      </button>
+                    </div>
+                  </>
+                </div>
+              ) : <div></div>}
+            </div>
           </div>
-        </div>
+        }
       </div >
     </>
   );

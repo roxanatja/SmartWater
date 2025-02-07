@@ -14,8 +14,8 @@ const MapaClientes: React.FC = () => {
     useContext(MapaClientesContext);
   const api: string = process.env.REACT_APP_API_GOOGLE!;
 
-  const [latitude, setLatitude] = useState<string>("");
-  const [longitude, setLongitude] = useState<string>("");
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -47,8 +47,8 @@ const MapaClientes: React.FC = () => {
       );
       if (filteredClients.length > 0) {
         const client = filteredClients[0];
-        setLatitude(client.location.latitude);
-        setLongitude(client.location.longitude);
+        setLatitude(Number(client.location.latitude || "0"));
+        setLongitude(Number(client.location.longitude || "0"));
         setActiveClient(client);
         setNoClientMessage(""); // Clear no client message
         setSuggestions(
@@ -57,13 +57,13 @@ const MapaClientes: React.FC = () => {
           )
         );
       } else {
-        setLatitude("");
-        setLongitude("");
+        setLatitude(undefined);
+        setLongitude(undefined);
         setActiveClient(null);
       }
     } else {
-      setLatitude("");
-      setLongitude("");
+      setLatitude(undefined);
+      setLongitude(undefined);
       setActiveClient(null);
       setNoClientMessage(
         "No se encontró ningún cliente con ese nombre o número."
@@ -73,30 +73,26 @@ const MapaClientes: React.FC = () => {
 
   return (
     <>
-      <div>
+      <div className="px-10 overflow-auto h-screen flex justify-between flex-col">
         <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
         <FiltroPaginado
+          noContent
           filtro
           paginacion={false}
-          add={true}
           exportar={false}
-          onAdd={AddUbicacion}
           iconUbicacion
           search={handleSearch}
           onFilter={() => setShowFiltro(true)}
-        >
-          <div className="Mapaclientes-googleubicacion">
-            <GoogleMaps
-              apiKey={api}
-              latitude={latitude}
-              longitude={longitude}
-              activeClient={activeClient ? activeClient._id : ""}
-            />
-          </div>
-        </FiltroPaginado>
+        ></FiltroPaginado>
+        <div className="MapaClientes w-full flex-1 pb-10">
+          <GoogleMaps
+            apiKey={api}
+            latitude={latitude}
+            longitude={longitude}
+            activeClient={activeClient ? activeClient._id : ""}
+          />
+        </div>
       </div>
-      {showMiniModal && <RegistrarNuevo />}
-      {/* {showFiltro && <FiltroClientes />} */}
     </>
   );
 };
