@@ -80,7 +80,7 @@ const BalancesReportModal = ({ toDate }: Props) => {
                         <span>Reporte de inventarios al {formatDateTime(toDate, 'numeric', '2-digit', '2-digit', false, true)}</span>
                     </div>
 
-                    <TableBalancesReport data={balanceReport.elements} className='w-full with-vertical-border' total={balanceReport.totalGeneral} />
+                    <TableBalancesReport data={balanceReport.elements} className='w-full with-vertical-border' total={balanceReport.totalGeneral} date={toDate} />
                 </div>
             }
         </div>

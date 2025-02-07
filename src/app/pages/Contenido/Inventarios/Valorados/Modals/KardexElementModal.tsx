@@ -8,10 +8,11 @@ import { showGeneratePDF } from "../../../../../../utils/pdfHelper";
 import { kardexTemplate } from "./pdfTemplates";
 
 interface Props {
-    kardexElement: KardexElement
+    kardexElement: KardexElement;
+    date: string;
 }
 
-const KardexElementModal = ({ kardexElement }: Props) => {
+const KardexElementModal = ({ kardexElement, date }: Props) => {
     const { setLoading } = useGlobalContext()
 
     const [loadingLocal, setLoadingLocal] = useState<boolean>(true)
@@ -20,7 +21,7 @@ const KardexElementModal = ({ kardexElement }: Props) => {
     useEffect(() => {
         setLoadingLocal(true)
         if (kardexElement) {
-            KardexApiConector.reportDetails({ filters: { elementId: kardexElement.elementId } }).then(res => {
+            KardexApiConector.reportDetails({ filters: { elementId: kardexElement.elementId, toDate: date } }).then(res => {
                 if (res && res.balances.length > 0) {
                     setBalanceReport(res.balances[0])
                 } else {
@@ -31,14 +32,14 @@ const KardexElementModal = ({ kardexElement }: Props) => {
             })
         }
 
-    }, [kardexElement])
+    }, [kardexElement, date])
 
 
     const report = async () => {
         if (balanceReport) {
             const inputs = [
                 {
-                    title: JSON.stringify({ element: kardexElement.name }),
+                    title: JSON.stringify({ element: `${kardexElement.name} (hasta el ${formatDateTime(date, 'numeric', '2-digit', '2-digit', false, true)})` }),
                     table: balanceReport.movements.map(row => {
                         return [
                             `${row.detail}`,

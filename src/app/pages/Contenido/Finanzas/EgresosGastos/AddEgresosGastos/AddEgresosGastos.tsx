@@ -40,7 +40,10 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
       paymentMethodCurrentAccount: selectedExpense.paymentMethodCurrentAccount,
       provider: selectedExpense.provider?._id || "",
       user: selectedExpense.user._id
-    } : {},
+    } : {
+      creditBuy: false,
+      paymentMethodCurrentAccount: false
+    },
     mode: 'all'
   });
 
@@ -90,6 +93,10 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
 
   useEffect(() => {
     if (selectedExpense._id !== "") {
+      if (selectedExpense.creditBuy) { setSelectedPayment('credit') }
+      else if (selectedExpense.paymentMethodCurrentAccount) { setSelectedPayment('cta') }
+      else { setSelectedPayment('cash') }
+
       const aux: IExpenseDetailsBody['data']['details'] = []
       console.log(selectedExpense)
 
@@ -222,7 +229,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black dark:disabled:bg-zinc-700 disabled:bg-zinc-300"
           >
-            <option value={"null"}>Seleccione un proveedor</option>
+            <option value={""}>Seleccione un proveedor</option>
             {
               provider.map((row, index) => (
                 <option value={row._id} key={index}>
@@ -252,7 +259,7 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
             })}
             className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black"
           >
-            <option value={"null"}>Seleccione una cuenta</option>
+            <option value={""}>Seleccione una cuenta</option>
             {
               accounts.map((row, index) => (
                 <option value={row._id} key={index}>

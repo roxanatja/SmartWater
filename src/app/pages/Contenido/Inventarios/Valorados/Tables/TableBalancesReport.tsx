@@ -3,14 +3,16 @@ import DataTable, { TableColumn } from 'react-data-table-component'
 import { KardexElement } from '../../../../../../type/Kardex'
 import Modal from '../../../../EntryComponents/Modal';
 import KardexElementModal from '../Modals/KardexElementModal';
+import { formatDateTime } from '../../../../../../utils/helpers';
 
 interface Props {
     total: string;
     data: KardexElement[];
     className?: string;
+    date: string;
 }
 
-const TableBalancesReport = ({ data, className, total }: Props) => {
+const TableBalancesReport = ({ data, className, total, date }: Props) => {
     const [detailed, setDetailed] = useState<KardexElement | null>(null)
 
     const columns: TableColumn<KardexElement>[] = useMemo<TableColumn<KardexElement>[]>(() => [
@@ -74,9 +76,9 @@ const TableBalancesReport = ({ data, className, total }: Props) => {
                 {
                     detailed && <>
                         <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
-                            Kardex físico valorado - {detailed.name}
+                            Kardex físico valorado - {detailed.name} (hasta el {formatDateTime(date, 'numeric', '2-digit', '2-digit', false, true)})
                         </h2>
-                        <KardexElementModal kardexElement={detailed} />
+                        <KardexElementModal kardexElement={detailed} date={date} />
                     </>
                 }
             </Modal>
