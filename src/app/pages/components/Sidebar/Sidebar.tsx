@@ -166,12 +166,12 @@ const Sidebar: FC = () => {
                     },
                     {
                       titulo: "Porcentaje por distruibuidor",
-                      to: "/Finanzas/Comisiones/Distribuidor",
+                      to: "/Finanzas/Comisiones/PorDistribuidor",
                       id: 1,
                     },
                     {
                       titulo: "Porcentajes específicos",
-                      to: "/Finanzas/Comisiones/Especifico",
+                      to: "/Finanzas/Comisiones/Especificos",
                       id: 2,
                     },
                   ]

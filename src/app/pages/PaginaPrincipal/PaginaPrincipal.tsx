@@ -37,6 +37,7 @@ import { CategoriesWrapper } from "../Contenido/Configuracion/Categorias/Categor
 import DatosEmpresa from "../Contenido/Configuracion/DatosEmpresa/DatosEmpresa";
 import { PromocionesWrapper } from "../Contenido/Configuracion/Promociones/PromocionesWrapper";
 import InventariosWrapper from "../Contenido/Inventarios/InventariosWrapper";
+import ComisionesWrapper from "../Contenido/Comisiones/ComisionesWrapper";
 
 const PaginaPrincipal: FC = () => {
   return (
@@ -79,6 +80,10 @@ const PaginaPrincipal: FC = () => {
                 <Route
                   path="/Finanzas/Inventarios/*"
                   element={<InventariosWrapper />}
+                />
+                <Route
+                  path="/Finanzas/Comisiones/*"
+                  element={<ComisionesWrapper />}
                 />
                 <Route
                   path="/Reportes/Ingresos/*"
