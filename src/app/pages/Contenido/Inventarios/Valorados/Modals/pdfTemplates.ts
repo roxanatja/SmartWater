@@ -10,8 +10,8 @@ export const kardexTemplate: Template = {
             }, {
                 "name": "table", "type": "table", "position": { "x": 10.259999999999991, "y": 30.69 }, "width": 258.74, "height": 13.7616,
                 "content": "[]", "showHead": true,
-                "head": ["DETALLE", "FECHA", "DOC", "CANTIDAD\nENTRADA", "P.U\nENTRADA", "IMPORTE\nENTRADA", "CANTIDAD\nSALIDA", "P.U\nSALIDA", "IMPORTE\nSALIDA", "SALDO\nCANTIDAD", "C.P.P", "SALDO\nIMPORTE"],
-                "headWidthPercentages": [9, 9, 8, 8.5, 8, 8.5, 8.5, 8, 8, 8.5, 8, 8],
+                "head": ["DETALLE", "FECHA", "DOC", "CODIGO", "CANTIDAD\nENTRADA", "P.U\nENTRADA", "IMPORTE\nENTRADA", "CANTIDAD\nSALIDA", "P.U\nSALIDA", "IMPORTE\nSALIDA", "SALDO\nCANTIDAD", "C.P.P", "SALDO\nIMPORTE"],
+                "headWidthPercentages": [9, 9, 5.75, 6.75, 8.25, 7.75, 8.25, 8.25, 7, 7.50, 8.25, 6.75, 7.50],
                 "tableStyles": { "borderWidth": 0.3, "borderColor": "#6b6b6b" },
                 "headStyles": { "fontName": "Roboto", "fontSize": 10, "characterSpacing": 0, "alignment": "left", "verticalAlignment": "middle", "lineHeight": 1, "fontColor": "#000000", "borderColor": "#6b6b6b", "backgroundColor": "#ffffff", "borderWidth": { "top": 0, "right": 0.1, "bottom": 0.3, "left": 0.1 }, "padding": { "top": 3, "right": 2, "bottom": 3, "left": 2 } },
                 "bodyStyles": { "fontName": "Roboto", "fontSize": 10, "characterSpacing": 0, "alignment": "left", "verticalAlignment": "middle", "lineHeight": 1, "fontColor": "#000000", "borderColor": "#6b6b6b", "backgroundColor": "", "alternateBackgroundColor": "#ffffff", "borderWidth": { "top": 0, "right": 0.1, "bottom": 0.1, "left": 0.1 }, "padding": { "top": 3, "right": 2, "bottom": 3, "left": 2 } },
