@@ -2,10 +2,9 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./CuentasPorPagar.css";
 import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { Account } from "../../../../../../../type/AccountEntry";
 import { Expense } from "../../../../../../../type/Expenses";
 import { useForm } from "react-hook-form";
-import { AccountEntryApiConector, ExpensesApiConector } from "../../../../../../../api/classes";
+import { ExpensesApiConector, ProvidersApiConector } from "../../../../../../../api/classes";
 import moment from "moment";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
 import { Line, Bar } from "react-chartjs-2";
@@ -13,6 +12,7 @@ import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
 import { verticalLinePlugin } from "../../../../../../../utils/charts.utils";
+import { Providers } from "../../../../../../../type/providers";
 
 ChartJS.register(
     LineElement,
@@ -40,17 +40,17 @@ const CuentasPorPagar: FC = () => {
 
     const [type, setType] = useState<string>('line')
 
-    const [products, setProducts] = useState<Account[]>([])
-    const [productsSelected, setProductsSelected] = useState<Account[]>([])
+    const [products, setProducts] = useState<Providers[]>([])
+    const [productsSelected, setProductsSelected] = useState<Providers[]>([])
 
     const [reports, setReports] = useState<Expense[]>([])
     const [filters, setFilters] = useState<{ initialDate?: string; finalDate?: string }>({})
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        AccountEntryApiConector.get().then(res => {
-            setProducts(res || [])
-            setProductsSelected(res || [])
+        ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => {
+            setProducts(res?.data || [])
+            setProductsSelected(res?.data || [])
         })
     }, [])
 
@@ -82,7 +82,7 @@ const CuentasPorPagar: FC = () => {
         let minDateRegistered = moment()
 
         reports.forEach(r => {
-            let idx = aux.findIndex(a => a.product === r.accountEntry._id)
+            let idx = aux.findIndex(a => a.product === r.provider?._id)
             const date = range === 'day' ? moment(r.created) : moment(r.created).startOf('month')
 
             if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
@@ -97,7 +97,7 @@ const CuentasPorPagar: FC = () => {
                 }
             } else {
                 aux.push({
-                    product: r.accountEntry._id,
+                    product: r.provider?._id || "",
                     sales: [{
                         amount: r.amount,
                         date: date.format("YYYY-MM-DD")
@@ -153,7 +153,7 @@ const CuentasPorPagar: FC = () => {
                 const dat = formatted.find(r => r.product === f._id)
 
                 return {
-                    label: f.name,
+                    label: f.fullName || "Sin nombre",
                     tension: 0,
                     fill: false,
                     data: dat ? dat.sales
@@ -170,7 +170,7 @@ const CuentasPorPagar: FC = () => {
 
     const dataPie = useMemo<ChartData<'bar', number[], string>>(() => {
         return {
-            labels: productsSelected.map(p => `${p.name || "Sin nombre"}`),
+            labels: productsSelected.map(p => `${p.fullName || "Sin nombre"}`),
             datasets: [{
                 data: productsSelected.map(p => (formatted.find(f => f.product === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)),
                 backgroundColor(ctx, options) {
@@ -251,7 +251,7 @@ const CuentasPorPagar: FC = () => {
                                                     setProductsSelected(prev => [...prev, p])
                                                 }
                                             }} key={p._id} id={p._id} />
-                                        <label htmlFor={p._id}>{p.name}</label>
+                                        <label htmlFor={p._id}>{p.fullName || "Sin nombre"}</label>
                                     </div>
                                 )
                             }
@@ -276,7 +276,7 @@ const CuentasPorPagar: FC = () => {
                         type === 'bar' &&
                         <Bar data={dataPie} options={{
                             responsive: true,
-                            maintainAspectRatio: false,
+                            maintainAspectRatio: true,
                             font: { family: "Poppins" },
                             plugins: {
                                 legend: {

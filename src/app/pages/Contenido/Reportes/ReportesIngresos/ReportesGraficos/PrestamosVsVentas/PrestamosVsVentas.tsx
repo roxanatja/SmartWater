@@ -106,7 +106,7 @@ const PrestamosVsVentas: FC = () => {
                         <div className='w-full'>
                             <Pie data={data} options={{
                                 responsive: true,
-                                maintainAspectRatio: false,
+                                maintainAspectRatio: true,
                                 font: { family: "Poppins" },
                                 plugins: {
                                     legend: {
