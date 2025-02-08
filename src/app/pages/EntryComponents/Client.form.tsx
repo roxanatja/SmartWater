@@ -18,16 +18,17 @@ const ClientForm = ({
   isOpen,
   onCancel,
   zones,
-  allClients
+  allClients,
+  selectedClient
 }: {
   onCancel?: () => void;
   isOpen: boolean;
   zones: Zone[];
-  allClients: Client[]
+  allClients: Client[];
+  selectedClient: Client
 }) => {
   const user = AuthService.getUser()
   const [isJeshua, setIsJeshua] = useState<boolean>(false)
-  const { selectedClient } = useContext(ClientesContext);
   const [active, setActive] = useState(false);
 
   const [disti, setDisti] = useState<District[]>(selectedClient._id !== "" ? zones.find(z => z._id === selectedClient.zone)?.districts || [] : []);

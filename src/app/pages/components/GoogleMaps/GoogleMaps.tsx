@@ -1,11 +1,15 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Modal from "../../EntryComponents/Modal";
+import { Client } from "../../../../type/Cliente/Client";
+import { MarkerClusterer } from "@googlemaps/markerclusterer";
 
 interface MapProps {
   apiKey: string;
   latitude?: number;
   longitude?: number;
   activeClient?: string;
+  onAdd: VoidFunction;
+  clients: Client[]
 }
 
 // const ICONS = {
@@ -44,6 +48,8 @@ const GoogleMaps: React.FC<MapProps> = ({
   latitude,
   longitude,
   activeClient,
+  clients,
+  onAdd
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -153,9 +159,7 @@ const GoogleMaps: React.FC<MapProps> = ({
           findMarkerButton
         );
 
-        findMarkerButton.addEventListener("click", async () => {
-          alert('onAdd')
-        });
+        findMarkerButton.addEventListener("click", onAdd);
 
         const mapTypeButton = document.createElement("button");
         mapTypeButton.classList.add("custom-map-control-button");
@@ -201,31 +205,10 @@ const GoogleMaps: React.FC<MapProps> = ({
     }
   }, [map, mapType])
 
-  // const [clients, setClients] = useState<any[]>([]);
-  // const [filteredClients, setFilteredClients] = useState<any[]>([]);
   // const [orders, setOrders] = useState<any[]>([]);
-  // const [scriptLoaded, setScriptLoaded] = useState<boolean>(false);
   // const [activeMarker, setActiveMarker] = useState<any>(null);
-  // const markersRef = useRef<google.maps.Marker[]>([]);
-  // const clustererRef = useRef<MarkerClusterer | null>(null);
-
-  // // useEffect(() => {
-  // //   const fetchClients = async () => {
-  // //     try {
-  // //       const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } });
-  // //       setClients(clientsData?.data || []);
-  // //       setFilteredClients(clientsData?.data || []);
-  // //     } catch (error) {
-  // //       console.error("Error fetching clients:", error);
-  // //     }
-  // //   };
-
-  // //   fetchClients();
-  // // }, []);
-
-  // const handleScriptLoad = () => {
-  //   setScriptLoaded(true);
-  // };
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const clustererRef = useRef<MarkerClusterer | null>(null);
 
   // const getMarkerIcon = useCallback((client: any) => {
   //   const hasOrderInProgress = orders.some(
@@ -267,64 +250,62 @@ const GoogleMaps: React.FC<MapProps> = ({
   //   setActiveMarker(client);
   // };
 
-  // const initializeMarkers = useCallback(() => {
-  //   if (mapRef) {
-  //     // Clear existing markers
-  //     markersRef.current.forEach((marker) => marker.setMap(null));
-  //     markersRef.current = [];
+  const initializeMarkers = useCallback(() => {
+    if (map) {
+      // Clear existing markers
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
 
-  //     const bounds = new google.maps.LatLngBounds();
+      // const bounds = new google.maps.LatLngBounds();
 
-  //     const clientsToShow = activeClient
-  //       ? filteredClients.filter((client) => client._id === activeClient)
-  //       : filteredClients;
+      clients.filter(c => !!c.location?.latitude && !!c.location?.longitude).forEach((client) => {
+        const position = {
+          lat: parseFloat(client.location.latitude),
+          lng: parseFloat(client.location.longitude),
+        };
 
-  //     clientsToShow.forEach((client) => {
-  //       const position = {
-  //         lat: parseFloat(client.location.latitude),
-  //         lng: parseFloat(client.location.longitude),
-  //       };
+        const marker = new google.maps.Marker({
+          position,
+          map,
+          // icon: getMarkerIcon(client),
+          title: client.fullName,
+          optimized: false
+        });
 
-  //       const marker = new google.maps.Marker({
-  //         position,
-  //         map: mapRef,
-  //         icon: getMarkerIcon(client),
-  //         title: client.fullName,
-  //       });
+        // marker.addListener("click", () => setActiveMarker(client));
+        markersRef.current.push(marker);
+        // bounds.extend(position);
+      });
 
-  //       marker.addListener("click", () => setActiveMarker(client));
-  //       markersRef.current.push(marker);
-  //       bounds.extend(position);
-  //     });
+      // Initialize or update marker clusterer
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current.addMarkers(markersRef.current);
+      } else {
+        clustererRef.current = new MarkerClusterer({
+          map,
+          markers: markersRef.current,
+          algorithmOptions: { maxZoom: 15 }
+        });
+      }
 
-  //     // Initialize or update marker clusterer
-  //     if (clustererRef.current) {
-  //       clustererRef.current.clearMarkers();
-  //       clustererRef.current.addMarkers(markersRef.current);
-  //     } else {
-  //       clustererRef.current = new MarkerClusterer({
-  //         map: mapRef,
-  //         markers: markersRef.current,
-  //       });
-  //     }
+      // if (!activeClient) {
+      //   map.fitBounds(bounds);
+      // } else if (activeMarker) {
+      //   map.setCenter({
+      //     lat: parseFloat(activeMarker.location.latitude),
+      //     lng: parseFloat(activeMarker.location.longitude),
+      //   });
+      //   map.setZoom(15);
+      // }
+    }
+  }, [activeClient, clients, map]);
 
-  //     if (!activeClient) {
-  //       mapRef.fitBounds(bounds);
-  //     } else if (activeMarker) {
-  //       mapRef.setCenter({
-  //         lat: parseFloat(activeMarker.location.latitude),
-  //         lng: parseFloat(activeMarker.location.longitude),
-  //       });
-  //       mapRef.setZoom(15);
-  //     }
-  //   }
-  // }, [activeClient, filteredClients, activeMarker, getMarkerIcon, mapRef]);
-
-  // useEffect(() => {
-  //   if (scriptLoaded) {
-  //     initializeMarkers();
-  //   }
-  // }, [scriptLoaded, initializeMarkers]);
+  useEffect(() => {
+    if (map) {
+      initializeMarkers();
+    }
+  }, [map, initializeMarkers]);
 
   return (
     <>
