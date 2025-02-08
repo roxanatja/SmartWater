@@ -22,7 +22,11 @@ const TableKardexDetails = ({ data, className }: Props) => {
         },
         {
             name: "DOC",
-            selector: row => row.documentNumber,
+            selector: row => row.documentNumber || "Sin documento",
+        },
+        {
+            name: "CODIGO",
+            selector: row => row.code || "Sin codigo",
         },
         {
             name: "CANTIDAD ENTRADA",

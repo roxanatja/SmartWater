@@ -91,6 +91,8 @@ export type KardexMovement = {
     registerDate: string,
     documentNumber: string,
     detail: string,
+    comment: string,
+    code?: string,
     inputQuantity: number,
     unitPriceInput: string,
     inputImport: string,

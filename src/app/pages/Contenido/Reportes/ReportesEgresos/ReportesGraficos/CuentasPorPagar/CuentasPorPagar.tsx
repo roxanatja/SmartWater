@@ -2,17 +2,17 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./CuentasPorPagar.css";
 import { PageTitle } from "../../../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
-import { Account } from "../../../../../../../type/AccountEntry";
 import { Expense } from "../../../../../../../type/Expenses";
 import { useForm } from "react-hook-form";
-import { AccountEntryApiConector, ExpensesApiConector } from "../../../../../../../api/classes";
+import { ExpensesApiConector, ProvidersApiConector } from "../../../../../../../api/classes";
 import moment from "moment";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
-import { Line, Pie } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
 import { verticalLinePlugin } from "../../../../../../../utils/charts.utils";
+import { Providers } from "../../../../../../../type/providers";
 
 ChartJS.register(
     LineElement,
@@ -40,17 +40,17 @@ const CuentasPorPagar: FC = () => {
 
     const [type, setType] = useState<string>('line')
 
-    const [products, setProducts] = useState<Account[]>([])
-    const [productsSelected, setProductsSelected] = useState<Account[]>([])
+    const [products, setProducts] = useState<Providers[]>([])
+    const [productsSelected, setProductsSelected] = useState<Providers[]>([])
 
     const [reports, setReports] = useState<Expense[]>([])
     const [filters, setFilters] = useState<{ initialDate?: string; finalDate?: string }>({})
     const { register, handleSubmit, watch } = useForm<{ initialDate?: string; finalDate?: string }>({ mode: 'all' })
 
     useEffect(() => {
-        AccountEntryApiConector.get().then(res => {
-            setProducts(res || [])
-            setProductsSelected(res || [])
+        ProvidersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }).then(res => {
+            setProducts(res?.data || [])
+            setProductsSelected(res?.data || [])
         })
     }, [])
 
@@ -82,7 +82,7 @@ const CuentasPorPagar: FC = () => {
         let minDateRegistered = moment()
 
         reports.forEach(r => {
-            let idx = aux.findIndex(a => a.product === r.accountEntry._id)
+            let idx = aux.findIndex(a => a.product === r.provider?._id)
             const date = range === 'day' ? moment(r.created) : moment(r.created).startOf('month')
 
             if (date.isBefore(minDateRegistered)) { minDateRegistered = date }
@@ -97,7 +97,7 @@ const CuentasPorPagar: FC = () => {
                 }
             } else {
                 aux.push({
-                    product: r.accountEntry._id,
+                    product: r.provider?._id || "",
                     sales: [{
                         amount: r.amount,
                         date: date.format("YYYY-MM-DD")
@@ -153,7 +153,7 @@ const CuentasPorPagar: FC = () => {
                 const dat = formatted.find(r => r.product === f._id)
 
                 return {
-                    label: f.name,
+                    label: f.fullName || "Sin nombre",
                     tension: 0,
                     fill: false,
                     data: dat ? dat.sales
@@ -168,9 +168,9 @@ const CuentasPorPagar: FC = () => {
         }
     }, [formatted, colors, productsSelected])
 
-    const dataPie = useMemo<ChartData<'pie', number[], string>>(() => {
+    const dataPie = useMemo<ChartData<'bar', number[], string>>(() => {
         return {
-            labels: productsSelected.map(p => `${p.name || "Sin nombre"}`),
+            labels: productsSelected.map(p => `${p.fullName || "Sin nombre"}`),
             datasets: [{
                 data: productsSelected.map(p => (formatted.find(f => f.product === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)),
                 backgroundColor(ctx, options) {
@@ -179,6 +179,12 @@ const CuentasPorPagar: FC = () => {
             }]
         }
     }, [formatted, colors, productsSelected])
+
+    const total = useMemo<number>(() => {
+        return formatted
+            .filter(f => productsSelected.some(p => p._id === f.product))
+            .reduce<number>((acc, f) => acc += f.sales.reduce<number>((accS, s) => accS += s.amount, 0), 0)
+    }, [formatted, productsSelected])
 
     const loadData = useCallback(async () => {
         const res = await ExpensesApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), creditBuy: true, pendingBalance: true } })
@@ -222,7 +228,7 @@ const CuentasPorPagar: FC = () => {
                                     <span className="text-left text-sm">Tipo de gráfico</span>
                                     <select value={type} onChange={(e) => setType(e.target.value || "line")} className="border-0 rounded outline-none font-semibold w-full bg-main-background text-sm full-selector">
                                         <option value="line">Líneas</option>
-                                        <option value="pie">Torta</option>
+                                        <option value="bar">Barras</option>
                                     </select>
                                 </div>
                             </div>
@@ -245,7 +251,7 @@ const CuentasPorPagar: FC = () => {
                                                     setProductsSelected(prev => [...prev, p])
                                                 }
                                             }} key={p._id} id={p._id} />
-                                        <label htmlFor={p._id}>{p.name}</label>
+                                        <label htmlFor={p._id}>{p.fullName || "Sin nombre"}</label>
                                     </div>
                                 )
                             }
@@ -267,17 +273,26 @@ const CuentasPorPagar: FC = () => {
 
                 <div className="my-10">
                     {
-                        type === 'pie' &&
-                        <Pie data={dataPie} options={{
+                        type === 'bar' &&
+                        <Bar data={dataPie} options={{
                             responsive: true,
-                            maintainAspectRatio: false,
+                            maintainAspectRatio: true,
                             font: { family: "Poppins" },
                             plugins: {
                                 legend: {
                                     display: false,
                                 },
                                 datalabels: {
-                                    display: false
+                                    font: { family: "Poppins" },
+                                    anchor: 'end',
+                                    align: 'end',
+                                    clamp: true,
+                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    offset: 10,
+                                    formatter(value, context) {
+                                        const percent = value / (total) * 100
+                                        return percent > 0 ? percent < 0.01 ? "< 0.01%" : `${(percent).toFixed(2)}%` : "0%"
+                                    },
                                 },
                                 tooltip: {
                                     titleFont: { family: "Poppins" },
@@ -286,6 +301,27 @@ const CuentasPorPagar: FC = () => {
                                         label(tooltipItem) {
                                             return `${Number((tooltipItem.raw as number).toFixed(2)).toLocaleString()} Bs.`
                                         },
+                                    }
+                                }
+                            },
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
                                     }
                                 }
                             }

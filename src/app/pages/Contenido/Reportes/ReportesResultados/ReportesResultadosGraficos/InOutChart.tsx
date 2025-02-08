@@ -50,6 +50,10 @@ const InOutChart = ({ reports, headers, mode }: {
         }
     }, [reports, colors, headers])
 
+    const total = useMemo<number[]>(() => {
+        return reports.map(r => r.values.reduce<number>((acc, f) => acc += f.value, 0))
+    }, [reports])
+
     return (
         <Bar data={data} options={{
             responsive: true,
@@ -66,10 +70,13 @@ const InOutChart = ({ reports, headers, mode }: {
                 datalabels: {
                     font: { family: "Poppins" },
                     anchor: 'end',
-                    clip: true,
+                    clamp: true,
                     rotation: 65,
                     align: 'top',
-                    formatter: (value: number) => `${value} Bs.`,
+                    formatter(value, context) {
+                        const percent = value / total[context.datasetIndex] * 100
+                        return percent > 0 ? percent < 0.01 ? "< 0.01%" : `${(percent).toFixed(2)}%` : "0%"
+                    },
                     color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
                 },
                 tooltip: {
@@ -83,7 +90,8 @@ const InOutChart = ({ reports, headers, mode }: {
                             if ((tooltipItem.raw as any).y === 0) {
                                 return ""
                             } else {
-                                return `${tooltipItem.raw} Bs.`
+                                const percent = tooltipItem.raw as number / total[tooltipItem.datasetIndex] * 100
+                                return `${tooltipItem.raw} Bs. (${percent.toFixed(2)} %)`
                             }
                         },
                     }

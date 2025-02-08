@@ -106,7 +106,7 @@ const PrestamosVsVentas: FC = () => {
                         <div className='w-full'>
                             <Pie data={data} options={{
                                 responsive: true,
-                                maintainAspectRatio: false,
+                                maintainAspectRatio: true,
                                 font: { family: "Poppins" },
                                 plugins: {
                                     legend: {
@@ -117,10 +117,18 @@ const PrestamosVsVentas: FC = () => {
                                         anchor: 'center',
                                         align: 'top',
                                         color: "#fefefe",
+                                        formatter(value, context) {
+                                            return `${(value / (salesNoLoan.length + salesLoans.length) * 100).toFixed(2)}%`
+                                        },
                                     },
                                     tooltip: {
                                         titleFont: { family: "Poppins" },
-                                        bodyFont: { family: "Poppins" }
+                                        bodyFont: { family: "Poppins" },
+                                        callbacks: {
+                                            label(tooltipItem) {
+                                                return `${tooltipItem.raw as number} (${(tooltipItem.raw as number / (salesNoLoan.length + salesLoans.length) * 100).toFixed(2)}%)`
+                                            },
+                                        }
                                     }
                                 }
                             }} />
