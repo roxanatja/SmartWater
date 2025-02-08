@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import moment from "moment";
 import { ItemsApiConector, LoansApiConector } from "../../../../../../../api/classes";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, TimeScale, ChartData, TimeUnit } from 'chart.js';
-import { Line, Pie } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import datalabels from 'chartjs-plugin-datalabels';
 import 'chartjs-adapter-date-fns';
 import "moment/locale/es";
@@ -169,7 +169,13 @@ const PrestamosPorItem: FC = () => {
         }
     }, [formatted, colors, productsSelected])
 
-    const dataPie = useMemo<ChartData<'pie', number[], string>>(() => {
+    const total = useMemo<number>(() => {
+        return formatted
+            .filter(f => productsSelected.some(p => p._id === f.product))
+            .reduce<number>((acc, f) => acc += f.sales.reduce<number>((accS, s) => accS += s.amount, 0), 0)
+    }, [formatted, productsSelected])
+
+    const dataPie = useMemo<ChartData<'bar', number[], string>>(() => {
         return {
             labels: productsSelected.map(p => p.name),
             datasets: [{
@@ -182,7 +188,7 @@ const PrestamosPorItem: FC = () => {
     }, [formatted, colors, productsSelected])
 
     const loadData = useCallback(async () => {
-        const res = await LoansApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") } })
+        const res = await LoansApiConector.get({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 30000 } })
         setReports(res?.data || [])
     }, [filters])
 
@@ -222,7 +228,7 @@ const PrestamosPorItem: FC = () => {
                                     <span className="text-left text-sm">Tipo de gráfico</span>
                                     <select value={type} onChange={(e) => setType(e.target.value || "line")} className="border-0 rounded outline-none font-semibold w-full bg-main-background text-sm full-selector">
                                         <option value="line">Líneas</option>
-                                        <option value="pie">Torta</option>
+                                        <option value="bar">Barras</option>
                                     </select>
                                 </div>
                             </div>
@@ -266,17 +272,26 @@ const PrestamosPorItem: FC = () => {
                 </div>
                 <div className="my-10">
                     {
-                        type === 'pie' &&
-                        <Pie data={dataPie} options={{
+                        type === 'bar' &&
+                        <Bar data={dataPie} options={{
                             responsive: true,
-                            maintainAspectRatio: false,
+                            maintainAspectRatio: true,
                             font: { family: "Poppins" },
                             plugins: {
                                 legend: {
                                     display: false,
                                 },
                                 datalabels: {
-                                    display: false
+                                    font: { family: "Poppins" },
+                                    anchor: 'end',
+                                    align: 'end',
+                                    clamp: true,
+                                    color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    offset: 10,
+                                    formatter(value, context) {
+                                        const percent = value / (total) * 100
+                                        return percent > 0 ? percent < 0.01 ? "< 0.01%" : `${(percent).toFixed(2)}%` : "0%"
+                                    },
                                 },
                                 tooltip: {
                                     titleFont: { family: "Poppins" },
@@ -285,6 +300,27 @@ const PrestamosPorItem: FC = () => {
                                         label(tooltipItem) {
                                             return `${Number((tooltipItem.raw as number)).toLocaleString()}`
                                         },
+                                    }
+                                }
+                            },
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: { family: "Poppins" },
+                                        color: document.body.classList.contains('dark') ? "#fefefe" : "#1B1B1B",
+                                    },
+                                    grid: {
+                                        color: document.body.classList.contains('dark') ? "#333" : "#e0e0e0"
                                     }
                                 }
                             }
