@@ -276,7 +276,7 @@ const PagoProveedores: FC = () => {
                         type === 'bar' &&
                         <Bar data={dataPie} options={{
                             responsive: true,
-                            maintainAspectRatio: false,
+                            maintainAspectRatio: true,
                             font: { family: "Poppins" },
                             plugins: {
                                 legend: {

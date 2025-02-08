@@ -30,8 +30,13 @@ const ProductForm = ({ categories, units, isOpen, onCancel }: Props) => {
         formState: { errors, isValid },
     } = useForm<IProductBody['data']>({
         defaultValues: selectedProduct._id === "" ? {} : {
-            name: selectedProduct.name, description: selectedProduct.description, category: (selectedProduct.category as CategoryProduct)._id,
-            unitMeasure: (selectedProduct.unitMeasure as UnitMeasure)._id, imageUrl: selectedProduct.imageUrl, price: selectedProduct.price, priceBusiness: selectedProduct.priceBusiness,
+            name: selectedProduct.name,
+            description: selectedProduct.description,
+            category: (selectedProduct.category as CategoryProduct)._id,
+            unitMeasure: (selectedProduct.unitMeasure as UnitMeasure)._id,
+            imageUrl: selectedProduct.imageUrl,
+            price: selectedProduct.price,
+            priceBusiness: selectedProduct.priceBusiness,
             canSellAndLend: false
         },
         mode: 'all'
