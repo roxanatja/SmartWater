@@ -1,11 +1,10 @@
-import React, { useState, useContext, useEffect, useCallback, useMemo } from "react";
-import { FiltroPaginado } from "../../components/FiltroPaginado/FiltroPaginado";
+import React, { useState, useContext, useEffect, useCallback, useRef } from "react";
+import { FiltroPaginado, IFiltroPaginadoReference } from "../../components/FiltroPaginado/FiltroPaginado";
 import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./MapaClientes.css";
 import { MapaClientesContext } from "./MapaClientesContext";
-import GoogleMaps from "../../components/GoogleMaps/GoogleMaps";
 import { Client } from "../../../../type/Cliente/Client";
-import { ClientsApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, OrdersApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { IClientGetParams } from "../../../../api/types/clients";
 import Modal from "../../EntryComponents/Modal";
 import FiltroClientes from "../Clientes/FiltroClientes/FiltroClientes";
@@ -16,36 +15,80 @@ import moment from "moment";
 import ClientForm from "../../EntryComponents/Client.form";
 import { client } from "../Clientes/ClientesContext";
 import LeafletMap from "../../components/LeafletMap/LeafletMap";
+import { useSearchParams } from "react-router-dom";
+import { useGlobalContext } from "../../../SmartwaterContext";
+import { Order } from "../../../../type/Order/Order";
 
 const MapaClientes: React.FC = () => {
   const { showFiltro, setShowFiltro, showModal, setShowModal } = useContext(MapaClientesContext);
-  const api: string = process.env.REACT_APP_API_GOOGLE!;
+  const { setLoading } = useGlobalContext()
 
   const [clients, setClients] = useState<Client[]>([]);
+  const [passedThis, setPassedThis] = useState<boolean>(false);
 
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [allClients, setAllClients] = useState<Client[]>([]);
 
+  const filterRef = useRef<IFiltroPaginadoReference>(null)
   const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters']>({});
+  const [query, setQuery] = useSearchParams()
+  const [queryData, setQueryData] = useState<IClientGetParams & { text?: string } | null>(null)
+
+  useEffect(() => {
+    if (query.has('filters')) {
+      const queryRes: IClientGetParams & { text?: string } = JSON.parse(atob(query.get('filters')!))
+      setQueryData(queryRes)
+
+      if (queryRes.filters) {
+        if (queryRes.text) {
+          filterRef.current?.setSearch(queryRes.text)
+        } else {
+          filterRef.current?.clearSearch()
+        }
+
+        if (queryRes.filters) {
+          setSavedFilters(queryRes.filters)
+        }
+      }
+    } else {
+      setQuery({ filters: btoa(JSON.stringify({ filters: {} })) })
+    }
+    setPassedThis(true)
+  }, [query, setQuery])
 
   const fetchClients = useCallback(async () => {
-    try {
-      const filters = { ...savedFilters }
+    if (passedThis) {
+      setLoading(true)
 
-      if (!!filters?.initialDate && !filters?.finalDate) {
-        filters.finalDate = moment().format("YYYY-MM-DD")
+      const qd = { ...queryData }
+      const extraFilters: IClientGetParams['filters'] = {}
+
+      if (!!qd.filters?.initialDate && !qd.filters?.finalDate) {
+        extraFilters.finalDate = moment().format("YYYY-MM-DD")
       }
-      if (!filters?.initialDate && !!filters?.finalDate) {
-        filters.initialDate = "2020-01-01"
+      if (!qd.filters?.initialDate && !!qd.filters?.finalDate) {
+        extraFilters.initialDate = "2020-01-01"
       }
 
-      const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters });
-      setClients(clientsData?.data || []);
-    } catch (error) {
-      console.error("Error fetching clients:", error);
+      const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...qd.filters, ...extraFilters } });
+
+      if (qd.text) {
+        setClients(
+          (clientsData?.data || []).filter(
+            (client) =>
+              client.fullName?.toLowerCase().includes(qd.text!.toLowerCase()) ||
+              client.phoneNumber?.includes(qd.text!)
+          )
+        );
+      } else {
+        setClients(clientsData?.data || []);
+      }
+
+      setLoading(false)
     }
-  }, [savedFilters]);
+  }, [queryData, setLoading]);
 
   useEffect(() => {
     fetchClients();
@@ -56,33 +99,36 @@ const MapaClientes: React.FC = () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: 'desc' }, filters: { desactivated: false } }))?.data || []);
+      setOrders((await OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
     }
     fetchZones()
   }, [])
 
   const handleFilterChange = (filters: IClientGetParams['filters']) => {
+    setQuery({ filters: btoa(JSON.stringify({ filters, text: queryData?.text })) })
     setSavedFilters(filters);
   };
 
   const [searchTerm, setSearchTerm] = useState<string>("")
-  const searchParam = useDebounce<string>(searchTerm, 800)
-  const filteredClients = useMemo<Client[]>(() => {
-    if (searchParam) {
-      return clients.filter(
-        (client) =>
-          client.fullName?.toLowerCase().includes(searchParam?.toLowerCase()) ||
-          client.phoneNumber?.includes(searchParam)
-      );
+  const searchParam = useDebounce<string>(searchTerm, 400)
+  useEffect(() => {
+    if (searchParam && searchParam.trim() !== "") {
+      if (!queryData?.text || queryData.text !== searchParam) {
+        setQuery({ filters: btoa(JSON.stringify({ ...queryData, text: searchParam })) })
+      }
     } else {
-      return clients
+      if (!!queryData?.text) {
+        setQuery({ filters: btoa(JSON.stringify({ ...queryData, text: undefined })) })
+      }
     }
-  }, [clients, searchParam])
+  }, [searchParam])
 
   return (
     <>
       <div className="px-10 overflow-auto h-screen flex justify-between flex-col">
         <PageTitle titulo="Mapa de clientes" icon="./ubicacion-icon.svg" />
         <FiltroPaginado
+          ref={filterRef}
           noContent
           filtro
           paginacion={false}
@@ -93,7 +139,7 @@ const MapaClientes: React.FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         ></FiltroPaginado>
         <div className="MapaClientes w-full flex-1 pb-10">
-          <LeafletMap onAdd={() => setShowModal(true)} clients={filteredClients} />
+          <LeafletMap onAdd={() => setShowModal(true)} clients={clients} orders={orders} />
           {/* <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} /> */}
         </div>
       </div>

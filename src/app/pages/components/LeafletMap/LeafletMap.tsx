@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { divIcon, LatLng, Map } from 'leaflet';
 import { Client } from '../../../../type/Cliente/Client';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { getMarkerHtml, markerStyles } from './constants';
+import { Order } from '../../../../type/Order/Order';
 
 const center = {
     lat: -16.702358987690342,
@@ -31,9 +32,10 @@ interface MapProps {
     activeClient?: string;
     onAdd: VoidFunction;
     clients: Client[]
+    orders: Order[]
 }
 
-const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapProps) => {
+const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders }: MapProps) => {
     const map = useRef<Map>(null)
 
     const [changeMapType, setChangeMapType] = useState<boolean>(false);
@@ -64,86 +66,21 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
         });
     }
 
-    // const initializeMarkers = useCallback(() => {
-    //     if (map.current) {
-    //         // Clear existing markers
-    //         markersRef.current = []
-
-    //         clients.filter(c => !!c.location?.latitude && !!c.location?.longitude).forEach((client) => {
-    //             const position = {
-    //                 lat: parseFloat(client.location.latitude),
-    //                 lng: parseFloat(client.location.longitude),
-    //             };
-
-    //             const marker = new Marker(position, {
-    //                 title: client.fullName || "Sin nombre"
-    //             })
-
-    //             // const marker = new google.maps.Marker({
-    //             //     position,
-    //             //     map,
-    //             //     // icon: getMarkerIcon(client),
-    //             //     title: client.fullName,
-    //             //     optimized: false
-    //             // });
-
-    //             // // marker.addListener("click", () => setActiveMarker(client));
-    //             markersRef.current.push(marker);
-    //             // // bounds.extend(position);
-    //         });
-
-    //         // Initialize or update marker clusterer
-    //         if (clustererRef.current) {
-    //             clustererRef.current.clearLayers()
-    //             clustererRef.current.addLayers(markersRef.current);
-    //         } else {
-    //             const cluster = markerClusterGroup()
-    //             cluster.addLayers(markersRef.current)
-    //             map.current.addLayer(cluster)
-    //             clustererRef.current = cluster
-    //         }
-
-    //         // if (!activeClient) {
-    //         //   map.fitBounds(bounds);
-    //         // } else if (activeMarker) {
-    //         //   map.setCenter({
-    //         //     lat: parseFloat(activeMarker.location.latitude),
-    //         //     lng: parseFloat(activeMarker.location.longitude),
-    //         //   });
-    //         //   map.setZoom(15);
-    //         // }
-    //     }
-    // }, [activeClient, clients, map.current]);
-
-    useEffect(() => {
-        if (map.current) {
-            const initMap = async () => {
-                if (map.current) {
-                    let initialPosition = center
-
-                    try {
-                        initialPosition = await currentLocation;
-                    } catch (error) {
-                        console.error(error);
-                    }
-
-                    map.current.panTo(initialPosition)
-                }
-            }
-
-            initMap()
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [map.current, currentLocation])
+    const getClientStatus = (client: Client): keyof typeof markerStyles => {
+        // TODO: Check the status assignament process
+        if (orders.some(o => !o.attended && o.client === client._id)) { return 'inProgress' }
+        if (orders.some(o => o.attended && o.client === client._id)) { return 'attended' }
+        return 'default'
+    }
 
     return (
         <>
             <div
                 style={{ position: "relative", height: "100%" }}
-                className={`rounded-lg`}
+                className={`rounded-lg overflow-hidden`}
             >
                 <MapContainer ref={map} center={center}
-                    zoom={13} style={{ width: "100%", height: "100%" }} zoomControl={false}>
+                    zoom={7} style={{ width: "100%", height: "100%" }} zoomControl={false}>
                     {
                         mapType === 'roadmap' &&
                         <TileLayer
@@ -178,8 +115,14 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                             clients.filter(c => !!c.location?.latitude && !!c.location?.longitude && !isNaN(Number(c.location.latitude)) && !isNaN(Number(c.location.longitude))).map((client) => {
                                 return (
                                     <Marker
+                                        eventHandlers={{
+                                            click: (event) => {
+                                                const mapZoom = map.current?.getZoom()
+                                                map.current?.flyTo(event.latlng, mapZoom && mapZoom >= 13 ? mapZoom : 13)
+                                            }
+                                        }}
                                         position={new LatLng(Number(client.location.latitude), Number(client.location.longitude))}
-                                        key={client._id} icon={getCustomIcon('renewClient')}>
+                                        key={client._id} icon={getCustomIcon(getClientStatus(client))}>
                                         <Popup>
                                             {client.fullName || "Sin nombre"}
                                         </Popup>
