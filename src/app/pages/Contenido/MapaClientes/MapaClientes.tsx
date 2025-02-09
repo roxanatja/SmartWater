@@ -15,6 +15,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import moment from "moment";
 import ClientForm from "../../EntryComponents/Client.form";
 import { client } from "../Clientes/ClientesContext";
+import LeafletMap from "../../components/LeafletMap/LeafletMap";
 
 const MapaClientes: React.FC = () => {
   const { showFiltro, setShowFiltro, showModal, setShowModal } = useContext(MapaClientesContext);
@@ -92,7 +93,8 @@ const MapaClientes: React.FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         ></FiltroPaginado>
         <div className="MapaClientes w-full flex-1 pb-10">
-          <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} />
+          <LeafletMap onAdd={() => setShowModal(true)} clients={filteredClients} />
+          {/* <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} /> */}
         </div>
       </div>
 
