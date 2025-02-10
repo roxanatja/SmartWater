@@ -219,22 +219,30 @@ const RegisterPrestaForm = ({ selectedClient, selectedLoan }: { selectedClient: 
     >
       <div className="flex flex-col gap-6 justify-center items-center w-full px-6 pb-0">
         {/* Client Information */}
-        <div className="flex justify-start items-center w-full gap-2 pt-2">
+        <div className="flex justify-between items-center w-full gap-2 pt-2">
+          <div className="flex gap-2 items-center">
+            {
+              selectedClient.clientImage ?
+                <img
+                  src={selectedClient?.clientImage || ""}
+                  className="w-8 h-8 rounded-full"
+                  alt="storeImage"
+                /> :
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
+                  <div className="opacity-0">.</div>
+                  <p className="absolute font-extrabold whitespace-nowrap">
+                    {selectedClient.fullName?.[0] || "S"}
+                  </p>
+                </div>
+            }
+            <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
+          </div>
+
           {
-            selectedClient.clientImage ?
-              <img
-                src={selectedClient?.clientImage || ""}
-                className="w-8 h-8 rounded-full"
-                alt="storeImage"
-              /> :
-              <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
-                <div className="opacity-0">.</div>
-                <p className="absolute font-extrabold whitespace-nowrap">
-                  {selectedClient.fullName?.[0] || "S"}
-                </p>
-              </div>
+            selectedLoan && <span>
+              Código de préstamo: {selectedLoan.code || "Sin código"}
+            </span>
           }
-          <p className="text-sm">{selectedClient?.fullName || "Sin nombre"}</p>
         </div>
         <div className="flex justify-between w-full items-center border-b border-zinc-300 pb-4 cursor-pointer">
           <p className="text-md font-semibold">Agregar Productos</p>
