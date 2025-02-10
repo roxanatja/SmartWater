@@ -205,7 +205,7 @@ const Clientes: FC = () => {
         <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
           Registrar Cliente
         </h2>
-        <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} allClients={allClients} />
+        <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} allClients={allClients} selectedClient={client} />
       </Modal>
 
       <Modal
@@ -219,6 +219,7 @@ const Clientes: FC = () => {
           isOpen={
             selectedClient._id !== "" && showMiniModal === false ? true : false
           }
+          selectedClient={selectedClient}
           onCancel={() => setSelectedClient(client)}
         />
       </Modal>
@@ -246,6 +247,7 @@ const Clientes: FC = () => {
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
         <FiltroClientes
+          setShowFiltro={setShowFiltro}
           distribuidores={distribuidores}
           zones={zones}
           onChange={handleFilterChange}

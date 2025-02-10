@@ -88,7 +88,6 @@ const FiltrosSalidas = ({
                 </div>
             </div>
 
-            {/* TODO: Change to checkboxes */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

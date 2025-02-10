@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { ClientesContext } from "../ClientesContext";
 import { Contador } from "../../../components/Contador/Contador";
 import { useForm } from "react-hook-form";
@@ -49,14 +49,15 @@ const FiltroClientes = ({
   onChange,
   initialFilters,
   zones,
-  distribuidores
+  distribuidores,
+  setShowFiltro
 }: {
   zones: Zone[];
   distribuidores: User[];
   onChange: (filters: IClientGetParams['filters']) => void;
   initialFilters: IClientGetParams['filters'];
+  setShowFiltro: Dispatch<SetStateAction<boolean>>
 }) => {
-  const { setShowFiltro } = useContext(ClientesContext);
   const { register, handleSubmit, setValue, watch } = useForm<IClientFilters>({
     defaultValues: initialState,
   });

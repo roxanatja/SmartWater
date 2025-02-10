@@ -14,7 +14,8 @@ interface IResultsFilters {
     withRange: boolean;
     fromDate: string | null;
     toDate: string | null;
-    monthDate: string | null;
+    monthToDate: string | null;
+    monthFromDate: string | null;
 }
 
 const initialState: IResultsFilters = {
@@ -22,7 +23,8 @@ const initialState: IResultsFilters = {
     withRange: true,
     fromDate: null,
     toDate: null,
-    monthDate: null
+    monthToDate: null,
+    monthFromDate: null
 }
 
 const FilterResultados = () => {
@@ -47,14 +49,16 @@ const FilterResultados = () => {
     const filterClients = (filters: IResultsFilters): IReportDailyBody['data'] => {
         const result: IReportDailyBody['data'] = { startDate: "", endDate: "" }
 
-        if (filters.withMonth && filters.monthDate) {
-            const month = moment(filters.monthDate)
-            result.startDate = month.startOf('month').format("YYYY-MM-DD")
+        if (filters.withMonth && filters.monthFromDate && filters.monthToDate) {
+            const monthFrom = moment(filters.monthFromDate)
+            const monthTo = moment(filters.monthToDate)
 
-            if (moment().month() === month.month()) {
+            result.startDate = monthFrom.startOf('month').format("YYYY-MM-DD")
+
+            if (moment().month() === monthTo.month()) {
                 result.endDate = moment().format("YYYY-MM-DD")
             } else {
-                result.endDate = month.endOf('month').format("YYYY-MM-DD")
+                result.endDate = monthTo.endOf('month').format("YYYY-MM-DD")
             }
         } else if (filters.withRange && filters.fromDate && filters.toDate) {
             result.startDate = filters.fromDate.toString()
@@ -79,7 +83,8 @@ const FilterResultados = () => {
             const range = watch('withRange')
 
             if (!range) {
-                setValue('monthDate', null, { shouldValidate: true })
+                setValue('monthToDate', null, { shouldValidate: true })
+                setValue('monthFromDate', null, { shouldValidate: true })
             }
 
             setValue('withMonth', range, { shouldValidate: true })
@@ -195,7 +200,7 @@ const FilterResultados = () => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-8">
-            <div className="flex-1">
+            <div className="flex-1 flex gap-4 items-center -mb-4">
                 <div className="FiltroClientes-Fechastitulo mb-2 flex items-center gap-2">
                     <input
                         className="input-check accent-blue_custom"
@@ -206,37 +211,6 @@ const FilterResultados = () => {
                     />
                     <label htmlFor='check1' className="text-blue_custom font-semibold">Por Fechas</label>
                 </div>
-                <div className="flex gap-3 w-full">
-                    <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                        <span className="text-left text-sm">De {watch('withRange') && <span className='text-red-500'>*</span>}</span>
-                        <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                        <input
-                            disabled={watch('withMonth')}
-                            max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
-                            type="date"
-                            {...register("fromDate", {
-                                required: watch('withRange')
-                            })}
-                            className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
-                        />
-                    </div>
-                    <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                        <span className="text-left text-sm">A {watch('withRange') && <span className='text-red-500'>*</span>}</span>
-                        <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                        <input
-                            disabled={watch('withMonth')}
-                            min={watch('fromDate')?.toString()}
-                            max={moment().format("YYYY-MM-DD")}
-                            type="date"
-                            {...register("toDate", {
-                                required: watch('withRange')
-                            })}
-                            className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div className="flex-1">
                 <div className="FiltroClientes-Fechastitulo mb-2 flex items-center gap-2">
                     <input
                         className="input-check accent-blue_custom"
@@ -247,21 +221,9 @@ const FilterResultados = () => {
                     />
                     <label htmlFor='check2' className="text-blue_custom font-semibold">Por Mes</label>
                 </div>
-                <div className="flex gap-3 w-full">
-                    <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
-                        <span className="text-left text-sm">Mes {watch('withMonth') && <span className='text-red-500'>*</span>}</span>
-                        <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
-                        <input
-                            disabled={watch('withRange')}
-                            max={moment().format("YYYY-MM")}
-                            type="month"
-                            {...register("monthDate", {
-                                required: watch('withMonth')
-                            })}
-                            className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
-                        />
-                    </div>
-                </div>
+            </div>
+            <div className="flex-1">
+               
             </div>
 
             <div className="flex justify-between w-full items-center gap-3 px-4">
@@ -282,7 +244,7 @@ const FilterResultados = () => {
                     Generar reporte
                 </button>
             </div>
-        </form>
+        </form >
     )
 }
 
