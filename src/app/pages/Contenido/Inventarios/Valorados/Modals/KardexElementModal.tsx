@@ -46,6 +46,7 @@ const KardexElementModal = ({ kardexElement, date }: Props) => {
                             `${formatDateTime(row.registerDate, 'numeric', '2-digit', '2-digit', false, true)}`,
                             `${row.documentNumber || ""}`,
                             `${row.code || ""}`,
+                            `${row.comment || ""}`,
                             `${row.inputQuantity}`,
                             `${row.unitPriceInput}`,
                             `${row.inputImport}`,

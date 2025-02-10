@@ -72,7 +72,7 @@ const TableBalancesReport = ({ data, className, total, date }: Props) => {
                     data={data} noDataComponent={<div className="min-h-[150px] flex items-center justify-center">Sin registros</div>} />
             </div>
 
-            <Modal isOpen={!!detailed} onClose={() => { setDetailed(null) }} className='!w-[95%] sm:!w-10/12'>
+            <Modal isOpen={!!detailed} onClose={() => { setDetailed(null) }} className='!w-[95%] sm:!w-11/12'>
                 {
                     detailed && <>
                         <h2 className="text-blue_custom font-semibold p-6 pb-0 z-30 bg-main-background">
