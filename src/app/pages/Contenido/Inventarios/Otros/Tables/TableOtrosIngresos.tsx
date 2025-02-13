@@ -88,6 +88,10 @@ const TableOtrosIngresos = ({ data, className, tableClassName, pageSize, totalRo
             selector: row => row.type === 'production_received' ? "De producción" : "Por ajuste",
         },
         {
+            name: "Código",
+            selector: row => row.code || "Sin código",
+        },
+        {
             name: "Comentario",
             selector: row => row.detail || "Sin comentario",
         },
