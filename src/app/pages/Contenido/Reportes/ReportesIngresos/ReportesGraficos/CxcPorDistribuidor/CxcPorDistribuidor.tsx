@@ -195,7 +195,7 @@ const CxcPorDistribuidor: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Cuentas por Cobrar" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Cuentas por Cobrar por usuario" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

@@ -195,7 +195,7 @@ const VentasPorDistribuidor: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Venta por distribuidor" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Venta por usuario" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
