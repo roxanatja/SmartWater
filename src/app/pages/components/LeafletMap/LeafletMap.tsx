@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
-import { useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { divIcon, LatLng, Map } from 'leaflet';
 import { Client } from '../../../../type/Cliente/Client';
 import toast from 'react-hot-toast';
@@ -10,8 +10,9 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { ClientStatus, getMarkerHtml, markerStyles } from './constants';
-import { Order } from '../../../../type/Order/Order';
-import moment from 'moment';
+import { MapaClientesContext } from '../../Contenido/MapaClientes/MapaClientesContext';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSessionStorage } from '@uidotdev/usehooks';
 
 const center = {
     lat: -16.702358987690342,
@@ -33,15 +34,19 @@ interface MapProps {
     activeClient?: string;
     onAdd: VoidFunction;
     clients: (Client & { status: ClientStatus })[]
-    orders: Order[]
 }
 
-const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders }: MapProps) => {
+const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapProps) => {
+    const { setSelectedClient } = useContext(MapaClientesContext);
+    const [query, setQuery] = useSearchParams()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [returnUrl, setReturnUrl] = useSessionStorage("returnUrl", "")
+
     const map = useRef<Map>(null)
 
     const [changeMapType, setChangeMapType] = useState<boolean>(false);
     const [mapType, setMapType] = useState<string>('roadmap');
-
 
     const currentLocation = useMemo(() => new Promise<{ lat: number; lng: number }>((resolve, reject) => {
         if (navigator.geolocation) {
@@ -66,6 +71,17 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
             popupAnchor: [0, -12]
         });
     }
+
+    useEffect(() => {
+        if (map.current && latitude && longitude) {
+            const mapZoom = map.current?.getZoom()
+            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 10 ? mapZoom : 10)
+
+            query.delete('latitude')
+            query.delete('longitude')
+            setQuery(query)
+        }
+    }, [latitude, longitude, map, query, setQuery])
 
     return (
         <>
@@ -109,12 +125,13 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
                             clients.filter(c => !!c.location?.latitude && !!c.location?.longitude && !isNaN(Number(c.location.latitude)) && !isNaN(Number(c.location.longitude))).map((client) => {
                                 return (
                                     <Marker
-                                        // eventHandlers={{
-                                        //     click: (event) => {
-                                        //         const mapZoom = map.current?.getZoom()
-                                        //         map.current?.flyTo(event.latlng, mapZoom && mapZoom >= 13 ? mapZoom : 13)
-                                        //     }
-                                        // }}
+                                        eventHandlers={{
+                                            click: (event) => {
+                                                setSelectedClient(client);
+                                                setReturnUrl(`${location.pathname}${location.search}&latitude=${client.location.latitude}&longitude=${client.location.longitude}`)
+                                                navigate("/MapaClientes/DetallesCliente")
+                                            }
+                                        }}
                                         position={new LatLng(Number(client.location.latitude), Number(client.location.longitude))}
                                         key={client._id} icon={getCustomIcon(client.status)}>
                                         <Tooltip direction='top' offset={[0, -12]}>

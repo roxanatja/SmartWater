@@ -27,9 +27,11 @@ const MapaClientes: React.FC = () => {
   const [clients, setClients] = useState<(Client & { status: ClientStatus })[]>([]);
   const [passedThis, setPassedThis] = useState<boolean>(false);
 
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
+
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
   const [allClients, setAllClients] = useState<Client[]>([]);
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
@@ -38,6 +40,15 @@ const MapaClientes: React.FC = () => {
   const [queryData, setQueryData] = useState<IClientGetParams & { text?: string; status?: ClientStatus[] } | null>(null)
 
   useEffect(() => {
+    if (query.has('latitude') && query.has('longitude')) {
+      console.log("Hi there", latitude, longitude)
+      setLatitude(parseFloat(query.get('latitude')!))
+      setLongitude(parseFloat(query.get('longitude')!))
+    } else {
+      setLatitude(undefined)
+      setLongitude(undefined)
+    }
+
     if (query.has('filters')) {
       const queryRes: IClientGetParams & { text?: string; status?: ClientStatus[] } = JSON.parse(atob(query.get('filters')!))
       setQueryData(queryRes)
@@ -58,6 +69,7 @@ const MapaClientes: React.FC = () => {
     } else {
       setQuery({ filters: btoa(JSON.stringify({ filters: {} })) })
     }
+
     setPassedThis(true)
   }, [query, setQuery])
 
@@ -82,7 +94,6 @@ const MapaClientes: React.FC = () => {
       setLoading(true)
       const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
       const ords = ordersData?.data || [];
-      setOrders(ords || []);
 
       const qd = { ...queryData }
       const extraFilters: IClientGetParams['filters'] = {}
@@ -99,7 +110,7 @@ const MapaClientes: React.FC = () => {
       let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => ({ ...client, status: getClientStatus(client, ords) }));
 
       if (ords) {
-        clientsWithStatus.push(...ords.filter(o => !o.client).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, status: getClientStatusFromOrder(o) })))
+        clientsWithStatus.push(...ords.filter(o => !o.client).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o) })))
       }
 
       if (qd.text) {
@@ -171,7 +182,7 @@ const MapaClientes: React.FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         ></FiltroPaginado>
         <div className="MapaClientes w-full flex-1 pb-10">
-          <LeafletMap onAdd={() => setShowModal(true)} clients={clients} orders={orders} />
+          <LeafletMap onAdd={() => setShowModal(true)} clients={clients} latitude={latitude} longitude={longitude} />
           {/* <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} /> */}
         </div>
       </div>

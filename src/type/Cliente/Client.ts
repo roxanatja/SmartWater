@@ -43,6 +43,7 @@ export interface Client {
   hasExpiredContract: boolean;
   credit: number;
   lastPostponed?: string;
+  associatedOrder?: string;
 }
 
 export interface ReportClient {
