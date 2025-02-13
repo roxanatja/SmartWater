@@ -7,7 +7,6 @@ import { Client } from "../../../../type/Cliente/Client";
 import { ClientsApiConector, OrdersApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { IClientGetParams } from "../../../../api/types/clients";
 import Modal from "../../EntryComponents/Modal";
-import FiltroClientes from "../Clientes/FiltroClientes/FiltroClientes";
 import { User } from "../../../../type/User";
 import { Zone } from "../../../../type/City";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -18,12 +17,14 @@ import LeafletMap from "../../components/LeafletMap/LeafletMap";
 import { useSearchParams } from "react-router-dom";
 import { useGlobalContext } from "../../../SmartwaterContext";
 import { Order } from "../../../../type/Order/Order";
+import { ClientStatus } from "../../components/LeafletMap/constants";
+import FiltroClientesMapa from "./FiltroClientesMapa/FiltroClientesMapa";
 
 const MapaClientes: React.FC = () => {
   const { showFiltro, setShowFiltro, showModal, setShowModal } = useContext(MapaClientesContext);
   const { setLoading } = useGlobalContext()
 
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<(Client & { status: ClientStatus })[]>([]);
   const [passedThis, setPassedThis] = useState<boolean>(false);
 
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
@@ -32,13 +33,13 @@ const MapaClientes: React.FC = () => {
   const [allClients, setAllClients] = useState<Client[]>([]);
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
-  const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters']>({});
+  const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters'] & { status?: ClientStatus[] }>({});
   const [query, setQuery] = useSearchParams()
-  const [queryData, setQueryData] = useState<IClientGetParams & { text?: string } | null>(null)
+  const [queryData, setQueryData] = useState<IClientGetParams & { text?: string; status?: ClientStatus[] } | null>(null)
 
   useEffect(() => {
     if (query.has('filters')) {
-      const queryRes: IClientGetParams & { text?: string } = JSON.parse(atob(query.get('filters')!))
+      const queryRes: IClientGetParams & { text?: string; status?: ClientStatus[] } = JSON.parse(atob(query.get('filters')!))
       setQueryData(queryRes)
 
       if (queryRes.filters) {
@@ -49,7 +50,9 @@ const MapaClientes: React.FC = () => {
         }
 
         if (queryRes.filters) {
-          setSavedFilters(queryRes.filters)
+          const filters: IClientGetParams['filters'] & { status?: ClientStatus[] } = { ...queryRes.filters }
+          if (queryRes.status) { filters.status = queryRes.status }
+          setSavedFilters(filters)
         }
       }
     } else {
@@ -58,9 +61,28 @@ const MapaClientes: React.FC = () => {
     setPassedThis(true)
   }, [query, setQuery])
 
+  const getClientStatus = (client: Client, orders: Order[]): ClientStatus => {
+    if (orders.some(o => !o.attended && o.client === client._id)) { return 'inProgress' }
+    if (orders.some(o => o.attended && moment(o.attended).isSame(moment(), 'day') && o.client === client._id)) { return 'attended' }
+    if (client.lastSale && client.renewInDays) {
+      const renewDate = moment(client.lastSale).add(client.renewInDays, 'days')
+      if (moment().isAfter(renewDate)) { return 'renewClient' }
+    }
+    return 'default'
+  }
+
+  const getClientStatusFromOrder = (o: Order): ClientStatus => {
+    if (!o.attended) { return 'inProgress' }
+    if (o.attended && moment(o.attended).isSame(moment(), 'day')) { return 'attended' }
+    return 'default'
+  }
+
   const fetchClients = useCallback(async () => {
     if (passedThis) {
       setLoading(true)
+      const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
+      const ords = ordersData?.data || [];
+      setOrders(ords || []);
 
       const qd = { ...queryData }
       const extraFilters: IClientGetParams['filters'] = {}
@@ -73,22 +95,30 @@ const MapaClientes: React.FC = () => {
       }
 
       const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...qd.filters, ...extraFilters } });
+      let clientsToSet = clientsData?.data || [];
+      let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => ({ ...client, status: getClientStatus(client, ords) }));
+
+      if (ords) {
+        clientsWithStatus.push(...ords.filter(o => !o.client).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, status: getClientStatusFromOrder(o) })))
+      }
 
       if (qd.text) {
-        setClients(
-          (clientsData?.data || []).filter(
-            (client) =>
-              client.fullName?.toLowerCase().includes(qd.text!.toLowerCase()) ||
-              client.phoneNumber?.includes(qd.text!)
-          )
-        );
-      } else {
-        setClients(clientsData?.data || []);
+        clientsWithStatus = clientsWithStatus.filter(
+          (client) =>
+            client.fullName?.toLowerCase().includes(qd.text!.toLowerCase()) ||
+            client.phoneNumber?.includes(qd.text!)
+        )
       }
+
+      if (qd.status) {
+        clientsWithStatus = clientsWithStatus.filter((client) => qd.status!.includes(client.status))
+      }
+
+      setClients(clientsWithStatus);
 
       setLoading(false)
     }
-  }, [queryData, setLoading]);
+  }, [queryData, setLoading, passedThis]);
 
   useEffect(() => {
     fetchClients();
@@ -99,13 +129,15 @@ const MapaClientes: React.FC = () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: 'desc' }, filters: { desactivated: false } }))?.data || []);
-      setOrders((await OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
     }
     fetchZones()
   }, [])
 
-  const handleFilterChange = (filters: IClientGetParams['filters']) => {
-    setQuery({ filters: btoa(JSON.stringify({ filters, text: queryData?.text })) })
+  const handleFilterChange = (filters: IClientGetParams['filters'] & { status?: ClientStatus[] }) => {
+    const status = filters.status
+    delete filters.status
+
+    setQuery({ filters: btoa(JSON.stringify({ filters, text: queryData?.text, status })) })
     setSavedFilters(filters);
   };
 
@@ -145,7 +177,7 @@ const MapaClientes: React.FC = () => {
       </div>
 
       <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
-        <FiltroClientes
+        <FiltroClientesMapa
           setShowFiltro={setShowFiltro}
           distribuidores={distribuidores}
           zones={zones}

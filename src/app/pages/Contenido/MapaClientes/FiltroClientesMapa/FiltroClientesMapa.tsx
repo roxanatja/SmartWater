@@ -5,6 +5,7 @@ import { Zone } from "../../../../../type/City";
 import { IClientGetParams } from "../../../../../api/types/clients";
 import { User } from "../../../../../type/User";
 import moment from "moment";
+import { ClientStatus, markerStyles } from "../../../components/LeafletMap/constants";
 
 interface IClientFilters {
   withOrder: boolean;
@@ -23,6 +24,7 @@ interface IClientFilters {
   fromDate: string | null;
   toDate: string | null;
   distributor: Record<string, string>;
+  status: Record<string, string>;
 }
 
 const initialState: IClientFilters = {
@@ -41,10 +43,11 @@ const initialState: IClientFilters = {
   zones: {},
   fromDate: null,
   toDate: null,
-  distributor: {}
+  distributor: {},
+  status: {}
 }
 
-const FiltroClientes = ({
+const FiltroClientesMapa = ({
   onChange,
   initialFilters,
   zones,
@@ -53,8 +56,8 @@ const FiltroClientes = ({
 }: {
   zones: Zone[];
   distribuidores: User[];
-  onChange: (filters: IClientGetParams['filters']) => void;
-  initialFilters: IClientGetParams['filters'];
+  onChange: (filters: IClientGetParams['filters'] & { status?: ClientStatus[] }) => void;
+  initialFilters: IClientGetParams['filters'] & { status?: ClientStatus[] };
   setShowFiltro: Dispatch<SetStateAction<boolean>>
 }) => {
   const { register, handleSubmit, setValue, watch } = useForm<IClientFilters>({
@@ -102,6 +105,11 @@ const FiltroClientes = ({
           setValue(`zones.${z}`, z, { shouldValidate: true })
         })
       }
+      if (initialFilters.status) {
+        initialFilters.status.forEach((z) => {
+          setValue(`status.${z}`, z, { shouldValidate: true })
+        })
+      }
       if (initialFilters.user) {
         setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
       }
@@ -114,8 +122,8 @@ const FiltroClientes = ({
     setShowFiltro(false);
   };
 
-  const filterClients = (filters: IClientFilters): IClientGetParams['filters'] => {
-    const result: IClientGetParams['filters'] = {}
+  const filterClients = (filters: IClientFilters): IClientGetParams['filters'] & { status?: ClientStatus[] } => {
+    const result: IClientGetParams['filters'] & { status?: ClientStatus[] } = {}
 
     if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
     if (filters.toDate) { result.finalDate = filters.toDate.toString() }
@@ -123,6 +131,11 @@ const FiltroClientes = ({
     if (filters.zones) {
       const zones = Object.values(filters.zones).filter(z => !!z).join(',')
       if (zones !== "") { result.zone = zones }
+    }
+
+    if (filters.status) {
+      const statuses = Object.values(filters.status).filter(z => !!z)
+      if (statuses.length > 0) { result.status = statuses as ClientStatus[] }
     }
 
     if (filters.daysSinceRenewed > 0) { result.renewedAgo = filters.daysSinceRenewed }
@@ -411,6 +424,33 @@ const FiltroClientes = ({
       </div>
 
       <div className="w-full flex flex-col gap-2">
+        <label className="font-semibold text-blue_custom">Clientes</label>
+        <div className="flex flex-wrap gap-x-6 gap-y-4">
+          {Object.keys(markerStyles).map((key, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3"
+            >
+              <input
+                className="input-check accent-blue_custom"
+                type="checkbox"
+                {...register(`status.${key}`)}
+                value={key}
+                id={`status-${key}`}
+              />
+              <img src={markerStyles[key].icon} alt="" />
+              <label
+                htmlFor={`status-${key}`}
+                className="text-sm"
+              >
+                {markerStyles[key].text}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-full flex flex-col gap-2">
         <label className="font-semibold text-blue_custom">Distribuidores</label>
         <div className="flex flex-wrap gap-x-6 gap-y-4">
           {distribuidores.filter(d => d.role === 'user').map((dists, index) => (
@@ -525,4 +565,4 @@ const FiltroClientes = ({
   );
 };
 
-export default FiltroClientes;
+export default FiltroClientesMapa;
