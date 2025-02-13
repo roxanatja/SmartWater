@@ -189,6 +189,7 @@ export type OutputItemBody = {
 export type OtherEntry = {
     _id: string;
     user: User;
+    code?: string;
     quantity: number;
     balance: {
         inputQuantity: number;
@@ -207,6 +208,7 @@ export type OtherEntry = {
 export type OtherOutput = {
     _id: string;
     user: User;
+    code?: string;
     quantity: number;
     balance: {
         inputQuantity: number;

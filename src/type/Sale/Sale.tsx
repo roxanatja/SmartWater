@@ -5,6 +5,7 @@ type Sale = {
   client: Client;
   user: string;
   zone: string;
+  code?: string;
   comment: string;
   detail: Array<{
     product: string;

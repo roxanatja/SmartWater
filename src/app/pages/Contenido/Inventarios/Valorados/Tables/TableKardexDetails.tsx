@@ -29,6 +29,10 @@ const TableKardexDetails = ({ data, className }: Props) => {
             selector: row => row.code || "Sin codigo",
         },
         {
+            name: "COMENTARIO",
+            selector: row => row.comment || "Sin comentario",
+        },
+        {
             name: "CANTIDAD ENTRADA",
             selector: row => row.inputQuantity,
         },

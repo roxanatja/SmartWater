@@ -168,10 +168,16 @@ const CxcPorDistribuidor: FC = () => {
     }, [formatted, colors, distribuidoresSelected])
 
     const dataPie = useMemo<ChartData<'bar', number[], string>>(() => {
+
+        const toSet: { label: string; amount: number }[] = distribuidoresSelected.map(p => ({
+            label: `${p.fullName || "Sin nombre"} ${p.role === 'admin' ? "(Administrador)" : ""}`,
+            amount: (formatted.find(f => f.distribuidor === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)
+        }))
+
         return {
-            labels: distribuidoresSelected.map(p => `${p.fullName || "Sin nombre"} ${p.role === 'admin' ? "(Administrador)" : ""}`),
+            labels: toSet.sort((a, b) => b.amount - a.amount).map(p => p.label),
             datasets: [{
-                data: distribuidoresSelected.map(p => (formatted.find(f => f.distribuidor === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)),
+                data: toSet.sort((a, b) => b.amount - a.amount).map(p => p.amount),
                 backgroundColor(ctx, options) {
                     return colors[ctx.dataIndex % colors.length]
                 },
@@ -195,7 +201,7 @@ const CxcPorDistribuidor: FC = () => {
     return (
         <>
             <div className="px-10 h-full overflow-y-auto">
-                <PageTitle titulo="Cuentas por Cobrar" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
+                <PageTitle titulo="Cuentas por Cobrar por usuario" icon="/Reportes-icon.svg" hasBack onBack={() => { navigate('/Reportes/Ingresos/Graficos'); }} />
 
                 <div style={{ marginTop: "32px" }}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

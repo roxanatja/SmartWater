@@ -25,7 +25,7 @@ const RegistrarPedido: FC = () => {
   return (
     <>
       <div className="px-10 h-screen overflow-y-auto">
-        <PageTitle titulo="Pedidos / Registrar pedido" icon="/Pedidos-icon.svg" />
+        <PageTitle titulo={`Pedidos / ${selectedOrder._id === "" ? "Registrar" : "Editar"} pedido`} icon="/Pedidos-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}

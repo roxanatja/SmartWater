@@ -88,6 +88,10 @@ const TableOtrasSalidas = ({ data, className, tableClassName, pageSize, totalRow
             selector: row => row.type === 'production_delivered' ? "De producción" : "Por ajuste",
         },
         {
+            name: "Código",
+            selector: row => row.code || "Sin código",
+        },
+        {
             name: "Comentario",
             selector: row => row.detail || "Sin comentario",
         },

@@ -24,7 +24,7 @@ const RegistrarPrestamos: FC = () => {
     return (
         <>
             <div className="px-10 h-screen overflow-y-auto">
-                <PageTitle titulo="Préstamos / Registrar préstamos" icon="../Prestamos-icon.svg" />
+                <PageTitle titulo={`Préstamos / ${selectedLoan._id === "" ? "Registrar" : "Editar"} préstamo`} icon="../Prestamos-icon.svg" />
                 <div
                     className="RegistrarVenta-titulo flex items-start cursor-pointer"
                     onClick={handleClick}

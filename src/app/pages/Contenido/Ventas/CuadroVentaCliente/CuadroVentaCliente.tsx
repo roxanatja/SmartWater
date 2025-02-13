@@ -146,10 +146,17 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
             </div>
           </div>
           <div className="CuadroVentaCliente-text">
-            <span className="font-semibold">
-              No. Cliente:{" "}
+            <span>
+              <span className="font-semibold">
+                No. Cliente:{" "}
+              </span>
+              <span className="text-blue_custom">{client?.code}</span>
             </span>
-            <span className="text-blue_custom">{client?.code}</span>
+            <br />
+            <span>
+              Código:{" "}
+              <span className="text-blue_custom">{sale.code || "Sin código"}</span>
+            </span>
           </div>
 
           {

@@ -57,6 +57,7 @@ const OtrasSalidasDetails = ({ elements, onCancel }: Props) => {
 
             <div className="mt-14 flex flex-col gap-6">
                 <p>{formatDateTime(selectedOutput.registerDate, 'numeric', '2-digit', '2-digit')}</p>
+                <p><strong>Código:</strong> {selectedOutput.code || "Sin código"}</p>
                 <p><strong>Tipo:</strong> {selectedOutput.type === 'production_delivered' ? `Salida a producción` : `Salida por ajuste`}</p>
                 <p><strong>Producto:</strong> {product?.name || "Producto desconocido"}</p>
                 <p><strong>Cantidad:</strong> {selectedOutput.quantity.toLocaleString()} {(product?.unitMeasure as UnitMeasure)?.name || ""}</p>

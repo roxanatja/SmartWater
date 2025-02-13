@@ -31,15 +31,14 @@ const AddEgresosGastos = ({ accounts, provider, onCancel, elements }: Props) => 
   } = useForm<IExpenseDetailsBody['data']>({
     defaultValues: selectedExpense._id !== "" ? {
       accountEntry: selectedExpense.accountEntry._id,
-      amount: selectedExpense.amount,
+      amount: (selectedExpense.creditBuy ? selectedExpense.amountStatic ? selectedExpense.amountStatic : selectedExpense.amount : selectedExpense.amount) || 0,
       comment: selectedExpense.comment,
       creditBuy: selectedExpense.creditBuy,
       documentNumber: selectedExpense.documentNumber,
       hasInVoice: selectedExpense.hasInVoice,
       hasReceipt: selectedExpense.hasReceipt,
       paymentMethodCurrentAccount: selectedExpense.paymentMethodCurrentAccount,
-      provider: selectedExpense.provider?._id || "",
-      user: selectedExpense.user._id
+      provider: selectedExpense.provider?._id || ""
     } : {
       creditBuy: false,
       paymentMethodCurrentAccount: false

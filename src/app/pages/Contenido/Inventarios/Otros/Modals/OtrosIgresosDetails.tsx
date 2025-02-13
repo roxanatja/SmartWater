@@ -35,6 +35,7 @@ const OtrosIgresosDetails = ({ elements, onCancel }: Props) => {
                     title: "Otros ingresos",
                     date: formatDateTime(selectedEntry.registerDate, 'numeric', '2-digit', '2-digit'),
                     comment: selectedEntry.detail || "Sin comentario",
+                    code: JSON.stringify({ code: selectedEntry.code || "Sin código" }),
                     type: JSON.stringify({ type: selectedEntry.type === 'production_received' ? `Ingreso de producción` : `Ingreso por ajuste` }),
                     quantity: JSON.stringify({ quantity: `${selectedEntry.quantity.toLocaleString()} ${(product?.unitMeasure as UnitMeasure)?.name || ""}` }),
                     product: JSON.stringify({ product: product?.name || "Producto desconocido" }),
@@ -56,6 +57,7 @@ const OtrosIgresosDetails = ({ elements, onCancel }: Props) => {
 
             <div className="mt-14 flex flex-col gap-6">
                 <p>{formatDateTime(selectedEntry.registerDate, 'numeric', '2-digit', '2-digit')}</p>
+                <p><strong>Código:</strong> {selectedEntry.code || "Sin código"}</p>
                 <p><strong>Tipo:</strong> {selectedEntry.type === 'production_received' ? `Ingreso de producción` : `Ingreso por ajuste`}</p>
                 <p><strong>Producto:</strong> {product?.name || "Producto desconocido"}</p>
                 <p><strong>Cantidad:</strong> {selectedEntry.quantity.toLocaleString()} {(product?.unitMeasure as UnitMeasure)?.name || ""}</p>
