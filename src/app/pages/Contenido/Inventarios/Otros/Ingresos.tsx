@@ -53,8 +53,6 @@ const Ingresos = () => {
 
         const res = await KardexApiConector.getOthers({ type: 'income', filters, pagination: { page: currentPage, pageSize } })
 
-        console.log(res)
-
         setCurrentData(res?.data || [])
         setTotal(res?.metadata?.total || 0)
 

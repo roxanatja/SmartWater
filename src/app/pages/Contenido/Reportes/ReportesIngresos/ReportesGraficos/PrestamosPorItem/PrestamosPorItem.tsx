@@ -176,10 +176,15 @@ const PrestamosPorItem: FC = () => {
     }, [formatted, productsSelected])
 
     const dataPie = useMemo<ChartData<'bar', number[], string>>(() => {
+        const toSet: { label: string; amount: number }[] = productsSelected.map(p => ({
+            label: `${p.name}`,
+            amount: (formatted.find(f => f.product === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)
+        }))
+
         return {
-            labels: productsSelected.map(p => p.name),
+            labels: toSet.sort((a, b) => b.amount - a.amount).map(p => p.label),
             datasets: [{
-                data: productsSelected.map(p => (formatted.find(f => f.product === p._id)?.sales || []).reduce((acc, curr) => acc += curr.amount, 0)),
+                data: toSet.sort((a, b) => b.amount - a.amount).map(p => p.amount),
                 backgroundColor(ctx, options) {
                     return colors[ctx.dataIndex % colors.length]
                 },

@@ -32,8 +32,8 @@ const PrestamosVsVentas: FC = () => {
             datasets: [
                 {
                     data: [
-                        salesNoLoan.length,
-                        salesLoans.length
+                        salesNoLoan.reduce((acc, sale) => acc + (sale.total || 0), 0),
+                        salesLoans.reduce((acc, sale) => acc + (sale.total || 0), 0),
                     ],
                     backgroundColor: ['#1A3D7D', '#367DFD'],
                     //barThickness: 73,
@@ -118,7 +118,7 @@ const PrestamosVsVentas: FC = () => {
                                         align: 'top',
                                         color: "#fefefe",
                                         formatter(value, context) {
-                                            return `${(value / (salesNoLoan.length + salesLoans.length) * 100).toFixed(2)}%`
+                                            return `${(value / (salesNoLoan.reduce((acc, sale) => acc + (sale.total || 0), 0) + salesLoans.reduce((acc, sale) => acc + (sale.total || 0), 0)) * 100).toFixed(2)}%`
                                         },
                                     },
                                     tooltip: {
@@ -126,7 +126,7 @@ const PrestamosVsVentas: FC = () => {
                                         bodyFont: { family: "Poppins" },
                                         callbacks: {
                                             label(tooltipItem) {
-                                                return `${tooltipItem.raw as number} (${(tooltipItem.raw as number / (salesNoLoan.length + salesLoans.length) * 100).toFixed(2)}%)`
+                                                return `${tooltipItem.raw as number} Bs. (${(tooltipItem.raw as number / (salesNoLoan.reduce((acc, sale) => acc + (sale.total || 0), 0) + salesLoans.reduce((acc, sale) => acc + (sale.total || 0), 0)) * 100).toFixed(2)}%)`
                                             },
                                         }
                                     }

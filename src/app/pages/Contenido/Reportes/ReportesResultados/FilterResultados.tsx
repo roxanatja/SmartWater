@@ -223,7 +223,70 @@ const FilterResultados = () => {
                 </div>
             </div>
             <div className="flex-1">
-               
+                {
+                    watch('withRange') &&
+                    <div className="flex gap-3 w-full">
+                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                            <span className="text-left text-sm">De {watch('withRange') && <span className='text-red-500'>*</span>}</span>
+                            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                            <input
+                                disabled={watch('withMonth')}
+                                max={watch('toDate')?.toString() || moment().format("YYYY-MM-DD")}
+                                type="date"
+                                {...register("fromDate", {
+                                    required: watch('withRange')
+                                })}
+                                className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
+                            />
+                        </div>
+                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                            <span className="text-left text-sm">A {watch('withRange') && <span className='text-red-500'>*</span>}</span>
+                            <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                            <input
+                                disabled={watch('withMonth')}
+                                min={watch('fromDate')?.toString()}
+                                max={moment().format("YYYY-MM-DD")}
+                                type="date"
+                                {...register("toDate", {
+                                    required: watch('withRange')
+                                })}
+                                className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
+                            />
+                        </div>
+                    </div>
+                }
+                {
+                    watch('withMonth') &&
+                    <div className="flex gap-3 w-full">
+                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                            <span className="text-left text-sm">De {watch('withMonth') && <span className='text-red-500'>*</span>}</span>
+                            <img src="/desde.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                            <input
+                                disabled={watch('withRange')}
+                                max={watch('monthToDate')?.toString() || moment().format("YYYY-MM")}
+                                type="month"
+                                {...register("monthFromDate", {
+                                    required: watch('withMonth')
+                                })}
+                                className="border-0 rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
+                            />
+                        </div>
+                        <div className="shadow-xl rounded-3xl px-4 py-2 border-gray-100 border flex-1 relative">
+                            <span className="text-left text-sm">A {watch('withMonth') && <span className='text-red-500'>*</span>}</span>
+                            <img src="/hasta.svg" alt="" className="w-[20px] h-[20px] absolute bottom-3 left-4 invert-0 dark:invert" />
+                            <input
+                                disabled={watch('withRange')}
+                                min={watch('monthFromDate')?.toString()}
+                                max={moment().format("YYYY-MM")}
+                                type="month"
+                                {...register("monthToDate", {
+                                    required: watch('withMonth')
+                                })}
+                                className="border-0  rounded outline-none font-semibold w-full bg-transparent text-sm full-selector pl-10 disabled:opacity-50"
+                            />
+                        </div>
+                    </div>
+                }
             </div>
 
             <div className="flex justify-between w-full items-center gap-3 px-4">
