@@ -1,21 +1,20 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import RegisterPedidoForm from "../../../EntryComponents/RegisterPedido";
-import { ClientesContext } from "../../Clientes/ClientesContext";
+import { clientWithStatus } from "../MapaClientesContext";
 
 const RegistrarPedido: FC = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/MapaClientes");
+    navigate(-1)
   };
-  const { selectedClient } = useContext(ClientesContext);
 
   return (
     <>
-      <div>
-        <PageTitle titulo="Clientes" icon="../clientes-icon.svg" />
+      <div className="px-10 h-screen overflow-y-auto">
+        <PageTitle titulo="Mapa de clientes / Registrar pedido" icon="../clientes-icon.svg" />
         <div
           className="RegistrarVenta-titulo flex items-start cursor-pointer"
           onClick={handleClick}
@@ -27,7 +26,7 @@ const RegistrarPedido: FC = () => {
           </button>
           <span>Regresar</span>
         </div>
-        <RegisterPedidoForm selectedClient={selectedClient} isNoClient={true} />
+        <RegisterPedidoForm selectedClient={clientWithStatus} isNoClient={true} fromMap />
       </div>
     </>
   );

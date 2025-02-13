@@ -1,5 +1,5 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import { useMemo, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { divIcon, LatLng, Map } from 'leaflet';
 import { Client } from '../../../../type/Cliente/Client';
 import toast from 'react-hot-toast';
@@ -9,8 +9,10 @@ import 'leaflet.markercluster'
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import { getMarkerHtml, markerStyles } from './constants';
-import { Order } from '../../../../type/Order/Order';
+import { ClientStatus, getMarkerHtml, markerStyles } from './constants';
+import { MapaClientesContext } from '../../Contenido/MapaClientes/MapaClientesContext';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSessionStorage } from '@uidotdev/usehooks';
 
 const center = {
     lat: -16.702358987690342,
@@ -31,16 +33,20 @@ interface MapProps {
     longitude?: number;
     activeClient?: string;
     onAdd: VoidFunction;
-    clients: Client[]
-    orders: Order[]
+    clients: (Client & { status: ClientStatus })[]
 }
 
-const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders }: MapProps) => {
+const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapProps) => {
+    const { setSelectedClient } = useContext(MapaClientesContext);
+    const [query, setQuery] = useSearchParams()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [returnUrl, setReturnUrl] = useSessionStorage("returnUrl", "")
+
     const map = useRef<Map>(null)
 
     const [changeMapType, setChangeMapType] = useState<boolean>(false);
     const [mapType, setMapType] = useState<string>('roadmap');
-
 
     const currentLocation = useMemo(() => new Promise<{ lat: number; lng: number }>((resolve, reject) => {
         if (navigator.geolocation) {
@@ -56,7 +62,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
         }
     }), []);
 
-    const getCustomIcon = (status: keyof typeof markerStyles) => {
+    const getCustomIcon = (status: ClientStatus) => {
         return divIcon({
             className: 'custom-marker',
             html: getMarkerHtml(markerStyles[status].backgroundColor),
@@ -66,12 +72,16 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
         });
     }
 
-    const getClientStatus = (client: Client): keyof typeof markerStyles => {
-        // TODO: Check the status assignament process
-        if (orders.some(o => !o.attended && o.client === client._id)) { return 'inProgress' }
-        if (orders.some(o => o.attended && o.client === client._id)) { return 'attended' }
-        return 'default'
-    }
+    useEffect(() => {
+        if (map.current && latitude && longitude) {
+            const mapZoom = map.current?.getZoom()
+            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 10 ? mapZoom : 10)
+
+            query.delete('latitude')
+            query.delete('longitude')
+            setQuery(query)
+        }
+    }, [latitude, longitude, map, query, setQuery])
 
     return (
         <>
@@ -84,7 +94,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
                     {
                         mapType === 'roadmap' &&
                         <TileLayer
-                            attribution={`&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`}
+                            attribution={`&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors`}
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                     }
@@ -117,15 +127,16 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, orders 
                                     <Marker
                                         eventHandlers={{
                                             click: (event) => {
-                                                const mapZoom = map.current?.getZoom()
-                                                map.current?.flyTo(event.latlng, mapZoom && mapZoom >= 13 ? mapZoom : 13)
+                                                setSelectedClient(client);
+                                                setReturnUrl(`${location.pathname}${location.search}&latitude=${client.location.latitude}&longitude=${client.location.longitude}`)
+                                                navigate("/MapaClientes/DetallesCliente")
                                             }
                                         }}
                                         position={new LatLng(Number(client.location.latitude), Number(client.location.longitude))}
-                                        key={client._id} icon={getCustomIcon(getClientStatus(client))}>
-                                        <Popup>
-                                            {client.fullName || "Sin nombre"}
-                                        </Popup>
+                                        key={client._id} icon={getCustomIcon(client.status)}>
+                                        <Tooltip direction='top' offset={[0, -12]}>
+                                            {client.fullName || "Sin nombre"} {(!client.isClient && !client.isAgency) ? ('from' in client && client.from === "customer") ? "(De SmartApp)" : "(Cliente no registrado)" : ""}
+                                        </Tooltip>
                                     </Marker>
                                 )
                             })
