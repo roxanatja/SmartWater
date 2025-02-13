@@ -19,9 +19,10 @@ import { useGlobalContext } from "../../../SmartwaterContext";
 import { Order } from "../../../../type/Order/Order";
 import { ClientStatus } from "../../components/LeafletMap/constants";
 import FiltroClientesMapa from "./FiltroClientesMapa/FiltroClientesMapa";
+import { OpcionesMap } from "./OpcionesMap/OpcionesMap";
 
 const MapaClientes: React.FC = () => {
-  const { showFiltro, setShowFiltro, showModal, setShowModal } = useContext(MapaClientesContext);
+  const { showFiltro, setShowFiltro, showModal, setShowModal, selectedOption, setSelectedOption } = useContext(MapaClientesContext);
   const { setLoading } = useGlobalContext()
 
   const [clients, setClients] = useState<(Client & { status: ClientStatus })[]>([]);
@@ -110,7 +111,7 @@ const MapaClientes: React.FC = () => {
       let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => ({ ...client, status: getClientStatus(client, ords) }));
 
       if (ords) {
-        clientsWithStatus.push(...ords.filter(o => !o.client).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o) })))
+        clientsWithStatus.push(...ords.filter(o => !o.client && !o.attended).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o) })))
       }
 
       if (qd.text) {
@@ -182,7 +183,7 @@ const MapaClientes: React.FC = () => {
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         ></FiltroPaginado>
         <div className="MapaClientes w-full flex-1 pb-10">
-          <LeafletMap onAdd={() => setShowModal(true)} clients={clients} latitude={latitude} longitude={longitude} />
+          <LeafletMap onAdd={() => setSelectedOption(true)} clients={clients} latitude={latitude} longitude={longitude} />
           {/* <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} /> */}
         </div>
       </div>
@@ -202,6 +203,21 @@ const MapaClientes: React.FC = () => {
           Registrar Cliente
         </h2>
         <ClientForm zones={zones} isOpen={showModal} onCancel={() => setShowModal(false)} allClients={allClients} selectedClient={client} />
+      </Modal>
+
+      <Modal
+        isOpen={selectedOption}
+        onClose={() => {
+          setSelectedOption(false);
+        }}
+        className="w-3/12"
+      >
+        <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+          {/* Registrar Cliente */}
+        </h2>
+        <div className="p-6">
+          <OpcionesMap onClose={() => { setSelectedOption(false); }} />
+        </div>
       </Modal>
     </>
   );
