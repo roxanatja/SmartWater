@@ -153,7 +153,7 @@ const Inicio: FC = () => {
             porcentaje={calculatePercentage(totalIncomeMonth, totalIncome)}
           />
         </div>
-        <div className="sub-title">
+        <div className="sub-title mb-2">
           <span>Acciones rápidas</span>
         </div>
         <div className="Cuadros">

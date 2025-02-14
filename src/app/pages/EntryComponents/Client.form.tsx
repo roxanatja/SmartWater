@@ -1,10 +1,9 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "./Inputs";
 import { motion } from "framer-motion";
 import ImageUploadField from "./ImageUploadField";
 import GoogleMapWithSelection from "./GoogleInputMap";
-import { ClientesContext } from "../Contenido/Clientes/ClientesContext";
 import * as Yup from 'yup'
 import { ClientsApiConector } from "../../../api/classes";
 import { District, Zone } from "../../../type/City";
@@ -78,7 +77,7 @@ const ClientForm = ({
         (t) => (
           <div>
             <p className="mb-4 text-center text-[#888]">
-              Ya existe un cliente con este nombre ¿Deseas crear el proveedor con este nombre de todos modos?
+              Ya existe un cliente con este nombre ¿Deseas crear el cliente con este nombre de todos modos?
             </p>
             <div className="flex justify-center">
               <button
@@ -184,17 +183,6 @@ const ClientForm = ({
       const zon = zones.find(z => z._id === selectedZone)
       const dists = zon?.districts || []
       setDisti(dists)
-      // if (dists.length > 0) {
-      //   if (selectedClient._id === "") {
-      //     setValue('district', dists[0]._id, { shouldValidate: true })
-      //   } else {
-      //     // if (dists.some(d => d._id === selectedClient.district)) {
-      //     //   setValue('district', selectedClient.district, { shouldValidate: true })
-      //     // } else {
-      //     //   setValue('district', "null", { shouldValidate: true })
-      //     // }
-      //   }
-      // } else { setValue('district', "null", { shouldValidate: true }) }
     }
   }, [selectedZone, zones, setValue, selectedClient])
 
@@ -344,7 +332,7 @@ const ClientForm = ({
           {exists &&
             <span className="text-yellow-500 font-normal text-sm w-full flex gap-2 items-center mt-1">
               <i className="fa-solid fa-triangle-exclamation"></i>
-              Existe un proveedor con este nombre
+              Existe un cliente con este nombre
             </span>
           }
         </div>
@@ -436,17 +424,6 @@ const ClientForm = ({
           register={register}
           errors={errors.reference}
         />
-        {/* {selectedClient._id === "" && (
-          <div className="col-span-2 max-sm:col-span-1">
-            <Input
-              label="Enlace de ubicación"
-              name="linkAddress"
-              placeholder="(Opcional)"
-              register={register}
-              icon={<i className="fa-solid fa-location-dot"></i>}
-            />
-          </div>
-        )} */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -716,20 +693,6 @@ const ClientForm = ({
               </div>
             </div>
           </div>
-          {/* {date2 && (
-            <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
-              <Input
-                type="date"
-                label="Renovacion Promedio"
-                register={register}
-                isVisibleLable
-                className="w-full"
-                name="renewInDaysNumber"
-                errors={errors.renewInDaysNumber}
-                required={date2}
-              />
-            </div>
-          )} */}
         </motion.div>
       </div>
       <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">

@@ -47,8 +47,8 @@ const CuadroClientes = () => {
               <div className="grid grid-cols-4 w-full" key={item._id}>
                 <div className="perfil-cliente flex-1 col-span-2 overflow-hidden">
                   {
-                    item.storeImage ?
-                      <img src={item.storeImage || 'clientes-icon-blue.svg'} className="img-cliente" alt="Cliente" /> :
+                    item.clientImage ?
+                      <img src={item.clientImage || 'clientes-icon-blue.svg'} className="img-cliente" alt="Cliente" /> :
                       (
                         <div className="bg-blue_custom text-white relative px-3.5 py-1.5 rounded-full flex justify-center items-center">
                           <div className="opacity-0">.</div>

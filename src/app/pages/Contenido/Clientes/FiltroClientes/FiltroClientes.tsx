@@ -251,7 +251,7 @@ const FiltroClientes = ({
               setValue("withoutExpiredContract", false);
             }}
           />
-          <img src="/ConContrato.svg" alt="" />
+          <img src="/with-loans.svg" alt="" />
           <label htmlFor="check1" className="text-sm" >
             Con préstamo
           </label>
@@ -363,7 +363,7 @@ const FiltroClientes = ({
               setValue("withExpiredContract", false);
             }}
           />
-          <img src="/SinContrato.svg" alt="" />
+          <img src="/without-loans.svg" alt="" />
           <label htmlFor="check2" className="text-sm" >
             Sin préstamo
           </label>
