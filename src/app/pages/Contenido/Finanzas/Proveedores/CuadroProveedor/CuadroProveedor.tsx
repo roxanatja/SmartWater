@@ -130,16 +130,30 @@ const CuadroProveedor = ({ provider }: { provider: Providers }) => {
         </div>
         <div className="w-[calc(100%_-_30px)] flex flex-col gap-2 text-sm">
           <div className="flex gap-2">
-            <span className="font-bold">Correo:</span>
+            <span className="">Correo:</span>
             <span className="text-blue_custom"><a href={`mailto:${provider.email}`}>{provider.email}</a></span>
           </div>
           <div className="flex gap-2">
-            <span className="font-bold">Dirección:</span>
+            <span className="">Dirección:</span>
             <span className="text-blue_custom">{provider.address}</span>
           </div>
           <div className="flex gap-2">
-            <span className="font-bold">NIT:</span>
+            <span className="">NIT:</span>
             <span className="text-blue_custom">{provider.NIT}</span>
+          </div>
+
+          <div className="flex items-center justify-end w-full">
+            <div className="infoClientes-ventas relative z-10">
+              <span className="text-blue_custom">
+                Saldo por pagar Bs.
+              </span>
+              <div className="infoClientes-moneda bg-blue_custom"              >
+                <img src="/Moneda-icon.svg" alt="" />
+                <div>
+                  <span>{0} Bs.</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div >

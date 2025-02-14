@@ -639,7 +639,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
   return (
     <>
-      <div className="flex justify-center flex-col pt-10 w-full ">
+      <div className="flex justify-center flex-col pt-4 w-full ">
         <div
           style={{ width: "100%", display: "flex" }}
           className="max-sm:flex-col"
@@ -802,7 +802,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
             </div>
           </div>
           {infoPedidos && (
-            <div className={`ml-6 infoPedidos-filtro bg-blocks dark:border-blocks overflow-auto text-xs ${infoPedidosClass ?? "mb-8"}`}>
+            <div className={`ml-6 infoPedidos-filtro bg-blocks dark:border-blocks overflow-auto text-xs ${infoPedidosClass ?? "mb-6"}`}>
               {
                 (infoPedidosData && infoPedidosData.length > 0) ?
                   <>
@@ -933,7 +933,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
         {
           !noContent &&
           <div
-            className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[140px]"
+            className={`${!resultadosPrestamo && "overflow-y-auto max-h-[70vh] pb-[50px]"
               } `}
           >
             {children}
