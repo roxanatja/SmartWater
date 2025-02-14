@@ -24,14 +24,16 @@ import { NumericOptionScrooll } from "../components/OptionScrooll/NumericOptionS
 const RegisterPedidoForm = ({
   isNoClient,
   selectedClient,
-  selectedOrder
+  selectedOrder,
+  fromMap
 }: {
   isNoClient?: boolean;
+  fromMap?: boolean;
   selectedClient: Client;
   selectedOrder?: Order;
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [mapview, setMapview] = useState(true);
+  const [mapview, setMapview] = useState(isNoClient && selectedClient._id !== "");
   const [active, setActive] = useState(false);
   const [editar, setEditar] = useState<{
     quantity: number;
@@ -65,7 +67,16 @@ const RegisterPedidoForm = ({
     watch, reset,
     setValue, formState: { isValid, errors }
   } = useForm<IOrderBody['data']>({
-    defaultValues: {
+    defaultValues: isNoClient && selectedClient ? {
+      detail: [{ product: "", quantity: 0 }],
+      deliverDate: "",
+      clientNotRegistered: {
+        address: selectedClient.address,
+        fullName: selectedClient.fullName,
+        location: selectedClient.location,
+        phoneNumber: selectedClient.phoneNumber,
+      },
+    } : {
       detail: [{ product: "", quantity: 0 }],
       deliverDate: "",
     },
@@ -90,16 +101,6 @@ const RegisterPedidoForm = ({
       getCitys();
     }
   }, [getCitys, isNoClient]);
-
-  useEffect(() => {
-    if (isNoClient && selectedClient) {
-      setValue('clientNotRegistered.address', selectedClient.address, { shouldValidate: true });
-      setValue('clientNotRegistered.fullName', selectedClient.fullName, { shouldValidate: true });
-      setValue('clientNotRegistered.location.longitude', selectedClient.location?.longitude, { shouldValidate: true });
-      setValue('clientNotRegistered.location.latitude', selectedClient.location?.latitude, { shouldValidate: true });
-      setValue('clientNotRegistered.phoneNumber', selectedClient.phoneNumber, { shouldValidate: true });
-    }
-  }, [isNoClient, selectedClient, setValue])
 
   const handleAddProduct = () => {
     const product = watch("detail")[0].product;
@@ -162,7 +163,10 @@ const RegisterPedidoForm = ({
           user: userData?._id || "",
           deliverDate: data.deliverDate.replace(/\//g, "-"),
           clientNotRegistered: {
-            ...data.clientNotRegistered,
+            address: data.clientNotRegistered.address,
+            fullName: data.clientNotRegistered.fullName,
+            location: data.clientNotRegistered.location,
+            phoneNumber: data.clientNotRegistered.phoneNumber,
             cityId: userData?.city.id || "",
           },
         };
@@ -306,7 +310,6 @@ const RegisterPedidoForm = ({
                     icon={<i className={`fa-solid fa-user text-2xl ${errors?.clientNotRegistered?.fullName && "text-red-500"}`}></i>}
                     register={register}
                     errors={errors.clientNotRegistered?.fullName}
-                    required
                   />
                   <Input
                     label="Teléfono"
@@ -314,7 +317,6 @@ const RegisterPedidoForm = ({
                     icon={<i className={`fa-solid fa-phone text-2xl ${errors?.clientNotRegistered?.phoneNumber && "text-red-500"}`}></i>}
                     register={register}
                     errors={errors.clientNotRegistered?.phoneNumber}
-                    required
                     validateAmount={(value: string) => { if (value && !isValidPhoneNumber(value, "BO")) { return "Número de teléfono incorrecto" } return true }}
                   />
                 </div>
@@ -342,6 +344,9 @@ const RegisterPedidoForm = ({
                       setValue("clientNotRegistered.location.longitude", `${coordinates.lng}`);
                     }}
                   />
+
+                  <input type="text" {...register('clientNotRegistered.location.latitude', { required: true })} className="bg-transparent" />
+                  <input type="text" {...register('clientNotRegistered.location.longitude', { required: true })} className="bg-transparent" />
                   <button
                     type="button"
                     onClick={() => setMapview(!mapview)}
@@ -426,7 +431,6 @@ const RegisterPedidoForm = ({
                             )
                             : 0;
 
-                          console.log(indepro)
                           setEditar({
                             quantity: Number(product.quantity) - 1,
                             item: indepro,
@@ -484,10 +488,10 @@ const RegisterPedidoForm = ({
               >
                 <label className="text-blue_custom font-semibold">Distribuidor</label>
                 <select
-                  {...register("distributorRedirectId")}
+                  {...register("distributorRedirectId", { required: fromMap ? "Seleccione un distribuidor" : false })}
                   className="pl-8 py-2.5 rounded-none font-pricedown bg-main-background text-blue_custom font-medium outline-0 border-b-2 border-blue_custom focus:outline-0"
                 >
-                  <option className="text-font-color" value={"null"}>Seleccione un distribuidor</option>
+                  <option className="text-font-color" value={""}>Seleccione un distribuidor</option>
                   {dist.length > 0 &&
                     dist.map((city, index) => (
                       <option value={city._id} key={index} className="text-font-color">

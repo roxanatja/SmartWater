@@ -6,12 +6,12 @@ import { useContext, useEffect } from "react";
 import { ClientesContext, client } from "../ClientesContext";
 
 const RegistrarPedido = () => {
-  const { setSelectedClient } = useContext(ClientesContext);
+  const { selectedClient, setSelectedClient } = useContext(ClientesContext);
   const navigate = useNavigate();
+ 
   const handleClick = () => {
     setSelectedClient(client);
   };
-  const { selectedClient } = useContext(ClientesContext);
 
   useEffect(() => {
     if (selectedClient._id === "") {
