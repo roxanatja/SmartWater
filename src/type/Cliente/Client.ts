@@ -44,6 +44,8 @@ export interface Client {
   credit: number;
   lastPostponed?: string;
   associatedOrder?: string;
+  numberOfOrders?: number;
+  numberOfLoans?: number;
 }
 
 export interface ReportClient {

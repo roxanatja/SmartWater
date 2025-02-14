@@ -70,13 +70,13 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
         <div className="flex justify-between gap-4 w-full">
           <div className="flex justify gap-2 items-center">
             {
-              client.storeImage ?
+              client.clientImage ?
                 <img
-                  src={client?.storeImage || ""}
+                  src={client?.clientImage || ""}
                   className="w-8 h-8 rounded-full"
                   alt="storeImage"
                 /> :
-                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center relative">
                   <div className="opacity-0">.</div>
                   <p className="absolute font-extrabold whitespace-nowrap">
                     {client.fullName?.[0] || "S"}
@@ -90,7 +90,7 @@ const CobroMiniModal: React.FC<CobroMiniModalProps> = ({ client, onClose }) => {
               <span className="text-blue_custom">Saldo a cobrar:</span>
             </div>
             <div className="infoClientes-moneda bg-blue_custom">
-              <img src="./Moneda-icon.svg" alt="" />
+              <img src="/Moneda-icon.svg" alt="" />
               <div>{client.credit} Bs.</div>
             </div>
           </div>

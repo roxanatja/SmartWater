@@ -75,7 +75,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
     useEffect(() => {
         if (map.current && latitude && longitude) {
             const mapZoom = map.current?.getZoom()
-            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 10 ? mapZoom : 10)
+            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 14 ? mapZoom : 14)
 
             query.delete('latitude')
             query.delete('longitude')
@@ -119,8 +119,14 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                                 minZoom={2}
                                 maxZoom={17}
                                 subdomains={['a', 'b', 'c', 'd']}
+                                attribution={`&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`}
+                                url='https://tiles.stadiamaps.com/tiles/stamen_toner_labels/{z}/{x}/{y}{r}.png' />
+                            {/* <TileLayer
+                                minZoom={2}
+                                maxZoom={17}
+                                subdomains={['a', 'b', 'c', 'd']}
                                 attribution={`&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`}
-                                url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png' />
+                                url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png' /> */}
                         </>
                     }
                     {
@@ -175,7 +181,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                                     console.error(error);
                                 }
 
-                                map.current.flyTo(initialPosition, 13)
+                                map.current.flyTo(initialPosition, 17)
                             } else {
                                 toast.error("Instancia del mapa no inicializada")
                             }

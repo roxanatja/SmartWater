@@ -4,7 +4,7 @@ import { PageTitle } from "../../components/PageTitle/PageTitle";
 import "./MapaClientes.css";
 import { MapaClientesContext } from "./MapaClientesContext";
 import { Client } from "../../../../type/Cliente/Client";
-import { ClientsApiConector, OrdersApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
+import { ClientsApiConector, LoansApiConector, OrdersApiConector, UsersApiConector, ZonesApiConector } from "../../../../api/classes";
 import { IClientGetParams } from "../../../../api/types/clients";
 import Modal from "../../EntryComponents/Modal";
 import { User } from "../../../../type/User";
@@ -22,7 +22,7 @@ import FiltroClientesMapa from "./FiltroClientesMapa/FiltroClientesMapa";
 import { OpcionesMap } from "./OpcionesMap/OpcionesMap";
 
 const MapaClientes: React.FC = () => {
-  const { showFiltro, setShowFiltro, showModal, setShowModal, selectedOption, setSelectedOption } = useContext(MapaClientesContext);
+  const { showFiltro, setShowFiltro, showModal, setShowModal, selectedOption, setSelectedOption, zones, setZones, allClients, setAllClients } = useContext(MapaClientesContext);
   const { setLoading } = useGlobalContext()
 
   const [clients, setClients] = useState<(Client & { status: ClientStatus })[]>([]);
@@ -32,8 +32,6 @@ const MapaClientes: React.FC = () => {
   const [longitude, setLongitude] = useState<number | undefined>(undefined);
 
   const [distribuidores, setDistribuidores] = useState<User[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [allClients, setAllClients] = useState<Client[]>([]);
 
   const filterRef = useRef<IFiltroPaginadoReference>(null)
   const [savedFilters, setSavedFilters] = useState<IClientGetParams['filters'] & { status?: ClientStatus[] }>({});
@@ -84,6 +82,11 @@ const MapaClientes: React.FC = () => {
     return 'default'
   }
 
+  const getClientNumberOfActiveOrders = (client: Client, orders: Order[]): number => {
+    const ords = orders.filter(o => !o.attended && moment(o.attended).isSame(moment(), 'day') && o.client === client._id)
+    return ords.length
+  }
+
   const getClientStatusFromOrder = (o: Order): ClientStatus => {
     if (!o.attended) { return 'inProgress' }
     if (o.attended && moment(o.attended).isSame(moment(), 'day')) { return 'attended' }
@@ -95,6 +98,8 @@ const MapaClientes: React.FC = () => {
       setLoading(true)
       const ordersData = await OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
       const ords = ordersData?.data || [];
+      const loansData = await LoansApiConector.get({ pagination: { page: 1, pageSize: 30000 } });
+      const loans = loansData?.data || [];
 
       const qd = { ...queryData }
       const extraFilters: IClientGetParams['filters'] = {}
@@ -108,10 +113,18 @@ const MapaClientes: React.FC = () => {
 
       const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...qd.filters, ...extraFilters } });
       let clientsToSet = clientsData?.data || [];
-      let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => ({ ...client, status: getClientStatus(client, ords) }));
+
+      let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => {
+        const status = getClientStatus(client, ords)
+        if (status === 'inProgress') {
+          return { ...client, status, numberOfOrders: getClientNumberOfActiveOrders(client, ords), numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
+        } else {
+          return { ...client, status, numberOfOrders: 1, numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
+        }
+      });
 
       if (ords) {
-        clientsWithStatus.push(...ords.filter(o => !o.client && !o.attended).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o) })))
+        clientsWithStatus.push(...ords.filter(o => !o.client && !o.attended).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o), numberOfOrders: 1 })))
       }
 
       if (qd.text) {
@@ -125,7 +138,6 @@ const MapaClientes: React.FC = () => {
       if (qd.status) {
         clientsWithStatus = clientsWithStatus.filter((client) => qd.status!.includes(client.status))
       }
-
       setClients(clientsWithStatus);
 
       setLoading(false)

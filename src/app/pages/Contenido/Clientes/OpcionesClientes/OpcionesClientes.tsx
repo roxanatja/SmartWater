@@ -56,21 +56,9 @@ const OpcionesClientes = ({ onClose }: { onClose: () => void }) => {
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          <svg
-            style={{ marginRight: "11px" }}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="19"
-            viewBox="0 0 24 19"
-            fill="none"
-          >
-            <path
-              d="M2 2.22021H14.7746C18.5985 2.22021 21.8457 5.3905 21.9946 9.27156C22.1524 13.3726 18.8152 16.887 14.7746 16.887H5.33225"
-              stroke="#1A3D7D"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+          <svg style={{ marginRight: "11px" }} width="24" height="23" viewBox="0 0 24 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.88892 2.61084L2 5.9442L5.88892 9.83313" stroke="#1A3D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 5.94434H14.7746C18.5985 5.94434 21.8457 9.06659 21.9946 12.8888C22.1524 16.9278 18.8152 20.3889 14.7746 20.3889H5.33225" stroke="#1A3D7D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           <span className="text-blue_custom">Registrar devolución parcial</span>
         </div>

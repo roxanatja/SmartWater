@@ -19,6 +19,7 @@ import { client } from "../Clientes/ClientesContext";
 import { User } from "../../../../type/User";
 import RegistrarClientePedido from "./RegistrarCliente/RegistrarClientePedido";
 import moment from "moment";
+import { Client } from "../../../../type/Cliente/Client";
 
 const Pedidos: FC = () => {
   const params = useParams()
@@ -26,7 +27,7 @@ const Pedidos: FC = () => {
 
   const { section } = params
 
-  const { showFiltro, setShowFiltro, showModal, setShowModal, setSelectedClient, selectedClient, showMiniModal, setShowMiniModal } = useContext(PedidosContext);
+  const { showFiltro, setShowFiltro, showModal, setShowModal, setSelectedClient, selectedClient, showMiniModal, setShowMiniModal, selectedOrder } = useContext(PedidosContext);
   const { setLoading } = useGlobalContext();
 
   const [currentData, setCurrentData] = useState<Array<Order>>([]);
@@ -34,6 +35,7 @@ const Pedidos: FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
   const [dists, setDists] = useState<User[]>([]);
+  const [allClients, setAllClients] = useState<Client[]>([]);
 
   const itemsPerPage: number = 12;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -161,6 +163,7 @@ const Pedidos: FC = () => {
 
   useEffect(() => {
     const fetchZones = async () => {
+      setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
       setZones((await ZonesApiConector.get({}))?.data || []);
       setProducts((await ProductsApiConector.get({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
       setDists((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
@@ -292,8 +295,11 @@ const Pedidos: FC = () => {
             setShowMiniModal(false);
             setSelectedClient(client);
           }}
+            allClients={allClients}
             isOpen={showMiniModal && selectedClient._id !== ""}
             zones={zones}
+            selectedClient={selectedClient}
+            associatedOrder={selectedOrder._id}
           />
         </div>
       </Modal >

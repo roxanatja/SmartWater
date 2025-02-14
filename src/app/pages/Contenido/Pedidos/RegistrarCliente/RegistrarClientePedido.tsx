@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { District, Zone } from '../../../../../type/City';
 import { AuthService } from '../../../../../api/services/AuthService';
-import { PedidosContext } from '../PedidosContext';
 import { IClientForm } from '../../../../../api/types/clients';
 import { formatNumber, isValidPhoneNumber } from 'libphonenumber-js';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -12,19 +11,26 @@ import { motion } from 'framer-motion';
 import Input from '../../../EntryComponents/Inputs';
 import ImageUploadField from '../../../EntryComponents/ImageUploadField';
 import GoogleMapWithSelection from '../../../EntryComponents/GoogleInputMap';
+import { Client } from '../../../../../type/Cliente/Client';
 
 const RegistrarClientePedido = ({
     isOpen,
     onCancel,
-    zones
+    allClients,
+    zones,
+    associatedOrder,
+    selectedClient
 }: {
     onCancel?: () => void;
     isOpen: boolean;
     zones: Zone[];
+    allClients: Client[];
+    selectedClient: Client;
+    associatedOrder: string;
 }) => {
     const user = AuthService.getUser()
     const [isJeshua, setIsJeshua] = useState<boolean>(false)
-    const { selectedClient, selectedOrder } = useContext(PedidosContext);
+    const [active, setActive] = useState(false);
 
     const [disti, setDisti] = useState<District[]>(selectedClient._id !== "" ? zones.find(z => z._id === selectedClient.zone)?.districts || [] : []);
     const [date, setDate] = useState(true);
@@ -37,6 +43,7 @@ const RegistrarClientePedido = ({
         {
             defaultValues: {
                 ...selectedClient,
+                fullName: (!selectedClient || selectedClient.fullName === "Sin nombre") ? "" : selectedClient.fullName,
                 zone: selectedClient.zone, district: selectedClient.district,
                 phoneLandLine: selectedClient.phoneLandLine ? formatNumber(selectedClient.phoneLandLine, "BO", "NATIONAL").replaceAll(" ", "") : undefined,
                 phoneNumber: formatNumber(selectedClient.phoneNumber, "BO", "NATIONAL").replaceAll(" ", ""),
@@ -65,6 +72,49 @@ const RegistrarClientePedido = ({
 
 
     const onSubmit: SubmitHandler<IClientForm> = async (data) => {
+        if (exists) {
+            toast.error(
+                (t) => (
+                    <div>
+                        <p className="mb-4 text-center text-[#888]">
+                            Ya existe un cliente con este nombre ¿Deseas crear el cliente con este nombre de todos modos?
+                        </p>
+                        <div className="flex justify-center">
+                            <button
+                                className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                                onClick={() => { toast.dismiss(t.id); setActive(false) }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                                onClick={async () => {
+                                    toast.dismiss(t.id);
+                                    saveClient(data)
+                                }}
+                            >
+                                Proceder
+                            </button>
+                        </div>
+                    </div>
+                ),
+                {
+                    className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+                    icon: null,
+                    position: "top-center",
+                    duration: 2 * 60000
+                }
+            );
+        } else {
+            saveClient(data)
+        }
+    }
+
+    const saveClient = async (data: IClientForm) => {
+        if (!data.isAgency && !data.isClient) {
+            data.isClient = true
+        }
+
         let res = await ClientsApiConector.registerClient({
             data: {
                 address: data.address,
@@ -94,8 +144,7 @@ const RegistrarClientePedido = ({
         })
 
         if (res) {
-
-            const associate = await OrdersApiConector.convertRegistered({ data: { client: res._id }, orderId: selectedOrder._id })
+            const associate = await OrdersApiConector.convertRegistered({ data: { client: res._id }, orderId: associatedOrder })
 
             if (associate) {
                 toast.success(`Cliente registrado correctamente`);
@@ -181,6 +230,12 @@ const RegistrarClientePedido = ({
         return responseData;
     };
 
+    const name = watch('fullName')
+    const exists = useMemo<boolean>(() => {
+        return !!name && allClients.some(p => p.fullName && p.fullName.trim().toLowerCase() === name.trim().toLowerCase() && p._id !== selectedClient._id)
+    }, [name, allClients, selectedClient])
+
+
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
@@ -247,13 +302,21 @@ const RegistrarClientePedido = ({
             </motion.div>
 
             <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 gap-4 w-full px-6">
-                <Input
-                    label="Nombre"
-                    name="fullName"
-                    register={register}
-                    errors={errors.fullName}
-                    required={!isJeshua}
-                />
+                <div className="flex flex-col">
+                    <Input
+                        label="Nombre"
+                        name="fullName"
+                        register={register}
+                        errors={errors.fullName}
+                        required={!isJeshua}
+                    />
+                    {exists &&
+                        <span className="text-yellow-500 font-normal text-sm w-full flex gap-2 items-center mt-1">
+                            <i className="fa-solid fa-triangle-exclamation"></i>
+                            Existe un cliente con este nombre
+                        </span>
+                    }
+                </div>
                 <Input
                     label="Datos de Factura"
                     name="billingInfo.name"
@@ -342,17 +405,6 @@ const RegistrarClientePedido = ({
                     register={register}
                     errors={errors.reference}
                 />
-                {/* {selectedClient._id === "" && (
-            <div className="col-span-2 max-sm:col-span-1">
-              <Input
-                label="Enlace de ubicación"
-                name="linkAddress"
-                placeholder="(Opcional)"
-                register={register}
-                icon={<i className="fa-solid fa-location-dot"></i>}
-              />
-            </div>
-          )} */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -488,6 +540,10 @@ const RegistrarClientePedido = ({
                             setValue("location.longitude", `${coordinates.lng}`);
                         }}
                     />
+
+                    <input type="hidden" {...register('location.latitude', { required: true })} className="bg-transparent" />
+                    <input type="hidden" {...register('location.longitude', { required: true })} className="bg-transparent" />
+
                     <button
                         type="button"
                         onClick={() => setMapinteration(!mapinteration)}
@@ -495,6 +551,14 @@ const RegistrarClientePedido = ({
                     >
                         {mapinteration ? "Editar" : "Bloquear"}
                     </button>
+
+                    {
+                        (errors.location?.latitude || errors.location?.longitude) &&
+                        <span className="text-red-500 font-normal text-sm">
+                            <i className="fa-solid fa-triangle-exclamation"></i>{" "}
+                            Ubicación no definida
+                        </span>
+                    }
                 </div>
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -531,6 +595,7 @@ const RegistrarClientePedido = ({
                                         className="w-full"
                                         errors={errors.renewInDays}
                                         required={date}
+                                        validateAmount={(val: number) => date ? val <= 0 ? "Indique un valor" : true : true}
                                     />
                                 </div>
                             ) : <p
@@ -609,20 +674,6 @@ const RegistrarClientePedido = ({
                             </div>
                         </div>
                     </div>
-                    {/* {date2 && (
-              <div className="absolute w-44 top-0 -translate-y-0.5 bg-white left-9 z-10">
-                <Input
-                  type="date"
-                  label="Renovacion Promedio"
-                  register={register}
-                  isVisibleLable
-                  className="w-full"
-                  name="renewInDaysNumber"
-                  errors={errors.renewInDaysNumber}
-                  required={date2}
-                />
-              </div>
-            )} */}
                 </motion.div>
             </div>
             <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
@@ -637,7 +688,13 @@ const RegistrarClientePedido = ({
                         type="submit"
                         className="w-full outline outline-2 outline-blue-500 bg-blue-500 py-2 rounded-full text-white font-black shadow-xl truncate"
                     >
-                        Registrar cliente
+                        {
+                            active ?
+                                <i className="fa-solid fa-spinner animate-spin"></i> :
+                                <span>
+                                    Registrar cliente
+                                </span>
+                        }
                     </button>
                 </div>
             </div>

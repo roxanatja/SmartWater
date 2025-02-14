@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import { ClientStatus } from "../../components/LeafletMap/constants";
+import { Zone } from "../../../../type/City";
 
 type MapaClientesContextType = {
   showModal: boolean;
@@ -13,6 +14,11 @@ type MapaClientesContextType = {
   setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
   selectedClient: Client & { status: ClientStatus };
   setSelectedClient: React.Dispatch<React.SetStateAction<Client & { status: ClientStatus }>>;
+
+  allClients: Client[];
+  setAllClients: React.Dispatch<React.SetStateAction<Client[]>>;
+  zones: Zone[];
+  setZones: React.Dispatch<React.SetStateAction<Zone[]>>;
 };
 
 export const MapaClientesContext = createContext<MapaClientesContextType>(
@@ -65,6 +71,8 @@ export const MapaClientesProvider = ({ children }: any) => {
   const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<boolean>(false);
   const [showFiltro, setShowFiltro] = useState<boolean>(false);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [allClients, setAllClients] = useState<Client[]>([]);
 
   const [selectedClient, setSelectedClient] = useState<Client & { status: ClientStatus }>(clientWithStatus);
 
@@ -81,6 +89,10 @@ export const MapaClientesProvider = ({ children }: any) => {
         setShowFiltro,
         selectedClient,
         setSelectedClient,
+        zones,
+        setZones,
+        allClients,
+        setAllClients
       }}
     >
       {children}
