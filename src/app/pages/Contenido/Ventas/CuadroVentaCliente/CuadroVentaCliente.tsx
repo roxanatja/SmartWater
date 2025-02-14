@@ -116,7 +116,7 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
   }, []);
 
   return (
-    <div className="CuadroVentaCliente-container relative bg-blocks dark:border-blocks w-full">
+    <div className="CuadroVentaCliente-container relative bg-blocks dark:border-blocks w-full h-fit">
       <div className="p-4">
         <div className={`flex flex-col gap-3 pb-2 ${!isCobro && "w-[calc(100%_-_30px)]"}`}>
           <div className="flex items-center justify-between">
@@ -182,11 +182,11 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
           }
         </div>
         <div className="CuadroVentaCliente-productos w-[calc(100%_-_30px)]">
-          <div className="w-full min-h-24 max-h-28 overflow-y-auto mt-4 relative">
-            <div className="grid grid-cols-5 truncate mb-2 text-blue_custom sticky top-0 bg-blocks">
+          <div className="w-full min-h-16 max-h-28 overflow-y-auto mt-4 relative">
+            <div className="grid grid-cols-5 mb-2 text-blue_custom sticky top-0 bg-blocks">
               <p className="col-span-3 text-sm">Productos</p>
-              <p className="w-full text-center text-sm">Cantidad</p>
-              <p className="w-full text-end pr-1 text-sm">Precio</p>
+              <p className="w-full overflow-hidden text-ellipsis text-center text-sm">Cantidad</p>
+              <p className="w-full overflow-hidden text-ellipsis text-end pr-1 text-sm">Precio</p>
             </div>
             <div className="flex w-full gap-2 justify-center items-center">
               <div className="flex flex-col justify-center items-start gap-4 w-full">
@@ -213,9 +213,9 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
       </div>
 
       <div className="PedidosCurso-Nota flex gap-3 border-b border-blue_bright/30 pb-2 relative mx-2 mt-4 w-[calc(100%_-_1rem)]">
-        <i className="fa-solid fa-message text-xl text-blue_custom"></i>
+        <i className="fa-solid fa-message text-lg text-blue_custom"></i>
 
-        <div>
+        <div className="text-sm">
           {sale.comment || "Sin comentarios"}
         </div> {/* Comentario del pedido */}
 
