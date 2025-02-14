@@ -93,29 +93,43 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                     zoom={7} style={{ width: "100%", height: "100%" }} zoomControl={false}>
                     {
                         mapType === 'roadmap' &&
+                        // <TileLayer
+                        //     minZoom={2}
+                        //     maxZoom={17}
+                        //     attribution={`&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors`}
+                        //     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        // />
                         <TileLayer
                             minZoom={2}
                             maxZoom={17}
-                            attribution={`&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors`}
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution={`Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012`}
+                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
                         />
                     }
                     {
                         mapType === 'satellite' &&
-                        <TileLayer
-                            minZoom={2}
-                            maxZoom={17}
-                            attribution={`Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community`}
-                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                        />
+                        <>
+                            <TileLayer
+                                minZoom={2}
+                                maxZoom={17}
+                                attribution={`Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community`}
+                                url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                            />
+                            <TileLayer
+                                minZoom={2}
+                                maxZoom={17}
+                                subdomains={['a', 'b', 'c', 'd']}
+                                attribution={`&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>`}
+                                url='https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png' />
+                        </>
                     }
                     {
                         mapType === 'terrain' &&
                         <TileLayer
                             minZoom={2}
                             maxZoom={17}
-                            attribution={`Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012`}
-                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+                            attribution={`Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community`}
+                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
                         />
                     }
 
