@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import InventariosLayout from '../InventariosLayout/InventariosLayout'
 import { InventariosFisicosContext } from './InventariosFisicosProvider';
 import { User } from '../../../../../type/User';
@@ -7,27 +7,69 @@ import Modal from '../../../EntryComponents/Modal';
 import FiltrosReportesInventarios from './Filtros/FiltrosReportesInventarios';
 import TableFisicosReportes from './Tables/TableFisicosReportes';
 import { fisicos_saldos } from '../mock-data';
+import { MatchedElementRoot } from '../../../../../type/Kardex';
+import { PhysiscalGeneratedReport } from '../../../../../type/PhysicalInventory';
+import { PhysicalInventoryApiConector } from '../../../../../api/classes/physical-inventory';
+import { useGlobalContext } from '../../../../SmartwaterContext';
+import moment from 'moment';
 
 const ReportesInventarios = () => {
     const { setShowFiltro, showFiltro } = useContext(InventariosFisicosContext)
+    const { setLoading } = useGlobalContext()
 
-    const itemsPerPage: number = 12;
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalPage, setTotalPage] = useState<number>(0);
-    const [total, setTotal] = useState<number>(0);
+    const [currentData, setCurrentData] = useState<PhysiscalGeneratedReport[]>([])
+    const [elements, setElements] = useState<MatchedElementRoot[]>([]);
 
     const [savedFilters, setSavedFilters] = useState<any>({})
 
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
+        PhysicalInventoryApiConector.getElements().then(res => setElements(res?.elements || []));
         UsersApiConector.get({ filters: { desactivated: false }, pagination: { page: 1, pageSize: 30000 } }).then(res => setDistribuidores(res?.data || []))
     }, [])
 
     const handleFilterChange = (filters: any) => {
-        setCurrentPage(1);
         setSavedFilters(filters);
     };
+
+    const getData = useCallback(async () => {
+        setLoading(true)
+
+        const filters = savedFilters ? { ...savedFilters } : {}
+        if (!filters.endDate) {
+            filters.endDate = moment().format("YYYY-MM-DD")
+        }
+
+        if (!filters.initialDate) {
+            filters.initialDate = "2020-01-01"
+        }
+
+        const promises: Promise<PhysiscalGeneratedReport[] | { message: string; } | null>[] = []
+
+        if (filters.user) {
+            for (const dist of filters.user.split(',')) {
+                promises.push(PhysicalInventoryApiConector.get({ type: 'generated-reports', filters: { ...filters, user: dist } }))
+            }
+        } else {
+            promises.push(PhysicalInventoryApiConector.get({ type: 'generated-reports', filters }))
+        }
+
+        const responses = await Promise.all(promises)
+        const array: PhysiscalGeneratedReport[] = []
+
+        responses.forEach(res => {
+            const results = res ? 'message' in res ? [] : res : []
+            array.push(...results)
+        })
+
+        setCurrentData(array.sort((a, b) => moment(b.registerDate).diff(moment(a.registerDate))))
+        setLoading(false)
+    }, [savedFilters, setLoading])
+
+    useEffect(() => {
+        getData()
+    }, [getData])
 
     return (
         <>
@@ -46,7 +88,7 @@ const ReportesInventarios = () => {
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
                 ]} add onAdd={() => { alert("OnAdd") }}>
-                <TableFisicosReportes data={fisicos_saldos} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                <TableFisicosReportes data={currentData} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' distribuidores={distribuidores} />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>

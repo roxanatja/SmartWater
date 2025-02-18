@@ -10,16 +10,16 @@ export interface IItemsGetParams extends Search {
 
 export interface IPhysicalGetParams extends FilteredSearch {
     filters?: {
-        intialDate?: string;
+        initialDate?: string;
         endDate?: string;
         user?: string;
     }
 }
 
 export type PhysicalGetReturnMap = {
-    'initial-balance': { balances: PhysicalInitialBalace[] | { message: string } };
-    'prev-report': { balances: PhysiscalPreviousReport[] | { message: string } };
-    'generated-report': { balances: PhysiscalGeneratedReport[] | { message: string } };
+    'initial-balance': PhysicalInitialBalace[] | { message: string };
+    'prev-report': PhysiscalPreviousReport[] | { message: string };
+    'generated-reports': PhysiscalGeneratedReport[] | { message: string };
 }
 
 export interface IInitialBalanceBody {

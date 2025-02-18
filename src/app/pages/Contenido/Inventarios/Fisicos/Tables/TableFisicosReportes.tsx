@@ -4,13 +4,16 @@ import { InventariosFisicosContext } from '../InventariosFisicosProvider'
 import toast from 'react-hot-toast'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
+import { PhysiscalGeneratedReport } from '../../../../../../type/PhysicalInventory'
+import { User } from '../../../../../../type/User'
 
 interface Props {
-    data: IMockInventories[];
+    data: PhysiscalGeneratedReport[];
+    distribuidores: User[];
     className?: string;
 }
 
-const TableFisicosReportes = ({ data, className }: Props) => {
+const TableFisicosReportes = ({ data, className, distribuidores }: Props) => {
     const { setSelectedInvetario, setSelectedOption } = useContext(InventariosFisicosContext)
 
     const deleteRegistry = useCallback((id: string) => {
@@ -72,34 +75,37 @@ const TableFisicosReportes = ({ data, className }: Props) => {
     }, [])
 
 
-    const columns: TableColumn<IMockInventories>[] = useMemo<TableColumn<IMockInventories>[]>(() => [
+    const columns: TableColumn<PhysiscalGeneratedReport>[] = useMemo<TableColumn<PhysiscalGeneratedReport>[]>(() => [
         {
-            name: "Del",
+            name: "Fecha",
             width: "17.5%",
-            selector: row => (row.initialDate ? formatDateTime(row.initialDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+            selector: row => (row.registerDate ? formatDateTime(row.registerDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
-        {
-            name: "Al",
-            width: "17.5%",
-            selector: row => (row.finalDate ? formatDateTime(row.finalDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
-        },
+        // {
+        //     name: "Al",
+        //     width: "17.5%",
+        //     selector: row => (row.finalDate ? formatDateTime(row.finalDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+        // },
         {
             name: "Usuario",
             width: "25%",
-            selector: row => row.name || "Distribuidor desconocido",
+            selector: row => {
+                const dist = distribuidores.find(u => u._id === row.user)
+                return `${dist?.fullName || "Distribuidor desconocido"} ${dist?.role === 'admin' ? "(Admistrador)" : ""}`
+            },
         },
-        {
-            name: "Sistema",
-            selector: row => row.system.toLocaleString(),
-        },
-        {
-            name: "Diferencia",
-            selector: row => row.difference.toLocaleString(),
-        },
-        {
-            name: "Estado",
-            selector: row => row.status ? "Generado" : "Generado",
-        },
+        // {
+        //     name: "Sistema",
+        //     selector: row => row.system.toLocaleString(),
+        // },
+        // {
+        //     name: "Diferencia",
+        //     selector: row => row.difference.toLocaleString(),
+        // },
+        // {
+        //     name: "Estado",
+        //     selector: row => row.status ? "Generado" : "Generado",
+        // },
         {
             name: "",
             width: "7%",

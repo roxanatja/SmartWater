@@ -1,3 +1,5 @@
+import { Moment } from "moment";
+
 export type PhysicalInitialBalace = {
     user: string;
     saldosIniciales: PhysicalBalace[]
@@ -17,7 +19,16 @@ export type PhysicalBalace = {
         };
         elementId: string;
         registerDate: string;
-    }
+    }[];
+}
+
+export type PhysicalBalanceToShow = PhysicalBalace & {
+    user: {
+        name: string;
+        _id: string;
+        isAdmin: boolean;
+    };
+    showDate: Moment;
 }
 
 export type PhysiscalPreviousReport = {
