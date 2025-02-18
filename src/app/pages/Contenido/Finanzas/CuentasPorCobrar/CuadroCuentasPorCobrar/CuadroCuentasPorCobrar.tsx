@@ -80,7 +80,7 @@ const CuadroCuentasPorCobrar = ({
         className="CuadroCuentasPorCobrar-container bg-blocks dark:border-blocks"
       >
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div className="CuadroVentaCliente-header">
               {sale?.client?.clientImage ? (
                 <img
@@ -96,7 +96,7 @@ const CuadroCuentasPorCobrar = ({
                   </p>
                 </div>
               )}
-              <span>{sale?.client?.fullName || "N/A"}</span>
+              <span>{sale?.client?.fullName || "N/A"} {sale?.client?.deactivated && "- Cliente Eliminado"}</span>
             </div>
             <div className="flex items-center">
               <button

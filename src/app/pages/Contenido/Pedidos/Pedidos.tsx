@@ -101,24 +101,31 @@ const Pedidos: FC = () => {
           filters.attended = false
         }
 
-        if (queryData.clients) {
-          queryData.clients.forEach(cf =>
-            promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters, client: cf } }))
-          )
-        } else {
-          promises.push(OrdersApiConector.get({ pagination: queryData.pagination, filters }))
-        }
+        promises.push(OrdersApiConector.get({ pagination: { page: 1, pageSize: 30000, sort: queryData.pagination?.sort }, filters: { ...filters } }))
       }
 
       const responses = await Promise.all(promises)
-      const datSales: Order[] = []
+      let datSales: Order[] = []
       let totalcount: number = 0
       responses.forEach(r => {
         datSales.push(...(r?.data || []))
         totalcount += r?.metadata.totalCount || 0
       })
 
-      setCurrentData(datSales);
+      if (queryData && (queryData.text || (queryData.clients && queryData.clients.length > 0))) {
+        datSales = datSales.filter(s => {
+          if (s.client && queryData.clients && queryData.clients.length > 0) {
+            return queryData.clients!.includes(s.client || "")
+          } else if (queryData.text) {
+            return !s.client && (
+              s.clientNotRegistered?.fullName?.toLowerCase().includes(queryData.text!.toLowerCase()) ||
+              s.clientNotRegistered?.phoneNumber?.includes(queryData.text!))
+          }
+          return true;
+        })
+      }
+
+      setCurrentData(datSales.splice(((queryData?.pagination?.page || 1) - 1) * itemsPerPage, itemsPerPage));
       setTotalPage(Math.ceil(totalcount / itemsPerPage)); // Update total pages
       setTotal(totalcount)
       setLoading(false)

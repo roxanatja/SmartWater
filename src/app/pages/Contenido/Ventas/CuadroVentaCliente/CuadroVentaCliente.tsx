@@ -118,9 +118,9 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
   return (
     <div className="CuadroVentaCliente-container relative bg-blocks dark:border-blocks w-full h-fit">
       <div className="p-4">
-        <div className={`flex flex-col gap-3 pb-2 ${!isCobro && "w-[calc(100%_-_30px)]"}`}>
-          <div className="flex items-center justify-between">
-            <div className="CuadroVentaCliente-header">
+        <div className={`flex flex-col gap-3 pb-2 ${(!isCobro && !client?.deactivated) && "w-[calc(100%_-_30px)]"} overflow-hidden`}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="CuadroVentaCliente-header flex-[2] overflow-hidden">
               {client?.clientImage ? (
                 <img
                   src={client?.clientImage}
@@ -137,9 +137,9 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
               )}
 
               {/* Muestra la imagen del cliente */}
-              <span>{client?.fullName || "N/A"}</span>
+              <span className="break-all">{client?.fullName || "N/A"} {client?.deactivated && "- Cliente Eliminado"}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-1 justify-end w-fit">
               <div className="infoClientes-ultimaventa text-blue_custom border-blue_custom">
                 <span>{date}</span>
               </div>
@@ -160,7 +160,7 @@ const CuadroVentaCliente = ({ products, sale, isCobro }: Props) => {
           </div>
 
           {
-            !isCobro &&
+            (!isCobro && !client?.deactivated) &&
             <div className="absolute -right-2 p-4 rounded-full z-[35] top-2 flex flex-col gap-6">
               <button type="button" className="invert-0 dark:invert" onClick={handleOpen}>
                 <img src="./Opciones-icon.svg" alt="" />

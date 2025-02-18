@@ -9,6 +9,7 @@ export interface ISalesGetParams extends Search {
         zone?: string;
         initialDate?: string;
         finalDate?: string;
+        userDelete?: boolean;
         creditSale?: boolean;
         pendingBalance?: boolean;
         hasInvoice?: boolean;

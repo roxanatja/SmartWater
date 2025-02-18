@@ -421,13 +421,14 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
 
         const typeDataToExport = {
           NRO: `${idx + 1}`,
+          CODIGO: sale.code || "Sin codigo",
           FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit", false, true),
           USUARIO: searchUser(sale.user, userList),
           "CODIGO CLIENTE": client?.code || "N/A",
           ZONA: zone?.name || "Sin zona",
           BARRIO: zone ? (searchDistrict(client?.district || "", zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
           DIRECCION: client?.address || "N/A",
-          NOMBRE: client?.fullName || "N/A",
+          NOMBRE: client?.fullName ? `${client.fullName || "Sin nombre"} ${!!client.deactivated ? "- Cliente Eliminado" : ""}` : "N/A",
           COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
           PRODUCTOS: product?.name || "Producto no encontrado",
           CANTIDAD: det.quantity,
@@ -635,7 +636,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
     setLoading(false)
   };
 
-  const { register, setValue } = useForm();
+  const { register, setValue, watch } = useForm();
 
   return (
     <>
@@ -661,7 +662,18 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
                     }
                   />
 
-                  <button type="submit" className="absolute right-3 top-2.5">
+                  <button type="submit" className="absolute right-3 top-2.5 flex gap-6 items-center">
+                    {
+                      watch('search') && watch('search').length > 0 &&
+                      < button type="button" onClick={() => {
+                        setValue("search", "");
+                        if (search) {
+                          search("")
+                        }
+                      }}>
+                        <i className="fa fa-x text-sm"></i>
+                      </button>
+                    }
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"

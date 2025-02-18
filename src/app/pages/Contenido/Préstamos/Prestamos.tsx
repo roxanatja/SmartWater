@@ -196,7 +196,7 @@ const Prestamos: FC = () => {
         >
           {
             currentData.length > 0 &&
-            <div className="grid md:grid-cols-2 grid-cols-1 lg:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
+            <div className="grid lg:grid-cols-2 grid-cols-1 xl:grid-cols-3 gap-4 pb-10 overflow-x-hidden">
               {currentData.map((loan: Loans) => {
                 const contratcEstate = getContractState(
                   loan.hasContract,

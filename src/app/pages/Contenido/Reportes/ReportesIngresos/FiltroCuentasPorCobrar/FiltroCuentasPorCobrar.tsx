@@ -140,6 +140,7 @@ const FiltroCuentasPorCobrar = ({ distribuidores, zones }: {
 
                     const typeDataToExport = {
                         NRO: `${index + 1}`,
+                        CODIGO: sale.code || "Sin codigo",
                         USUARIO: searchUser(sale.user, distribuidores),
                         "CODIGO CLIENTE": client.code ? client.code : "Sin codigo", // Código del cliente
                         "NOMBRE CLIENTE": client.fullName || "Sin nombre",

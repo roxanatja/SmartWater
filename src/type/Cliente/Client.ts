@@ -46,6 +46,7 @@ export interface Client {
   associatedOrder?: string;
   numberOfOrders?: number;
   numberOfLoans?: number;
+  deactivated?: string;
 }
 
 export interface ReportClient {
