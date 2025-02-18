@@ -15,6 +15,7 @@ export interface IClientGetParams extends Search {
         renewedAgo?: number;
         renewedIn?: number;
         hasCredit?: boolean;
+        clientDeleted?: boolean;
     }
 }
 
@@ -37,6 +38,7 @@ export interface IReportClientsParams extends FilteredSearch {
 export interface ISearchGetParams extends Search {
     filters?: {
         text?: string;
+        clientDeleted?: boolean;
     }
 }
 
