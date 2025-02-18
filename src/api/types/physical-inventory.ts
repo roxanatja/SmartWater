@@ -33,7 +33,7 @@ export interface IInitialBalanceBody {
                 product?: string;
                 item?: string;
                 initialBalance: number;
-            }
+            }[]
         }[];
         registerDate: string;
     }

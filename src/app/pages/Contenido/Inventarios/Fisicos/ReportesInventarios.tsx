@@ -25,7 +25,7 @@ const ReportesInventarios = () => {
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
-        PhysicalInventoryApiConector.getElements().then(res => setElements(res?.elements || []));
+        PhysicalInventoryApiConector.getElements().then(res => setElements(res || []));
         UsersApiConector.get({ filters: { desactivated: false }, pagination: { page: 1, pageSize: 30000 } }).then(res => setDistribuidores(res?.data || []))
     }, [])
 

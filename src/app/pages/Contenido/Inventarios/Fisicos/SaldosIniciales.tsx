@@ -12,9 +12,13 @@ import { PhysicalInventoryApiConector } from '../../../../../api/classes/physica
 import { useGlobalContext } from '../../../../SmartwaterContext'
 import moment from 'moment'
 import { PhysicalBalanceToShow, PhysicalInitialBalace } from '../../../../../type/PhysicalInventory'
+import SaldosInicialesForm from './Modals/SaldosInicialesForm'
 
 const SaldosIniciales = () => {
-    const { setShowFiltro, showFiltro } = useContext(InventariosFisicosContext)
+    const {
+        setShowFiltro, showFiltro,
+        setShowMiniModal, showMiniModal
+    } = useContext(InventariosFisicosContext)
     const { setLoading } = useGlobalContext()
 
     const [currentData, setCurrentData] = useState<PhysicalBalanceToShow[]>([])
@@ -24,7 +28,7 @@ const SaldosIniciales = () => {
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
-        PhysicalInventoryApiConector.getElements().then(res => setElements(res?.elements || []));
+        PhysicalInventoryApiConector.getElements().then(res => setElements(res || []));
         UsersApiConector.get({ filters: { desactivated: false }, pagination: { page: 1, pageSize: 30000 } }).then(res => setDistribuidores(res?.data || []))
     }, [])
 
@@ -104,12 +108,16 @@ const SaldosIniciales = () => {
                         text: "Reportes de inventario",
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
-                ]} add onAdd={() => { alert("OnAdd") }} >
+                ]} add onAdd={() => { setShowMiniModal(true) }} >
                 <TableFisicosSaldosIniciales data={currentData} className='w-full xl:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
                 <FiltrosSaldosIniciales distribuidores={distribuidores} initialFilters={savedFilters} onChange={handleFilterChange} />
+            </Modal>
+
+            <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)}>
+                <SaldosInicialesForm distribuidores={distribuidores} elements={elements} onCancel={() => { setShowMiniModal(false) }} />
             </Modal>
         </>
     )
