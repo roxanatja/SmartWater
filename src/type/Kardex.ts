@@ -104,7 +104,7 @@ export type KardexMovement = {
     balanceImport: string
 }
 
-export type MatchedElement = {
+export type MatchedElementRoot = {
     _id: string;
     name: string;
     description: string;
@@ -127,7 +127,9 @@ export type MatchedElement = {
     type: "product" | "item";
     isItem: boolean | null;
     canSellAndLend: boolean;
+}
 
+export type MatchedElement = MatchedElementRoot & {
     productKardex?: ProductKardex[];
     itemKardex?: ItemKardex[];
     hasKardex: boolean;

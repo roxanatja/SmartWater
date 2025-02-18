@@ -78,7 +78,7 @@ const Clientes: FC = () => {
     const fetchZones = async () => {
       setZones((await ZonesApiConector.get({}))?.data || []);
       setDistribuidores((await UsersApiConector.get({ pagination: { page: 1, pageSize: 30000 }, filters: { desactivated: false } }))?.data || []);
-      setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 } }))?.data || []);
+      setAllClients((await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { clientDeleted: false } }))?.data || []);
     }
     fetchZones()
   }, [])
@@ -88,8 +88,8 @@ const Clientes: FC = () => {
 
     let datClients: { data: Client[] } & QueryMetadata | null = null
     if (queryData) {
-      if (queryData?.filters?.hasOwnProperty('text')) {
-        datClients = await ClientsApiConector.searchClients(queryData as ISearchGetParams);
+      if (queryData && queryData.filters && 'text' in queryData.filters) {
+        datClients = await ClientsApiConector.searchClients({ pagination: queryData.pagination, filters: { text: queryData.filters.text, clientDeleted: false } });
       } else {
         const qd = { ...queryData as IClientGetParams }
         const extraFilters: IClientGetParams['filters'] = {}
@@ -101,7 +101,7 @@ const Clientes: FC = () => {
           extraFilters.initialDate = "2020-01-01"
         }
 
-        datClients = await ClientsApiConector.getClients({ pagination: qd.pagination, filters: { ...qd.filters, ...extraFilters } });
+        datClients = await ClientsApiConector.getClients({ pagination: qd.pagination, filters: { ...qd.filters, ...extraFilters, clientDeleted: false } });
       }
     }
 

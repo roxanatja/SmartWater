@@ -3,6 +3,7 @@ import { User } from "../../../../../../type/User";
 import { useContext, useEffect, useState } from "react";
 import { InventariosFisicosContext } from "../InventariosFisicosProvider";
 import moment from "moment";
+import { IPhysicalGetParams } from "../../../../../../api/types/physical-inventory";
 
 interface IInitialBalancesFilters {
     fromDate: string | null;
@@ -22,8 +23,8 @@ const FiltrosReportesInventarios = ({
     distribuidores
 }: {
     distribuidores: User[];
-    onChange: (filters: any) => void;
-    initialFilters: any;
+    onChange: (filters: IPhysicalGetParams['filters']) => void;
+    initialFilters: IPhysicalGetParams['filters'];
 }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IInitialBalancesFilters>({
         defaultValues: initialState || {},
@@ -36,8 +37,8 @@ const FiltrosReportesInventarios = ({
             if (initialFilters.initialDate) {
                 setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
             }
-            if (initialFilters.finalDate) {
-                setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
+            if (initialFilters.endDate) {
+                setValue('toDate', initialFilters.endDate, { shouldValidate: true })
             }
             if (initialFilters.user) {
                 setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
@@ -54,10 +55,10 @@ const FiltrosReportesInventarios = ({
     };
 
     const filterClients = (filters: IInitialBalancesFilters): any => {
-        const result: any = {}
+        const result: IPhysicalGetParams['filters'] = {}
 
         if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
-        if (filters.toDate) { result.finalDate = filters.toDate.toString() }
+        if (filters.toDate) { result.endDate = filters.toDate.toString() }
 
         if (selectedDists.length > 0) {
             const dists = selectedDists.map(z => z._id).join(',')
@@ -130,7 +131,7 @@ const FiltrosReportesInventarios = ({
                         </div>
                     ))}
                 </div>
-                <label className="text-blue_custom mt-2">Administradores</label>
+                {/* <label className="text-blue_custom mt-2">Administradores</label>
                 <div className="flex flex-wrap gap-x-6 gap-y-4">
                     {distribuidores.filter(d => d.role === 'admin').map((dists, index) => (
                         <div
@@ -158,7 +159,7 @@ const FiltrosReportesInventarios = ({
                             </label>
                         </div>
                     ))}
-                </div>
+                </div> */}
             </div>
 
             <div className="flex justify-between w-full items-center gap-3 px-4">

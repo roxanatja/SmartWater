@@ -139,13 +139,14 @@ const FiltroVenta = ({ distribuidores, zones }: {
 
         const typeDataToExport = {
           NRO: `${idx + 1}`,
+          CODIGO: sale.code || "Sin código",
           FECHA: formatDateTime(sale.created, "numeric", "2-digit", "2-digit", false, true),
           USUARIO: searchUser(sale.user, distribuidores),
           "CODIGO CLIENTE": client?.code || "N/A",
           ZONA: zone?.name || "Sin zona",
           BARRIO: zone ? (searchDistrict(client?.district || "", zone.districts)?.name || "Sin barrio") : "Sin barrio", // Buscar barrio
           DIRECCION: client?.address || "N/A",
-          NOMBRE: client?.fullName || "N/A",
+          NOMBRE: client?.fullName ? `${client.fullName || "Sin nombre"} ${!!client.deactivated ? "- Cliente Eliminado" : ""}` : "N/A",
           COMENTARIO: sale.comment ? sale.comment : "Sin comentario",
           PRODUCTOS: product?.name || "Producto no encontrado",
           CANTIDAD: det.quantity,

@@ -1,19 +1,20 @@
-import React, { useCallback, useContext, useMemo } from 'react'
-import { IMockInventories } from '../../mock-data'
+import React, { useCallback, useContext, useEffect, useMemo } from 'react'
 import { InventariosFisicosContext } from '../InventariosFisicosProvider'
 import toast from 'react-hot-toast'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
+import { PhysicalBalanceToShow } from '../../../../../../type/PhysicalInventory'
+import { PhysicalInventoryApiConector } from '../../../../../../api/classes/physical-inventory'
 
 interface Props {
-    data: IMockInventories[];
+    data: PhysicalBalanceToShow[];
     className?: string;
 }
 
 const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
     const { setSelectedInvetario, setSelectedOption, setShowModal } = useContext(InventariosFisicosContext)
 
-    const deleteRegistry = useCallback((id: string) => {
+    const deleteRegistry = useCallback((row: PhysicalBalanceToShow) => {
         toast.error(
             (t) => (
                 <div>
@@ -31,31 +32,37 @@ const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                toast.success("Registro eliminado con exito", {
-                                    position: "top-center",
-                                    duration: 2000
-                                });
-
-                                //     const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
-                                //     if (!!response) {
-                                //         if (response.mensaje) {
-                                //             toast.success(response.mensaje, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //             window.location.reload();
-                                //         } else if (response.error) {
-                                //             toast.error(response.error, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //         }
-                                //     } else {
-                                //         toast.error("Error al eliminar cliente", {
-                                //             position: "top-center",
-                                //             duration: 2000
-                                //         });
-                                //     }
+                                const response = await PhysicalInventoryApiConector.delete({
+                                    data: {
+                                        code: row.code,
+                                        registerDate: row.showDate.format("YYYY-MM-DDTHH:mm"),
+                                        user: row.user._id,
+                                        elements: row.saldo.map(s => {
+                                            if (s.item) { return { item: s.item._id } }
+                                            if (s.product) { return { product: s.product._id } }
+                                            return { product: s.elementId }
+                                        })
+                                    }
+                                }) as any;
+                                if (!!response) {
+                                    if (response.mensaje) {
+                                        toast.success(response.mensaje, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        // window.location.reload();
+                                    } else if (response.error) {
+                                        toast.error(response.error, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                    }
+                                } else {
+                                    toast.error("Error al eliminar cliente", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
                             }}
                         >
                             Proceder
@@ -71,19 +78,23 @@ const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
         );
     }, [])
 
+    useEffect(() => {
 
-    const columns: TableColumn<IMockInventories>[] = useMemo<TableColumn<IMockInventories>[]>(() => [
+    }, [data])
+
+
+    const columns: TableColumn<PhysicalBalanceToShow>[] = useMemo<TableColumn<PhysicalBalanceToShow>[]>(() => [
         {
             name: "Hora y fecha de registro",
-            selector: row => (row.initialDate ? formatDateTime(row.initialDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+            selector: row => (row.showDate ? formatDateTime(row.showDate.format("YYYY-MM-DDTHH:mm"), 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
         {
             name: "Usuario",
-            selector: row => row.name || "Distribuidor desconocido",
+            selector: row => `${row.user.name || "Distribuidor desconocido"} ${row.user.isAdmin ? "(Administrador)" : ""}`,
         },
         {
-            name: "Estado",
-            selector: row => row.status ? "Registrado" : "Registrado",
+            name: "Código",
+            selector: row => row.code,
         },
         {
             name: "",
@@ -96,7 +107,7 @@ const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
                     <button onClick={() => { setSelectedInvetario(row); setShowModal(true) }}>
                         <i className="fa-solid fa-pen-to-square text-blue_bright" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => deleteRegistry(row._id)}>
+                    <button onClick={() => deleteRegistry(row)}>
                         <i className="fa fa-trash text-red-500" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -106,10 +117,10 @@ const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
     return (
         <>
             <div className="text-font-color">
-                <DataTable columns={columns} className={className}
+                <DataTable responsive={true} columns={columns} className={className}
                     data={data}
                     pagination={data.length > 10}
-                    paginationPerPage={5}
+                    paginationPerPage={10}
                     noDataComponent={<div className="min-h-[150px] flex items-center justify-center">Sin registros</div>}
                     paginationComponent={({ currentPage, onChangePage, rowCount, rowsPerPage }) => (<>
                         <div className="flex gap-2 w-full justify-end mt-2">

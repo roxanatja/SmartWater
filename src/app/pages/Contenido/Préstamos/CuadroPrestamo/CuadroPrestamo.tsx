@@ -136,33 +136,37 @@ const CuadroPrestamo: FC<Prestamo> = ({
               justifyContent: "space-between",
             }}
           >
-            <div className={`flex items-center justify-between ${info ? "w-full" : "w-[calc(100%_-_60px)]"}`}>
-              <div className="CuadroVentaCliente-header flex gap-4 items-center">
-                {loan.client[0]?.clientImage ? (
-                  <img
-                    src={loan.client[0]?.clientImage}
-                    alt=""
-                    className="infoClientes-imgStore"
-                  />
-                ) : (
-                  <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
-                    <div className="opacity-0">.</div>
-                    <p className="absolute font-extrabold whitespace-nowrap">
-                      {loan.client[0]?.fullName?.[0] || "S"}
-                    </p>
-                  </div>
-                )}
-                <span>{loan.client[0]?.fullName || "Sin nombre"}</span>
-              </div>
-              <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
-                <span>
-                  {formatDateTime(
-                    loan.created,
-                    "numeric",
-                    "2-digit",
-                    "2-digit"
+            <div className={`flex items-center justify-between ${info ? "w-full" : "w-[calc(100%_-_30px)]"} overflow-hidden`}>
+              <div className="w-full flex items-center justify-between gap-2">
+                <div className="CuadroVentaCliente-header flex gap-4 items-center flex-[2] overflow-hidden">
+                  {loan.client[0]?.clientImage ? (
+                    <img
+                      src={loan.client[0]?.clientImage}
+                      alt=""
+                      className="infoClientes-imgStore"
+                    />
+                  ) : (
+                    <div className="bg-blue_custom text-white px-3.5 py-1.5 rounded-full flex justify-center items-center">
+                      <div className="opacity-0">.</div>
+                      <p className="absolute font-extrabold whitespace-nowrap">
+                        {loan.client[0]?.fullName?.[0] || "S"}
+                      </p>
+                    </div>
                   )}
-                </span>
+                  <span className="break-all">{loan.client[0]?.fullName || "Sin nombre"}</span>
+                </div>
+                <div className="flex gap-2 flex-1 justify-end w-fit">
+                  <div className="infoClientes-ultimaventa border-blue_custom text-blue_custom">
+                    <span>
+                      {formatDateTime(
+                        loan.created,
+                        "numeric",
+                        "2-digit",
+                        "2-digit"
+                      )}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
             {

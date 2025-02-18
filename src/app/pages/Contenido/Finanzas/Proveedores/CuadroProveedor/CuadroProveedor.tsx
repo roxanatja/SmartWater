@@ -128,7 +128,7 @@ const CuadroProveedor = ({ provider }: { provider: Providers }) => {
             </div>
           </div>
         </div>
-        <div className="w-[calc(100%_-_30px)] flex flex-col gap-2 text-sm">
+        <div className="w-[calc(100%_-_30px)] flex flex-col gap-1 text-[12px]">
           <div className="flex gap-2">
             <span className="">Correo:</span>
             <span className="text-blue_custom"><a href={`mailto:${provider.email}`}>{provider.email}</a></span>

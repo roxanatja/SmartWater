@@ -45,7 +45,7 @@ const BarChart = () => {
 
         if (salesResponse) {
           const prods: string[] = []; const sales: number[] = []
-          salesResponse.forEach(sp => {
+          salesResponse.sort((a, b) => b.total - a.total).forEach(sp => {
             prods.push(sp.prod)
             sales.push(Math.ceil(sp.total))
           })
@@ -78,7 +78,7 @@ const BarChart = () => {
   // Componente que muestra el gráfico de barras
   return (
     <div className="BarContainer bg-blocks dark:border-blocks !h-auto w-full p-10">
-      <h4 className="mb-4 font-[600] text-lg">Ventas de productos</h4>
+      <h4 className="mb-4 font-[600] text-lg">Ventas de productos del último mes</h4>
       <div className="w-full overflow-auto px-16">
         <Bar data={data} options={{
           responsive: true,
