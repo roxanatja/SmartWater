@@ -75,16 +75,15 @@ const MapaClientes: React.FC = () => {
   const getClientStatus = (client: Client, orders: Order[]): ClientStatus => {
     if (orders.some(o => !o.attended && o.client === client._id)) { return 'inProgress' }
     if (orders.some(o => o.attended && moment(o.attended).isSame(moment(), 'day') && o.client === client._id)) { return 'attended' }
-    if (client.lastSale && client.renewInDays) {
-      const renewDate = moment(client.lastSale).add(client.renewInDays, 'days')
-      if (moment().isAfter(renewDate)) { return 'renewClient' }
+    if (client.renewDate) {
+      if (moment().isAfter(client.renewDate)) { return 'renewClient' }
     }
     return 'default'
   }
 
-  const getClientNumberOfActiveOrders = (client: Client, orders: Order[]): number => {
+  const getClientActiveOrders = (client: Client, orders: Order[]): string[] => {
     const ords = orders.filter(o => !o.attended && moment(o.attended).isSame(moment(), 'day') && o.client === client._id)
-    return ords.length
+    return ords.map(o => o._id)
   }
 
   const getClientStatusFromOrder = (o: Order): ClientStatus => {
@@ -117,14 +116,15 @@ const MapaClientes: React.FC = () => {
       let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => {
         const status = getClientStatus(client, ords)
         if (status === 'inProgress') {
-          return { ...client, status, numberOfOrders: getClientNumberOfActiveOrders(client, ords), numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
+          const activeOrders = getClientActiveOrders(client, ords)
+          return { ...client, status, numberOfOrders: activeOrders.length, associatedOrders: activeOrders, numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
         } else {
-          return { ...client, status, numberOfOrders: 1, numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
+          return { ...client, status, associatedOrders: [], numberOfLoans: loans.filter(l => l.client.some(c => c._id === client._id)).length }
         }
       });
 
       if (ords) {
-        clientsWithStatus.push(...ords.filter(o => !o.client && !o.attended).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrder: o._id, status: getClientStatusFromOrder(o), numberOfOrders: 1 })))
+        clientsWithStatus.push(...ords.filter(o => !o.client && !o.attended).map((o) => ({ ...o.clientNotRegistered as unknown as Client, isClient: false, isAgency: false, associatedOrders: [o._id], status: getClientStatusFromOrder(o), numberOfOrders: 1 })))
       }
 
       if (qd.text) {

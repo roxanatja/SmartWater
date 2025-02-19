@@ -1,5 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { PedidosContext } from '../PedidosContext'
+import { useCallback, useEffect, useState } from 'react'
 import Product from '../../../../../type/Products/Products';
 import { useNavigate } from 'react-router-dom';
 import { ISaleBody } from '../../../../../api/types/sales';
@@ -13,9 +12,15 @@ import { useGlobalContext } from '../../../../SmartwaterContext';
 import { NumericOptionScrooll } from '../../../components/OptionScrooll/NumericOptionScroll';
 import { SelectableOptionScrooll } from '../../../components/OptionScrooll/SelectableOptionScrooll';
 import DecimalOptionScroll from '../../../components/OptionScrooll/DecimalOptionScroll';
+import { Client } from '../../../../../type/Cliente/Client';
+import { Order } from '../../../../../type/Order/Order';
 
-const RegistrarVentasPedidosForm = () => {
-    const { selectedClient, selectedOrder } = useContext(PedidosContext)
+interface Props {
+    selectedClient: Client;
+    selectedOrder: Order;
+}
+
+const RegistrarVentasPedidosForm = ({ selectedClient, selectedOrder }: Props) => {
     const { setLoading } = useGlobalContext()
 
     const [products, setProducts] = useState<Product[] | null>(null);
@@ -64,7 +69,7 @@ const RegistrarVentasPedidosForm = () => {
         };
 
         const res = await SalesApiConector.create({ data: values });
-        
+
         if (res) {
             if ('error' in res) {
                 toast.error(

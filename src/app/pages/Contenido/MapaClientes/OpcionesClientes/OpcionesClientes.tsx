@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 import { MapaClientesContext } from "../MapaClientesContext";
 
 const OpcionesClientes = ({ onClose }: { onClose: () => void }) => {
-  const { setSelectedOption } = useContext(MapaClientesContext);
+  const { setSelectedOption, setShowMiniModal } = useContext(MapaClientesContext);
 
   return (
     <>
       <Link
-        to={"#"}
-        // to={"/Clientes/RegistrarPedido"}
+        to={"/MapaClientes/RegistrarPedidoCliente"}
+        onClick={() => setShowMiniModal(false)}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -25,8 +25,8 @@ const OpcionesClientes = ({ onClose }: { onClose: () => void }) => {
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
-        to={"#"}
-        // to={"/Clientes/RegistrarPrestamo"}
+        to={"/MapaClientes/RegistrarPrestamo"}
+        onClick={() => setShowMiniModal(false)}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -40,8 +40,8 @@ const OpcionesClientes = ({ onClose }: { onClose: () => void }) => {
         <i className="fa-solid fa-chevron-right text-blue_custom p-2.5"></i>
       </Link>
       <Link
-        to={"#"}
-        // to={"/Clientes/RegistrarDevolucion/parcial"}
+        to={"/MapaClientes/RegistrarDevolucion"}
+        onClick={() => setShowMiniModal(false)}
         className="opcionesClientes-Item hover:bg-zinc-200 cursor-pointer"
       >
         <div style={{ display: "flex", alignItems: "center" }}>

@@ -145,7 +145,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                                         position={new LatLng(Number(client.location.latitude), Number(client.location.longitude))}
                                         key={client._id} icon={getCustomIcon(client.status)}>
                                         <Tooltip direction='top' offset={[0, -12]}>
-                                            {client.fullName || "Sin nombre"} {(!client.isClient && !client.isAgency) ? ('from' in client && client.from === "customer") ? "(De SmartApp)" : "(Cliente no registrado)" : ""}
+                                            {client.fullName || "Sin nombre"} {(!client.isClient && !client.isAgency) ? ('from' in client && client.from === "customer") ? "(De SmartApp)" : "(Cliente no registrado)" : ""} {!!client.deactivated ? "- Cliente eliminado" : ""}
                                         </Tooltip>
                                     </Marker>
                                 )

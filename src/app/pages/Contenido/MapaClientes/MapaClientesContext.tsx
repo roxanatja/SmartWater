@@ -2,6 +2,8 @@ import { createContext, useState } from "react";
 import { Client } from "../../../../type/Cliente/Client";
 import { ClientStatus } from "../../components/LeafletMap/constants";
 import { Zone } from "../../../../type/City";
+import { Order } from "../../../../type/Order/Order";
+import { order } from "../Pedidos/PedidosContext";
 
 type MapaClientesContextType = {
   showModal: boolean;
@@ -19,6 +21,9 @@ type MapaClientesContextType = {
   setAllClients: React.Dispatch<React.SetStateAction<Client[]>>;
   zones: Zone[];
   setZones: React.Dispatch<React.SetStateAction<Zone[]>>;
+
+  selectedOrder: Order;
+  setSelectedOrder: React.Dispatch<React.SetStateAction<Order>>;
 };
 
 export const MapaClientesContext = createContext<MapaClientesContextType>(
@@ -64,6 +69,7 @@ export const clientWithStatus: Client & { status: ClientStatus } = {
   hasExpiredContract: false,
   credit: 1,
   status: "default",
+  associatedOrders: []
 };
 
 export const MapaClientesProvider = ({ children }: any) => {
@@ -75,6 +81,7 @@ export const MapaClientesProvider = ({ children }: any) => {
   const [allClients, setAllClients] = useState<Client[]>([]);
 
   const [selectedClient, setSelectedClient] = useState<Client & { status: ClientStatus }>(clientWithStatus);
+  const [selectedOrder, setSelectedOrder] = useState<Order>(order);
 
   return (
     <MapaClientesContext.Provider
@@ -92,7 +99,9 @@ export const MapaClientesProvider = ({ children }: any) => {
         zones,
         setZones,
         allClients,
-        setAllClients
+        setAllClients,
+        selectedOrder,
+        setSelectedOrder,
       }}
     >
       {children}
