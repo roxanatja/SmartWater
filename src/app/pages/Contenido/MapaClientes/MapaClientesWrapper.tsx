@@ -1,9 +1,14 @@
 import { FC } from "react"
 import { MapaClientesProvider } from "./MapaClientesContext"
 import { MapaClientes } from "./MapaClientes"
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import { RegistrarPedido } from "./RegistrarPedido/RegistrarPedido"
 import MapClientDetails from "./MapClientDetails"
+import { RegistrarVenta } from "./RegistrarVenta/RegistrarVenta"
+import { RegistrarPedidoCliente } from "./RegistrarPedidoCliente/RegistrarPedidoCliente"
+import { RegistrarPrestamo } from "./RegistrarPrestamo/RegistrarPrestamo"
+import { RegistrarDevolucion } from "./RegistrarDevolucion/RegistrarDevolucion"
+import ClientInfo from "./ClientInfo/ClientInfo"
 
 
 const MapaClientesWrapper: FC = () => {
@@ -14,7 +19,16 @@ const MapaClientesWrapper: FC = () => {
                 <Routes>
                     <Route path='/*' element={<MapaClientes />} />
                     <Route path='/DetallesCliente' element={<MapClientDetails />} />
+                    <Route path='/Informacion' element={<ClientInfo />} />
                     <Route path='/RegistrarPedido' element={<RegistrarPedido />} />
+                    <Route path='/RegistrarPedidoCliente' element={<RegistrarPedidoCliente />} />
+                    <Route path='/RegistrarVenta' element={<RegistrarVenta />} />
+                    <Route path='/RegistrarPrestamo' element={<RegistrarPrestamo />} />
+                    <Route path='/RegistrarDevolucion' element={<Navigate to={"/MapaClientes/RegistrarDevolucion/parcial"} replace />} />
+                    <Route
+                        path="/RegistrarDevolucion/:parcial"
+                        element={<RegistrarDevolucion />}
+                    />
                 </Routes>
             </MapaClientesProvider>
         </>

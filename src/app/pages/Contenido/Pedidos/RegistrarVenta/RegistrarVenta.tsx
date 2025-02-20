@@ -4,11 +4,10 @@ import { PageTitle } from "../../../components/PageTitle/PageTitle";
 import { useNavigate } from "react-router-dom";
 import { PedidosContext } from "../PedidosContext";
 import { client } from "../../Clientes/ClientesContext";
-import { Client } from "../../../../../type/Cliente/Client";
 import RegistrarVentasPedidosForm from "./RegistrarVentasPedidosForm";
 
 const RegistrarVenta: FC = () => {
-  const { setSelectedClient, selectedClient } = useContext(PedidosContext);
+  const { setSelectedClient, selectedClient, selectedOrder } = useContext(PedidosContext);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -37,7 +36,7 @@ const RegistrarVenta: FC = () => {
           <span className="text-blue_custom">Regresar</span>
         </div>
 
-        <RegistrarVentasPedidosForm />
+        <RegistrarVentasPedidosForm selectedClient={selectedClient} selectedOrder={selectedOrder} />
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { clientWithStatus, MapaClientesContext } from './MapaClientesContext'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../components/PageTitle/PageTitle';
 import { useSessionStorage } from '@uidotdev/usehooks';
 import { markerStyles } from '../../components/LeafletMap/constants';
@@ -8,9 +8,15 @@ import Modal from '../../EntryComponents/Modal';
 import CobroMiniModal from '../../components/CashRegister/CashRegister';
 import { OpcionesClientes } from './OpcionesClientes/OpcionesClientes';
 import RegistrarClientePedido from '../Pedidos/RegistrarCliente/RegistrarClientePedido';
+import PostponeModal from './PostponeModal';
+import toast from 'react-hot-toast';
+import { OrdersApiConector } from '../../../../api/classes';
+import { useGlobalContext } from '../../../SmartwaterContext';
 
 const MapClientDetails = () => {
-    const { selectedClient, setSelectedClient, setShowMiniModal, showMiniModal, zones, allClients } = useContext(MapaClientesContext)
+    const { selectedClient, setSelectedClient, setShowMiniModal, showMiniModal, zones, allClients, setSelectedOrder } = useContext(MapaClientesContext)
+    const { setLoading } = useGlobalContext()
+
     const navigate = useNavigate();
     const [returnUrl, setReturnUrl] = useSessionStorage("returnUrl", "")
 
@@ -34,6 +40,98 @@ const MapClientDetails = () => {
         }
     }, [selectedClient, navigate])
 
+    const goToLoans = () => {
+        const filters = btoa(JSON.stringify({
+            text: selectedClient.fullName || "Sin nombre",
+            clients: [selectedClient._id],
+            pagination: {
+                pageSize: 12,
+                page: 1,
+                sort: 'desc'
+            }
+        }))
+        navigate(`/Prestamos?filters=${filters}`)
+    }
+
+    const goToOrders = () => {
+        const filters = btoa(JSON.stringify({
+            text: selectedClient.fullName || "Sin nombre",
+            clients: selectedClient._id ? [selectedClient._id] : [],
+            pagination: {
+                pageSize: 12,
+                page: 1,
+                sort: 'desc'
+            }
+        }))
+        navigate(`/Pedidos/EnCurso?filters=${filters}`)
+    }
+
+    const cancelOrder = async (orderId: string) => {
+        toast.error(
+            (t) => (
+                <div>
+                    <p className="mb-4 text-center text-[#888]">
+                        Se <b>cancelará</b> este pedido <br /> pulsa <b>Proceder</b> para continuar
+                    </p>
+                    <div className="flex justify-center">
+                        <button
+                            className="bg-red-500 px-3 py-1 rounded-lg ml-2 text-white"
+                            onClick={() => { toast.dismiss(t.id); }}
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
+                            onClick={async () => {
+                                toast.dismiss(t.id);
+                                const response = await OrdersApiConector.cancel({ orderId });
+                                if (!!response) {
+                                    if (response.mensaje) {
+                                        toast.success(response.mensaje, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        window.location.reload();
+                                    }
+                                } else {
+                                    toast.error("Error al cancelar el pedido", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
+                            }}
+                        >
+                            Proceder
+                        </button>
+                    </div>
+                </div>
+            ),
+            {
+                className: "shadow-md dark:shadow-slate-400 border border-slate-100 bg-main-background",
+                icon: null,
+                position: "top-center"
+            }
+        );
+    }
+
+    const onSell = async (orderId?: string) => {
+        if (orderId) {
+            setLoading(true);
+
+            const order = await OrdersApiConector.getOne({ orderId })
+            if (order) {
+                setSelectedOrder(order)
+                navigate("/MapaClientes/RegistrarVenta")
+            } else {
+                toast.error("No se encontró el pedido")
+            }
+
+            setLoading(false)
+        } else {
+            navigate("/MapaClientes/RegistrarVenta")
+        }
+    }
+
     return (
         <>
             <div className="px-10 h-screen overflow-y-auto">
@@ -42,16 +140,16 @@ const MapClientDetails = () => {
                 <div className={`w-full h-[calc(100%_-_122px)] my-4 rounded-[20px] !text-white px-8 py-5 relative overflow-hidden`}>
                     <div className="absolute top-0 left-0 bottom-0 right-0 content-[''] bg-center bg-cover bg-no-repeat z-0" style={{
                         backgroundImage: `url(${selectedClient.storeImage || "/map-details-bg.png"})`,
-                        filter: selectedClient.storeImage ? "brightness(40%)" : "grayscale(100%) brightness(40%)"
+                        filter: selectedClient.storeImage ? "brightness(70%)" : "grayscale(100%) brightness(70%)"
                     }}></div>
 
                     <div className="w-full h-full overflow-auto z-10 flex flex-col relative">
                         <div className="flex w-full justify-between items-center">
                             <div
-                                className={`RegistrarVenta-titulo flex items-start cursor-pointer text-white mt-0 filter drop-shadow-lg`}
+                                className={`gap-3 text-[18px] font-semibold flex items-start cursor-pointer text-white mt-0 filter drop-shadow-lg`}
                                 onClick={handleClick}
                             >
-                                <button className="RegistrarVenta-btn">
+                                <button className="cursor-pointer bg-none border-none">
                                     <span className="material-symbols-outlined translate-y-0.5 text-white">
                                         arrow_back
                                     </span>
@@ -60,20 +158,22 @@ const MapClientDetails = () => {
                             </div>
 
                             {
-                                selectedClient.status === 'inProgress' &&
-                                <div className='relative mr-3'>
+                                (selectedClient.status === 'inProgress' && selectedClient.numberOfOrders && selectedClient.numberOfOrders > 1) &&
+                                <button type='button' className='relative mr-3 mt-4' onClick={() => {
+                                    goToOrders()
+                                }}>
                                     <div className="bg-blue_bright rounded-full w-[22.5px] h-[22.5px] text-white text-xs font-semibold absolute -right-1 -top-2 flex items-center justify-center">{selectedClient.numberOfOrders}</div>
                                     <svg width="50" height="50" viewBox="0 0 55 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0 2.25C0 1.00312 1.0217 0 2.29167 0H6.63628C8.73698 0 10.599 1.2 11.4679 3H50.7127C53.224 3 55.0573 5.34375 54.3984 7.725L50.4835 22.0031C49.6719 24.9469 46.9505 27 43.8472 27H16.2995L16.8151 29.6719C17.0252 30.7313 17.9705 31.5 19.0686 31.5H46.5972C47.8672 31.5 48.8889 32.5031 48.8889 33.75C48.8889 34.9969 47.8672 36 46.5972 36H19.0686C15.7648 36 12.9288 33.6937 12.3177 30.5156L7.39062 5.10938C7.32378 4.75313 7.00868 4.5 6.63628 4.5H2.29167C1.0217 4.5 0 3.49688 0 2.25ZM12.2222 43.5C12.2222 42.909 12.3408 42.3239 12.5711 41.7779C12.8014 41.232 13.139 40.7359 13.5646 40.318C13.9903 39.9002 14.4955 39.5687 15.0516 39.3425C15.6077 39.1164 16.2037 39 16.8056 39C17.4074 39 18.0034 39.1164 18.5595 39.3425C19.1156 39.5687 19.6209 39.9002 20.0465 40.318C20.4721 40.7359 20.8097 41.232 21.04 41.7779C21.2703 42.3239 21.3889 42.909 21.3889 43.5C21.3889 44.091 21.2703 44.6761 21.04 45.2221C20.8097 45.768 20.4721 46.2641 20.0465 46.682C19.6209 47.0998 19.1156 47.4313 18.5595 47.6575C18.0034 47.8836 17.4074 48 16.8056 48C16.2037 48 15.6077 47.8836 15.0516 47.6575C14.4955 47.4313 13.9903 47.0998 13.5646 46.682C13.139 46.2641 12.8014 45.768 12.5711 45.2221C12.3408 44.6761 12.2222 44.091 12.2222 43.5ZM44.3056 39C45.5211 39 46.6869 39.4741 47.5465 40.318C48.406 41.1619 48.8889 42.3065 48.8889 43.5C48.8889 44.6935 48.406 45.8381 47.5465 46.682C46.6869 47.5259 45.5211 48 44.3056 48C43.09 48 41.9242 47.5259 41.0646 46.682C40.2051 45.8381 39.7222 44.6935 39.7222 43.5C39.7222 42.3065 40.2051 41.1619 41.0646 40.318C41.9242 39.4741 43.09 39 44.3056 39Z" fill={markerStyles[selectedClient.status].backgroundColor} />
                                     </svg>
-                                </div>
+                                </button>
 
                             }
                             {
-                                selectedClient.status === 'renewClient' &&
-                                <button type='button' className='relative mr-3' onClick={() => setShowPostponeModal(true)}>
+                                (selectedClient.status === 'renewClient' || selectedClient.status === 'attended') &&
+                                <button type='button' className='relative mr-3 mt-4' onClick={() => setShowPostponeModal(true)}>
                                     <svg width="50" height="50" viewBox="0 0 109 103" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M54.1985 102.297C47.8371 102.297 41.8779 101.068 36.3206 98.6117C30.7634 96.1549 25.9288 92.8401 21.8168 88.6673C17.7048 84.4877 14.441 79.5775 12.0254 73.9369C9.60984 68.2963 8.40034 62.2439 8.39694 55.7797C8.39694 49.319 9.60644 43.2666 12.0254 37.6225C14.4444 31.9784 17.7082 27.0683 21.8168 22.8921C25.9321 18.7158 30.7668 15.4011 36.3206 12.9477C41.8745 10.4944 47.8338 9.26597 54.1985 9.26252C60.5598 9.26252 66.5191 10.4909 72.0763 12.9477C77.6336 15.4045 82.4682 18.721 86.5801 22.8972C90.6921 27.0734 93.9576 31.9836 96.3766 37.6277C98.7956 43.2717 100.003 49.3224 100 55.7797C100 62.2404 98.7905 68.2928 96.3715 73.9369C93.9525 79.581 90.6887 84.4911 86.5801 88.6673C82.4648 92.8436 77.6302 96.16 72.0763 98.6168C66.5225 101.074 60.5632 102.3 54.1985 102.297ZM68.4478 77.4877L75.5725 70.2517L59.2875 53.7123V29.9368H49.1094V57.8471L68.4478 77.4877ZM21.6285 0.734375L28.7532 7.97038L7.12468 29.9368L0 22.7008L21.6285 0.734375ZM86.7684 0.734375L108.397 22.7008L101.272 29.9368L79.6438 7.97038L86.7684 0.734375Z" fill="#FF5C00" />
+                                        <path d="M54.1985 102.297C47.8371 102.297 41.8779 101.068 36.3206 98.6117C30.7634 96.1549 25.9288 92.8401 21.8168 88.6673C17.7048 84.4877 14.441 79.5775 12.0254 73.9369C9.60984 68.2963 8.40034 62.2439 8.39694 55.7797C8.39694 49.319 9.60644 43.2666 12.0254 37.6225C14.4444 31.9784 17.7082 27.0683 21.8168 22.8921C25.9321 18.7158 30.7668 15.4011 36.3206 12.9477C41.8745 10.4944 47.8338 9.26597 54.1985 9.26252C60.5598 9.26252 66.5191 10.4909 72.0763 12.9477C77.6336 15.4045 82.4682 18.721 86.5801 22.8972C90.6921 27.0734 93.9576 31.9836 96.3766 37.6277C98.7956 43.2717 100.003 49.3224 100 55.7797C100 62.2404 98.7905 68.2928 96.3715 73.9369C93.9525 79.581 90.6887 84.4911 86.5801 88.6673C82.4648 92.8436 77.6302 96.16 72.0763 98.6168C66.5225 101.074 60.5632 102.3 54.1985 102.297ZM68.4478 77.4877L75.5725 70.2517L59.2875 53.7123V29.9368H49.1094V57.8471L68.4478 77.4877ZM21.6285 0.734375L28.7532 7.97038L7.12468 29.9368L0 22.7008L21.6285 0.734375ZM86.7684 0.734375L108.397 22.7008L101.272 29.9368L79.6438 7.97038L86.7684 0.734375Z" fill={markerStyles[selectedClient.status].backgroundColor} />
                                     </svg>
 
                                 </button>
@@ -85,11 +185,53 @@ const MapClientDetails = () => {
                             {
                                 !selectedClient._id &&
                                 <button onClick={() => setShowRegisterModal(true)}
-                                    className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border-white border backdrop-blur-sm'>Registrar cliente</button>
+                                    className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border-white border backdrop-blur-md font-semibold'>Registrar cliente</button>
                             }
 
-                            {/* <button>Button 1</button>
-                            <button>Button 2</button> */}
+                            {
+                                selectedClient.status === 'inProgress' &&
+                                <>
+                                    {
+                                        (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) && <>
+                                            {
+                                                !!selectedClient._id &&
+                                                <button
+                                                    onClick={() => {
+                                                        if (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) {
+                                                            onSell(selectedClient.associatedOrders[0])
+                                                        }
+                                                    }}
+                                                    className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border backdrop-blur-md font-semibold border-white'>
+                                                    Vender
+                                                </button>
+                                            }
+                                            <button
+                                                onClick={() => {
+                                                    if (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) {
+                                                        cancelOrder(selectedClient.associatedOrders[0])
+                                                    }
+                                                }}
+                                                className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border backdrop-blur-md font-semibold'
+                                                style={{
+                                                    borderColor: markerStyles[selectedClient.status].backgroundColor,
+                                                    color: markerStyles[selectedClient.status].backgroundColor
+                                                }}>
+                                                Cancelar
+                                            </button>
+                                        </>
+                                    }
+                                </>
+                            }
+
+                            {
+                                (selectedClient.status !== 'inProgress') && <>
+                                    <button
+                                        onClick={() => { onSell() }}
+                                        className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border backdrop-blur-md font-semibold border-white'>
+                                        Vender
+                                    </button>
+                                </>
+                            }
 
                             {
                                 selectedClient._id &&
@@ -110,6 +252,7 @@ const MapClientDetails = () => {
 
                                     <div className="infoClientes-ventas relative z-10">
                                         <button
+                                            onClick={() => goToLoans()}
                                             disabled={selectedClient.numberOfLoans === 0}
                                             className={`infoClientes-moneda cursor-pointer border-0 disabled:!bg-gray-400 min-w-[100px]`}
                                             style={{ backgroundColor: markerStyles[selectedClient.status].backgroundColor }}
@@ -146,13 +289,16 @@ const MapClientDetails = () => {
                             }
                         </div>
                         {
-                            selectedClient._id && <>
-                                <button className="absolute left-1/2 bottom-0 -translate-x-1/2" title='Más opciones' onClick={() => setShowMiniModal(true)}>
-                                    <i className="fa-solid fa-angles-up text-2xl"></i>
-                                </button>
-                                <button className="absolute right-0 top-1/2 -translate-y-1/2" title='Información del cliente'>
+                            (selectedClient._id) && <>
+                                {
+                                    !selectedClient.deactivated &&
+                                    <button className="absolute left-1/2 bottom-0 -translate-x-1/2" title='Más opciones' onClick={() => setShowMiniModal(true)}>
+                                        <i className="fa-solid fa-angles-up text-2xl"></i>
+                                    </button>
+                                }
+                                <Link to={"/MapaClientes/Informacion"} className="absolute right-0 top-1/2 -translate-y-1/2" title='Información del cliente'>
                                     <i className="fa-solid fa-angles-right text-2xl"></i>
-                                </button>
+                                </Link>
                             </>
                         }
                     </div>
@@ -170,9 +316,12 @@ const MapClientDetails = () => {
             <Modal
                 isOpen={showPostponeModal}
                 onClose={() => setShowPostponeModal(false)}
-                className="p-6 w-2/12"
+                className="!w-3/12"
             >
-                <div>Posponer</div>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30">
+                    Posponer
+                </h2>
+                <PostponeModal onClose={() => setShowPostponeModal(false)} />
             </Modal>
 
 
@@ -205,7 +354,7 @@ const MapClientDetails = () => {
                         isOpen={showRegisterModal && !selectedClient._id}
                         zones={zones}
                         selectedClient={selectedClient}
-                        associatedOrder={selectedClient.associatedOrder!}
+                        associatedOrder={selectedClient.associatedOrders![0]}
                     />
                 </div>
             </Modal >

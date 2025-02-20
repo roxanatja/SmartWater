@@ -300,7 +300,7 @@ const RegisterPedidoForm = ({
             <i className="fa-solid fa-chevron-up"></i>
           </div>
 
-          <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10">
+          <div className="w-full sm:w-3/4 lg:w-2/3 flex flex-col gap-10 mx-auto">
             {isNoClient &&
               <>
                 <div className="flex flex-col md:flex-row gap-6 w-full">

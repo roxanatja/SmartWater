@@ -205,7 +205,7 @@ const InfoClient = ({ client }: { client: Client }) => {
                   <p className="font-semibold">Próxima fecha de renovación:</p>
                   <p>
                     {client.lastSale
-                      ? formatDateTime(client.renewDate, 'numeric', '2-digit', '2-digit')
+                      ? formatDateTime(client.renewDate, 'numeric', '2-digit', '2-digit', true, true)
                       : "N/A"}
                   </p>
                 </li>

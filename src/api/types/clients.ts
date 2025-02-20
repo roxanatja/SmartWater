@@ -91,7 +91,7 @@ export interface IClientRegisterParams {
 export interface IPosponeRenovation {
     data: {
         client: string;
-        posponeInDays: string;
+        posponeInDays: number;
     };
 }
 
