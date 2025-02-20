@@ -8,6 +8,7 @@ import { RegistrarVenta } from "./RegistrarVenta/RegistrarVenta"
 import { RegistrarPedidoCliente } from "./RegistrarPedidoCliente/RegistrarPedidoCliente"
 import { RegistrarPrestamo } from "./RegistrarPrestamo/RegistrarPrestamo"
 import { RegistrarDevolucion } from "./RegistrarDevolucion/RegistrarDevolucion"
+import ClientInfo from "./ClientInfo/ClientInfo"
 
 
 const MapaClientesWrapper: FC = () => {
@@ -18,6 +19,7 @@ const MapaClientesWrapper: FC = () => {
                 <Routes>
                     <Route path='/*' element={<MapaClientes />} />
                     <Route path='/DetallesCliente' element={<MapClientDetails />} />
+                    <Route path='/Informacion' element={<ClientInfo />} />
                     <Route path='/RegistrarPedido' element={<RegistrarPedido />} />
                     <Route path='/RegistrarPedidoCliente' element={<RegistrarPedidoCliente />} />
                     <Route path='/RegistrarVenta' element={<RegistrarVenta />} />

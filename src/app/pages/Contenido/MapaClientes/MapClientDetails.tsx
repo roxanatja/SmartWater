@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { clientWithStatus, MapaClientesContext } from './MapaClientesContext'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageTitle } from '../../components/PageTitle/PageTitle';
 import { useSessionStorage } from '@uidotdev/usehooks';
 import { markerStyles } from '../../components/LeafletMap/constants';
@@ -158,11 +158,9 @@ const MapClientDetails = () => {
                             </div>
 
                             {
-                                selectedClient.status === 'inProgress' &&
+                                (selectedClient.status === 'inProgress' && selectedClient.numberOfOrders && selectedClient.numberOfOrders > 1) &&
                                 <button type='button' className='relative mr-3 mt-4' onClick={() => {
-                                    if (selectedClient.numberOfOrders && selectedClient.numberOfOrders > 1) {
-                                        goToOrders()
-                                    }
+                                    goToOrders()
                                 }}>
                                     <div className="bg-blue_bright rounded-full w-[22.5px] h-[22.5px] text-white text-xs font-semibold absolute -right-1 -top-2 flex items-center justify-center">{selectedClient.numberOfOrders}</div>
                                     <svg width="50" height="50" viewBox="0 0 55 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -172,10 +170,10 @@ const MapClientDetails = () => {
 
                             }
                             {
-                                selectedClient.status === 'renewClient' &&
+                                (selectedClient.status === 'renewClient' || selectedClient.status === 'attended') &&
                                 <button type='button' className='relative mr-3 mt-4' onClick={() => setShowPostponeModal(true)}>
                                     <svg width="50" height="50" viewBox="0 0 109 103" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M54.1985 102.297C47.8371 102.297 41.8779 101.068 36.3206 98.6117C30.7634 96.1549 25.9288 92.8401 21.8168 88.6673C17.7048 84.4877 14.441 79.5775 12.0254 73.9369C9.60984 68.2963 8.40034 62.2439 8.39694 55.7797C8.39694 49.319 9.60644 43.2666 12.0254 37.6225C14.4444 31.9784 17.7082 27.0683 21.8168 22.8921C25.9321 18.7158 30.7668 15.4011 36.3206 12.9477C41.8745 10.4944 47.8338 9.26597 54.1985 9.26252C60.5598 9.26252 66.5191 10.4909 72.0763 12.9477C77.6336 15.4045 82.4682 18.721 86.5801 22.8972C90.6921 27.0734 93.9576 31.9836 96.3766 37.6277C98.7956 43.2717 100.003 49.3224 100 55.7797C100 62.2404 98.7905 68.2928 96.3715 73.9369C93.9525 79.581 90.6887 84.4911 86.5801 88.6673C82.4648 92.8436 77.6302 96.16 72.0763 98.6168C66.5225 101.074 60.5632 102.3 54.1985 102.297ZM68.4478 77.4877L75.5725 70.2517L59.2875 53.7123V29.9368H49.1094V57.8471L68.4478 77.4877ZM21.6285 0.734375L28.7532 7.97038L7.12468 29.9368L0 22.7008L21.6285 0.734375ZM86.7684 0.734375L108.397 22.7008L101.272 29.9368L79.6438 7.97038L86.7684 0.734375Z" fill="#FF5C00" />
+                                        <path d="M54.1985 102.297C47.8371 102.297 41.8779 101.068 36.3206 98.6117C30.7634 96.1549 25.9288 92.8401 21.8168 88.6673C17.7048 84.4877 14.441 79.5775 12.0254 73.9369C9.60984 68.2963 8.40034 62.2439 8.39694 55.7797C8.39694 49.319 9.60644 43.2666 12.0254 37.6225C14.4444 31.9784 17.7082 27.0683 21.8168 22.8921C25.9321 18.7158 30.7668 15.4011 36.3206 12.9477C41.8745 10.4944 47.8338 9.26597 54.1985 9.26252C60.5598 9.26252 66.5191 10.4909 72.0763 12.9477C77.6336 15.4045 82.4682 18.721 86.5801 22.8972C90.6921 27.0734 93.9576 31.9836 96.3766 37.6277C98.7956 43.2717 100.003 49.3224 100 55.7797C100 62.2404 98.7905 68.2928 96.3715 73.9369C93.9525 79.581 90.6887 84.4911 86.5801 88.6673C82.4648 92.8436 77.6302 96.16 72.0763 98.6168C66.5225 101.074 60.5632 102.3 54.1985 102.297ZM68.4478 77.4877L75.5725 70.2517L59.2875 53.7123V29.9368H49.1094V57.8471L68.4478 77.4877ZM21.6285 0.734375L28.7532 7.97038L7.12468 29.9368L0 22.7008L21.6285 0.734375ZM86.7684 0.734375L108.397 22.7008L101.272 29.9368L79.6438 7.97038L86.7684 0.734375Z" fill={markerStyles[selectedClient.status].backgroundColor} />
                                     </svg>
 
                                 </button>
@@ -194,15 +192,13 @@ const MapClientDetails = () => {
                                 selectedClient.status === 'inProgress' &&
                                 <>
                                     {
-                                        (selectedClient.associatedOrders && selectedClient.associatedOrders.length > 0) && <>
+                                        (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) && <>
                                             {
                                                 !!selectedClient._id &&
                                                 <button
                                                     onClick={() => {
                                                         if (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) {
                                                             onSell(selectedClient.associatedOrders[0])
-                                                        } else {
-                                                            goToOrders()
                                                         }
                                                     }}
                                                     className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border backdrop-blur-md font-semibold border-white'>
@@ -213,8 +209,6 @@ const MapClientDetails = () => {
                                                 onClick={() => {
                                                     if (selectedClient.associatedOrders && selectedClient.associatedOrders.length === 1) {
                                                         cancelOrder(selectedClient.associatedOrders[0])
-                                                    } else {
-                                                        goToOrders()
                                                     }
                                                 }}
                                                 className='bg-black/20 min-w-[275px] px-8 py-3 rounded-[25px] border backdrop-blur-md font-semibold'
@@ -302,9 +296,9 @@ const MapClientDetails = () => {
                                         <i className="fa-solid fa-angles-up text-2xl"></i>
                                     </button>
                                 }
-                                <button className="absolute right-0 top-1/2 -translate-y-1/2" title='Información del cliente'>
+                                <Link to={"/MapaClientes/Informacion"} className="absolute right-0 top-1/2 -translate-y-1/2" title='Información del cliente'>
                                     <i className="fa-solid fa-angles-right text-2xl"></i>
-                                </button>
+                                </Link>
                             </>
                         }
                     </div>

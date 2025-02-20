@@ -110,7 +110,7 @@ const MapaClientes: React.FC = () => {
         extraFilters.initialDate = "2020-01-01"
       }
 
-      const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...qd.filters, ...extraFilters } });
+      const clientsData = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...qd.filters, ...extraFilters, clientDeleted: false } });
       let clientsToSet = clientsData?.data || [];
 
       let clientsWithStatus: (Client & { status: ClientStatus })[] = clientsToSet.map((client) => {

@@ -25,7 +25,7 @@ const RegistrarVenta: FC = () => {
     return (
         <>
             <div className="px-10 h-screen overflow-y-auto">
-                <PageTitle titulo="Mapa de clientes / Registrar pedido" icon="/Pedidos-icon.svg" />
+                <PageTitle titulo="Mapa de clientes / Registrar venta" icon="/Pedidos-icon.svg" />
                 <div
                     className="RegistrarVenta-titulo flex items-start cursor-pointer"
                     onClick={handleClick}
