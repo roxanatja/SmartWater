@@ -1,4 +1,6 @@
 import React, { createContext, PropsWithChildren, useState } from 'react'
+import { PhysicalBalanceToShow } from '../../../../../type/PhysicalInventory';
+import moment from 'moment';
 
 type InventariosFisicosContextType = {
     showModal: boolean;
@@ -9,12 +11,25 @@ type InventariosFisicosContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedBalance: PhysicalBalanceToShow;
+    setSelectedBalance: React.Dispatch<React.SetStateAction<PhysicalBalanceToShow>>;
     selectedInventario: unknown;
     setSelectedInvetario: React.Dispatch<React.SetStateAction<unknown>>;
 };
 
 export const InventariosFisicosContext =
     createContext<InventariosFisicosContextType>({} as InventariosFisicosContextType);
+
+export const balance: PhysicalBalanceToShow = {
+    code: "",
+    saldo: [],
+    showDate: moment(),
+    user: {
+        _id: "",
+        isAdmin: false,
+        name: ""
+    }
+}
 
 
 const InventariosFisicosProvider = ({ children }: PropsWithChildren) => {
@@ -23,6 +38,7 @@ const InventariosFisicosProvider = ({ children }: PropsWithChildren) => {
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
     const [selectedInventario, setSelectedInvetario] = useState<unknown>({});
+    const [selectedBalance, setSelectedBalance] = useState<PhysicalBalanceToShow>(balance);
 
     return (
         <InventariosFisicosContext.Provider
@@ -37,6 +53,8 @@ const InventariosFisicosProvider = ({ children }: PropsWithChildren) => {
                 setShowFiltro,
                 selectedInventario,
                 setSelectedInvetario,
+                selectedBalance,
+                setSelectedBalance,
             }}
         >
             {children}

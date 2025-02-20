@@ -6,7 +6,7 @@ import { ApiConnector } from "./api-conector";
 export abstract class PhysicalInventoryApiConector {
     private static root_path = "/physical-inventory"
 
-    static async getElements(): Promise<{ elements: MatchedElementRoot[] } | null> {
+    static async getElements(): Promise<MatchedElementRoot[] | null> {
         try {
             const res = await ApiConnector.getInstance().get(`${this.root_path}/elements-match`)
             return res.data
@@ -26,9 +26,14 @@ export abstract class PhysicalInventoryApiConector {
         }
     }
 
-    static async createBalance(params: IInitialBalanceBody): Promise<{ id: string } | null> {
+    static async createBalance(params: IInitialBalanceBody): Promise<{ id: string } | { message: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().post(`${this.root_path}/initial-balance/create`, params.data)
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/initial-balance/create`, params.data, {
+                validateStatus(status) {
+                    if (status === 400 || status === 200) return true
+                    return false
+                },
+            })
             return res.data
         } catch (error) {
             return null
