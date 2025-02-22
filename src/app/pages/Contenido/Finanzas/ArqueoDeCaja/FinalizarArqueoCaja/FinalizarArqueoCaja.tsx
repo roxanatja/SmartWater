@@ -72,6 +72,12 @@ const FinalizarArqueoCaja = ({
     try {
       const inputs = [
         {
+          "date_end": cash?.endDate
+            ? formatDateTime(cash?.endDate, 'numeric', '2-digit', '2-digit', true, true)
+            : "",
+          "date_end_label": cash?.endDate
+            ? "Hora de cierre"
+            : "",
           "date": cash?.startDate
             ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
             : "N/A",
@@ -140,13 +146,26 @@ const FinalizarArqueoCaja = ({
         </div>
 
         <div id="printArea">
-          <div className="FinalizarArqueoCaja-hora mb-6">
-            <span>Hora de apertura</span>
-            <span className="font-medium">
-              {cash?.startDate
-                ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
-                : "N/A"}
-            </span>
+          <div className="flex gap-6">
+            <div className="FinalizarArqueoCaja-hora mb-6">
+              <span>Hora de apertura</span>
+              <span className="font-medium">
+                {cash?.startDate
+                  ? formatDateTime(cash?.startDate, 'numeric', '2-digit', '2-digit', true, true)
+                  : "N/A"}
+              </span>
+            </div>
+            {
+              cash?.endDate &&
+              <div className="FinalizarArqueoCaja-hora mb-6">
+                <span>Hora de cierre</span>
+                <span className="font-medium">
+                  {cash?.endDate
+                    ? formatDateTime(cash?.endDate, 'numeric', '2-digit', '2-digit', true, true)
+                    : "N/A"}
+                </span>
+              </div>
+            }
           </div>
           <div className="w-full sm:w-1/2 md:w-1/4">
             <div className="flex flex-col gap-3">
