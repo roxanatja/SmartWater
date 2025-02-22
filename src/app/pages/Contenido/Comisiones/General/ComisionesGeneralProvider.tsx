@@ -1,5 +1,5 @@
 import React, { createContext, PropsWithChildren, useState } from 'react'
-import { IMockComissions } from '../mock-data';
+import { Comission } from '../../../../../type/Comission';
 
 type ComisionesGeneralContextType = {
     showModal: boolean;
@@ -10,21 +10,21 @@ type ComisionesGeneralContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedInventario: IMockComissions;
-    setSelectedInvetario: React.Dispatch<React.SetStateAction<IMockComissions>>;
+    selectedInventario: Comission<'general'>;
+    setSelectedInvetario: React.Dispatch<React.SetStateAction<Comission<'general'>>>;
 };
 
 export const ComisionesGeneralContext =
     createContext<ComisionesGeneralContextType>({} as ComisionesGeneralContextType);
 
-export const generalMock: IMockComissions = { _id: "", commission: 0, finalDate: "", initialDate: "", name: "", percent: 0, sales: 0 }
+export const generalMock: Comission<'general'> = { _id: "", type: 'general', endDate: "", initialDate: "", percentage: 0, totalAfter: 0, totalBefore: 0, user: { _id: "", email: "", role: "user" } }
 
 const ComisionesGeneralProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
-    const [selectedInventario, setSelectedInvetario] = useState<IMockComissions>(generalMock);
+    const [selectedInventario, setSelectedInvetario] = useState<Comission<'general'>>(generalMock);
 
     return (
         <ComisionesGeneralContext.Provider

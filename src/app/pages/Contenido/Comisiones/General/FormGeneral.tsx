@@ -1,11 +1,14 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Input from "../../../EntryComponents/Inputs";
 import moment from "moment";
-import { ComisionesGeneralContext } from "./ComisionesGeneralProvider";
+import toast from "react-hot-toast";
+import { ComissionsApiConector } from "../../../../../api/classes/comissions";
+import { Comission } from "../../../../../type/Comission";
 
 interface Props {
     onCancel?: () => void;
+    selectedInventario: Comission<'general'> | Comission<'byuser'>
 }
 
 type FormType = {
@@ -14,38 +17,41 @@ type FormType = {
     percent: number;
 }
 
-const FormGeneral = ({ onCancel }: Props) => {
+const FormGeneral = ({ onCancel, selectedInventario }: Props) => {
     const [active, setActive] = useState(false);
-    const { selectedInventario } = useContext(ComisionesGeneralContext)
 
     const { register, formState: { errors, isValid }, handleSubmit, watch } = useForm<FormType>({
         defaultValues: selectedInventario._id !== "" ? {
-            finalDate: selectedInventario.finalDate,
-            initialDate: selectedInventario.initialDate,
-            percent: selectedInventario.percent
+            finalDate: moment.utc(selectedInventario.endDate).format("YYYY-MM-DDTHH:mm"),
+            initialDate: moment.utc(selectedInventario.initialDate).format("YYYY-MM-DDTHH:mm"),
+            percent: selectedInventario.percentage
         } : {},
         mode: 'all'
     })
 
     const onSubmit = async (data: FormType) => {
-        alert(JSON.stringify(data, null, 2))
         let res = null
         setActive(true)
 
-        // if (selectedItem._id !== "") {
-        //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
-        // } else {
-        // res = await KardexApiConector.registerEntryMore({ data: requestBody });
-        // }
+        if (selectedInventario._id !== "") {
+            res = await ComissionsApiConector.updateByUser({ comissionId: selectedInventario._id, data: { percentage: data.percent } })
+        } else {
+            res = await ComissionsApiConector.createGeneral({
+                data: {
+                    endDate: data.finalDate,
+                    initialDate: data.initialDate,
+                    percentage: data.percent
+                }
+            });
+        }
 
-        // if (res) {
-        //     // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-        //     toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
-        //     window.location.reload();
-        // } else {
-        //     toast.error("Upps error al registrar el ingreso", { position: "bottom-center" });
-        setActive(false)
-        // }
+        if (res) {
+            toast.success(`Comisión ${selectedInventario._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
+            window.location.reload();
+        } else {
+            toast.error("Upps error al registrar la comisión", { position: "bottom-center" });
+            setActive(false)
+        }
     }
 
     const validateHours = (val: string, type: 'init' | 'end'): string | boolean => {
@@ -93,7 +99,8 @@ const FormGeneral = ({ onCancel }: Props) => {
                     errors={errors.initialDate}
                     register={register}
                     required
-                    className="full-selector"
+                    className="full-selector disabled:opacity-40"
+                    disabled={selectedInventario._id !== ""}
                     max={watch('finalDate') ? moment(watch('finalDate')!.toString()).format("YYYY-MM-DDTHH:mm") : moment().format("YYYY-MM-DDTHH:mm")}
                     validateAmount={(val) => validateHours(val, 'init')}
                 />
@@ -103,7 +110,8 @@ const FormGeneral = ({ onCancel }: Props) => {
                     type="datetime-local"
                     errors={errors.finalDate}
                     register={register}
-                    className="full-selector"
+                    className="full-selector disabled:opacity-40"
+                    disabled={selectedInventario._id !== ""}
                     min={watch('initialDate') ? moment(watch('initialDate')!.toString()).format("YYYY-MM-DDTHH:mm") : undefined}
                     max={moment().format("YYYY-MM-DDTHH:mm")}
                     validateAmount={(val) => validateHours(val, 'end')}
