@@ -1,4 +1,4 @@
-import React, { CSSProperties, useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { User } from '../../../../../type/User';
 import Product from '../../../../../type/Products/Products';
 import moment from 'moment';
@@ -6,6 +6,8 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { ComisionesEspecificosContext } from './ComisionesEspecificosProvider';
 import Input from '../../../EntryComponents/Inputs';
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast';
+import { ComissionsApiConector } from '../../../../../api/classes/comissions';
 
 interface Props {
     onCancel?: () => void;
@@ -31,8 +33,15 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
 
     const { control, register, formState: { errors, isValid }, handleSubmit, watch } = useForm<FormType>({
         defaultValues: selectedInventario._id !== "" ? {
-            finalDate: selectedInventario.finalDate,
-            initialDate: selectedInventario.initialDate
+            finalDate: moment.utc(selectedInventario.endDate).format("YYYY-MM-DDTHH:mm"),
+            initialDate: moment.utc(selectedInventario.initialDate).format("YYYY-MM-DDTHH:mm"),
+            users: [{
+                user_id: selectedInventario.user._id,
+                percent: products.map(p => ({
+                    product: p._id,
+                    value: selectedInventario.details.find(i => i.product === p._id)?.percentageElem || null
+                }))
+            }]
         } : {},
         mode: 'all'
     })
@@ -40,28 +49,54 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'users',
-        rules: { required: "Debes agregar al menos un distribuidor" }
+        rules: {
+            required: "Debes agregar al menos un distribuidor",
+            validate: (val) => {
+                return val.every(v => v.percent.some(p => {
+                    return p.value && Number(String(p.value)) > 0
+                }))
+            }
+        }
     });
 
     const onSubmit = async (data: FormType) => {
-        alert(JSON.stringify(data, null, 2))
-        // let res = null
+        let res = null
         setActive(true)
 
-        // if (selectedItem._id !== "") {
-        //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
-        // } else {
-        // res = await KardexApiConector.registerEntryMore({ data: requestBody });
-        // }
+        if (selectedInventario._id !== "") {
+            res = await ComissionsApiConector.updateSpecific({
+                comissionId: selectedInventario._id,
+                data: {
+                    elements: data.users[0].percent.filter(p => p.value && p.value > 0).map(p => ({
+                        product: p.product,
+                        percentageElem: Number(String(p.value!))
+                    }))
+                }
+            })
+        } else {
+            res = await ComissionsApiConector.createSpecific({
+                data: {
+                    users: data.users.map(u => ({
+                        endDate: data.finalDate,
+                        initialDate: data.initialDate,
+                        user: u.user_id,
+                        elements: u.percent.filter(p => p.value && p.value > 0).map(p => ({
+                            product: p.product,
+                            percentage: Number(String(p.value!))
+                        }))
+                    }))
+                }
+            });
+        }
 
-        // if (res) {
-        //     // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-        //     toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
-        //     window.location.reload();
-        // } else {
-        //     toast.error("Upps error al registrar el ingreso", { position: "bottom-center" });
-        setActive(false)
-        // }
+        if (res) {
+            toast.success(`Item ${selectedInventario._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            // toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
+            window.location.reload();
+        } else {
+            toast.error("Upps error al registrar el ingreso", { position: "bottom-center" });
+            setActive(false)
+        }
     }
 
     const validateHours = (val: string, type: 'init' | 'end'): string | boolean => {
@@ -111,7 +146,8 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                         errors={errors.initialDate}
                         register={register}
                         required
-                        className="full-selector"
+                        className="full-selector opacity-40"
+                        disabled={selectedInventario._id !== ""}
                         max={watch('finalDate') ? moment(watch('finalDate')!.toString()).format("YYYY-MM-DDTHH:mm") : moment().format("YYYY-MM-DDTHH:mm")}
                         validateAmount={(val) => validateHours(val, 'init')}
                     />
@@ -123,7 +159,8 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                         errors={errors.finalDate}
                         register={register}
                         required
-                        className="full-selector"
+                        className="full-selector opacity-40"
+                        disabled={selectedInventario._id !== ""}
                         min={watch('initialDate') ? moment(watch('initialDate')!.toString()).format("YYYY-MM-DDTHH:mm") : undefined}
                         max={moment().format("YYYY-MM-DDTHH:mm")}
                         validateAmount={(val) => validateHours(val, 'end')}
@@ -138,9 +175,11 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                     className="w-full flex flex-col gap-2"
                 >
                     <label htmlFor='user'>Distribuidores</label>
-                    <select id='user' onChange={e => {
-                        append({ user_id: e.target.value, percent: products.map(p => ({ product: p._id, value: null })) })
-                    }} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
+                    <select id='user'
+                        disabled={selectedInventario._id !== ""}
+                        onChange={e => {
+                            append({ user_id: e.target.value, percent: products.map(p => ({ product: p._id, value: null })) })
+                        }} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black disabled:opacity-40">
                         <option value="">Sin selección</option>
                         {
                             distribuidores
@@ -150,7 +189,7 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                                 )
                         }
                     </select>
-                    {errors.users?.root && (
+                    {(errors.users?.root && errors.users.root.type === 'required') && (
                         <span className="text-red-500 font-normal text-sm font-pricedown">
                             <i className="fa-solid fa-triangle-exclamation"></i>{" "}
                             {errors.users.root.message}

@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react'
-import { ComisionesDistribuidorContext } from './ComisionesDistribuidorProvider';
+import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form';
 import moment from 'moment';
 import Input from '../../../EntryComponents/Inputs';
 import { motion } from 'framer-motion'
 import { User } from '../../../../../type/User';
+import { ComissionsApiConector } from '../../../../../api/classes/comissions';
+import toast from 'react-hot-toast';
 
 interface Props {
     onCancel?: () => void;
@@ -22,13 +23,8 @@ type FormType = {
 
 const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
     const [active, setActive] = useState(false);
-    const { selectedInventario } = useContext(ComisionesDistribuidorContext)
 
     const { control, register, formState: { errors, isValid }, handleSubmit, watch } = useForm<FormType>({
-        defaultValues: selectedInventario._id !== "" ? {
-            finalDate: selectedInventario.finalDate,
-            initialDate: selectedInventario.initialDate
-        } : {},
         mode: 'all'
     })
 
@@ -39,24 +35,27 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
     });
 
     const onSubmit = async (data: FormType) => {
-        alert(JSON.stringify(data, null, 2))
-        // let res = null
         setActive(true)
 
-        // if (selectedItem._id !== "") {
-        //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
-        // } else {
-        // res = await KardexApiConector.registerEntryMore({ data: requestBody });
-        // }
+        const res = await ComissionsApiConector.createByUser({
+            data: {
+                users: data.users.map(u => ({
+                    endDate: data.finalDate,
+                    initialDate: data.initialDate,
+                    percentage: u.percent,
+                    user: u.user_id
+                }))
+            }
+        });
 
-        // if (res) {
-        //     // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-        //     toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
-        //     window.location.reload();
-        // } else {
-        //     toast.error("Upps error al registrar el ingreso", { position: "bottom-center" });
-        setActive(false)
-        // }
+        if (res) {
+            // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            toast.success(`Comisión registrada correctamente`, { position: "bottom-center" });
+            window.location.reload();
+        } else {
+            toast.error("Upps error al registrar la comisión", { position: "bottom-center" });
+            setActive(false)
+        }
     }
 
     const validateHours = (val: string, type: 'init' | 'end'): string | boolean => {
@@ -190,9 +189,7 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
                         {active ? (
                             <i className="fa-solid fa-spinner animate-spin"></i>
                         ) : (
-                            <>
-                                {selectedInventario._id !== "" ? "Editar" : "Generar"}
-                            </>
+                            <span>Generar</span>
                         )}
                     </button>
                 </div>

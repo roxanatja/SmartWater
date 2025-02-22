@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import moment from 'moment';
 import { motion } from 'framer-motion';
 import { ComisionesEspecificosContext } from './ComisionesEspecificosProvider';
+import { IComissionGetParams } from '../../../../../api/types/comissions';
 
 interface IInitialBalancesFilters {
     fromDate: string | null;
@@ -22,11 +23,13 @@ const initialState: IInitialBalancesFilters = {
 const Filterespecificos = ({
     onChange,
     initialFilters,
-    distribuidores
+    distribuidores,
+    percentages
 }: {
     distribuidores: User[];
-    onChange: (filters: any) => void;
-    initialFilters: any;
+    onChange: (filters: IComissionGetParams['filters']) => void;
+    initialFilters: IComissionGetParams['filters'];
+    percentages: number[]
 }) => {
     const { register, handleSubmit, setValue, watch } = useForm<IInitialBalancesFilters>({
         defaultValues: initialState || {},
@@ -39,11 +42,11 @@ const Filterespecificos = ({
             if (initialFilters.initialDate) {
                 setValue('fromDate', initialFilters.initialDate, { shouldValidate: true })
             }
-            if (initialFilters.finalDate) {
-                setValue('toDate', initialFilters.finalDate, { shouldValidate: true })
+            if (initialFilters.endDate) {
+                setValue('toDate', initialFilters.endDate, { shouldValidate: true })
             }
-            if (initialFilters.percent) {
-                setValue('percent', String(initialFilters.percent), { shouldValidate: true })
+            if (initialFilters.percentage) {
+                setValue('percent', String(initialFilters.percentage), { shouldValidate: true })
             }
             if (initialFilters.user) {
                 setSelectedDists(distribuidores.filter(d => initialFilters.user!.includes(d._id)))
@@ -60,11 +63,11 @@ const Filterespecificos = ({
     };
 
     const filterClients = (filters: IInitialBalancesFilters): any => {
-        const result: any = {}
+        const result: IComissionGetParams['filters'] = {}
 
         if (filters.fromDate) { result.initialDate = filters.fromDate.toString() }
-        if (filters.toDate) { result.finalDate = filters.toDate.toString() }
-        if (filters.percent) { result.percent = Number(filters.percent) }
+        if (filters.toDate) { result.endDate = filters.toDate.toString() }
+        if (filters.percent) { result.percentage = Number(filters.percent) }
 
         if (selectedDists.length > 0) {
             const dists = selectedDists.map(z => z._id).join(',')
@@ -117,9 +120,7 @@ const Filterespecificos = ({
                 <label>Porcentaje</label>
                 <select {...register("percent")} className="p-2 py-2.5 rounded-md font-pricedown focus:outline-4 bg-main-background outline outline-2 outline-black">
                     <option value="">Sin selección</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
+                    {percentages.map(p => <option value={`${p}`}>{p}</option>)}
                 </select>
             </motion.div>
 

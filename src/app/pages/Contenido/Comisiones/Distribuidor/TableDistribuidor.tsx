@@ -1,17 +1,19 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import { IMockComissions } from '../mock-data';
 import toast from 'react-hot-toast';
 import DataTable, { TableColumn } from 'react-data-table-component';
 import { formatDateTime } from '../../../../../utils/helpers';
 import { ComisionesDistribuidorContext } from './ComisionesDistribuidorProvider';
+import { Comission } from '../../../../../type/Comission';
+import { User } from '../../../../../type/User';
+import { ComissionsApiConector } from '../../../../../api/classes/comissions';
 
 interface Props {
-    data: IMockComissions[];
+    data: Comission<'byuser'>[];
+    distribuidores: User[];
     className?: string;
 }
 
-
-const TableDistribuidor = ({ data, className }: Props) => {
+const TableDistribuidor = ({ data, className, distribuidores }: Props) => {
     const { setSelectedInvetario, setSelectedOption, setShowModal } = useContext(ComisionesDistribuidorContext)
 
     const deleteRegistry = useCallback((id: string) => {
@@ -31,32 +33,22 @@ const TableDistribuidor = ({ data, className }: Props) => {
                         <button
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
-                                toast.dismiss(t.id);
-                                toast.success("Registro eliminado con exito", {
-                                    position: "top-center",
-                                    duration: 2000
-                                });
-
-                                //     const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
-                                //     if (!!response) {
-                                //         if (response.mensaje) {
-                                //             toast.success(response.mensaje, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //             window.location.reload();
-                                //         } else if (response.error) {
-                                //             toast.error(response.error, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //         }
-                                //     } else {
-                                //         toast.error("Error al eliminar cliente", {
-                                //             position: "top-center",
-                                //             duration: 2000
-                                //         });
-                                //     }
+                                toast.dismiss(t.id)
+                                const response = await ComissionsApiConector.delete({ comissionId: id });
+                                if (!!response) {
+                                    if (response.message) {
+                                        toast.success("Registro eliminado con exito", {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        window.location.reload();
+                                    }
+                                } else {
+                                    toast.error("Error al eliminar cliente", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
                             }}
                         >
                             Proceder
@@ -73,33 +65,33 @@ const TableDistribuidor = ({ data, className }: Props) => {
     }, [])
 
 
-    const columns: TableColumn<IMockComissions>[] = useMemo<TableColumn<IMockComissions>[]>(() => [
+    const columns: TableColumn<Comission<'byuser'>>[] = useMemo<TableColumn<Comission<'byuser'>>[]>(() => [
         {
             name: "Fecha inicial",
             selector: row => (row.initialDate ? formatDateTime(row.initialDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
         {
             name: "Fecha final",
-            selector: row => (row.finalDate ? formatDateTime(row.finalDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+            selector: row => (row.endDate ? formatDateTime(row.endDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
         {
             name: "Usuario",
-            selector: row => row.name || "Distribuidor desconocido",
+            selector: row => `${distribuidores.find(d => d._id === row.user._id)?.fullName || "Distribuidor desconocido"} ${row.user.role === 'admin' ? "(Administrador)" : ""}`,
         },
         {
             name: "Ventas",
             width: "12%",
-            selector: row => row.sales.toLocaleString(),
+            selector: row => row.totalBefore.toFixed(2),
         },
         {
             name: "%",
             width: "12%",
-            selector: row => row.percent.toLocaleString(),
+            selector: row => row.percentage,
         },
         {
             name: "Comisión",
             width: "12%",
-            selector: row => row.commission.toLocaleString(),
+            selector: row => row.totalAfter.toFixed(2),
         },
         {
             name: "",
@@ -117,7 +109,7 @@ const TableDistribuidor = ({ data, className }: Props) => {
                     </button>
                 </div>
         }
-    ], [deleteRegistry, setSelectedInvetario, setSelectedOption, setShowModal])
+    ], [deleteRegistry, setSelectedInvetario, setSelectedOption, setShowModal, distribuidores])
 
     return (
         <>
