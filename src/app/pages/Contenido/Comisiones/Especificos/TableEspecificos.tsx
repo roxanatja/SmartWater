@@ -82,12 +82,12 @@ const TableEspecificos = ({ data, className, distribuidores }: Props) => {
         {
             name: "Ventas",
             width: "12%",
-            selector: row => row.details.reduce<number>((acc, d) => acc += d.totalBeforeElem, 0).toFixed(2),
+            selector: row => row.details.reduce<number>((acc, d) => acc += d?.totalBeforeElem || 0, 0).toFixed(2),
         },
         {
             name: "Comisión",
             width: "12%",
-            selector: row => row.details.reduce<number>((acc, d) => acc += d.totalAfterElem, 0).toFixed(2),
+            selector: row => row.details.reduce<number>((acc, d) => acc += d?.totalAfterElem || 0, 0).toFixed(2),
         },
         {
             name: "",

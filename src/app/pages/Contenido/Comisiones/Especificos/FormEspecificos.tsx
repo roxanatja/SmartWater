@@ -40,7 +40,7 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                 user_id: selectedInventario.user._id,
                 percent: products.map(p => ({
                     product: p._id,
-                    value: selectedInventario.details.find(i => i.product === p._id)?.percentageElem || null
+                    value: selectedInventario.details.filter(d => !!d).find(i => i.product === p._id)?.percentageElem || null
                 }))
             }]
         } : {},
@@ -91,11 +91,11 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
         }
 
         if (res) {
-            toast.success(`Comisión ${selectedInventario._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            toast.success(`Comisión ${selectedInventario._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
             // toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
             window.location.reload();
         } else {
-            toast.error("Upps error al registrar el ingreso", { position: "bottom-center" });
+            toast.error("Upps error al registrar la comisión", { position: "bottom-center" });
             setActive(false)
         }
     }
@@ -104,9 +104,9 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
         if (type === 'init') {
             const hasEnd = watch('initialDate')
             const init = moment(val)
-            const end = hasEnd ? moment(watch('finalDate')) : moment()
+            const end = moment(watch('finalDate'))
 
-            if (init.isSameOrAfter(end)) {
+            if (hasEnd && init.isSameOrAfter(end)) {
                 return `La fecha de apertura debe ser menor que la fecha y hora ${hasEnd ? "de cierre" : "actual"}`
             }
 
@@ -117,11 +117,7 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
             const hasStart = watch('initialDate')
             const check = moment(val)
             const init = hasStart ? moment(watch('initialDate')) : undefined
-            const end = moment()
 
-            if (check.isAfter(end)) {
-                return `La fecha de cierre debe ser menor que la fecha y hora actual`
-            }
             if (init && check.isSameOrBefore(init)) {
                 return `La fecha de cierre debe ser mayor que la fecha y hora de apertura`
             }
@@ -163,7 +159,6 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                         className="full-selector opacity-40"
                         disabled={selectedInventario._id !== ""}
                         min={watch('initialDate') ? moment(watch('initialDate')!.toString()).format("YYYY-MM-DDTHH:mm") : undefined}
-                        max={moment().format("YYYY-MM-DDTHH:mm")}
                         validateAmount={(val) => validateHours(val, 'end')}
                     />
                 </div>
@@ -240,7 +235,6 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
                         })
                     }
                 </div>
-
             </div>
 
             <div className="w-full  sticky bottom-0 bg-main-background h-full z-50">
