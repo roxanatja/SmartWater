@@ -28,3 +28,15 @@ export type Permission = {
   created: string;
   updated: string;
 }
+
+export type UserGeoMonitoring = User & {
+  organization: string;
+  city: {
+    id: string;
+    name: string;
+  };
+  geolocation: {
+    latitude: number;
+    longitude: number;
+  }
+}

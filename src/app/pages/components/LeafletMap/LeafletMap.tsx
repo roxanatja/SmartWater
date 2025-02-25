@@ -9,10 +9,10 @@ import 'leaflet.markercluster'
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import { ClientStatus, getMarkerHtml, markerStyles } from './constants';
-import { MapaClientesContext } from '../../Contenido/MapaClientes/MapaClientesContext';
+import { ClientStatus, getDistribuidorMarkerHtml, getMarkerHtml, markerStyles } from './constants';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSessionStorage } from '@uidotdev/usehooks';
+import { UserGeoMonitoring } from '../../../../type/User';
 
 const center = {
     lat: -16.702358987690342,
@@ -33,11 +33,13 @@ interface MapProps {
     longitude?: number;
     activeClient?: string;
     onAdd: VoidFunction;
-    clients: (Client & { status: ClientStatus })[]
+    clients: (Client & { status: ClientStatus })[];
+    setSelectedClient: React.Dispatch<React.SetStateAction<Client & { status: ClientStatus }>>;
+    monitoring?: { user: UserGeoMonitoring, color: string }[];
+    origin?: string;
 }
 
-const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapProps) => {
-    const { setSelectedClient } = useContext(MapaClientesContext);
+const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude, setSelectedClient, monitoring, origin = "/MapaClientes" }: MapProps) => {
     const [query, setQuery] = useSearchParams()
     const location = useLocation()
     const navigate = useNavigate()
@@ -72,10 +74,20 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
         });
     }
 
+    const getCustomDistribuitor = (color: string) => {
+        return divIcon({
+            className: 'custom-marker',
+            html: getDistribuidorMarkerHtml(color),
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -12]
+        });
+    }
+
     useEffect(() => {
         if (map.current && latitude && longitude) {
             const mapZoom = map.current?.getZoom()
-            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 14 ? mapZoom : 14)
+            map.current.flyTo([latitude, longitude], mapZoom && mapZoom > 17 ? mapZoom : 17)
 
             query.delete('latitude')
             query.delete('longitude')
@@ -139,7 +151,7 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                                             click: (event) => {
                                                 setSelectedClient(client);
                                                 setReturnUrl(`${location.pathname}${location.search}&latitude=${client.location.latitude}&longitude=${client.location.longitude}`)
-                                                navigate("/MapaClientes/DetallesCliente")
+                                                navigate(`${origin}/DetallesCliente`)
                                             }
                                         }}
                                         position={new LatLng(Number(client.location.latitude), Number(client.location.longitude))}
@@ -152,6 +164,25 @@ const LeafletMap = ({ clients, onAdd, activeClient, latitude, longitude }: MapPr
                             })
                         }
                     </MarkerClusterGroup>
+
+                    {
+                        monitoring && monitoring.map(m => {
+                            return <Marker
+                                eventHandlers={{
+                                    click: (event) => {
+                                        if (map.current) {
+                                            map.current.flyTo(event.latlng, 17)
+                                        }
+                                    }
+                                }}
+                                position={new LatLng(Number(m.user.geolocation.latitude), Number(m.user.geolocation.longitude))}
+                                key={m.user._id} icon={getCustomDistribuitor(m.color)}>
+                                <Tooltip direction='top' offset={[0, -12]}>
+                                    {m.user.fullName || "Sin nombre"}
+                                </Tooltip>
+                            </Marker>
+                        })
+                    }
 
                     <button type='button' className={`${POSITION_CLASSES.topright} !rounded-full cursor-pointer flex items-center justify-center !right-[20px] !top-[10px] !w-[30px] !h-[30px] custom-map-control-button !pointer-events-auto shadow-lg shadow-black/60 !border !border-black/25`}
                         onClick={() => setChangeMapType(true)}>
