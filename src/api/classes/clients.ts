@@ -87,11 +87,8 @@ export abstract class ClientsApiConector {
     }
 
     static async deleteClient(params: IClientGetOneParams): Promise<{ mensaje: string } | { error: string } | null> {
-        console.log("deleting")
         try {
-            console.log("deleting inner")
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.clientId}`)
-            console.log(res)
             return res.data
         } catch (error) {
             const err = error as AxiosError

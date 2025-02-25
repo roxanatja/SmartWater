@@ -456,7 +456,7 @@ const FiltroPaginado = forwardRef<IFiltroPaginadoReference, Componentes>(({
   };
 
   const getDataClients = async () => {
-    const filters = activeFilters ? { ...activeFilters } : {}
+    const filters = activeFilters ? { ...activeFilters, clientDeleted: false } : { clientDeleted: false }
 
     let datClients: { data: Client[] } & QueryMetadata | null = null
     if (filters) {

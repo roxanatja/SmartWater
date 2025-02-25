@@ -8,6 +8,7 @@ export type Providers = {
   created: string;
   updated: string;
   user: string;
+  saldos: number;
 };
 
 export type ProvidersBody = {

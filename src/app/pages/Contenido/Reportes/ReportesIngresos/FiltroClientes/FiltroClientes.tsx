@@ -123,7 +123,7 @@ const FiltroClientes = ({ distribuidores, zones }: {
       filters.initialDate = "2020-01-01"
     }
 
-    let datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters });
+    let datClients = await ClientsApiConector.getClients({ pagination: { page: 1, pageSize: 30000 }, filters: { ...filters, clientDeleted: false } });
 
     // Cargar datos
     const data = datClients?.data || [];
