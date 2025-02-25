@@ -16,9 +16,16 @@ export abstract class ComissionsApiConector {
         }
     }
 
-    static async createGeneral(params: IComissionGeneralBody): Promise<{ id: string } | null> {
+    static async createGeneral(params: IComissionGeneralBody): Promise<{ id: string } | { error: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().post(`${this.root_path}/general-comission/generate`, params.data)
+            const res = await ApiConnector.getInstance().post(`${this.root_path}/general-comission/generate`, params.data, {
+                validateStatus(status) {
+                    if (status === 200 || status === 404) {
+                        return true
+                    }
+                    return false;
+                },
+            })
             return res.data
         } catch (error) {
             return null

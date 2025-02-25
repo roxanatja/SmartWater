@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Input from "../../../EntryComponents/Inputs";
 import moment from "moment";
+import momentTz from "moment-timezone";
 import toast from "react-hot-toast";
 import { ComissionsApiConector } from "../../../../../api/classes/comissions";
 import { Comission } from "../../../../../type/Comission";
@@ -38,16 +39,21 @@ const FormGeneral = ({ onCancel, selectedInventario }: Props) => {
         } else {
             res = await ComissionsApiConector.createGeneral({
                 data: {
-                    endDate: data.finalDate,
-                    initialDate: data.initialDate,
+                    endDate: momentTz(data.finalDate).tz("America/La_Paz").format(),
+                    initialDate: momentTz(data.initialDate).tz("America/La_Paz").format(),
                     percentage: data.percent
                 }
             });
         }
 
         if (res) {
-            toast.success(`Comisión ${selectedInventario._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
-            window.location.reload();
+            if ('error' in res) {
+                toast.error(res.error, { position: "bottom-center" });
+                setActive(false)
+            } else {
+                toast.success(`Comisión ${selectedInventario._id === "" ? "registrada" : "editada"} correctamente`, { position: "bottom-center" });
+                // window.location.reload();
+            }
         } else {
             toast.error("Upps error al registrar la comisión", { position: "bottom-center" });
             setActive(false)

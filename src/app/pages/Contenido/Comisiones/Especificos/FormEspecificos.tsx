@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { User } from '../../../../../type/User';
 import Product from '../../../../../type/Products/Products';
 import moment from 'moment';
+import momentTz from 'moment-timezone';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { ComisionesEspecificosContext } from './ComisionesEspecificosProvider';
 import Input from '../../../EntryComponents/Inputs';
@@ -77,8 +78,8 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
             res = await ComissionsApiConector.createSpecific({
                 data: {
                     users: data.users.map(u => ({
-                        endDate: data.finalDate,
-                        initialDate: data.initialDate,
+                        endDate: momentTz(data.finalDate).tz("America/La_Paz").format(),
+                        initialDate: momentTz(data.initialDate).tz("America/La_Paz").format(),
                         user: u.user_id,
                         elements: u.percent.filter(p => p.value && p.value > 0).map(p => ({
                             product: p.product,
@@ -90,7 +91,7 @@ const FormEspecificos = ({ distribuidores, products, onCancel }: Props) => {
         }
 
         if (res) {
-            toast.success(`Item ${selectedInventario._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
+            toast.success(`Comisión ${selectedInventario._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
             // toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
             window.location.reload();
         } else {
