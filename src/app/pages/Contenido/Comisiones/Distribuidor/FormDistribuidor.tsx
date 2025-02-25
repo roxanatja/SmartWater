@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form';
 import moment from 'moment';
+import momentTz from 'moment-timezone';
 import Input from '../../../EntryComponents/Inputs';
 import { motion } from 'framer-motion'
 import { User } from '../../../../../type/User';
@@ -40,8 +41,8 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
         const res = await ComissionsApiConector.createByUser({
             data: {
                 users: data.users.map(u => ({
-                    endDate: data.finalDate,
-                    initialDate: data.initialDate,
+                    endDate: momentTz(data.finalDate).tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss"),
+                    initialDate: momentTz(data.initialDate).tz("America/La_Paz").format("YYYY-MM-DDTHH:mm:ss"),
                     percentage: u.percent,
                     user: u.user_id
                 }))

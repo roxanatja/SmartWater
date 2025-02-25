@@ -113,7 +113,7 @@ const TableEspecificos = ({ data, className, distribuidores }: Props) => {
                 <DataTable columns={columns} className={className}
                     data={data}
                     pagination={data.length > 10}
-                    paginationPerPage={5}
+                    paginationPerPage={10}
                     noDataComponent={<div className="min-h-[150px] flex items-center justify-center">Sin registros</div>}
                     paginationComponent={({ currentPage, onChangePage, rowCount, rowsPerPage }) => (<>
                         <div className="flex gap-2 w-full justify-end mt-2">

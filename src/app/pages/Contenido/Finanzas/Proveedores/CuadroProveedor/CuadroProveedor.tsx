@@ -147,10 +147,10 @@ const CuadroProveedor = ({ provider }: { provider: Providers }) => {
               <span className="text-blue_custom">
                 Saldo por pagar Bs.
               </span>
-              <div className="infoClientes-moneda bg-blue_custom"              >
+              <div className="infoClientes-moneda bg-blue_custom">
                 <img src="/Moneda-icon.svg" alt="" />
                 <div>
-                  <span>{0} Bs.</span>
+                  <span>{provider.saldos.toLocaleString()} Bs.</span>
                 </div>
               </div>
             </div>

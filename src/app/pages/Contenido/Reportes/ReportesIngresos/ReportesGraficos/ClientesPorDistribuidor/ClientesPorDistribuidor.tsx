@@ -191,7 +191,7 @@ const ClientesPorDistribuidor: FC = () => {
     }, [formatted, distribuidoresSelected])
 
     const loadData = useCallback(async () => {
-        const res = await ClientsApiConector.getClients({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD") }, pagination: { page: 1, pageSize: 30000 } })
+        const res = await ClientsApiConector.getClients({ filters: { initialDate: filters.initialDate || "2020-01-01", finalDate: filters.finalDate || moment().format("YYYY-MM-DD"), clientDeleted: false }, pagination: { page: 1, pageSize: 30000 } })
         setReports(res?.data || [])
     }, [filters])
 
