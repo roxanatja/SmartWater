@@ -64,7 +64,7 @@ const ComisionesEspecificos = () => {
 
     const allPercentages = useMemo<number[]>(() => {
         const aux: number[] = []
-        allComissions.forEach(d => aux.push(...d.details.map(det => det.percentageElem)))
+        allComissions.forEach(d => aux.push(...d.details.map(det => { return det?.percentageElem })))
         return Array.from(new Set(aux.sort((a, b) => a - b)))
     }, [allComissions])
 

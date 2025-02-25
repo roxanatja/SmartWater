@@ -63,9 +63,9 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
         if (type === 'init') {
             const hasEnd = watch('initialDate')
             const init = moment(val)
-            const end = hasEnd ? moment(watch('finalDate')) : moment()
+            const end = moment(watch('finalDate'))
 
-            if (init.isSameOrAfter(end)) {
+            if (hasEnd && init.isSameOrAfter(end)) {
                 return `La fecha de apertura debe ser menor que la fecha y hora ${hasEnd ? "de cierre" : "actual"}`
             }
 
@@ -76,11 +76,7 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
             const hasStart = watch('initialDate')
             const check = moment(val)
             const init = hasStart ? moment(watch('initialDate')) : undefined
-            const end = moment()
 
-            if (check.isAfter(end)) {
-                return `La fecha de cierre debe ser menor que la fecha y hora actual`
-            }
             if (init && check.isSameOrBefore(init)) {
                 return `La fecha de cierre debe ser mayor que la fecha y hora de apertura`
             }
@@ -117,7 +113,6 @@ const FormDistribuidor = ({ onCancel, distribuidores }: Props) => {
                     required
                     className="full-selector"
                     min={watch('initialDate') ? moment(watch('initialDate')!.toString()).format("YYYY-MM-DDTHH:mm") : undefined}
-                    max={moment().format("YYYY-MM-DDTHH:mm")}
                     validateAmount={(val) => validateHours(val, 'end')}
                 />
 
