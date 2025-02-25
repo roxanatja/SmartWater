@@ -109,12 +109,10 @@ const PaginaPrincipal: FC = () => {
                   path="/MapaClientes/*"
                   element={<MapaClientesWrapper />}
                 />
-                {/* 
                 <Route
-                  path="/MonitoreoDistribuidores"
+                  path="/MonitoreoDistribuidores/*"
                   element={<MonitoreoDistribuidoresWrapper />}
                 />
-                 */}
                 <Route
                   path="/Configuracion/General"
                   element={<ConfiguracionGeneralWrapper />}

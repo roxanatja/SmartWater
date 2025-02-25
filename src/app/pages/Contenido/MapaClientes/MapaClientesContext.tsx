@@ -30,7 +30,6 @@ export const MapaClientesContext = createContext<MapaClientesContextType>(
   {} as MapaClientesContextType
 );
 
-
 export const clientWithStatus: Client & { status: ClientStatus } = {
   // Tu objeto de cliente
   _id: "",
