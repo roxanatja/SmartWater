@@ -22,7 +22,7 @@ import FiltroClientesMapa from "./FiltroClientesMapa/FiltroClientesMapa";
 import { OpcionesMap } from "./OpcionesMap/OpcionesMap";
 
 const MapaClientes: React.FC = () => {
-  const { showFiltro, setShowFiltro, showModal, setShowModal, selectedOption, setSelectedOption, zones, setZones, allClients, setAllClients } = useContext(MapaClientesContext);
+  const { showFiltro, setShowFiltro, showModal, setShowModal, selectedOption, setSelectedOption, zones, setZones, allClients, setAllClients, setSelectedClient } = useContext(MapaClientesContext);
   const { setLoading } = useGlobalContext()
 
   const [clients, setClients] = useState<(Client & { status: ClientStatus })[]>([]);
@@ -190,12 +190,71 @@ const MapaClientes: React.FC = () => {
           paginacion={false}
           exportar={false}
           iconUbicacion
+          iconUbicacionInject={
+            <div
+              style={{
+                display: "flex",
+                gap: "35px",
+                marginBottom: "25px",
+                marginTop: "10px",
+              }}
+            >
+              <div className="Mapaclientes-ubicacion">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="30"
+                  viewBox="0 0 31 47"
+                  fill="#DD0000"
+                >
+                  <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z" />
+                </svg>
+                <span>Pedidos en curso</span>
+              </div>
+              <div className="Mapaclientes-ubicacion">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="30"
+                  viewBox="0 0 31 47"
+                  fill="#FF5C00"
+                >
+                  <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z" />
+                </svg>
+                <span>Clientes deben renovar</span>
+              </div>
+              <div className="Mapaclientes-ubicacion">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="30"
+                  viewBox="0 0 31 47"
+                  fill="#960090"
+                >
+                  <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z" />
+                </svg>
+                <span>Resto de clientes</span>
+              </div>
+              <div className="Mapaclientes-ubicacion">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="30"
+                  viewBox="0 0 31 47"
+                  fill="#1FAF38"
+                >
+                  <path d="M31 15.3918C31 23.8925 23.1159 33.807 15.5 47C6.78557 33.807 0 23.8925 0 15.3918C0 6.89115 6.93959 0 15.5 0C24.0604 0 31 6.89115 31 15.3918Z" />
+                </svg>
+                <span>Pedidos atendidos</span>
+              </div>
+            </div>
+          }
           search={(val: string) => setSearchTerm(val)}
           onFilter={() => setShowFiltro(true)}
           hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
         ></FiltroPaginado>
         <div className="MapaClientes w-full flex-1 pb-10">
-          <LeafletMap onAdd={() => setSelectedOption(true)} clients={clients} latitude={latitude} longitude={longitude} />
+          <LeafletMap onAdd={() => setSelectedOption(true)} clients={clients} latitude={latitude} longitude={longitude} setSelectedClient={setSelectedClient} />
           {/* <GoogleMaps apiKey={api} onAdd={() => setShowModal(true)} clients={filteredClients} /> */}
         </div>
       </div>
