@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IInitialBalanceBody } from "../../../../../../api/types/kardex";
 import { MatchedElement } from "../../../../../../type/Kardex";
@@ -9,6 +9,7 @@ import DataTable, { TableColumn } from "react-data-table-component";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import toast from "react-hot-toast";
+import { InventariosValoradosContext } from "../InventariosValoradosProvider";
 
 interface Props {
     onCancel?: () => void;
@@ -17,15 +18,17 @@ interface Props {
 
 const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
     const [active, setActive] = useState(false);
+    const { selectedInventario } = useContext(InventariosValoradosContext)
 
     const { register, formState: { errors, isValid }, handleSubmit } = useForm<IInitialBalanceBody['data']>({
         defaultValues: {
             elements: elemnts.map(e => ({
                 product: e.isProduct ? e._id : undefined,
                 item: e.isItem ? ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id) : undefined,
-                quantity: e.initialBalance,
-                unitPrice: (e.initialBalance > 0 && e.initialBalanceTransactions.length > 0) ? e.initialBalanceTransactions[0].balance.weightedAverageCost : 0
+                quantity: selectedInventario.detailsToElements.length > 0 ? selectedInventario.detailsToElements.find(el => (e.isProduct && el.elementId === e._id) || (e.isItem && el.elementId === ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id)))?.quantity : 0,
+                unitPrice: undefined
             })),
+            openingDate: selectedInventario.initialBalance.registerDate !== "" ? moment.utc(selectedInventario.initialBalance.registerDate).tz("America/La_Paz", true).format("YYYY-MM-DD") : undefined,
             user: AuthService.getUser()?._id || ""
         },
         mode: 'all'
@@ -47,7 +50,7 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                     const cpy: IInitialBalanceBody['data']['elements'][0] = {
                         quantity: parseFloat(String(e.quantity)),
                         unitPrice: parseFloat(String(e.unitPrice)),
-                        // inputImport: parseFloat(String(e.unitPrice)) * parseFloat(String(e.quantity))
+                        inputImport: parseFloat(String(e.unitPrice)) * parseFloat(String(e.quantity))
                     }
                     if (e.product) { cpy.product = e.product }
                     if (e.item) { cpy.item = e.item }

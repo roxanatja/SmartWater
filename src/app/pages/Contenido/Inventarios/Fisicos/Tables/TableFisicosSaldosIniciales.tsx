@@ -101,12 +101,12 @@ const TableFisicosSaldosIniciales = ({ data, className }: Props) => {
             width: "20%",
             cell: (row) =>
                 <div className="flex items-center justify-end w-full gap-6 pr-3">
-                    <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
+                    {/* <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
                         <i className="fa fa-eye text-blue_bright" aria-hidden="true"></i>
                     </button>
                     <button onClick={() => { setSelectedInvetario(row); setShowModal(true) }}>
                         <i className="fa-solid fa-pen-to-square text-blue_bright" aria-hidden="true"></i>
-                    </button>
+                    </button> */}
                     <button onClick={() => deleteRegistry(row)}>
                         <i className="fa fa-trash text-red-500" aria-hidden="true"></i>
                     </button>

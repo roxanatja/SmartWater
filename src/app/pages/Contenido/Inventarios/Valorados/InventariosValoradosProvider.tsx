@@ -1,4 +1,5 @@
 import React, { createContext, PropsWithChildren, useState } from 'react'
+import { KardexInitialBalances } from '../../../../../type/Kardex';
 
 type InventariosValoradosContextType = {
     showModal: boolean;
@@ -9,20 +10,21 @@ type InventariosValoradosContextType = {
     setSelectedOption: React.Dispatch<React.SetStateAction<boolean>>;
     showFiltro: boolean;
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedInventario: unknown;
-    setSelectedInvetario: React.Dispatch<React.SetStateAction<unknown>>;
+    selectedInventario: KardexInitialBalances;
+    setSelectedInvetario: React.Dispatch<React.SetStateAction<KardexInitialBalances>>;
 };
 
 export const InventariosValoradosContext =
     createContext<InventariosValoradosContextType>({} as InventariosValoradosContextType);
 
+export const initialBalanceMock: KardexInitialBalances = { detailsToElements: [], initialBalance: { registerDate: "", user: [] } }
 
 const InventariosValoradosProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
-    const [selectedInventario, setSelectedInvetario] = useState<unknown>({});
+    const [selectedInventario, setSelectedInvetario] = useState<KardexInitialBalances>(initialBalanceMock);
 
     return (
         <InventariosValoradosContext.Provider

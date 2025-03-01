@@ -1,11 +1,11 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import { IMockInventories } from '../../mock-data'
 import { InventariosFisicosContext } from '../InventariosFisicosProvider'
 import toast from 'react-hot-toast'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
 import { PhysiscalGeneratedReport } from '../../../../../../type/PhysicalInventory'
 import { User } from '../../../../../../type/User'
+import { PhysicalInventoryApiConector } from '../../../../../../api/classes/physical-inventory'
 
 interface Props {
     data: PhysiscalGeneratedReport[];
@@ -34,31 +34,27 @@ const TableFisicosReportes = ({ data, className, distribuidores }: Props) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                toast.success("Registro eliminado con exito", {
-                                    position: "top-center",
-                                    duration: 2000
-                                });
 
-                                //     const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
-                                //     if (!!response) {
-                                //         if (response.mensaje) {
-                                //             toast.success(response.mensaje, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //             window.location.reload();
-                                //         } else if (response.error) {
-                                //             toast.error(response.error, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //         }
-                                //     } else {
-                                //         toast.error("Error al eliminar cliente", {
-                                //             position: "top-center",
-                                //             duration: 2000
-                                //         });
-                                //     }
+                                const response = await PhysicalInventoryApiConector.deleteReport({ inventoryId: id })
+                                if (!!response) {
+                                    if (response.message) {
+                                        toast.success(response.message, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        window.location.reload();
+                                    } else {
+                                        toast.error("Error al eliminar el reporte", {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                    }
+                                } else {
+                                    toast.error("Error al eliminar el reporte", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
                             }}
                         >
                             Proceder
@@ -111,15 +107,15 @@ const TableFisicosReportes = ({ data, className, distribuidores }: Props) => {
             width: "7%",
             cell: (row) =>
                 <div className="flex items-center justify-end w-full gap-6">
-                    <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
+                    {/* <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
                         <i className="fa fa-eye text-blue_bright" aria-hidden="true"></i>
-                    </button>
+                    </button> */}
                     <button onClick={() => deleteRegistry(row._id)}>
                         <i className="fa fa-trash text-red-500" aria-hidden="true"></i>
                     </button>
                 </div>
         }
-    ], [deleteRegistry, setSelectedInvetario, setSelectedOption])
+    ], [deleteRegistry, setSelectedInvetario, setSelectedOption, distribuidores])
 
     return (
         <>

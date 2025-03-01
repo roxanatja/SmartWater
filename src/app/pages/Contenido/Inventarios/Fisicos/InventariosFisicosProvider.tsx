@@ -1,5 +1,5 @@
 import React, { createContext, PropsWithChildren, useState } from 'react'
-import { PhysicalBalanceToShow } from '../../../../../type/PhysicalInventory';
+import { PhysicalBalanceToShow, PhysiscalPreviousReport } from '../../../../../type/PhysicalInventory';
 import moment from 'moment';
 
 type InventariosFisicosContextType = {
@@ -13,8 +13,8 @@ type InventariosFisicosContextType = {
     setShowFiltro: React.Dispatch<React.SetStateAction<boolean>>;
     selectedBalance: PhysicalBalanceToShow;
     setSelectedBalance: React.Dispatch<React.SetStateAction<PhysicalBalanceToShow>>;
-    selectedInventario: unknown;
-    setSelectedInvetario: React.Dispatch<React.SetStateAction<unknown>>;
+    selectedInventario: PhysiscalPreviousReport[];
+    setSelectedInvetario: React.Dispatch<React.SetStateAction<PhysiscalPreviousReport[]>>;
 };
 
 export const InventariosFisicosContext =
@@ -37,7 +37,7 @@ const InventariosFisicosProvider = ({ children }: PropsWithChildren) => {
     const [showMiniModal, setShowMiniModal] = useState<boolean>(false);
     const [selectedOption, setSelectedOption] = useState<boolean>(false);
     const [showFiltro, setShowFiltro] = useState<boolean>(false);
-    const [selectedInventario, setSelectedInvetario] = useState<unknown>({});
+    const [selectedInventario, setSelectedInvetario] = useState<PhysiscalPreviousReport[]>([]);
     const [selectedBalance, setSelectedBalance] = useState<PhysicalBalanceToShow>(balance);
 
     return (

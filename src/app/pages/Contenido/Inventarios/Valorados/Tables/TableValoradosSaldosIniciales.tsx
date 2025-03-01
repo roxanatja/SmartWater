@@ -1,24 +1,26 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import { IMockInventories } from '../../mock-data'
 import toast from 'react-hot-toast'
 import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
 import { InventariosValoradosContext } from '../InventariosValoradosProvider'
+import { KardexInitialBalances } from '../../../../../../type/Kardex'
+import { KardexApiConector } from '../../../../../../api/classes/kardex'
+import moment from 'moment-timezone'
 
 interface Props {
-    data: IMockInventories[];
+    data: KardexInitialBalances[];
     className?: string;
 }
 
 const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
     const { setSelectedInvetario, setSelectedOption, setShowModal } = useContext(InventariosValoradosContext)
 
-    const deleteRegistry = useCallback((id: string) => {
+    const deleteRegistry = useCallback(() => {
         toast.error(
             (t) => (
                 <div>
                     <p className="mb-4 text-center text-[#888]">
-                        Se <b>eliminará</b> este registro, <br /> pulsa <b>Proceder</b> para continuar
+                        Se <b>eliminarán</b> los registros de saldos iniciales, <br /> pulsa <b>Proceder</b> para continuar
                     </p>
                     <div className="flex justify-center">
                         <button
@@ -31,31 +33,26 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                toast.success("Registro eliminado con exito", {
-                                    position: "top-center",
-                                    duration: 2000
-                                });
-
-                                //     const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
-                                //     if (!!response) {
-                                //         if (response.mensaje) {
-                                //             toast.success(response.mensaje, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //             window.location.reload();
-                                //         } else if (response.error) {
-                                //             toast.error(response.error, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //         }
-                                //     } else {
-                                //         toast.error("Error al eliminar cliente", {
-                                //             position: "top-center",
-                                //             duration: 2000
-                                //         });
-                                //     }
+                                const response = await KardexApiConector.deleteInitialBalances();
+                                if (!!response) {
+                                    if (response.message) {
+                                        toast.success(response.message, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        window.location.reload();
+                                    } else {
+                                        toast.error("Error al eliminar los saldos iniciales", {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                    }
+                                } else {
+                                    toast.error("Error al eliminar los saldos iniciales", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
                             }}
                         >
                             Proceder
@@ -72,18 +69,20 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
     }, [])
 
 
-    const columns: TableColumn<IMockInventories>[] = useMemo<TableColumn<IMockInventories>[]>(() => [
+    const columns: TableColumn<KardexInitialBalances>[] = useMemo<TableColumn<KardexInitialBalances>[]>(() => [
         {
             name: "Hora y fecha de registro",
-            selector: row => (row.initialDate ? formatDateTime(row.initialDate, 'numeric', '2-digit', '2-digit', true, true) : "N/A"),
+            selector: row => (row.initialBalance.registerDate ? formatDateTime(
+                moment.utc(row.initialBalance.registerDate).tz("America/La_Paz", true).format(),
+                'numeric', '2-digit', '2-digit', true, true) : "N/A"),
         },
         {
             name: "Administrador",
-            selector: row => row.name || "Distribuidor desconocido",
+            selector: row => row.initialBalance.user[0].fullName || "Distribuidor desconocido",
         },
         {
             name: "Estado",
-            selector: row => row.status ? "Generado" : "Generado",
+            selector: row => "Generado",
         },
         {
             name: "",
@@ -96,7 +95,7 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
                     <button onClick={() => { setSelectedInvetario(row); setShowModal(true) }}>
                         <i className="fa-solid fa-pen-to-square text-blue_bright" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => deleteRegistry(row._id)}>
+                    <button onClick={() => deleteRegistry()}>
                         <i className="fa fa-trash text-red-500" aria-hidden="true"></i>
                     </button>
                 </div>

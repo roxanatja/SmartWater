@@ -58,7 +58,7 @@ export abstract class PhysicalInventoryApiConector {
         }
     }
 
-    static async deleteReport(params: IInventoryFilter): Promise<{ mensaje: string } | null> {
+    static async deleteReport(params: IInventoryFilter): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/${params.inventoryId}/delete-report`)
             return res.data
@@ -67,7 +67,7 @@ export abstract class PhysicalInventoryApiConector {
         }
     }
 
-    static async delete(params: IDeleteBody): Promise<{ mensaje: string } | null> {
+    static async delete(params: IDeleteBody): Promise<{ message: string } | null> {
         try {
             const res = await ApiConnector.getInstance().delete(`${this.root_path}/initial-balance/delete`, {
                 data: params.data
