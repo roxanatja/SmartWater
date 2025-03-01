@@ -52,6 +52,8 @@ const LoginForm = () => {
     }
   };
 
+  const [passwordState, setPasswordState] = useState<boolean>(false)
+
   return (
     <motion.div
       className="login-overlay"
@@ -91,16 +93,28 @@ const LoginForm = () => {
               </motion.p>
             )}
 
-            <motion.input
-              className={`login-input bg-transparent text-font-color border-font-color ${passwordError && "error"}`}
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            />
+            <div className="relative mb-[20px]">
+              <motion.input
+                className={`login-input bg-transparent text-font-color border-font-color !mb-0 ${passwordError && "error"}`}
+                type={passwordState ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              />
+              <div className="absolute top-1/2 right-2 -translate-y-1/2" onClick={() => setPasswordState(!passwordState)}>
+                {
+                  passwordState &&
+                  <i className="far fa-eye-slash"></i>
+                }
+                {
+                  !passwordState &&
+                  <i className="far fa-eye"></i>
+                }
+              </div>
+            </div>
             {passwordError && (
               <motion.p
                 className="error-message"

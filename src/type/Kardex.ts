@@ -225,3 +225,19 @@ export type OtherOutput = {
     detail: string,
     elementName: string;
 }
+
+export type KardexInitialBalances = {
+    initialBalance: {
+        user: User[];
+        registerDate: string;
+    };
+    detailsToElements: {
+        _id: string;
+        admin: string;
+        registerDate: string;
+        elementId: string;
+        element: string;
+        quantity: number;
+        hasInitialBalance: boolean;
+    }[]
+}

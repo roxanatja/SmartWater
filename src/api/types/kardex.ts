@@ -29,7 +29,7 @@ export interface IInitialBalanceBody {
             product?: string;
             item?: string;
             quantity: number;
-            unitPrice: number;
+            unitPrice?: number;
             inputImport?: number;
         }[];
     }

@@ -1,4 +1,4 @@
-import { KardexDetail, MatchedElement } from "../../type/Kardex";
+import { KardexDetail, KardexInitialBalances, MatchedElement } from "../../type/Kardex";
 import { QueryMetadata } from "../types/common";
 import { IInitialBalanceBody, IKardexDetailGetParams, IKardexOthersGetParams, IKardexReportsParams, IOtherEntryBody, IOtherOutputBody, IOthersEntryMoreBody, IOthersOutputMoreBody, KardexOthersReturnMap, KardexReportReturnMap } from "../types/kardex";
 import { generateQueryString } from "../utils/common";
@@ -6,6 +6,19 @@ import { ApiConnector } from "./api-conector";
 
 export abstract class KardexApiConector {
     private static root_path = "/kardex"
+
+    static async getInitialBalances(): Promise<KardexInitialBalances | null> {
+        try {
+            const res = await ApiConnector.getInstance().get(`${this.root_path}/find/initial-balance`)
+            if ('initialBalance' in res.data) {
+                return res.data
+            } else {
+                return null
+            }
+        } catch (error) {
+            return null
+        }
+    }
 
     static async getKardexElements(): Promise<{ elements: MatchedElement[] } | null> {
         try {
@@ -107,6 +120,15 @@ export abstract class KardexApiConector {
             } else {
                 return res.data
             }
+        } catch (error) {
+            return null
+        }
+    }
+
+    static async deleteInitialBalances(): Promise<{ message: string } | null> {
+        try {
+            const res = await ApiConnector.getInstance().delete(`${this.root_path}/initial-balance/delete`)
+            return res.data
         } catch (error) {
             return null
         }
