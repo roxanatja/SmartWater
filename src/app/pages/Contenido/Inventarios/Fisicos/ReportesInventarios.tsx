@@ -6,22 +6,24 @@ import { UsersApiConector } from '../../../../../api/classes';
 import Modal from '../../../EntryComponents/Modal';
 import FiltrosReportesInventarios from './Filtros/FiltrosReportesInventarios';
 import TableFisicosReportes from './Tables/TableFisicosReportes';
-import { fisicos_saldos } from '../mock-data';
 import { MatchedElementRoot } from '../../../../../type/Kardex';
 import { PhysiscalGeneratedReport } from '../../../../../type/PhysicalInventory';
 import { PhysicalInventoryApiConector } from '../../../../../api/classes/physical-inventory';
 import { useGlobalContext } from '../../../../SmartwaterContext';
 import moment from 'moment';
+import FormPickDistribuidor from './Modals/FormPickDistribuidor';
 
 const ReportesInventarios = () => {
-    const { setShowFiltro, showFiltro } = useContext(InventariosFisicosContext)
+    const {
+        setShowFiltro, showFiltro,
+        setShowModal, showModal
+    } = useContext(InventariosFisicosContext)
     const { setLoading } = useGlobalContext()
 
     const [currentData, setCurrentData] = useState<PhysiscalGeneratedReport[]>([])
     const [elements, setElements] = useState<MatchedElementRoot[]>([]);
 
     const [savedFilters, setSavedFilters] = useState<any>({})
-
     const [distribuidores, setDistribuidores] = useState<User[]>([])
 
     useEffect(() => {
@@ -87,12 +89,17 @@ const ReportesInventarios = () => {
                         text: "Reportes de inventario",
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
-                ]} add onAdd={() => { alert("OnAdd") }}>
+                ]} add onAdd={() => { setShowModal(true) }}>
                 <TableFisicosReportes data={currentData} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' distribuidores={distribuidores} />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
                 <FiltrosReportesInventarios distribuidores={distribuidores} initialFilters={savedFilters} onChange={handleFilterChange} />
+            </Modal>
+
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">Reporte de inventarios</h2>
+                <FormPickDistribuidor distribuidores={distribuidores} onCancel={() => setShowModal(false)} />
             </Modal>
         </>
     )
