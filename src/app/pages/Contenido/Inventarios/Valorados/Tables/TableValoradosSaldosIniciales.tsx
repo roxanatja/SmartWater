@@ -78,7 +78,7 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
         },
         {
             name: "Administrador",
-            selector: row => row.initialBalance.user[0].fullName || "Distribuidor desconocido",
+            selector: row => row.initialBalance.user?.[0].fullName || "Distribuidor desconocido",
         },
         {
             name: "Estado",

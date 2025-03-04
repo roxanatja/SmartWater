@@ -17,7 +17,7 @@ type ComisionesEspecificosContextType = {
 export const ComisionesEspecificosContext =
     createContext<ComisionesEspecificosContextType>({} as ComisionesEspecificosContextType);
 
-export const especificoMock: Comission<'specific'> = { _id: "", type: 'specific', endDate: "", initialDate: "", details: [], user: { _id: "", email: "", role: "user" } }
+export const especificoMock: Comission<'specific'> = { _id: "", code: '', type: 'specific', endDate: "", initialDate: "", details: [], user: { _id: "", email: "", role: "user" } }
 
 const ComisionesEspecificosProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);

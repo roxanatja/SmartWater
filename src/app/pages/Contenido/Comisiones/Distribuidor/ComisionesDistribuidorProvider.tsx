@@ -17,7 +17,7 @@ type ComisionesDistribuidorContextType = {
 export const ComisionesDistribuidorContext =
     createContext<ComisionesDistribuidorContextType>({} as ComisionesDistribuidorContextType);
 
-export const distribuidorMock: Comission<'byuser'> = { _id: "", type: 'byuser', endDate: "", initialDate: "", percentage: 0, totalAfter: 0, totalBefore: 0, user: { _id: "", email: "", role: "user" } }
+export const distribuidorMock: Comission<'byuser'> = { _id: "", type: 'byuser', code: "", endDate: "", initialDate: "", percentage: 0, totalAfter: 0, totalBefore: 0, user: { _id: "", email: "", role: "user" } }
 
 const ComisionesDistribuidorProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);

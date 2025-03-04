@@ -80,6 +80,10 @@ const TableGeneral = ({ data, className, distribuidores }: Props) => {
             selector: row => `${distribuidores.find(d => d._id === row.user._id)?.fullName || "Distribuidor desconocido"} ${row.user.role === 'admin' ? "(Administrador)" : ""}`,
         },
         {
+            name: "Código",
+            selector: row => row.code || "Sin código",
+        },
+        {
             name: "Ventas",
             width: "12%",
             selector: row => row.totalBefore.toFixed(2),

@@ -17,7 +17,7 @@ type ComisionesGeneralContextType = {
 export const ComisionesGeneralContext =
     createContext<ComisionesGeneralContextType>({} as ComisionesGeneralContextType);
 
-export const generalMock: Comission<'general'> = { _id: "", type: 'general', endDate: "", initialDate: "", percentage: 0, totalAfter: 0, totalBefore: 0, user: { _id: "", email: "", role: "user" } }
+export const generalMock: Comission<'general'> = { _id: "", code: "", type: 'general', endDate: "", initialDate: "", percentage: 0, totalAfter: 0, totalBefore: 0, user: { _id: "", email: "", role: "user" } }
 
 const ComisionesGeneralProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);
