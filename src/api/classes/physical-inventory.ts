@@ -19,7 +19,12 @@ export abstract class PhysicalInventoryApiConector {
         const query = generateQueryString(params)
 
         try {
-            const res = await ApiConnector.getInstance().get(`${this.root_path}/${params.type}${query ? `?${query}` : ''}`)
+            const res = await ApiConnector.getInstance().get(`${this.root_path}/${params.type}${query ? `?${query}` : ''}`, {
+                validateStatus(status) {
+                    if (status === 400 || status === 200 || status === 404) return true
+                    return false
+                },
+            })
             return res.data
         } catch (error) {
             return null

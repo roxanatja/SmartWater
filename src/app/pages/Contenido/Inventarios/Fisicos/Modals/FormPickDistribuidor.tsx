@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
 import momentTz from 'moment-timezone';
@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { User } from '../../../../../../type/User';
 import Input from '../../../../EntryComponents/Inputs';
 import { PhysicalInventoryApiConector } from '../../../../../../api/classes/physical-inventory';
+import toast from 'react-hot-toast';
+import { InventariosFisicosContext } from '../InventariosFisicosProvider';
 
 interface Props {
     onCancel?: () => void;
@@ -20,6 +22,7 @@ type FormType = {
 
 const FormPickDistribuidor = ({ onCancel, distribuidores }: Props) => {
     const [active, setActive] = useState(false);
+    const { setSelectedInvetario, setShowMiniModal } = useContext(InventariosFisicosContext)
 
     const { register, formState: { errors, isValid }, handleSubmit, watch } = useForm<FormType>({
         mode: 'all'
@@ -37,17 +40,26 @@ const FormPickDistribuidor = ({ onCancel, distribuidores }: Props) => {
             }
         });
 
-        console.log(res)
         setActive(false)
 
-        // if (res) {
-        //     // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
-        //     toast.success(`Comisión registrada correctamente`, { position: "bottom-center" });
-        //     window.location.reload();
-        // } else {
-        //     toast.error("Upps error al registrar la comisión", { position: "bottom-center" });
-        //     setActive(false)
-        // }
+        if (res) {
+            if ('message' in res) {
+                toast.error(res.message, { position: "bottom-right" });
+                setActive(false)
+            } else {
+                if (res.length > 0) {
+                    setSelectedInvetario(res)
+                    setShowMiniModal(true)
+                    onCancel && onCancel()
+                } else {
+                    toast.error("Sin datos", { position: "bottom-center" });
+                    setActive(false)
+                }
+            }
+        } else {
+            toast.error("Upps error al obtener los datos", { position: "bottom-center" });
+            setActive(false)
+        }
     }
 
     const validateHours = (val: string, type: 'init' | 'end'): string | boolean => {
