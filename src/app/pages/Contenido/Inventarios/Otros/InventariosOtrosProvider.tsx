@@ -20,8 +20,8 @@ type InventariosOtrosContextType = {
 export const InventariosOtrosContext =
     createContext<InventariosOtrosContextType>({} as InventariosOtrosContextType);
 
-export const otroEntry: OtherEntry = { _id: "", balance: { balanceAmount: 0, balanceImport: 0, cpp: 0, inputImport: 0, inputQuantity: 0 }, detail: "", documentNumber: "", elementName: "", quantity: 0, registerDate: "", type: "production_received", user: user }
-export const otroOutput: OtherOutput = { _id: "", balance: { balanceAmount: 0, balanceImport: 0, cpp: 0, inputImport: 0, inputQuantity: 0 }, detail: "", documentNumber: "", elementName: "", quantity: 0, registerDate: "", type: "production_delivered", user: user }
+export const otroEntry: OtherEntry = { _id: "", code: "", balance: { balanceAmount: 0, balanceImport: 0, cpp: 0, inputImport: 0, inputQuantity: 0 }, detail: "", documentNumber: "", elementName: "", quantity: 0, registerDate: "", type: "production_received", user: user }
+export const otroOutput: OtherOutput = { _id: "", code: "", balance: { balanceAmount: 0, balanceImport: 0, cpp: 0, inputImport: 0, inputQuantity: 0 }, detail: "", documentNumber: "", elementName: "", quantity: 0, registerDate: "", type: "production_delivered", user: user }
 
 const InventariosOtrosProvider = ({ children }: PropsWithChildren) => {
     const [showModal, setShowModal] = useState<boolean>(false);

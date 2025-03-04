@@ -109,7 +109,8 @@ const SaldosIniciales = () => {
                         url: "/Finanzas/Inventarios/Fisicos/ReporteInventario"
                     },
                 ]} add onAdd={() => { setShowMiniModal(true) }} >
-                <TableFisicosSaldosIniciales data={currentData} className='w-full xl:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                <TableFisicosSaldosIniciales data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                    className='w-full xl:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>

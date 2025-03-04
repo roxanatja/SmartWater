@@ -1,4 +1,4 @@
-import { BalanceReport, OtherEntry, OtherOutput } from "../../type/Kardex";
+import { EntrysReport, OtherEntry, OtherOutput, OutputsReport } from "../../type/Kardex";
 import { FilteredSearch, Search } from "./common";
 
 export interface IKardexDetailGetParams extends FilteredSearch {
@@ -15,7 +15,8 @@ export interface IKardexReportsParams extends FilteredSearch {
 }
 
 export type KardexReportReturnMap = {
-    balance: { balances: BalanceReport };
+    entrys: { balances: EntrysReport };
+    outputs: { balances: OutputsReport };
 }
 
 export interface IInitialBalanceBody {
@@ -104,4 +105,9 @@ export interface IKardexOthersGetParams extends Search {
 export type KardexOthersReturnMap = {
     income: { data: OtherEntry[] };
     exits: { data: OtherOutput[] };
+}
+
+export interface IDeleteOther {
+    type: 'outputs' | 'entrys',
+    entryId: string;
 }

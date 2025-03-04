@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../../../../SmartwaterContext";
-import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import { EntrysReport } from "../../../../../../type/Kardex";
 import { formatDateTime } from "../../../../../../utils/helpers";
 import TableEntriesReport from "../Tables/TableEntriesReport";
 import { entriesReport } from "./pdfTemplates";
 import { showGeneratePDF } from "../../../../../../utils/pdfHelper";
+import { ValuedPhysicalApiConector } from "../../../../../../api/classes/valued-physical";
 
 interface Props {
     toDate: string;
@@ -19,7 +19,7 @@ const EntriesReportModal = ({ toDate }: Props) => {
     useEffect(() => {
         setLoadingLocal(true)
 
-        KardexApiConector.kardexReports({ type: "entrys", filters: { toDate } }).then(res => {
+        ValuedPhysicalApiConector.kardexReports({ type: "entrys", filters: { toDate } }).then(res => {
             if (res) {
                 setBalanceReport(res.balances)
             } else {

@@ -6,8 +6,8 @@ import { EntryItemBody, MatchedElement } from "../../../../../../type/Kardex";
 import InventoriesEntryForm from "./InventoriesEntryForm";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { IOthersEntryMoreBody } from "../../../../../../api/types/kardex";
-import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import toast from "react-hot-toast";
+import { ValuedPhysicalApiConector } from "../../../../../../api/classes/valued-physical";
 
 interface Props {
     onCancel?: () => void;
@@ -76,7 +76,7 @@ const OtrosIngresosForm = ({ elements, onCancel }: Props) => {
         // if (selectedItem._id !== "") {
         //     res = await ItemsApiConector.update({ productId: selectedItem._id, data })
         // } else {
-        res = await KardexApiConector.registerEntryMore({ data: requestBody });
+        res = await ValuedPhysicalApiConector.registerEntryMore({ data: requestBody });
         // }
 
         if (res) {

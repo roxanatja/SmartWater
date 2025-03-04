@@ -7,9 +7,9 @@ import Input from "../../../../EntryComponents/Inputs";
 import React from "react";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { AuthService } from "../../../../../../api/services/AuthService";
-import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import toast from "react-hot-toast";
 import { InventariosValoradosContext } from "../InventariosValoradosProvider";
+import { ValuedPhysicalApiConector } from "../../../../../../api/classes/valued-physical";
 
 interface Props {
     onCancel?: () => void;
@@ -26,10 +26,11 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
                 product: e.isProduct ? e._id : undefined,
                 item: e.isItem ? ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id) : undefined,
                 quantity: selectedInventario.detailsToElements.length > 0 ? selectedInventario.detailsToElements.find(el => (e.isProduct && el.elementId === e._id) || (e.isItem && el.elementId === ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id)))?.quantity : 0,
-                unitPrice: undefined
+                unitPrice: selectedInventario.detailsToElements.length > 0 ? selectedInventario.detailsToElements.find(el => (e.isProduct && el.elementId === e._id) || (e.isItem && el.elementId === ((e.matchingItems && e.matchingItems?.length > 0) ? e.matchingItems[0]._id : e._id)))?.unitPrice : 0
             })),
             openingDate: selectedInventario.initialBalance.registerDate !== "" ? moment.utc(selectedInventario.initialBalance.registerDate).tz("America/La_Paz", true).format("YYYY-MM-DD") : undefined,
-            user: AuthService.getUser()?._id || ""
+            user: AuthService.getUser()?._id || "",
+            documentNumber: selectedInventario.initialBalance.documentNumber
         },
         mode: 'all'
     })
@@ -43,7 +44,7 @@ const AddEditInitialBalances = ({ elemnts, onCancel }: Props) => {
         const now = moment.tz("America/La_Paz").set({ date: selected.date(), month: selected.month(), year: selected.year() })
         data.openingDate = now.format("YYYY-MM-DDTHH:mm")
 
-        res = await KardexApiConector.initialBalance({
+        res = await ValuedPhysicalApiConector.initialBalance({
             data: {
                 ...data,
                 elements: data.elements.map(e => {

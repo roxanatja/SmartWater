@@ -10,6 +10,7 @@ import { MatchedElement, OtherOutput } from '../../../../../type/Kardex';
 import { IKardexOthersGetParams } from '../../../../../api/types/kardex';
 import { useGlobalContext } from '../../../../SmartwaterContext';
 import OtrasSalidasDetails from './Modals/OtrasSalidasDetails';
+import { ValuedPhysicalApiConector } from '../../../../../api/classes/valued-physical';
 
 const Salidas = () => {
     const {
@@ -41,7 +42,7 @@ const Salidas = () => {
     const getData = useCallback(async () => {
         setLoading(true)
 
-        const res = await KardexApiConector.getOthers({ type: 'exits', filters: savedFilters, pagination: { page: currentPage, pageSize } })
+        const res = await ValuedPhysicalApiConector.getOthers({ type: 'exits', filters: savedFilters, pagination: { page: currentPage, pageSize } })
 
         setCurrentData(res?.data || [])
         setTotal(res?.metadata?.total || 0)
@@ -70,7 +71,8 @@ const Salidas = () => {
                         url: "/Finanzas/Inventarios/Otros/Salidas"
                     },
                 ]} add onAdd={() => setShowMiniModal(true)}>
-                <TableOtrasSalidas data={currentData} tableClassName='no-inner-border border !border-font-color/20 !rounded-[10px]' className='w-full xl:!w-3/4' handleChangePage={setCurrentPage} totalRows={total} pageSize={pageSize} />
+                <TableOtrasSalidas data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                    tableClassName='no-inner-border border !border-font-color/20 !rounded-[10px]' className='w-full xl:!w-3/4' handleChangePage={setCurrentPage} totalRows={total} pageSize={pageSize} />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>
