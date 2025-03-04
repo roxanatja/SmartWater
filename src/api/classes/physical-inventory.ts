@@ -1,5 +1,5 @@
 import { MatchedElementRoot } from "../../type/Kardex";
-import { IDeleteBody, IInitialBalanceBody, IInventoryFilter, IPhysicalGetParams, ISaveReportBody, PhysicalGetReturnMap } from "../types/physical-inventory";
+import { IDeleteBody, IInitialBalanceBody, IInitialBalanceUpdateBody, IInventoryFilter, IPhysicalGetParams, ISaveReportBody, PhysicalGetReturnMap } from "../types/physical-inventory";
 import { generateQueryString } from "../utils/common";
 import { ApiConnector } from "./api-conector";
 
@@ -49,9 +49,14 @@ export abstract class PhysicalInventoryApiConector {
         }
     }
 
-    static async update(params: IInitialBalanceBody): Promise<{ mensaje: string } | null> {
+    static async update(params: IInitialBalanceUpdateBody): Promise<{ mensaje: string } | null> {
         try {
-            const res = await ApiConnector.getInstance().put(`${this.root_path}/update/initial-balance`, params.data)
+            const res = await ApiConnector.getInstance().put(`${this.root_path}/update/initial-balance`, params.data, {
+                validateStatus(status) {
+                    if (status === 400 || status === 200) return true
+                    return false
+                },
+            })
             return res.data
         } catch (error) {
             return null

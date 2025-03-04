@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import InventariosLayout from '../InventariosLayout/InventariosLayout'
 import { User } from '../../../../../type/User'
-import { InventariosFisicosContext } from './InventariosFisicosProvider'
+import { balance, InventariosFisicosContext } from './InventariosFisicosProvider'
 import Modal from '../../../EntryComponents/Modal'
 import FiltrosSaldosIniciales from './Filtros/FiltrosSaldosIniciales'
 import { UsersApiConector } from '../../../../../api/classes'
@@ -13,11 +13,15 @@ import { useGlobalContext } from '../../../../SmartwaterContext'
 import moment from 'moment'
 import { PhysicalBalanceToShow, PhysicalInitialBalace } from '../../../../../type/PhysicalInventory'
 import SaldosInicialesForm from './Modals/SaldosInicialesForm'
+import ShowInitialBalancesModal from './Modals/ShowInitialBalancesModal'
 
 const SaldosIniciales = () => {
     const {
         setShowFiltro, showFiltro,
-        setShowMiniModal, showMiniModal
+        setShowMiniModal, showMiniModal,
+        setShowModal, showModal,
+        setSelectedBalance, selectedBalance,
+        setSelectedOption, selectedOption
     } = useContext(InventariosFisicosContext)
     const { setLoading } = useGlobalContext()
 
@@ -119,6 +123,17 @@ const SaldosIniciales = () => {
 
             <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)}>
                 <SaldosInicialesForm distribuidores={distribuidores} elements={elements} onCancel={() => { setShowMiniModal(false) }} />
+            </Modal>
+
+            <Modal isOpen={showModal && selectedBalance.code !== ""} onClose={() => { setShowModal(false); setSelectedBalance(balance) }}>
+                <SaldosInicialesForm distribuidores={distribuidores} elements={elements} onCancel={() => { setShowModal(false); setSelectedBalance(balance) }} />
+            </Modal>
+
+            <Modal isOpen={selectedOption && selectedBalance.code !== ""} onClose={() => { setSelectedOption(false); setSelectedBalance(balance) }}>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Saldos iniciales
+                </h2>
+                <ShowInitialBalancesModal elements={elements} onCancel={() => { setSelectedOption(false); setSelectedBalance(balance) }} />
             </Modal>
         </>
     )
