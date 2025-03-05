@@ -131,7 +131,7 @@ const FiltrosReportesInventarios = ({
                         </div>
                     ))}
                 </div>
-                {/* <label className="text-blue_custom mt-2">Administradores</label>
+                <label className="text-blue_custom mt-2">Administradores</label>
                 <div className="flex flex-wrap gap-x-6 gap-y-4">
                     {distribuidores.filter(d => d.role === 'admin').map((dists, index) => (
                         <div
@@ -159,7 +159,7 @@ const FiltrosReportesInventarios = ({
                             </label>
                         </div>
                     ))}
-                </div> */}
+                </div>
             </div>
 
             <div className="flex justify-between w-full items-center gap-3 px-4">
