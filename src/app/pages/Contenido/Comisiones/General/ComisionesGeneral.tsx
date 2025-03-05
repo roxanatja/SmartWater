@@ -13,13 +13,15 @@ import { useGlobalContext } from '../../../../SmartwaterContext';
 import moment from 'moment';
 import { ComissionsApiConector } from '../../../../../api/classes/comissions';
 import { IComissionGetParams } from '../../../../../api/types/comissions';
+import ShowComisionesGenerales from './ShowComisionesGenerales';
 
 const ComisionesGeneral = () => {
     const {
         setShowFiltro, showFiltro,
         setShowMiniModal, showMiniModal,
         setShowModal, showModal,
-        setSelectedInvetario, selectedInventario
+        setSelectedInvetario, selectedInventario,
+        setSelectedOption, selectedOption
     } = useContext(ComisionesGeneralContext)
     const { setLoading } = useGlobalContext()
 
@@ -71,7 +73,8 @@ const ComisionesGeneral = () => {
                     onFilter={() => setShowFiltro(true)}
                     hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
                     add onAdd={() => setShowMiniModal(true)} >
-                    <TableGeneral data={currentData} distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                    <TableGeneral data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                        distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
                 </InventariosLayout>
             </div>
 
@@ -92,6 +95,13 @@ const ComisionesGeneral = () => {
                     Editar porcentaje general
                 </h2>
                 <FormGeneral onCancel={() => { setShowModal(false); setSelectedInvetario(generalMock); }} selectedInventario={selectedInventario} />
+            </Modal>
+
+            <Modal isOpen={selectedOption && selectedInventario._id !== ""} onClose={() => { setSelectedOption(false); setSelectedInvetario(generalMock); }} className='!w-3/4 sm:!w-1/2'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Porcentaje general
+                </h2>
+                <ShowComisionesGenerales onCancel={() => { setSelectedOption(false); setSelectedInvetario(generalMock); }} selectedInventario={selectedInventario} allComissions={currentData} distribuidores={distribuidores} />
             </Modal>
         </>
     )

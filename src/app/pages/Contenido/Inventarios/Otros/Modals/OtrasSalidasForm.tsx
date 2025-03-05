@@ -5,9 +5,9 @@ import moment from "moment-timezone";
 import { MatchedElement, OutputItemBody } from "../../../../../../type/Kardex";
 import { AuthService } from "../../../../../../api/services/AuthService";
 import { IOthersOutputMoreBody } from "../../../../../../api/types/kardex";
-import { KardexApiConector } from "../../../../../../api/classes/kardex";
 import toast from "react-hot-toast";
 import InventoriesOutputForm from "./InventoriesOutputForm";
+import { ValuedPhysicalApiConector } from "../../../../../../api/classes/valued-physical";
 
 interface Props {
     onCancel?: () => void;
@@ -74,7 +74,7 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
         let res = null
         setActive(true)
 
-        res = await KardexApiConector.registerOutputMore({ data: requestBody });
+        res = await ValuedPhysicalApiConector.registerOutputMore({ data: requestBody });
 
         if (res) {
             if ('error' in res) {
@@ -99,7 +99,7 @@ const OtrasSalidasForm = ({ elements, onCancel }: Props) => {
                                     className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                                     onClick={async () => {
                                         toast.dismiss(t.id);
-                                        let resp2 = await KardexApiConector.registerOutputMore({ data: { ...requestBody, forceOut: true } })
+                                        let resp2 = await ValuedPhysicalApiConector.registerOutputMore({ data: { ...requestBody, forceOut: true } })
 
                                         if (resp2) {
                                             toast.success(`Salida registrada correctamente`, { position: "bottom-center" });

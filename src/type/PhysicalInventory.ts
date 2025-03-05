@@ -35,6 +35,8 @@ export type PhysiscalPreviousReport = {
     user: string;
     role: 'admin' | 'user';
     name: string;
+    item?: string;
+    product?: string;
     initialBalance: number;
     returnDistributor: number;
     providerPurchase: number;

@@ -1,5 +1,6 @@
 export type ComissionData = {
     _id: string;
+    code: string;
     user: {
         _id: string;
         role: "user" | "admin",

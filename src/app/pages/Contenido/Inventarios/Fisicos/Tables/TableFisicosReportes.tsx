@@ -14,7 +14,7 @@ interface Props {
 }
 
 const TableFisicosReportes = ({ data, className, distribuidores }: Props) => {
-    const { setSelectedInvetario, setSelectedOption } = useContext(InventariosFisicosContext)
+    const { setSelectedReport, setSelectedOption } = useContext(InventariosFisicosContext)
 
     const deleteRegistry = useCallback((id: string) => {
         toast.error(
@@ -90,32 +90,32 @@ const TableFisicosReportes = ({ data, className, distribuidores }: Props) => {
                 return `${dist?.fullName || "Distribuidor desconocido"} ${dist?.role === 'admin' ? "(Admistrador)" : ""}`
             },
         },
-        // {
-        //     name: "Sistema",
-        //     selector: row => row.system.toLocaleString(),
-        // },
-        // {
-        //     name: "Diferencia",
-        //     selector: row => row.difference.toLocaleString(),
-        // },
-        // {
-        //     name: "Estado",
-        //     selector: row => row.status ? "Generado" : "Generado",
-        // },
+        {
+            name: "Sistema",
+            selector: row => row.elements.reduce((acc, c) => acc += (c.ssg || 0), 0),
+        },
+        {
+            name: "Diferencia",
+            selector: row => row.elements.reduce((acc, c) => acc += (c.diff || 0), 0),
+        },
+        {
+            name: "Estado",
+            selector: row => "Generado",
+        },
         {
             name: "",
             width: "7%",
             cell: (row) =>
                 <div className="flex items-center justify-end w-full gap-6">
-                    {/* <button onClick={() => { setSelectedInvetario(row); setSelectedOption(true) }}>
+                    <button onClick={() => { setSelectedReport(row); setSelectedOption(true) }}>
                         <i className="fa fa-eye text-blue_bright" aria-hidden="true"></i>
-                    </button> */}
+                    </button>
                     <button onClick={() => deleteRegistry(row._id)}>
                         <i className="fa fa-trash text-red-500" aria-hidden="true"></i>
                     </button>
                 </div>
         }
-    ], [deleteRegistry, setSelectedInvetario, setSelectedOption, distribuidores])
+    ], [deleteRegistry, setSelectedReport, setSelectedOption, distribuidores])
 
     return (
         <>

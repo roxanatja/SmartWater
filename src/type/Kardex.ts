@@ -191,7 +191,7 @@ export type OutputItemBody = {
 export type OtherEntry = {
     _id: string;
     user: User;
-    code?: string;
+    code: string;
     quantity: number;
     balance: {
         inputQuantity: number;
@@ -210,7 +210,7 @@ export type OtherEntry = {
 export type OtherOutput = {
     _id: string;
     user: User;
-    code?: string;
+    code: string;
     quantity: number;
     balance: {
         inputQuantity: number;
@@ -230,14 +230,18 @@ export type KardexInitialBalances = {
     initialBalance: {
         user: User[];
         registerDate: string;
+        code: string;
+        documentNumber: string;
     };
     detailsToElements: {
         _id: string;
         admin: string;
+        code: string;
         registerDate: string;
         elementId: string;
         element: string;
         quantity: number;
         hasInitialBalance: boolean;
+        unitPrice: number;
     }[]
 }

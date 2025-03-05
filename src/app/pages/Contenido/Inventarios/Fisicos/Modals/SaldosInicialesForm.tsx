@@ -6,7 +6,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import moment from 'moment';
 import { motion } from 'framer-motion';
 import Input from '../../../../EntryComponents/Inputs';
-import { IInitialBalanceBody } from '../../../../../../api/types/physical-inventory';
+import { IInitialBalanceBody, IInitialBalanceUpdateBody } from '../../../../../../api/types/physical-inventory';
 import toast from 'react-hot-toast';
 import { PhysicalInventoryApiConector } from '../../../../../../api/classes/physical-inventory';
 
@@ -40,7 +40,7 @@ const SaldosInicialesForm = ({ distribuidores, elements, onCancel }: Props) => {
             forceCreation: true,
             role: selectedBalance.user.isAdmin ? 'admin' : "user",
             user: selectedBalance.user._id,
-            elements: selectedBalance.saldo.map(s => ({ product: s.product?._id, item: s.item?._id, initialBalance: s.initialBalance }))
+            elements: selectedBalance.saldo.map(s => ({ product: s.product?._id, item: s.item?._id, initialBalance: s.initialBalance || 0 }))
         } : {},
         mode: 'all'
     })
@@ -52,41 +52,65 @@ const SaldosInicialesForm = ({ distribuidores, elements, onCancel }: Props) => {
     });
 
     const onSubmit = async (data: FormType) => {
-        console.log(data)
         let res = null
         setActive(true)
 
-        const formData: IInitialBalanceBody['data'] = {
-            registerDate: data.registerDate,
-            users: [{
-                role: data.role,
-                user: data.user,
-                forceCreation: true,
-                elements: data.elements.map(d => {
-                    const res: IInitialBalanceBody['data']['users'][0]['elements'][0] = { initialBalance: Number(String(d.initialBalance)), }
-                    if (d.item) { res.item = d.item }
-                    if (d.product) { res.product = d.product }
-                    return res
-                })
-            }]
+        if (selectedBalance.code !== "") {
+            const formData: IInitialBalanceUpdateBody['data'] = {
+                users: [{
+                    role: data.role,
+                    user: data.user,
+                    code: selectedBalance.code,
+                    lastRegisterDate: selectedBalance.showDate.format("YYYY-MM-DDTHH:mm"),
+                    elements: data.elements.map(d => {
+                        const res: IInitialBalanceBody['data']['users'][0]['elements'][0] = { initialBalance: Number(String(d.initialBalance)), }
+                        if (d.item) { res.item = d.item }
+                        if (d.product) { res.product = d.product }
+                        return res
+                    })
+                }]
+            }
+
+            res = await PhysicalInventoryApiConector.update({ data: formData })
+        } else {
+            const formData: IInitialBalanceBody['data'] = {
+                registerDate: data.registerDate,
+                users: [{
+                    role: data.role,
+                    user: data.user,
+                    forceCreation: true,
+                    elements: data.elements.map(d => {
+                        const res: IInitialBalanceBody['data']['users'][0]['elements'][0] = { initialBalance: Number(String(d.initialBalance)), }
+                        if (d.item) { res.item = d.item }
+                        if (d.product) { res.product = d.product }
+                        return res
+                    })
+                }]
+            }
+
+            res = await PhysicalInventoryApiConector.createBalance({ data: formData });
         }
 
-        // if (selectedBalance.code !== "") {
-        //     res = await PhysicalInventoryApiConector.update({ data})
-        // } else {
-        res = await PhysicalInventoryApiConector.createBalance({ data: formData });
-        // }
-
         if (res) {
-            // toast.success(`Item ${selectedItem._id === "" ? "registrado" : "editado"} correctamente`, { position: "bottom-center" });
             if ('message' in res) {
                 if ('results' in res) {
                     toast.success(`Ingreso registrado correctamente`, { position: "bottom-center" });
                     window.location.reload();
                 } else {
-                    toast.error(res.message, { position: "bottom-right", duration: 2000 });
+                    let messageResult = res.message
+                    console.log(messageResult)
+                    if (res.message.includes("no tiene stock")) {
+                        const itemId = res.message.split(" ")[2]
+                        const productName = elements.find(e => e._id === itemId)?.name || itemId
+                        messageResult = messageResult.replace(itemId, productName)
+                    }
+
+                    toast.error(messageResult, { position: "bottom-right", duration: 2000 });
                     setActive(false)
                 }
+            } else if ('mensaje' in res) {
+                toast.success(res.mensaje, { position: "bottom-center" });
+                window.location.reload();
             } else {
                 toast.error("Upps error al registrar el ingreso", { position: "bottom-right" });
                 setActive(false)

@@ -52,7 +52,8 @@ const SaldosIniciales = () => {
                 },
             ]}
                 add={currentData.length === 0} onAdd={() => setShowMiniModal(true)}>
-                <TableValoradosSaldosIniciales data={currentData} className='w-full lg:!w-3/4 no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                <TableValoradosSaldosIniciales data={currentData.sort((a, b) => Number(b.initialBalance.code.split("-")[2]) - Number(a.initialBalance.code.split("-")[2]))}
+                    className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
             </InventariosLayout>
 
             <Modal isOpen={showMiniModal} onClose={() => setShowMiniModal(false)} className='!w-[95%] sm:!w-3/4'>

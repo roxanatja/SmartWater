@@ -27,8 +27,7 @@ export interface IInitialBalanceBody {
         users: {
             user: string;
             role: 'admin' | 'user';
-            code?: string;  // For edit
-            forceCreation?: boolean; // For create
+            forceCreation: boolean;
             elements: {
                 product?: string;
                 item?: string;
@@ -36,6 +35,22 @@ export interface IInitialBalanceBody {
             }[]
         }[];
         registerDate: string;
+    }
+}
+
+export interface IInitialBalanceUpdateBody {
+    data: {
+        users: {
+            user: string;
+            role: 'admin' | 'user';
+            code: string;
+            lastRegisterDate: string;
+            elements: {
+                product?: string;
+                item?: string;
+                initialBalance: number;
+            }[]
+        }[];
     }
 }
 

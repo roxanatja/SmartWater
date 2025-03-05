@@ -14,13 +14,15 @@ import { ComissionsApiConector } from '../../../../../api/classes/comissions';
 import { useGlobalContext } from '../../../../SmartwaterContext';
 import moment from 'moment';
 import FormGeneral from '../General/FormGeneral';
+import ShowComisionesDistribuidor from './ShowComisionesDistribuidor';
 
 const ComisionesDistribuidor = () => {
     const {
         setShowFiltro, showFiltro,
         setShowMiniModal, showMiniModal,
         setShowModal, showModal,
-        setSelectedInvetario, selectedInventario
+        setSelectedInvetario, selectedInventario,
+        setSelectedOption, selectedOption
     } = useContext(ComisionesDistribuidorContext)
     const { setLoading } = useGlobalContext()
 
@@ -73,7 +75,8 @@ const ComisionesDistribuidor = () => {
                     onFilter={() => setShowFiltro(true)}
                     hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
                     add onAdd={() => { setShowMiniModal(true) }} >
-                    <TableDistribuidor data={currentData} distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                    <TableDistribuidor data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                        distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
                 </InventariosLayout>
             </div>
 
@@ -94,6 +97,14 @@ const ComisionesDistribuidor = () => {
                     Editar porcentaje distribuidor
                 </h2>
                 <FormGeneral onCancel={() => { setShowModal(false); setSelectedInvetario(distribuidorMock); }} selectedInventario={selectedInventario} />
+            </Modal>
+
+
+            <Modal isOpen={selectedOption && selectedInventario._id !== ""} onClose={() => { setSelectedOption(false); setSelectedInvetario(distribuidorMock); }} className='!w-3/4 sm:!w-1/2'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Porcentaje general
+                </h2>
+                <ShowComisionesDistribuidor onCancel={() => { setSelectedOption(false); setSelectedInvetario(distribuidorMock); }} selectedInventario={selectedInventario} allComissions={currentData} distribuidores={distribuidores} />
             </Modal>
         </>
     )

@@ -13,13 +13,15 @@ import { useGlobalContext } from '../../../../SmartwaterContext';
 import { Comission } from '../../../../../type/Comission';
 import { ComissionsApiConector } from '../../../../../api/classes/comissions';
 import moment from 'moment';
+import ShowComisionesEspecifico from './ShowComisionesEspecifico';
 
 const ComisionesEspecificos = () => {
     const {
         setShowFiltro, showFiltro,
         setShowMiniModal, showMiniModal,
         setShowModal, showModal,
-        setSelectedInvetario, selectedInventario
+        setSelectedInvetario, selectedInventario,
+        setSelectedOption, selectedOption
     } = useContext(ComisionesEspecificosContext)
     const { setLoading } = useGlobalContext()
 
@@ -79,7 +81,8 @@ const ComisionesEspecificos = () => {
                     onFilter={() => setShowFiltro(true)}
                     hasFilter={!!savedFilters && Object.keys(savedFilters).length > 0}
                     add onAdd={() => { setShowMiniModal(true) }} >
-                    <TableEspecificos data={currentData} distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
+                    <TableEspecificos data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                        distribuidores={distribuidores} className='w-full no-inner-border border !border-font-color/20 !rounded-[10px]' />
                 </InventariosLayout>
             </div>
 
@@ -100,6 +103,14 @@ const ComisionesEspecificos = () => {
                     Editar porcentaje específico
                 </h2>
                 <FormEspecificos onCancel={() => { setShowModal(false); setSelectedInvetario(especificoMock); }} distribuidores={distribuidores} products={products} />
+            </Modal>
+
+
+            <Modal isOpen={selectedOption && selectedInventario._id !== ""} onClose={() => { setSelectedOption(false); setSelectedInvetario(especificoMock); }} className='!w-3/4 sm:!w-1/2'>
+                <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
+                    Porcentaje general
+                </h2>
+                <ShowComisionesEspecifico onCancel={() => { setSelectedOption(false); setSelectedInvetario(especificoMock); }} selectedInventario={selectedInventario} allComissions={currentData} distribuidores={distribuidores} products={products} />
             </Modal>
         </>
     )

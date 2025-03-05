@@ -4,8 +4,8 @@ import DataTable, { TableColumn } from 'react-data-table-component'
 import { formatDateTime } from '../../../../../../utils/helpers'
 import { InventariosValoradosContext } from '../InventariosValoradosProvider'
 import { KardexInitialBalances } from '../../../../../../type/Kardex'
-import { KardexApiConector } from '../../../../../../api/classes/kardex'
 import moment from 'moment-timezone'
+import { ValuedPhysicalApiConector } from '../../../../../../api/classes/valued-physical'
 
 interface Props {
     data: KardexInitialBalances[];
@@ -33,7 +33,7 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                const response = await KardexApiConector.deleteInitialBalances();
+                                const response = await ValuedPhysicalApiConector.deleteInitialBalances();
                                 if (!!response) {
                                     if (response.message) {
                                         toast.success(response.message, {
@@ -78,11 +78,15 @@ const TableValoradosSaldosIniciales = ({ data, className }: Props) => {
         },
         {
             name: "Administrador",
-            selector: row => row.initialBalance.user[0].fullName || "Distribuidor desconocido",
+            selector: row => row.initialBalance.user?.[0].fullName || "Distribuidor desconocido",
         },
         {
-            name: "Estado",
-            selector: row => "Generado",
+            name: "Código",
+            selector: row => row.initialBalance.code,
+        },
+        {
+            name: "Número de documento",
+            selector: row => row.initialBalance.documentNumber,
         },
         {
             name: "",

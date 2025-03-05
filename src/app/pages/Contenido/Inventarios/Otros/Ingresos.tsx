@@ -11,6 +11,7 @@ import OtrosIgresosDetails from './Modals/OtrosIgresosDetails';
 import { useGlobalContext } from '../../../../SmartwaterContext';
 import { IKardexOthersGetParams } from '../../../../../api/types/kardex';
 import moment from 'moment-timezone';
+import { ValuedPhysicalApiConector } from '../../../../../api/classes/valued-physical';
 
 const Ingresos = () => {
     const {
@@ -51,7 +52,7 @@ const Ingresos = () => {
             filters.initialDate = "2020-01-01"
         }
 
-        const res = await KardexApiConector.getOthers({ type: 'income', filters, pagination: { page: currentPage, pageSize } })
+        const res = await ValuedPhysicalApiConector.getOthers({ type: 'income', filters, pagination: { page: currentPage, pageSize } })
 
         setCurrentData(res?.data || [])
         setTotal(res?.metadata?.total || 0)
@@ -80,7 +81,8 @@ const Ingresos = () => {
                         url: "/Finanzas/Inventarios/Otros/Salidas"
                     },
                 ]} add onAdd={() => setShowMiniModal(true)}>
-                <TableOtrosIngresos data={currentData} tableClassName='no-inner-border border !border-font-color/20 !rounded-[10px]' className='w-full xl:!w-3/4' handleChangePage={setCurrentPage} totalRows={total} pageSize={pageSize} />
+                <TableOtrosIngresos data={currentData.sort((a, b) => Number(b.code.split("-")[2]) - Number(a.code.split("-")[2]))}
+                    tableClassName='no-inner-border border !border-font-color/20 !rounded-[10px]' className='w-full xl:!w-3/4' handleChangePage={setCurrentPage} totalRows={total} pageSize={pageSize} />
             </InventariosLayout>
 
             <Modal isOpen={showFiltro} onClose={() => setShowFiltro(false)}>

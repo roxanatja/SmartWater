@@ -5,6 +5,7 @@ import { formatDateTime } from '../../../../../../utils/helpers'
 import { InventariosOtrosContext } from '../InventariosOtrosProvider'
 import { useGlobalContext } from '../../../../../SmartwaterContext'
 import { OtherEntry } from '../../../../../../type/Kardex'
+import { ValuedPhysicalApiConector } from '../../../../../../api/classes/valued-physical'
 
 interface Props {
     data: OtherEntry[];
@@ -37,31 +38,27 @@ const TableOtrosIngresos = ({ data, className, tableClassName, pageSize, totalRo
                             className="bg-blue_custom px-3 py-1 rounded-lg ml-2 text-white"
                             onClick={async () => {
                                 toast.dismiss(t.id);
-                                toast.success("Registro eliminado con exito", {
-                                    position: "top-center",
-                                    duration: 2000
-                                });
 
-                                //     const response = await CashRegisterApiConector.delete({ registryId: id }) as any;
-                                //     if (!!response) {
-                                //         if (response.mensaje) {
-                                //             toast.success(response.mensaje, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //             window.location.reload();
-                                //         } else if (response.error) {
-                                //             toast.error(response.error, {
-                                //                 position: "top-center",
-                                //                 duration: 2000
-                                //             });
-                                //         }
-                                //     } else {
-                                //         toast.error("Error al eliminar cliente", {
-                                //             position: "top-center",
-                                //             duration: 2000
-                                //         });
-                                //     }
+                                const response = await ValuedPhysicalApiConector.deleteOther({ entryId: id, type: 'entrys' });
+                                if (!!response) {
+                                    if (response.message) {
+                                        toast.success(response.message, {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                        window.location.reload();
+                                    } else {
+                                        toast.error("Error al eliminar el registro", {
+                                            position: "top-center",
+                                            duration: 2000
+                                        });
+                                    }
+                                } else {
+                                    toast.error("Error al eliminar el registro", {
+                                        position: "top-center",
+                                        duration: 2000
+                                    });
+                                }
                             }}
                         >
                             Proceder
