@@ -89,7 +89,7 @@ const ComisionesDistribuidor = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Generar porcentaje distribuidor
                 </h2>
-                <FormDistribuidor onCancel={() => setShowMiniModal(false)} distribuidores={distribuidores} />
+                <FormDistribuidor onCancel={() => setShowMiniModal(false)} distribuidores={distribuidores.filter(d => d.role === 'user')} />
             </Modal>
 
             <Modal isOpen={showModal && selectedInventario._id !== ""} onClose={() => { setShowModal(false); setSelectedInvetario(distribuidorMock); }} className='!w-3/4 md:!w-1/2 xl:!w-1/3'>

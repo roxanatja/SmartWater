@@ -95,7 +95,7 @@ const ComisionesEspecificos = () => {
                 <h2 className="text-blue_custom font-semibold p-6 pb-0 sticky top-0 z-30 bg-main-background">
                     Generar porcentaje específico
                 </h2>
-                <FormEspecificos onCancel={() => setShowMiniModal(false)} distribuidores={distribuidores} products={products} />
+                <FormEspecificos onCancel={() => setShowMiniModal(false)} distribuidores={distribuidores.filter(d => d.role === 'user')} products={products} />
             </Modal>
 
             <Modal isOpen={showModal && selectedInventario._id !== ""} onClose={() => { setShowModal(false); setSelectedInvetario(especificoMock); }} className='!w-3/4 md:!w-2/3'>

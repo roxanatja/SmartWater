@@ -5,6 +5,7 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.6",
     "@googlemaps/markerclusterer": "^2.5.3",
+    "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "github:react-hook-form/resolvers",
     "@pdfme/common": "^5.2.16",
     "@pdfme/generator": "^5.2.16",
