@@ -28,16 +28,24 @@ const NotificationBlock = ({ notification, markAsRead }: Props) => {
         <div className={`border rounded-[10px] font-normal text-font-color px-3 py-3 flex flex-col gap-1.5 ${notification.read ? "opacity-65 border-font-color/25" : "border-2 font-[500] border-font-color/60"}`}
             onClick={() => markAsRead(notification._id)}>
             <p className='text-sm font-[500]'>{notification.title}</p>
-            <p className='text-xs'>{notification.message}</p>
 
             {
                 (notification.type === 'claim' && client) &&
-                <p className='text-xs'><strong>Cliente: </strong>{client.fullName}</p>
+                <>
+                    <p className='text-xs'>{notification.message}</p>
+                    <p className='text-xs'><strong>Cliente: </strong>{client.fullName}</p>
+                </>
             }
 
             {
                 notification.type === 'disconnected' &&
                 <>
+                    {
+                        notification.message.includes("se ha desconectado") ?
+                            <p className='text-xs'>{notification.message}</p> :
+                            <p className='text-xs'><strong>Desconectado: </strong>{notification.message}</p>
+                    }
+                    <p className='text-xs'><strong>Fecha y hora de desconexión: </strong>{formatDateTime((notification.data as DisconnectedData).disconnectInfo.timestamp, 'numeric', '2-digit', '2-digit', true, true)}</p>
                     <p className='text-xs'><strong>Dentro del horario laboral: </strong>{(notification.data as DisconnectedData).isWithinSchedule ? "Sí" : "No"}</p>
 
                     {

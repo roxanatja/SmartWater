@@ -54,8 +54,8 @@ const ShowInitialBalancesModal = ({ elements, onCancel }: Props) => {
                     {
                         selectedBalance.saldo.map(s =>
                             <div className="flex justify-between w-full" key={s.elementId}>
-                                <p>{s.product ? s.product.name : s.item ? s.item.name : "Producto desconocido"}</p>
-                                <p>{s.initialBalance || 0}</p>
+                                <p className='flex-[2]'>{s.product ? s.product.name : s.item ? s.item.name : "Producto desconocido"}</p>
+                                <p className='flex-[1]'>{s.initialBalance || 0}</p>
                             </div>
                         )
                     }

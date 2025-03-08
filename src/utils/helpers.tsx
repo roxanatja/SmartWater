@@ -11,7 +11,7 @@ export const formatDateTime = (date: string, year: Intl.DateTimeFormatOptions['y
     const options: Intl.DateTimeFormatOptions = { year, month, day };
 
     if (addTime) {
-        options.hour12 = true
+        options.hour12 = false
         options.hour = '2-digit'
         options.minute = '2-digit'
     }
